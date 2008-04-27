@@ -188,11 +188,6 @@ rm -v drivers/media/video/dabfirmware.h
 clean_kconfig ./drivers/media/Kconfig 'USB_DABUSB'
 sed -i '/(CONFIG_USB_DABUSB)/d' ./drivers/media/video/Makefile
 
-# USB_SN9C102 - USB SN9C1xx PC Camera Controller support
-rm -v drivers/media/video/sn9c102/*
-sed -i '/source "drivers\/media\/video\/sn9c102\/Kconfig"/d' drivers/media/video/Kconfig
-sed -i '/(CONFIG_USB_SN9C102)/d' ./drivers/media/video/Makefile
-
 # video/usbvideo
 
 # USB_IBMCAM - USB IBM (Xirlink) C-it Camera support
