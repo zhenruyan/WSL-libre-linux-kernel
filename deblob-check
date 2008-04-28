@@ -1140,7 +1140,7 @@ set_except () {
     oprepline '#define AR5K_RATES_11G '
     oprepline '#define AR5K_RATES_TURBO '
     oprepline '#define AR5K_RATES_XR '
-    initnc 'static const struct ath5k_ini_mode rf2413_ini_mode_end\[\] ='
+    initnc 'static const struct ath5k_ini_mode rf24\(13\|25\)_ini_mode_end\[\] ='
     # git logs
     accept '   sudo modprobe ath5k debug=0x00000400[\n][ 	]*[\n]\([ 	]*Band[^\n]*[\n]\([ 	]*\(\(channels\|rates\):\|[- 	0-9a-f]*\|\[\.\.\. etc \]\)[\n]\)\+\)\+       540 000c 0000 0000'
     oprepline '	{ 1, MODULATION_XR, 3000, 1, 150, 3 },'
