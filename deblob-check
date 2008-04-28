@@ -499,7 +499,7 @@ set_except () {
   }
 
   case /$1 in
-  */linux*.tar* | */kernel*.tar* | */linux-*.*.*/*)
+  */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
     # false alarms, contain source
     # drivers/net/wan/wanxlfw.inc_shipped -> wanxlfw.S
     accept 'static u8 firmware\[\]={[\n]0x60,\(0x00,\)*0x16,\(0x00,\)*\([\n]\(0x[0-9A-F][0-9A-F],\)*\)*[\n]0x23,0xFC,0x00,0x00,0x00,0x01,0xFF,0xF9,0x00,0xD4,0x61,0x00,0x06,0x74,0x33,0xFC,\([\n]\(0x[0-9A-F][0-9A-F],\)*\)*0x00[\n]};'
@@ -591,10 +591,41 @@ set_except () {
     # drivers/media/video/saa7114.c
     initc 'static const unsigned char init\[\] = {[^;]*MODE=0 ;.*SAA_7114_NTSC_HSYNC_START'
 
+    # new in 2.6.25
+    accept "%canned_values = ([\\n]	\\([0-9]\\+ => \\[[ 	\\n]\\+\\(\\([0-9]\\+\\|'0x[0-9a-f]\\+'\\),[ 	\\n]*\\)*\\]\\(, \\|[\\n]\\)\\)*);"
+
+    # from 2.6.25-rc* patches
+    initnc '	int bcomm_irq\[3\*16\] ='
+    initnc '	static const int8 countLeadingZerosHigh\[\] ='
+    initnc 'static struct nic_qp_map nic_qp_mapping_[01]\[\] ='
+    initnc 'static struct regval ov_initvals\[\] ='
+    initnc 'static struct regval stk1125_initvals\[\] ='
+    initnc 'static u8 bnx2x_stats_len_arr\[BNX2X_NUM_STATS\] ='
+    initnc 'static const struct arb_line read_arb_data\[NUM_RD_Q\]\[MAX_RD_ORD + 1\] ='
+    initnc 'static const struct arb_line write_arb_data\[NUM_WR_Q\]\[MAX_WR_ORD + 1\] ='
+    oprepline '#define AR5K_RATES_11A '
+    oprepline '#define AR5K_RATES_11B '
+    oprepline '#define AR5K_RATES_11G '
+    oprepline '#define AR5K_RATES_TURBO '
+    oprepline '#define AR5K_RATES_XR '
+    initnc '		} blinkrates\[\] ='
+    initnc 'static const struct ath5k_ini ar5212_ini\[\] ='
+    initnc 'static const struct ath5k_ini_mode rf5413_ini_mode_end\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5111\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5112\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5112a\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5413\[\] ='
+    initnc 'const u\(8\|16\|32\) b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\] ='
+
     # quite suspicious
     # arch/parisc/kernel/perf_images.h
     initc 'static uint32_t onyx_images\[\]\[PCXU_IMAGE_SIZE\/sizeof(uint32_t)\] __read_mostly ='
     initc 'static uint32_t cuda_images\[\]\[PCXW_IMAGE_SIZE\/sizeof(uint32_t)\] __read_mostly ='
+
+    # These are regarded as ok
+    initnc 'static const u8 SN9C102_\(Y\|UV\)_QTABLE[01]\[64\] = {'
+    initnc '	static const u8 jpeg_header\[589\] = {'
+    accept '[	]\{1,2\}err = sn9c102_write_const_regs(cam\(,[ 	\n]\+{0x[0-9a-fA-F][0-9a-fA-F], 0x[0-9a-fA-F][0-9a-fA-F]}\)*);'
 
     # too lax?
     initnc 'static yyconst flex_int\(16\|32\)_t yy_[^[]*\[[][0-9]*\] ='
@@ -867,7 +898,7 @@ set_except () {
     initnc 'static struct hash_testvec wp256_tv_template\[\] ='
     initnc 'static struct hash_testvec wp384_tv_template\[\] ='
     initnc 'static struct hash_testvec wp512_tv_template\[\] ='
-    initnc 'static struct iwl_tx_power power_gain_table\[2\]\[IWL_MAX_GAIN_ENTRIES\] ='
+    initnc 'static struct iwl\(3945\)\?_tx_power power_gain_table\[2\]\[IWL_MAX_GAIN_ENTRIES\] ='
     initnc 'static struct ovcamchip_regvals regvals_init_\(76be\|7[16]20\|7x10\)\[\] ='
     initnc 'static struct regval_list ov7670_default_regs\[\] ='
     initnc 'static struct s_c2 SetRate48000\[\] ='
@@ -1064,13 +1095,18 @@ set_except () {
     accept '		'"'"'0x[^\n]*[\n]\([^\n]*[\n]\)*	\]\(, [0-9]\+ => \[\)\?'"$eol"
     initnc 'const u\(8\|16\|32\) b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\] ='
     ;;
-  */nouveau-drm.patch)
+  */nouveau-drm*.patch)
     initnc '\(static uint32_t\|}\) nv04_graph_ctx_regs \[\] ='
     initnc 'static int nv10_graph_ctx_regs \[\] ='
-    # this is highly suspicious, but it does not look like the
-    # developers are trying to stop anyone from modifying it,
-    # they just grabbed these numbers from mmio interactions.
-    initnc 'static uint32_t nv\(4[013467ace]\|49_4b\|8[46]\)_ctx_voodoo\[\] ='
+
+    # Although the developers of the drivers are not trying to stop
+    # anyone from modifying it or understanding it, they acknowledge
+    # these are bits of code, obtained through mmio interactions.
+    # This means these blobs are not source code, AND original authors
+    # of the blobs have power to stop others from modifying them.
+    # Non-Free software, for sure.
+
+    # initnc 'static uint32_t nv\(4[013467ace]\|49_4b\|8[46]\)_ctx_\(voodoo\|prog\)\[\] ='
     ;;
   */linux-2.6-lirc.patch)
     initnc 'const unsigned char map_table\[\] ='
@@ -1745,7 +1781,8 @@ check () {
   # Extract or otherwise munge...
   case $input in
   *.tar*)
-    cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'";;
+    cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'"
+    ;;
   *patch* | *diff*)
     sedpatch='
       /^[-]/d;
@@ -1758,12 +1795,21 @@ check () {
 	s/$/*\/;/;
       };
       s/^[ +]//;'
-    cmd='sed "$sedpatch"' ;;
+    cmd='sed "$sedpatch"'
+    ;;
   *)
-    cmd='cat' ;;
+    cmd='cat'
+    ;;
   esac
   cmd="{ echo \";/*begin $input*/;\"; $cmd; echo \";/*end $input*/;\"; }"
   set "$@" "$cmd"
+
+  case $input in
+  *.tar*)
+    cmd="{ cat; cat > /dev/null; }"
+    set "$@" "$cmd"
+    ;;
+  esac
 
   # Then run through the selected action.
   if test "$rm" != "rm -f" || test ! `echo "$sedmain" | wc -c` -lt 1024; then
