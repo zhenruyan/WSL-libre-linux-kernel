@@ -1,6 +1,7 @@
 #!/bin/sh
 #
 #    Copyright (C) 2008 Jeff Moe
+#    Copyright (C) 2008 Alexandre Oliva <lxoliva@fsfla.org>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,6 +30,12 @@
 #
 # Thanks to Brian Brazil @ gnewsense
 #
+
+# This version, suited for 2.6.25, avoids removing Free Software for
+# the sake of removing non-Free Software.  Drivers that currently
+# require non-Free firmware are retained, but firmware included in
+# GPLed sources is replaced with /*(DEBLOBBED)*/ if the deblob-check
+# script, that knows how to do this, is present.  -lxoliva
 
 ####################
 # FOOOOO XXXXXX
