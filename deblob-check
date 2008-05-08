@@ -195,6 +195,11 @@
 
 # Yeah, lots of stuff to do.  Want to help?
 
+# This makes it much faster, and mostly immune to non-ASCII stuff, as
+# long as a 8-bit-safe sed is used.  Probably a safe assumption these
+# days.
+case ${LANG+set} in set) LANG=C; export LANG;; esac
+
 rm="rm -f"
 case $1 in
 --save-scripts | -S)
@@ -598,6 +603,10 @@ set_except () {
     initnc '	static const unsigned char invert5\[\] ='
     initnc 'static unsigned char alpa2target\[\] ='
     initnc 'static unsigned char target2alpa\[\] ='
+    oprepline '#define INIT_THREAD [{0},]\+[ 	]*\\[ 	]*[{0},]\+'
+    initnc 'static uint tas300\(1c\|4\)_\(master\|mixer\|treble\|bass\)_tab\[\]='
+    initnc 'static short dmasound_[au]law2dma16\[\] ='
+    initnc 'static const unsigned short DACVolTable\[101\] ='
 
     # new in 2.6.25
     accept "%canned_values = ([\\n]	\\([0-9]\\+ => \\[[ 	\\n]\\+\\(\\([0-9]\\+\\|'0x[0-9a-f]\\+'\\),[ 	\\n]*\\)*\\]\\(, \\|[\\n]\\)\\)*);"
@@ -637,7 +646,7 @@ set_except () {
 
     # too lax?
     initnc 'static yyconst flex_int\(16\|32\)_t yy_[^[]*\[[][0-9]*\] ='
-    initnc 'static const yytype_u\?int\(8\|16\) yy[^[]*\[\] ='
+    initnc 'static const \(yytype_u\?int\(8\|16\)\|unsigned \(short\( int\)\?\|char\)\) yy[^[]*\[\] ='
     initnc '\(\|	\)static \(const \|\)\(unsigned \(short\|char\)\|struct SiS_[^ ]*\) SiS[^[]*\(\[[] [*0-9]*\]\)\+ *='
 
     initnc 'static const a3d_Hrtf_t A3dHrirZeros = {'
