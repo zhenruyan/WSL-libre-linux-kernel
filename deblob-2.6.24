@@ -313,7 +313,7 @@ patch --no-backup-if-mismatch -p0 <<\EOF # patches/linux-2.6-tg3-clean.patch
  
 EOF
 clean_blob drivers/net/tg3.c
- 
+sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/tg3.c 
 
 # TYPHOON - 3cr990 series Typhoon
 clean_blob drivers/net/typhoon-firmware.h
