@@ -504,6 +504,14 @@ set_except () {
   }
 
   case /$1 in
+  /drivers/net/tg3.c)
+    # This file contains firmwares that we deblob with high
+    # sensitivity, so make sure the sequences of numbers that are not
+    # blobs are not deblobbed.  FIXME: we should have patterns to
+    # recognize the blobs instead.
+    initnc '	static const u32 test_pat\[4\]\[6\] ='
+    initnc '	}, mem_tbl_5705\[\] ='
+    ;;
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
     # false alarms, contain source
     # drivers/net/wan/wanxlfw.inc_shipped -> wanxlfw.S

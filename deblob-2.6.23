@@ -32,11 +32,17 @@
 # Thanks to Brian Brazil @ gnewsense
 #
 
-# This version, suited for 2.6.25, avoids removing Free Software for
+# This version, suited for 2.6.23, avoids removing Free Software for
 # the sake of removing non-Free Software.  Drivers that currently
 # require non-Free firmware are retained, but firmware included in
 # GPLed sources is replaced with /*(DEBLOBBED)*/ if the deblob-check
 # script, that knows how to do this, is present.  -lxoliva
+
+# For each kver release, start extra with an empty string, then count
+# from 1 if changes are needed that require rebuilding the tarball.
+kver=2.6.23 extra=
+
+sed -i "s,^EXTRAVERSION.*,EXTRAVERSION = -libre$extra," Makefile
 
 ####################
 # FOOOOO XXXXXX
@@ -52,11 +58,15 @@ function clean_file {
 	rm -v $1
 }
 
+check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
 function clean_blob {
 	#$1 = filename
-	if test -f $0-check; then
-	    $0-check -d $1 > $1.deblob
-	    mv $1.deblob $1
+	if test -f $check; then
+	    name=$1
+	    set fnord "$@" -d
+	    shift 2
+	    $check "$@" $name > $name.deblob
+	    mv $name.deblob $name
 	else
 	    clean_file $1
 	fi
@@ -312,7 +322,7 @@ patch --no-backup-if-mismatch -p0 <<\EOF # patches/linux-2.6-tg3-clean.patch
  
  
 EOF
-clean_blob drivers/net/tg3.c
+clean_blob drivers/net/tg3.c -s 9
 sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/tg3.c 
 
 # TYPHOON - 3cr990 series Typhoon
