@@ -1144,7 +1144,7 @@ set_except () {
     oprepline '#define AR5K_RATES_TURBO '
     oprepline '#define AR5K_RATES_XR '
     initnc 'static const struct ath5k_ini ar5212_ini\[\] ='
-    initnc 'static const struct ath5k_ini_mode rf\(5413\|24\(13|25\)\)_ini_mode_end\[\] ='
+    initnc 'static const struct ath5k_ini_mode rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\] ='
     initnc '		} blinkrates\[\] ='
 
     # git logs
