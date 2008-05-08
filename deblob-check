@@ -591,6 +591,11 @@ set_except () {
     # drivers/media/video/saa7114.c
     initc 'static const unsigned char init\[\] = {[^;]*MODE=0 ;.*SAA_7114_NTSC_HSYNC_START'
 
+    # in 2.6.23 only
+    accept " Psize    Ipps       Tput     Rxint     Txint    Done     Ndone[\\n] ---------------------------------------------------------------\\([\\n][ 0-9]\\+\\)\\+$eol"
+    initnc 'static u_short ataplain_map\[NR_KEYS\] __initdata ='
+    initnc 'static RegInitializer initData\[\] __initdata ='
+
     # new in 2.6.25
     accept "%canned_values = ([\\n]	\\([0-9]\\+ => \\[[ 	\\n]\\+\\(\\([0-9]\\+\\|'0x[0-9a-f]\\+'\\),[ 	\\n]*\\)*\\]\\(, \\|[\\n]\\)\\)*);"
 
