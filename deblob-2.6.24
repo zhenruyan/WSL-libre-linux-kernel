@@ -40,7 +40,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.25 extra=
+kver=2.6.24 extra=1
 
 sed -i "s,^EXTRAVERSION.*,EXTRAVERSION = -libre$extra," Makefile
 
@@ -66,6 +66,7 @@ function clean_blob {
 	    set fnord "$@" -d
 	    shift 2
 	    $check "$@" $name > $name.deblob
+	    cmp $name.deblob $name || exit 1
 	    mv $name.deblob $name
 	else
 	    clean_file $1
@@ -88,6 +89,7 @@ function clean_mk {
 function clean_ifdef {
 	#$1 = filename $2 = macro to -U
 	unifdef $1 -U$2 > $1.deblob
+	cmp $name.deblob $name || exit 1
 	mv $1.deblob $1
 }
 
