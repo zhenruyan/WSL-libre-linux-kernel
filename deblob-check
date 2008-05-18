@@ -473,34 +473,40 @@ fi
 set_except () {
   # Look for a multi-line definition starting with a line that matches
   # $1 (implicitly anchored to the beginning of the line), and ending
-  # at the first ';'.
+  # at the first ';'.  $2 may optionally name the files in which this
+  # match is to be disregarded as a potential blob.
   initnc () {
-    addx "$1[^;]*;"
+    addx "$1[^;]*;\\?" $2
   }
 
   # Look for a multi-line definition starting with a line that matches
   # $1 (implicitly anchored to the beginning of the line), and ending
   # at the first ';' that's not within comments.
   initc () {
-    addx "$1\\([^;]*\\|$comment\\)*;"
+    addx "$1\\([^;]*\\|$comment\\)*;\\?" $2
   }
 
   # Accept as a non-blob an expression $1 that would have otherwise
   # triggered blob detection.  The expression must end in a way that
   # would trigger the blob detection machinery.
   accept () {
-    addx "$1"
+    addx "$1" $2
   }
 
   # Match up to the end a comment started in $1.
   ocomment () {
-    addx "$1\\([^*]\\|[*][*]*[^*/]\\|[*]*[\\n]\\)*[*]*[*][/]"
+    addx "$1\\([^*]\\|[*][*]*[^*/]\\|[*]*[\\n]\\)*[*]*[*][/]" $2
   }
 
   # Match $1 followed by backslash-terminated lines and a last
   # non-backslash-terminated line.
   oprepline () {
-    addx "$1\\([^\\n]*\\\\[\\n]\\)*[^\\n\\\\]*$eol"
+    addx "$1\\([^\\n]*\\\\[\\n]\\)*[^\\n\\\\]*$eol" $2
+  }
+
+  # Match $1 in $2 as a blob.  Not implemented yet.
+  blob () {
+    :
   }
 
   case /$1 in
@@ -531,8 +537,7 @@ set_except () {
     initnc '	\.initial_reg_values	= (struct ixp2000_reg_value \[\]) {'
     # drivers/net/ixp2000/ixp2400_rx.ucode -> ixp2400_rx.uc
     initnc '	\.initial_reg_values	= (struct ixp2000_reg_value \[\]) {'
-    # crypto/tcrypt.h
-    initnc '[ 	]*\.\(digest\|entries\|input\|key\|output\|plaintext\|result\)[ 	]*= {'
+    initnc '[ 	]*\.\(digest\|entries\|input\|key\|output\|plaintext\|result\)[ 	]*= [{"]' crypto/tcrypt.h
 
     # checked:
 
@@ -828,7 +833,7 @@ set_except () {
     initnc 'static const u32 treble_table\[41\]\[5\] ='
     initnc 'static const u64 [CT][0-7]\[256\] ='
     initnc 'static const u64 sbox[1-4]\[256\] ='
-    initnc 'static const u64 sha512_K\[80\] ='
+    initnc 'static const u64 sha512_K\[80\] =' 'crypto/sha512\(_generic\)\?.c'
     initnc 'static const u8 Tr\[4\]\[8\] ='
     initnc 'static const u8 aes_sbox\[256\] ='
     initnc 'static const u8 calc_sb_tbl\[512\] ='
@@ -910,9 +915,9 @@ set_except () {
     initnc 'static struct cipher_testvec xtea_dec_tv_template\[\] ='
     initnc 'static struct cipher_testvec xtea_enc_tv_template\[\] ='
     initnc 'static struct comp_testvec deflate_decomp_tv_template\[\] ='
-    initnc 'static struct hash_testvec aes_xcbc128_tv_template\[\] ='
+    initnc 'static struct hash_testvec aes_xcbc128_tv_template\[\] =' crypto/tcrypt.h
     initnc 'static struct hash_testvec crc32c_tv_template\[\] ='
-    initnc 'static struct hash_testvec hmac_sha256_tv_template\[\] ='
+    initnc 'static struct hash_testvec hmac_sha256_tv_template\[\] =' crypto/tcrypt.h
     initnc 'static struct hash_testvec sha256_tv_template\[\] ='
     initnc 'static struct hash_testvec sha384_tv_template\[\] ='
     initnc 'static struct hash_testvec sha512_tv_template\[\] ='
@@ -951,8 +956,10 @@ set_except () {
     initnc 'static u8 ini_time_value\[\]\[8\] ='
     initnc 'static u8 init_tab \[\] ='
     initnc 'static u8 mac_reader\[\] ='
-    initnc 'static u8 mt2131_config1\[\] ='
-    initnc 'static u8 mt2266_init2\[\] ='
+    initnc 'static u8 mt2131_config1\[\] =' drivers/media/dvb/frontends/mt2131.c # <= 2.6.25
+    initnc 'static u8 mt2131_config1\[\] =' drivers/media/common/tuners/mt2131.c # >= 2.6.26
+    initnc 'static u8 mt2266_init2\[\] =' drivers/media/dvb/frontends/mt2266.c # <= 2.6.25
+    initnc 'static u8 mt2266_init2\[\] =' drivers/media/common/tuners/mt2266.c # >= 2.6.26
     initnc 'static u8 opera1_inittab\[\] ='
     initnc 'static u8 rco_time_value\[\]\[8\] ='
     initnc 'static u8 saa7113_init_regs\[\] ='
@@ -1056,8 +1063,8 @@ set_except () {
     initnc 'u_short shift_ctrl_map\[NR_KEYS\] ='
     initnc 'u_short shift_map\[NR_KEYS\] *='
     initnc 'uint patch_2[0f]00\[\] ='
-    initnc 'uint16_t e1000_igp_cable_length_table\[IGP01E1000_AGC_LENGTH_TABLE_SIZE\] ='
-    initnc 'uint16_t e1000_igp_2_cable_length_table\[IGP02E1000_AGC_LENGTH_TABLE_SIZE\] ='
+    initnc '\(uint16_t\|u16\) e1000_igp_cable_length_table\[IGP01E1000_AGC_LENGTH_TABLE_SIZE\] =' drivers/net/e1000/e1000_hw.c # u16 on 2.6.26
+    initnc '\(uint16_t\|u16\) e1000_igp_2_cable_length_table\[IGP02E1000_AGC_LENGTH_TABLE_SIZE\] =' drivers/net/e1000/e1000_hw.c # u16 on 2.6.26
     initnc '} euc2sjisibm_jisx0212_map\[\] ='
     initnc '} freq\[\] ='
     initnc '} hps_h_coeff_tab \[\] ='
@@ -1066,12 +1073,49 @@ set_except () {
     initnc '} maven_gamma\[\] ='
     initnc '} mem_table\[\] ='
     initnc '} mxb_saa7740_init\[\] ='
-    initnc '} pll_table\[\] ='
+    initnc '} pll_table\[\] =' drivers/video/geode/lxfb_ops.c
     initnc '} qam256_snr_tab\[\] ='
     initnc '} qam64_snr_tab\[\] ='
     initnc '} sil_port\[\] ='
     initnc '} vsb_snr_tab\[\] ='
     initnc '} yss225_registers\[\] __devinitdata ='
+    ;;
+  */patch*2.6.26-rc*)
+    initnc 'static u64 vec2off\[68\] =' arch/ia64/kvm/process.c
+    initnc "			interrupts = <\\(0x\\)\\?3 \\(0x\\)\\?0 \\(0x\\)\\?0  $blobpat*>;" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
+    initnc 'static const u32 crctab32\[\] =' arch/x86/boot/tools/build.c
+    initnc 'static const u64 sha512_K\[80\] =' 'crypto/sha512\(_generic\)\?.c'
+    initnc 'static struct hash_testvec \(hmac_sha\(224\|256\)\|aes_xcbc128\|crc32c\)_tv_template\[\] =' crypto/tcrypt.h
+    initnc 'static struct cipher_testvec \(bf_cbc\|serpent\|tnepres\|aes\(_\(cbc\|ctr\|xts\)\)\?\|x\?tea\|anubis\(_cbc\)\?\|xeta\|camellia_cbc\|cts_mode\)_\(enc\|dec\)_tv_template\[\] =' crypto/tcrypt.h
+    initnc '		\.\(digest\|entries\|input\|key\|output\|plaintext\|result\)[ 	]*= [{"]' crypto/tcrypt.h
+    initnc 'static const u8 speedtab \[3\]\[12\] =' drivers/ide/legacy/umc8672.c
+    initnc 'static u8 cvs_time_value\[\]\[XFER_UDMA_6 - XFER_UDMA_0 + 1\] =' drivers/ide/pci/sis5513.c
+    initnc 'static u8 \(ini\|act\|rco\)_time_value\[\]\[8\] =' drivers/ide/pci/sis5513.c
+    initnc 'static u8 mt2131_config1\[\] =' drivers/media/common/tuners/mt2131.c
+    initnc 'static u8 mt2266_init2\[\] =' drivers/media/common/tuners/mt2266.c
+    initnc 'u16 e1000_igp_cable_length_table\[IGP01E1000_AGC_LENGTH_TABLE_SIZE\] =' drivers/net/e1000/e1000_hw.c
+    initnc '\(uint16_t\|u16\) e1000_igp_2_cable_length_table\[IGP02E1000_AGC_LENGTH_TABLE_SIZE\] =' drivers/net/e1000/e1000_hw.c # u16 on 2.6.26
+    oprepline '#define AR5K_RATES_11[ABG] ' drivers/net/wireless/ath5k/ath5k.h
+    oprepline '	{ 1, MODULATION_XR, 1000, 2, 139, 1 },	' drivers/net/wireless/ath5k/ath5k.h
+    initnc 'static const struct ath5k_ini_mode rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c
+    initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =[*][/];' scripts/kconfig/zconf.tab.c_shipped
+    initnc 'static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =' scripts/kconfig/zconf.tab.c_shipped
+    # new in 2.6.26
+    initnc 'static struct mse2snr_tab \(vsb\|qam\(64\|256\)\)_mse2snr_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} \(VSB\|QAM\)_mod_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} itd1000_\(lpf_pga\|fre_values\)\[\] =' drivers/media/dvb/frontends/itd1000.c
+    initnc '} \(vsb\|qam\(64\|256\)\)_snr_tab\[\] =' drivers/media/dvb/frontends/s5h1411.c
+    initnc '} snr_tab\[\] =' drivers/media/dvb/frontends/tda10048.c
+    initnc '	static const u8 biphase_tbl\[\] =' drivers/media/video/cx18/cx18-av-vbi.c
+    initnc '	static const u8 mpeg_hdr_data\[\] =' drivers/media/video/cx18/cx18-vbi.c
+    initnc 'static u32 reg_init_initialize\[\] =' drivers/media/video/saa717x.c
+    initnc '	} vals\[\] =' drivers/media/video/saa717x.c
+    initnc 'static const u32 \(main\|gear\)_seedset\[BACKOFF_SEEDSET_ROWS\]\[BACKOFF_SEEDSET_LFSRS\] =' drivers/net/forcedeth.c
+    blob '^unsigned char \(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\) = '"$blobsep$blobseq*$blobsep;" drivers/s390/net/qeth_core_mpc.c # from drivers/s390/net/qeth_mpc.c in 2.6.25
+    initnc '} pll_table\[\] =' drivers/video/geode/lxfb_ops.c
+    accept "  { 0x00014284,  19688 },[\n]  { 0x00011104,  20400 },[\n]  { $blobpat* }," drivers/video/geode/lxfb_ops.c # won't be necessary in rc3
+    initnc 'static const u16 wm9713_reg\[\] =' sound/soc/codecs/wm9713.c
+    accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_blackfin_clut224.ppm
     ;;
   */patch*2.6.25-rc*)
     initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static uchar sbox\[8\]\[4\]\[16\] = {[*][/];'
@@ -1094,14 +1138,9 @@ set_except () {
     initnc 'static const struct arb_line write_arb_data\[NUM_WR_Q\]\[MAX_WR_ORD + 1\] ='
     initnc 'uint16_t e1000_igp_cable_length_table\[IGP01E1000_AGC_LENGTH_TABLE_SIZE\] ='
     initnc 'uint16_t e1000_igp_2_cable_length_table\[IGP02E1000_AGC_LENGTH_TABLE_SIZE\] ='
-    oprepline '#define AR5K_RATES_11A '
-    oprepline '#define AR5K_RATES_11B '
-    oprepline '#define AR5K_RATES_11G '
-    oprepline '#define AR5K_RATES_TURBO '
-    oprepline '#define AR5K_RATES_XR '
+    oprepline '#define AR5K_RATES_11\([ABG]\|TURBO\|XR\) ' drivers/net/wireless/ath5k/ath5k.h
     initnc '		} blinkrates\[\] ='
     initnc 'static const struct ath5k_ini ar5212_ini\[\] ='
-    initnc 'static const struct ath5k_ini_mode rf5413_ini_mode_end\[\] ='
     initnc 'static const struct ath5k_ini_rf rfregs_5111\[\] ='
     initnc 'static const struct ath5k_ini_rf rfregs_5112\[\] ='
     initnc 'static const struct ath5k_ini_rf rfregs_5112a\[\] ='
@@ -1172,7 +1211,7 @@ set_except () {
     oprepline '#define AR5K_RATES_TURBO '
     oprepline '#define AR5K_RATES_XR '
     initnc 'static const struct ath5k_ini ar5212_ini\[\] ='
-    initnc 'static const struct ath5k_ini_mode rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\] ='
+    initnc 'static const struct ath5k_ini_mode rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c # ?
     initnc '		} blinkrates\[\] ='
 
     # git logs
@@ -1783,8 +1822,10 @@ check () {
   falsepos_name=`mktemp -t deblob-check-falsepos-XXXXXX`
   tempfiles="$falsepos_name"
 
-  # Add $1 to falsepos.  Its usage makes it implicitly anchored to
-  # the beginning of the line.
+
+  # Add $1 to falsepos.  Its usage makes it implicitly anchored to the
+  # beginning of the line.  $2, if present, will some day narrow the
+  # falsepos matches to files that match it.
   addx () {
     if test -n "$1"; then
       echo -n "\\|$1" >> $falsepos_name
