@@ -163,14 +163,16 @@ echo Deblobbing within linux-$kver-$libre
 (cd linux-$kver-$libre && /bin/sh ../$deblob)
 rm -f linux-$kver-$libre.patch
 
+cp $0 $deblob deblob-check linux-$kver-$libre
+
 echo Generating linux-$kver-$libre.patch
 diff -druN linux-$kver linux-$kver-$libre > linux-$kver-$libre.patch
 
 echo Removing removed or modified files from linux-$kver-$libre.tar
 diff -rq linux-$kver linux-$kver-$libre |
 sed -n "
-  s,^Only in \(linux-$kver/.*\): \(.*\),\1/\2,p;
-  s,^Files \(linux-$kver/.*\) and libre-\1 differ,\1,p;
+  s,^Only in \(linux-$kver/\?.*\): \(.*\),\1/\2,p;
+  s,^Files \(linux-$kver\)/\(.*\) and \1-$libre/\2 differ,\1/\2,p;
 " |
 xargs tar --delete -f linux-$kver-$libre.tar
 
@@ -181,7 +183,7 @@ mv linux-$kver-$libre linux-$kver
 diff -rq orig-linux-$kver linux-$kver |
 sed -n "
   s,^Files orig-\(linux-$kver/.*\) and \1 differ,\1,p;
-  s,^Only in \(linux-$kver/.*\): \(.*\),\1/\2,p;
+  s,^Only in \(linux-$kver/?.*\): \(.*\),\1/\2,p;
 " |
 xargs tar --append -f linux-$kver-$libre.tar
 
@@ -191,15 +193,18 @@ rm -rf linux-$kver orig-linux-$kver
 echo Creating xdelta between linux-$kver.tar and linux-$kver-$libre.tar
 xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta
 
-echo Compressing linux-$kver-$libre.tar
+echo Compressing linux-$kver-$libre.tar and linux-$kver-$libre.xdelta
 rm -f linux-$kver.tar
-bzip2 -9 linux-$kver-$libre.tar
+bzip2 -9 linux-$kver-$libre.tar linux-$kver-$libre.xdelta
 
 trap "status=$?; (exit $status); exit" 0 1 2 15
 
 echo Done except for signing, feel free to interrupt
 gpg -a --detach-sign linux-$kver-$libre.tar.bz2
 mv linux-$kver-$libre.tar.bz2.asc linux-$kver-$libre.tar.bz2.sign
+
+gpg -a --detach-sign linux-$kver-$libre.xdelta.bz2
+mv linux-$kver-$libre.xdelta.bz2.asc linux-$kver-$libre.xdelta.bz2.sign
 
 echo All set, please review linux-$kver-$libre.patch
 
