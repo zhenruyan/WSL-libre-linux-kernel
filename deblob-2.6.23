@@ -59,7 +59,7 @@ function clean_file {
 }
 
 function check_changed {
-	if cmp $1.deblob $1; then
+	if cmp $1.deblob $1 > /dev/null; then
 		echo $1 did not change, something is wrong >&2
 		exit 1
 	fi
