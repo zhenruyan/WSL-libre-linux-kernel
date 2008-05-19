@@ -616,7 +616,7 @@ set_except () {
     initnc '	static const unsigned char invert5\[\] ='
     initnc 'static unsigned char alpa2target\[\] ='
     initnc 'static unsigned char target2alpa\[\] ='
-    oprepline '#define INIT_THREAD [{0},]\+[ 	]*\\[ 	]*[{0},]\+'
+    oprepline '#define INIT_THREAD [{0},]\+[ 	]*\\[\n][ 	]*[{0},]\+'
     initnc 'static uint tas300\(1c\|4\)_\(master\|mixer\|treble\|bass\)_tab\[\]='
     initnc 'static short dmasound_[au]law2dma16\[\] ='
     initnc 'static const unsigned short DACVolTable\[101\] ='
@@ -658,8 +658,8 @@ set_except () {
     accept '[	]\{1,2\}err = sn9c102_write_const_regs(cam\(,[ 	\n]\+{0x[0-9a-fA-F][0-9a-fA-F], 0x[0-9a-fA-F][0-9a-fA-F]}\)*);'
 
     # too lax?
-    initnc 'static yyconst flex_int\(16\|32\)_t yy_[^[]*\[[][0-9]*\] ='
-    initnc 'static const \(yytype_u\?int\(8\|16\)\|unsigned \(short\( int\)\?\|char\)\) yy[^[]*\[\] ='
+    initnc 'static yyconst \(flex_int\(16\|32\)_t\|\(\(short \)\?int\)\) yy_[^[]*\[[][0-9]*\] ='
+    initnc 'static const \(yytype_u\?int\(8\|16\)\|\(unsigned \)\?\(short\( int\)\?\|char\)\) yy[^[]*\[\] ='
     initnc '\(\|	\)static \(const \|\)\(unsigned \(short\|char\)\|struct SiS_[^ ]*\) SiS[^[]*\(\[[] [*0-9]*\]\)\+ *='
 
     initnc 'static const a3d_Hrtf_t A3dHrirZeros = {'
