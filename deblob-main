@@ -157,7 +157,7 @@ echo Extracing linux-$kver.tar into linux-$kver
 tar -xf linux-$kver.tar
 rm -rf linux-$kver-$libre linux-$kver-$libre.tar
 
-echo Copying linux-$kver to linux-$kver-$libre.tar
+echo Copying linux-$kver to linux-$kver-$libre
 cp linux-$kver.tar linux-$kver-$libre.tar
 cp -lR linux-$kver/. linux-$kver-$libre
 
@@ -168,7 +168,7 @@ rm -f linux-$kver-$libre.patch
 cp $0 $deblob deblob-check linux-$kver-$libre
 
 echo Generating linux-$kver-$libre.patch
-diff -druN linux-$kver linux-$kver-$libre > linux-$kver-$libre.patch
+diff -druN linux-$kver linux-$kver-$libre > linux-$kver-$libre.patch || :
 
 echo Removing removed or modified files from linux-$kver-$libre.tar
 diff -rq linux-$kver linux-$kver-$libre |
