@@ -63,7 +63,7 @@ function check_changed {
 		echo $1 did not change, something is wrong >&2
 		exit 1
 	fi
-	mv $1.deblobbed $1
+	mv $1.deblob $1
 }
 
 check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
