@@ -84,7 +84,7 @@ function clean_blob {
 function clean_kconfig {
         #$1 = filename $2 = things to remove
         echo Marking config $2 as depending on NONFREE in $1
-	sed "/^config $2\$/{p;i\
+	sed "/^config \($2\)\$/{p;i\
 	depends on NONFREE
 d;}" $1 > $1.deblob
 	check_changed $1
@@ -302,7 +302,7 @@ clean_mk CONFIG_BNX2 drivers/net/Makefile
 
 clean_blob drivers/net/bnx2x_init_values.h
 clean_kconfig drivers/net/Kconfig 'BNX2X'
-clean_mk CONFIG_BNX2X divers/net/Makefile
+clean_mk CONFIG_BNX2X drivers/net/Makefile
 
 # CASSINI - Sun Cassini
 clean_blob drivers/net/cassini.h
@@ -360,7 +360,7 @@ clean_mk CONFIG_TYPHOON drivers/net/Makefile
 # clean_blob drivers/net/appletalk/cops.h
 clean_blob drivers/net/appletalk/cops_ffdrv.h
 clean_blob drivers/net/appletalk/cops_ltdrv.h
-clean_kconfig drivers/net/appletalk/Kconfig 'COPS|COPS_DAYNA|COPS_TANGENT'
+clean_kconfig drivers/net/appletalk/Kconfig 'COPS'
 clean_mk CONFIG_COPS drivers/net/appletalk/Makefile
 
 # hamradio
