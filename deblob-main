@@ -165,7 +165,8 @@ echo Deblobbing within linux-$kver-$libre
 (cd linux-$kver-$libre && /bin/sh ../$deblob) || exit 1
 rm -f linux-$kver-$libre.patch
 
-cp $0 $deblob deblob-check linux-$kver-$libre
+# Do not copy these scripts for now, deblob-check regards itself as a blog.
+# cp -p $0 $deblob deblob-check linux-$kver-$libre
 
 echo Generating linux-$kver-$libre.patch
 diff -druN linux-$kver linux-$kver-$libre > linux-$kver-$libre.patch || :
