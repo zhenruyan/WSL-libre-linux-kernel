@@ -272,10 +272,9 @@ clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 
 # disable -- appears to neeed other DVB bits
 clean_mk CONFIG_DVB_CORE drivers/media/Makefile
-clean_mk CONFIG_VIDEOBUF_DVB drivers/media/video/Makefile
 clean_mk CONFIG_VIDEO_SAA7134 drivers/media/video/Makefile
 clean_mk CONFIG_VIDEO_CX88 drivers/media/video/Makefile
-clean_kconfig drivers/media/Kconfig 'VIDEOBUF_DVB'
+clean_kconfig drivers/media/Kconfig 'DVB_CORE'
 
 #######################
 # Removed net Drivers #
