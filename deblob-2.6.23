@@ -274,7 +274,7 @@ clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 clean_mk CONFIG_DVB_CORE drivers/media/Makefile
 clean_mk CONFIG_VIDEO_SAA7134 drivers/media/video/Makefile
 clean_mk CONFIG_VIDEO_CX88 drivers/media/video/Makefile
-clean_kconfig drivers/media/Kconfig 'DVB_CORE'
+clean_kconfig drivers/media/dvb/dvb-core/Kconfig 'DVB_CORE'
 
 #######################
 # Removed net Drivers #
