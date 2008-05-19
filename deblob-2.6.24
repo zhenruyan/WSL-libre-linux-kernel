@@ -84,7 +84,7 @@ function clean_blob {
 function clean_kconfig {
         #$1 = filename $2 = things to remove
         echo Marking config $2 as depending on NONFREE in $1
-	sed "/^config \($2\)\$/{p;i\
+	sed "/^config \\($2\\)\$/{p;i\
 	depends on NONFREE
 d;}" $1 > $1.deblob
 	check_changed $1
@@ -93,9 +93,9 @@ d;}" $1 > $1.deblob
 function clean_mk {
 	#$1 = config $2 = Makefile name
 	# We don't clean up Makefiles any more --lxoliva
-	# sed -i "/($1)/d" $2
+	# sed -i "/\\($1\\)/d" $2
 	# check_changed $2
-	if sed -n "/($1)/p" $2 | grep . > /dev/null; then
+	if sed -n "/\\($1\\)/p" $2 | grep . > /dev/null; then
 	    :
 	else
 	    echo $2 does not contain matches for $1
