@@ -58,6 +58,14 @@ function clean_file {
 	rm -v $1
 }
 
+function check_changed {
+	if cmp $1.deblob $1; then
+		echo $1 did not change, something is wrong >&2
+		exit 1
+	fi
+	mv $1.deblobbed $1
+}
+
 check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
 function clean_blob {
 	#$1 = filename
@@ -66,8 +74,7 @@ function clean_blob {
 	    set fnord "$@" -d
 	    shift 2
 	    $check "$@" $name > $name.deblob
-	    cmp $name.deblob $name || exit 1
-	    mv $name.deblob $name
+	    check_changed $name
 	else
 	    clean_file $1
 	fi
@@ -75,9 +82,10 @@ function clean_blob {
 
 function clean_kconfig {
         #$1 = filename $2 = things to remove
-	sed -i "/^config $2\$/{p;i\
+	sed "/^config $2\$/{p;i\
 	depends on NONFREE
-d;}" $1
+d;}" $1 > $1.deblob
+	check_changed $1
 }
 
 function clean_mk {
@@ -89,8 +97,7 @@ function clean_mk {
 function clean_ifdef {
 	#$1 = filename $2 = macro to -U
 	unifdef $1 -U$2 > $1.deblob
-	cmp $name.deblob $name || exit 1
-	mv $1.deblob $1
+	check_changed $1
 }
 
 #######################
