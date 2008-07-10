@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-05-18
+# deblob-check version 2008-07-09
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
