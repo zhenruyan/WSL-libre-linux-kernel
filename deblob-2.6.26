@@ -32,7 +32,7 @@
 # Thanks to Brian Brazil @ gnewsense
 #
 
-# This version, suited for 2.6.25, avoids removing Free Software for
+# This version, suited for 2.6.26, avoids removing Free Software for
 # the sake of removing non-Free Software.  Drivers that currently
 # require non-Free firmware are retained, but firmware included in
 # GPLed sources is replaced with /*(DEBLOBBED)*/ if the deblob-check
@@ -63,11 +63,18 @@ fi
 
 function clean_file {
 	#$1 = filename
+	if test ! -f $1; then
+		echo $1 does not exist, something is wrong >&2
+		exit 1
+	fi
 	rm -v $1
 }
 
 function check_changed {
-	if cmp $1.deblob $1 > /dev/null; then
+	if test ! -f $1; then
+		echo $1 does not exist, something is wrong >&2
+		exit 1
+	elif cmp $1.deblob $1 > /dev/null; then
 		echo $1 did not change, something is wrong >&2
 		exit 1
 	fi
@@ -77,6 +84,10 @@ function check_changed {
 function clean_blob {
 	#$1 = filename
 	if $have_check; then
+	    if test ! -f $1; then
+		echo $1 does not exist, something is wrong >&2
+		exit 1
+	    fi
 	    name=$1
 	    echo Removing blobs from $name
 	    set fnord "$@" -d
