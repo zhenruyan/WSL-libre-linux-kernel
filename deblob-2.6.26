@@ -172,7 +172,7 @@ clean_kconfig drivers/char/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/char/drm/Makefile
 
 # DRM_RADEON - ATI Radeon
-clean_blob drivers/char/drm/radeon_cp.c
+clean_blob drivers/char/drm/radeon_microcode.h
 clean_kconfig drivers/char/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/char/drm/Makefile
 
