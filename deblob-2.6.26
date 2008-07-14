@@ -568,7 +568,7 @@ clean_kconfig sound/pci/Kconfig 'SND_CS46XX'
 
 # SND_KORG1212 - Korg 1212 IO
 # clean_ifdef sound/pci/korg1212/korg1212.c CONFIG_SND_KORG1212_FIRMWARE_IN_KERNEL
-clean_blob sound/pci/korg1212/korg1212-firmware.c
+clean_blob sound/pci/korg1212/korg1212-firmware.h
 
 # SND_MAESTRO3 - ESS Allegro/Maestro3
 clean_ifdef sound/pci/maestro3.c CONFIG_SND_MAESTRO3_FIRMWARE_IN_KERNEL
