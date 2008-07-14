@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-07-09
+# deblob-check version 2008-07-14
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -26,7 +26,7 @@
 
 
 # usage: deblob-check [-S] [-vv] [-s S] [-lDdBbCcXxPpFftVh?H] \
-#        [*.tar* patch-* *.patch]
+#        [*.tar* patch-* *.patch *.diff]
 
 # Look for too-long undocumented sequences of numbers (generally blobs
 # in disguise) in source files.
@@ -515,8 +515,8 @@ set_except () {
     # sensitivity, so make sure the sequences of numbers that are not
     # blobs are not deblobbed.  FIXME: we should have patterns to
     # recognize the blobs instead.
-    initnc '	static const u32 test_pat\[4\]\[6\] ='
-    initnc '	}, mem_tbl_5705\[\] ='
+    accept "	static const u32 test_pat\[4\]\[6\] = {$sepx$blobpat*$sepx};" drivers/net/tg3.c
+    accept "	}\\(,\\? mem_tbl_5\\(70x\\|705\\|755\\|906\\)\\[\\] = {$sepx$blobpat*$sepx}\\)*;" drivers/net/tg3.c
     ;;
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
     # false alarms, contain source
@@ -1111,7 +1111,7 @@ set_except () {
     initnc 'static u32 reg_init_initialize\[\] =' drivers/media/video/saa717x.c
     initnc '	} vals\[\] =' drivers/media/video/saa717x.c
     initnc 'static const u32 \(main\|gear\)_seedset\[BACKOFF_SEEDSET_ROWS\]\[BACKOFF_SEEDSET_LFSRS\] =' drivers/net/forcedeth.c
-    blob '^unsigned char \(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\) = '"$blobsep$blobseq*$blobsep;" drivers/s390/net/qeth_core_mpc.c # from drivers/s390/net/qeth_mpc.c in 2.6.25
+    blob '^unsigned char \(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\) = '"$sepx$blobseq*$sepx;" drivers/s390/net/qeth_core_mpc.c # from drivers/s390/net/qeth_mpc.c in 2.6.25
     initnc '} pll_table\[\] =' drivers/video/geode/lxfb_ops.c
     accept "  { 0x00014284,  19688 },[\n]  { 0x00011104,  20400 },[\n]  { $blobpat* }," drivers/video/geode/lxfb_ops.c # won't be necessary in rc3
     initnc 'static const u16 wm9713_reg\[\] =' sound/soc/codecs/wm9713.c
@@ -1283,7 +1283,7 @@ defineblob='[ 	]*#[ 	]*define[ 	]\+\([^\n]*\\[\n]\)*[^\n]*'"$blobseq"'\([^\n]*\\
 
 # Regular expression that matches an assembly label followed by a blob
 # without any intervening label.
-asmblob="[a-zA-Z_.][^\\n:;#/ 	]*[ ]*:\\([^:]*\\|$asmcomment\\)*$blobseq\\([^:]*\\|$asmcomment\\)*"
+asmblob="[a-zA-Z_.][^\\n:;#/ 	]*[ ]*:\\([^:{}]*\\|$asmcomment\\)*$blobseq\\([^:]*\\|$asmcomment\\)*"
 
 # Regular expression that matches one or more blobs without
 # intervening line breaks.
@@ -1867,7 +1867,7 @@ check () {
   *.tar*)
     cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'"
     ;;
-  *patch* | *diff*)
+  *.patch | patch-* | *.diff)
     sedpatch='
       /^[-]/d;
       /^\(@@\|+++\) / {
