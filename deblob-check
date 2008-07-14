@@ -647,6 +647,20 @@ set_except () {
     initnc 'static const struct ath5k_ini_rf rfregs_5413\[\] ='
     initnc 'const u\(8\|16\|32\) b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\] ='
 
+    # new in 2.6.26
+    initnc 'static u64 vec2off\[68\] =' arch/ia64/kvm/process.c
+    initnc "			interrupts = <\\(0x\\)\\?3 \\(0x\\)\\?0 \\(0x\\)\\?0  $blobpat*>;" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
+    initnc 'static const u32 crctab32\[\] =' arch/x86/boot/tools/build.c
+    initnc 'static struct mse2snr_tab \(vsb\|qam\(64\|256\)\)_mse2snr_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} \(VSB\|QAM\)_mod_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} itd1000_\(lpf_pga\|fre_values\)\[\] =' drivers/media/dvb/frontends/itd1000.c
+    initnc '} \(vsb\|qam\(64\|256\)\)_snr_tab\[\] =' drivers/media/dvb/frontends/s5h1411.c
+    initnc '} snr_tab\[\] =' drivers/media/dvb/frontends/tda10048.c
+    initnc 'static u32 reg_init_initialize\[\] =' drivers/media/video/saa717x.c
+    initnc 'static const u32 \(main\|gear\)_seedset\[BACKOFF_SEEDSET_ROWS\]\[BACKOFF_SEEDSET_LFSRS\] =' drivers/net/forcedeth.c
+    initnc 'static const struct ath5k_ini_mode rf24\(13\|25\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c
+    initnc 'static const u16 wm9713_reg\[\] =' sound/soc/codecs/wm9713.c
+
     # quite suspicious
     # arch/parisc/kernel/perf_images.h
     initc 'static uint32_t onyx_images\[\]\[PCXU_IMAGE_SIZE\/sizeof(uint32_t)\] __read_mostly ='
@@ -692,7 +706,7 @@ set_except () {
     initnc '	#define WakeupSeq    {'
     initnc '	SetRate44100\[\] ='
     initnc '	const short period\[32\] ='
-    initnc '	const static int desc_idx_table\[\] ='
+    initnc '	\(const static\|static const\) int desc_idx_table\[\] ='
     initnc '	int prop_bcomm_irq\[3\*16\] ='
     initnc '	static char logSlopeTable\[128\] ='
     initnc '	static const int uc_\(dup\|word\)_table\[\]\[2\] ='
@@ -983,7 +997,7 @@ set_except () {
     initnc 'static uchar sbox\[8\]\[4\]\[16\] ='
     initnc 'static uint16_t crc_table\[256\] ='
     initnc 'static uint8_t lpfcAlpaArray\[\] ='
-    initnc 'static uint8_t seqprog\[\] ='
+    initnc 'static \(const \)\?uint8_t seqprog\[\] ='
     initnc 'static unsigned char V110_OffMatrix_9600\[\] ='
     initnc 'static unsigned char V110_OnMatrix_9600\[\] ='
     initnc 'static unsigned char a2232_65EC02code\[\] ='
