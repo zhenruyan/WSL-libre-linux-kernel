@@ -40,7 +40,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.23 extra=1
+kver=2.6.23 extra=2
 
 sed -i "s,^EXTRAVERSION.*,EXTRAVERSION = -libre$extra," Makefile
 
@@ -268,18 +268,10 @@ clean_blob drivers/media/video/usbvideo/vicam.c
 clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_VICAM'
 clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 
-# other...
-
-# disable -- appears to neeed other DVB bits
-clean_mk CONFIG_DVB_CORE drivers/media/Makefile
-clean_mk CONFIG_VIDEO_SAA7134 drivers/media/video/Makefile
-clean_mk CONFIG_VIDEO_CX88 drivers/media/video/Makefile
-clean_kconfig drivers/media/dvb/dvb-core/Kconfig 'DVB_CORE'
 
 #######################
 # Removed net Drivers #
 #######################
-
 
 # ACENIC - Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit
 clean_blob drivers/net/acenic_firmware.h
