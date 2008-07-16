@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-07-16
+# deblob-check version 2008-07-16.1
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1091,7 +1091,8 @@ set_except () {
     initnc '} vsb_snr_tab\[\] ='
     initnc '} yss225_registers\[\] __devinitdata ='
     ;;
-  */patch*2.6.27-rc* | */patch*2.6.26-git*)
+
+  */patch*2.6.27-rc* | */patch*2.6.26-git* | */git-linus.diff)
     accept '	\.section __ex_table,"a"'"$sepx$blobpat*" 'arch/x86/lib/copy_user_\(nocache_\)\?64.S'
     initnc 'static struct cipher_testvec des3_ede_cbc_\(enc\|dec\)_tv_template\[\] =' crypto/tcrypt.h
 
@@ -1101,6 +1102,9 @@ set_except () {
     accept ':03000000020200F9[\n]:040023000205\(9B0037\|5F0073\)[\n]\(:050030000000000000CB[\n]\|:0400430002010000B6[\n]\)*'"$sepx$blobpat*"'[\n]:\(0E06E0006400670065007400060334003700F4\|0606A000060334003700E0\)[\n]:00000001FF[\n]' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).HEX'
     initnc 'static const u16 uda1380_reg\[UDA1380_CACHEREGNUM\] =' sound/soc/codecs/uda1380.c
     initnc 'static const u16 wm8510_reg\[WM8510_CACHEREGNUM\] =' sound/soc/codecs/wm8510.c
+
+    initnc '	static int sysdiv_to_div_x_2\[\] =' arch/powerpc/platforms/512x/clock.c
+    initnc 'static const __u16 t10_dif_crc_table\[256\] =' lib/crc-t10dif.c
     ;;
     
   */patch*2.6.26-rc*)
