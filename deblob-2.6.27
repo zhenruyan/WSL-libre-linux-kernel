@@ -46,8 +46,6 @@
 # from 1 if changes are needed that require rebuilding the tarball.
 kver=2.6.27 extra=
 
-sed -i "s,^EXTRAVERSION.*,EXTRAVERSION = -libre$extra," Makefile
-
 check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
 if [ ! -f $check ] ; then
   echo optional deblob-check missing, will remove entire files >&2
@@ -159,6 +157,8 @@ for f in \
   fi
 done
 
+# Identify the tarball.
+sed -i "s,^EXTRAVERSION.*,&-libre$extra," Makefile
 
 #######################
 # Removed ATM Drivers #

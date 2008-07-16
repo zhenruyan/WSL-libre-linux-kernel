@@ -46,8 +46,6 @@
 # from 1 if changes are needed that require rebuilding the tarball.
 kver=2.6.25 extra=3
 
-sed -i "s,^EXTRAVERSION.*,EXTRAVERSION = -libre$extra," Makefile
-
 if unifdef /dev/null; then :; else
     echo unifdef is required >&2
     exit 1
@@ -170,6 +168,8 @@ for f in \
   fi
 done
 
+# Identify the tarball.
+sed -i "s,^EXTRAVERSION.*,&-libre$extra," Makefile
 
 #######################
 # Removed ATM Drivers #
