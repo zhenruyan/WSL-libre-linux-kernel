@@ -40,7 +40,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.26 extra=
+kver=2.6.26 extra=1
 
 sed -i "s,^EXTRAVERSION.*,EXTRAVERSION = -libre$extra," Makefile
 
@@ -127,6 +127,49 @@ function clean_ifdef {
 	unifdef $1 -U$2 > $1.deblob
 	check_changed $1
 }
+
+
+# First, check that files that contain firmwares and their
+# corresponding sources are present.
+
+for f in \
+  drivers/char/ser_a2232fw.h \
+    drivers/char/ser_a2232fw.ax \
+  drivers/net/ixp2000/ixp2400_rx.ucode \
+    drivers/net/ixp2000/ixp2400_rx.uc \
+  drivers/net/ixp2000/ixp2400_tx.ucode \
+    drivers/net/ixp2000/ixp2400_rx.uc \
+  drivers/net/wan/wanxlfw.inc_shipped \
+    drivers/net/wan/wanxlfw.S \
+  drivers/net/wireless/atmel.c \
+    drivers/net/wireless/atmel.c \
+  drivers/scsi/53c700_d.h_shipped \
+    drivers/scsi/53c700.scr \
+  drivers/scsi/aic7xxx/aic79xx_seq.h_shipped \
+    drivers/scsi/aic7xxx/aic79xx.seq \
+  drivers/scsi/aic7xxx/aic7xxx_seq.h_shipped \
+    drivers/scsi/aic7xxx/aic7xxx.seq \
+  drivers/scsi/aic7xxx_old/aic7xxx_seq.c \
+    drivers/scsi/aic7xxx_old/aic7xxx.seq \
+  drivers/scsi/53c7xx_d.h_shipped \
+    drivers/scsi/53c7xx.scr \
+  drivers/scsi/sym53c8xx_2/sym_fw1.h \
+    drivers/scsi/sym53c8xx_2/sym_fw1.h \
+  drivers/scsi/sym53c8xx_2/sym_fw2.h \
+    drivers/scsi/sym53c8xx_2/sym_fw2.h \
+  drivers/usb/serial/keyspan_pda_fw.h \
+    drivers/usb/serial/keyspan_pda.S \
+  drivers/usb/serial/xircom_pgs_fw.h \
+    drivers/usb/serial/xircom_pgs.S \
+  sound/pci/cs46xx/imgs/cwcbinhack.h \
+    sound/pci/cs46xx/imgs/cwcdma.asp \
+; do
+  if test ! $f; then
+    echo $f is not present, something is amiss >&2
+    exit 1
+  fi
+done
+
 
 #######################
 # Removed ATM Drivers #
@@ -588,53 +631,14 @@ clean_ifdef sound/pci/maestro3.c CONFIG_SND_MAESTRO3_FIRMWARE_IN_KERNEL
 clean_blob sound/pci/ymfpci/ymfpci_image.h
 clean_ifdef sound/pci/ymfpci/ymfpci_main.c CONFIG_SND_YMFPCI_FIRMWARE_IN_KERNEL
 
+# SND_SB16_CSP_FIRMWARE_IN_KERNEL - SB16 Advanced Signal Processor
+clean_blob sound/isa/sb/sb16_csp_codecs.h
+clean_kconfig sound/isa/Kconfig SND_SB16_CSP_FIRMWARE_IN_KERNEL
 
-###############
-# Not Removed #
-###############
+# SND_WAVEFRONT_FIRMWARE_IN_KERNEL
+# Most of this file is not matched by deblob-check because of WAIT_IDLE.
+# Just remove it.
+clean_file sound/isa/wavefront/yss225.c
+clean_kconfig sound/isa/Kconfig SND_WAVEFRONT_FIRMWARE_IN_KERNEL
 
-# This is not removed in debian nor gnewsense nor do I think
-# it should be removed. It's on debian's list to check out
-# I think it points at firmware, but doesn't contain any
-# (e.g. if you add the file yss225_registers.bin it will use it)
-# clean_blob sound/isa/wavefront/wavefront_fx.c
-
-# VIDEO_STRADIS - Stradis 4:2:2 MPEG-2 video driver
-# This just sets a few values and a bunch of zeros. It doesn't look like
-# it was done by anything that would have upstream source code. This should 
-# probably be kept. It's removed in gnewsense, but not even mentioned
-# by debian as potential candidate. It is used by stratis.c
-# clean_blob drivers/media/video/cs8420.h
-
-# gnewsense removes drivers/serial/jsm/jsm_neo.c but vanilla version looks ok
-
-# Not in kernel 2.6.23
-# drivers/scsi/qla2xxx/ql2100_fw.c
-# drivers/scsi/qla2xxx/ql2200_fw.c
-# drivers/scsi/qla2xxx/ql2300_fw.c
-# drivers/scsi/qla2xxx/ql2322_fw.c
-# drivers/scsi/qla2xxx/ql2400_fw.c
-# drivers/usb/net/kawethfw.h
-# sound/isa/sb/sb16/sb16_csp_codecs.h
-# sound/oss/yss225.c
-# drivers/scsi/53c7xx_d.h_shipped 53c7xx.scr
-# sound/pci/cs46xx/imgs/cwcemb80.h
-
-# Not in kernel 2.6.24
-# drivers/net/dgrs_firmware.c
-
-# blobs but free source available (source listed 2nd)
-# drivers/char/ser_a2232fw.h				ser_a2232fw.ax
-# drivers/net/ixp2000/ixp2400_rx.ucode			ixp2400_rx.uc
-# drivers/net/ixp2000/ixp2400_tx.ucode			ixp2400_rx.uc
-# drivers/net/wan/wanxlfw.inc_shipped			wanxlfw.S
-# drivers/net/wireless/atmel.c				atmel.c
-# drivers/scsi/53c700_d.h_shipped			53c700.scr
-# drivers/scsi/aic7xxx/aic79xx_seq.h_shipped		aic79xx.seq
-# drivers/scsi/aic7xxx/aic7xxx_seq.h_shipped		aic7xxx.seq
-# drivers/scsi/aic7xxx_old/aic7xxx_seq.c		aic7xxx.seq
-# drivers/scsi/sym53c8xx_2/sym_fw1.h			sym_fw1.h
-# drivers/scsi/sym53c8xx_2/sym_fw2.h			sym_fw2.h
-# drivers/usb/serial/keyspan_pda_fw.h			keyspan_pda.S
-# drivers/usb/serial/xircom_pgs_fw.h			xircom_pgs.S
-
+exit 0
