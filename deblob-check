@@ -1100,6 +1100,7 @@ set_except () {
     accept 'string_mfg:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_mfg_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
     accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
     accept ':03000000020200F9[\n]:040023000205\(9B0037\|5F0073\)[\n]\(:050030000000000000CB[\n]\|:0400430002010000B6[\n]\)*'"$sepx$blobpat*"'[\n]:\(0E06E0006400670065007400060334003700F4\|0606A000060334003700E0\)[\n]:00000001FF[\n]' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).HEX'
+    accept ':100000000C004000000000000000000000000000A4[\n]'"$sepx$blobpat*"'[\n]\/\* DSP56001 bootstrap code \*\/' firmware/dsp56k/bootstrap.bin.ihex
     initnc 'static const u16 uda1380_reg\[UDA1380_CACHEREGNUM\] =' sound/soc/codecs/uda1380.c
     initnc 'static const u16 wm8510_reg\[WM8510_CACHEREGNUM\] =' sound/soc/codecs/wm8510.c
 
