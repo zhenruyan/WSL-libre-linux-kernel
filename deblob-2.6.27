@@ -154,14 +154,14 @@ for f in \
     drivers/scsi/sym53c8xx_2/sym_fw1.h \
   drivers/scsi/sym53c8xx_2/sym_fw2.h \
     drivers/scsi/sym53c8xx_2/sym_fw2.h \
-  drivers/usb/serial/keyspan_pda_fw.h \
-    drivers/usb/serial/keyspan_pda.S \
-  drivers/usb/serial/xircom_pgs_fw.h \
-    drivers/usb/serial/xircom_pgs.S \
-  sound/pci/cs46xx/imgs/cwcbinhack.h \
-    sound/pci/cs46xx/imgs/cwcdma.asp \
   firmware/dsp56k/bootstrap.bin.ihex \
     firmware/dsp56k/bootstrap.asm \
+  firmware/keyspan_pda/keyspan_pda.HEX \
+    firmware/keyspan_pda/keyspan_pda.S \
+  firmware/keyspan_pda/xircom_pgs.HEX \
+    firmware/keyspan_pda/xircom_pgs.S \
+  sound/pci/cs46xx/imgs/cwcbinhack.h \
+    sound/pci/cs46xx/imgs/cwcdma.asp \
 ; do
   if test ! $f; then
     echo $f is not present, something is amiss >&2
