@@ -92,6 +92,16 @@ function clean_blob {
 	fi
 }
 
+function dummy_blob {
+	#$1 = filename
+	if test -f $1; then
+	    echo $1 exists, something is wrong >&2
+	    exit 1
+	else
+	    echo '/*(DEBLOBBED)*/' > $1
+	fi
+}
+
 function clean_kconfig {
         #$1 = filename $2 = things to remove
         echo Marking config $2 as depending on NONFREE in $1
@@ -150,6 +160,8 @@ for f in \
     drivers/usb/serial/xircom_pgs.S \
   sound/pci/cs46xx/imgs/cwcbinhack.h \
     sound/pci/cs46xx/imgs/cwcdma.asp \
+  firmware/dsp56k/bootstrap.bin.ihex \
+    firmware/dsp56k/bootstrap.asm \
 ; do
   if test ! $f; then
     echo $f is not present, something is amiss >&2
@@ -160,12 +172,20 @@ done
 # Identify the tarball.
 sed -i "s,^EXTRAVERSION.*,&-libre$extra," Makefile
 
+# We use `# clean_blob\nclean_file' to indicate that a file is
+# allegedly under the GPL or some other compatible license, but we
+# don't have its sources.  Using the default deblobbing machinery
+# doesn't work, because then the binary firmware generators would barf
+# at the deblobbed file.
+
 #######################
 # Removed ATM Drivers #
 #######################
 
 # ATM_AMBASSADOR -  Madge Ambassador (Collage PCI 155 Server)
-clean_blob firmware/atmsar11.HEX
+# clean_blob
+clean_file firmware/atmsar11.HEX
+empty_blob firmware/atmsar11.fw
 
 # ATM_FORE200E_PCA
 # ATM_FORE200E_SBA - SBA-200E
@@ -185,13 +205,9 @@ clean_mk CONFIG_ATM_AMBASSADOR drivers/atm/Makefile
 
 # COMPUTONE - Computone IntelliPort Plus serial
 clean_file firmware/intelliport2.bin.ihex
+dummy_blob firmware/intelliport2.bin
 clean_kconfig drivers/char/Kconfig 'COMPUTONE'
 clean_mk CONFIG_COMPUTONE drivers/char/Makefile
-
-# DSP56001 Device Driver
-clean_blob firmware/dsk56k/bootstrap.bin.ihex
-clean_kconfig arch/m68k/Kconfig 'ATARI_DSP56K'
-clean_mk CONFIG_ATARI_DSP56K drivers/char/Makefile
 
 # gpu drm
 
@@ -269,6 +285,7 @@ clean_mk CONFIG_DVB_BUDGET_CI drivers/media/dvb/ttpci/Makefile
 
 # DVB_TTUSB_BUDGET - Technotrend/Hauppauge Nova-USB devices
 clean_file firmware/ttusb-budget/dspbootcode.bin.ihex
+dummy_blob firmware/ttusb-budget/dspbootcode.bin
 clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_kconfig drivers/media/dvb/ttusb-budget/Kconfig 'DVB_TTUSB_BUDGET'
 clean_mk CONFIG_DVB_TTUSB_BUDGET drivers/media/dvb/ttusb-budget/Makefile
@@ -282,7 +299,9 @@ clean_kconfig drivers/media/video/pwc/Kconfig 'USB_PWC'
 clean_mk CONFIG_USB_PWC drivers/media/video/Makefile
 
 # VIDEO_CPIA - CPiA Video For Linux
-clean_blob firmware/cpia2/stv0672_vp4.bin.ihex
+# clean_blob
+clean_file firmware/cpia2/stv0672_vp4.bin.ihex
+dummy_blob firmware/cpia2/stv0672_vp4.bin
 clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA'
 clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_PP'
 clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_USB'
@@ -293,8 +312,12 @@ clean_mk CONFIG_VIDEO_CPIA_USB drivers/media/video/Makefile
 clean_mk CONFIG_VIDEO_CPIA2 drivers/media/video/Makefile
 
 # USB_DABUSB - DABUSB driver
-clean_blob firmware/dabusb/bitstream.bin.ihex
-clean_blob firmware/dabusb/firmware.HEX
+# clean_blob
+clean_file firmware/dabusb/bitstream.bin.ihex
+dummy_blob firmware/dabusb/bitstream.bin
+# clean_blob
+clean_file firmware/dabusb/firmware.HEX
+dummy_blob firmware/dabusb/firmware.fw
 clean_kconfig drivers/media/Kconfig 'USB_DABUSB'
 clean_mk CONFIG_USB_DABUSB drivers/media/video/Makefile
 
@@ -307,6 +330,7 @@ clean_mk CONFIG_USB_IBMCAM drivers/media/video/usbvideo/Makefile
 
 # USB_VICAM - USB 3com HomeConnect (aka vicam)
 clean_file firmware/vicam/firmware.H16
+dummy_blob firmware/vicam/firmware.fw
 clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_VICAM'
 clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 
@@ -436,7 +460,8 @@ clean_mk CONFIG_3C359 drivers/net/tokenring/Makefile
 # clean_blob drivers/net/tokenring/smctr.c
 # clean_blob drivers/net/tokenring/smctr.h
 # This file is not under the GPL, better remove it all.
-clean_file firmware/tr_smctr.bin.ihex drivers/net/tokenring/smctr_firmware.h
+clean_file firmware/tr_smctr.bin.ihex
+dummy_blob firmware/tr_smctr.bin
 clean_kconfig drivers/net/tokenring/Kconfig 'SMCTR'
 clean_mk CONFIG_SMCTR drivers/net/tokenring/Makefile
 
@@ -444,9 +469,13 @@ clean_mk CONFIG_SMCTR drivers/net/tokenring/Makefile
 
 # USB_KAWETH - USB KLSI KL5USB101-based ethernet device support
 clean_file firmware/kaweth/new_code.bin.ihex
+dummy_blob firmware/kaweth/new_code.bin
 clean_file firmware/kaweth/new_code_fix.bin.ihex
+dummy_blob firmware/kaweth/new_code_fix.bin
 clean_file firmware/kaweth/trigger_code.bin.ihex
+dummy_blob firmware/kaweth/trigger_code.bin
 clean_file firmware/kaweth/trigger_code_fix.bin.ihex
+dummy_blob firmware/kaweth/trigger_code_fix.bin
 clean_kconfig drivers/net/usb/Kconfig 'USB_KAWETH'
 clean_mk CONFIG_USB_KAWETH drivers/net/usb/Makefile
 
@@ -493,8 +522,11 @@ clean_mk CONFIG_SCSI_QLOGIC_1280 drivers/scsi/Makefile
 # clean_blob drivers/usb/misc/emi26.c
 # These files are not under the GPL, better remove them all.
 clean_file firmware/emi26/bitstream.HEX
+dummy_blob firmware/emi26/bitstream.fw
 clean_file firmware/emi26/firmware.HEX
+dummy_blob firmware/emi26/firmware.fw
 clean_file firmware/emi26/loader.HEX
+dummy_blob firmware/emi26/loader.fw
 clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI26'
 clean_mk CONFIG_USB_EMI26 drivers/usb/misc/Makefile
 
@@ -503,9 +535,13 @@ clean_mk CONFIG_USB_EMI26 drivers/usb/misc/Makefile
 # clean_blob drivers/usb/misc/emi62.c
 # These files are probably not under the GPL, better remove them all.
 clean_file firmware/emi62/bitstream.HEX
-clean_file firmware/emi62/firmware.HEX
+dummy_blob firmware/emi62/bitstream.fw
+clean_file firmware/emi62/loader.HEX
+dummy_blob firmware/emi62/loader.fw
 clean_file firmware/emi62/midi.HEX
+dummy_blob firmware/emi62/midi.fw
 clean_file firmware/emi62/spdif.HEX
+dummy_blob firmware/emi62/spdif.fw
 clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI62'
 clean_mk CONFIG_USB_EMI62 drivers/usb/misc/Makefile
 
@@ -518,65 +554,95 @@ clean_mk CONFIG_USB_SISUSBVGA drivers/usb/misc/sisusbvga/Makefile
 
 # USB_SERIAL_KEYSPAN_MPR - USB Keyspan MPR Firmware
 clean_file firmware/keyspan/mpr.HEX
+dummy_blob firmware/keyspan/mpr.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_MPR'
 # USB_SERIAL_KEYSPAN_USA18X - USB Keyspan USA-18X Firmware
 clean_file firmware/keyspan/usa18x.HEX
+dummy_blob firmware/keyspan/usa18x.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA18X'
 # USB_SERIAL_KEYSPAN_USA19 - USB Keyspan USA-19 Firmware
 clean_file firmware/keyspan/usa19.HEX
+dummy_blob firmware/keyspan/usa19.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19'
 # USB_SERIAL_KEYSPAN_USA19QI - USB Keyspan USA-19QI Firmware
 clean_file firmware/keyspan/usa19qi.HEX
+dummy_blob firmware/keyspan/usa19qi.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QI'
 # USB_SERIAL_KEYSPAN_USA19QW - USB Keyspan USA-19QW Firmware
 clean_file firmware/keyspan/usa19qw.HEX
+dummy_blob firmware/keyspan/usa19qw.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QW'
 # USB_SERIAL_KEYSPAN_USA19W - USB Keyspan USA-19W Firmware
 clean_file firmware/keyspan/usa19w.HEX
+dummy_blob firmware/keyspan/usa19w.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19W'
 # USB_SERIAL_KEYSPAN_USA28 - USB Keyspan USA-28 Firmware
 clean_file firmware/keyspan/usa28.HEX
+dummy_blob firmware/keyspan/usa28.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28'
 # USB_SERIAL_KEYSPAN_USA28XA - USB Keyspan USA-28XA Firmware
 clean_file firmware/keyspan/usa28xa.HEX
+dummy_blob firmware/keyspan/usa28xa.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XA'
 # USB_SERIAL_KEYSPAN_USA28XB - USB Keyspan USA-28XB Firmware
 clean_file firmware/keyspan/usa28xb.HEX
+dummy_blob firmware/keyspan/usa28xb.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XB'
 # USB_SERIAL_KEYSPAN_USA28X - USB Keyspan USA-28X Firmware
 clean_file firmware/keyspan/usa28x.HEX
+dummy_blob firmware/keyspan/usa28x.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28X'
 # USB_SERIAL_KEYSPAN_USA49W - USB Keyspan USA-49W Firmware
 clean_file firmware/keyspan/usa49w.HEX
+dummy_blob firmware/keyspan/usa49w.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49W'
 # USB_SERIAL_KEYSPAN_USA49WLC - USB Keyspan USA-49WLC Firmware
 clean_file firmware/keyspan/usa49wlc.HEX
+dummy_blob firmware/keyspan/usa49wlc.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49WLC'
 clean_mk CONFIG_USB_SERIAL_KEYSPAN drivers/usb/serial/Makefile
 
 # USB_SERIAL_EDGEPORT - USB Inside Out Edgeport Serial Driver
-clean_blob firmware/edgeport/boot.H16
-clean_blob firmware/edgeport/down.H16
-clean_blob firmware/edgeport/down2.H16
+# clean_blob
+clean_file firmware/edgeport/boot.H16
+dummy_blob firmware/edgeport/boot.fw
+# clean_blob
+clean_file firmware/edgeport/down.H16
+dummy_blob firmware/edgeport/down.fw
+# clean_blob
+clean_file firmware/edgeport/down2.H16
+dummy_blob firmware/edgeport/down2.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT drivers/usb/serial/Makefile
 
 # USB_SERIAL_EDGEPORT_TI - USB Inside Out Edgeport Serial Driver (TI devices)
-clean_blob firmware/edgeport/boot2.H16
-clean_blob firmware/edgeport/down3.H16
+# clean_blob
+clean_file firmware/edgeport/boot2.H16
+dummy_blob firmware/edgeport/boot2.fw
+# clean_blob
+clean_file firmware/edgeport/down3.bin.ihex
+dummy_blob firmware/edgeport/down3.bin
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT_TI'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT_TI drivers/usb/serial/Makefile
 
 # USB_SERIAL_TI - USB TI 3410/5052 Serial Driver
 clean_file firmware/ti_3410.fw.ihex
+dummy_blob firmware/ti_3410.fw
 clean_file firmware/ti_5052.fw.ihex
+dummy_blob firmware/ti_5052.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_TI'
 clean_mk CONFIG_USB_SERIAL_TI drivers/usb/serial/Makefile
 
 # USB_SERIAL_WHITEHEAT - USB ConnectTech WhiteHEAT Serial Driver
-clean_blob firmware/whiteheat.HEX
-clean_blob firmware/whiteheat_loader.HEX
-clean_blob firmware/whiteheat_loader_debug.HEX
+# clean_blob
+clean_file firmware/whiteheat.HEX
+dummy_blob firmware/whiteheat.fw
+# clean_blob
+clean_file firmware/whiteheat_loader.HEX
+dummy_blob firmware/whiteheat_loader.fw
+# clean_blob
+clean_file firmware/whiteheat_loader_debug.HEX
+dummy_blob firmware/whiteheat_loader_debug.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_WHITEHEAT'
 clean_mk CONFIG_USB_SERIAL_WHITEHEAT drivers/usb/serial/Makefile
 
@@ -612,22 +678,33 @@ clean_kconfig sound/pci/Kconfig 'SND_CS46XX'
 
 # SND_KORG1212 - Korg 1212 IO
 clean_file firmware/korg/k1212.dsp.ihex
+dummy_blob firmware/korg/k1212.dsp
 
 # SND_MAESTRO3 - ESS Allegro/Maestro3
 clean_file firmware/ess/maestro3_assp_kernel.fw.ihex
+dummy_blob firmware/ess/maestro3_assp_kernel.fw
 clean_file firmware/ess/maestro3_assp_minisrc.fw.ihex
+dummy_blob firmware/ess/maestro3_assp_minisrc.fw
 
 # SND_YMFPCI - Yamaha YMF724/740/744/754
 clean_file firmware/yamaha/ds1_ctrl.fw.ihex
+dummy_blob firmware/yamaha/ds1_ctrl.fw
 clean_file firmware/yamaha/ds1_dsp.fw.ihex
+dummy_blob firmware/yamaha/ds1_dsp.fw
 clean_file firmware/yamaha/ds1e_ctrl.fw.ihex
+dummy_blob firmware/yamaha/ds1e_ctrl.fw
 
 # SND_SB16_CSP_FIRMWARE_IN_KERNEL - SB16 Advanced Signal Processor
 clean_file firmware/sb16/alaw_main.csp.ihex
+dummy_blob firmware/sb16/alaw_main.csp
 clean_file firmware/sb16/mulaw_main.csp.ihex
+dummy_blob firmware/sb16/mulaw_main.csp
 clean_file firmware/sb16/ima_adpcm_init.csp.ihex
+dummy_blob firmware/sb16/ima_adpcm_init.csp
 clean_file firmware/sb16/ima_adpcm_capture.csp.ihex
+dummy_blob firmware/sb16/ima_adpcm_capture.csp
 clean_file firmware/sb16/ima_adpcm_playback.csp.ihex
+dummy_blob firmware/sb16/ima_adpcm_playback.csp
 
 # SND_WAVEFRONT_FIRMWARE_IN_KERNEL
 # Most of this file is not matched by deblob-check because of WAIT_IDLE.
