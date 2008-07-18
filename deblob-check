@@ -1891,7 +1891,7 @@ check () {
   fi
 
   # Extract or otherwise munge...
-  case $input in
+  case /$input in
   *.tar*)
     cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'"
     ;;
