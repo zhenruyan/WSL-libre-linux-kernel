@@ -479,6 +479,12 @@ dummy_blob firmware/kaweth/trigger_code_fix.bin
 clean_kconfig drivers/net/usb/Kconfig 'USB_KAWETH'
 clean_mk CONFIG_USB_KAWETH drivers/net/usb/Makefile
 
+# wireless
+
+clean_blob drivers/net/wireless/rtl8187_dev.c
+# clean_kconfig drivers/net/wireless/Kconfig 'RTL8187'
+# clean_mk CONFIG_RTL8187 drivers/net/wireless/Makefile
+
 
 ########################
 # Removed s390 Drivers #
@@ -661,6 +667,10 @@ clean_blob drivers/video/chipsfb.c
 clean_kconfig drivers/video/Kconfig 'FB_CT65550'
 clean_mk CONFIG_FB_CT65550 drivers/video/Makefile
 
+# USB_GSPCA - Conexant 11646
+clean_blob drivers/media/video/gspca/conex.c
+# clean_kconfig drivers/video/gspca/Kconfig 'USB_GSPCA'
+# clean_mk CONFIG_USB_GSPCA drivers/video/Makefile
 
 #########################
 # Removed Sound Drivers #
