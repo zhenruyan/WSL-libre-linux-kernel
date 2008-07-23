@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-07-16.1
+# deblob-check version 2008-07-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1104,7 +1104,41 @@ set_except () {
     initnc 'static const u16 uda1380_reg\[UDA1380_CACHEREGNUM\] =' sound/soc/codecs/uda1380.c
     initnc 'static const u16 wm8510_reg\[WM8510_CACHEREGNUM\] =' sound/soc/codecs/wm8510.c
 
+    initnc 'static const unsigned short atkbd_set[23]_keycode\[512\] =' drivers/input/keyboard/atkbd.c
+    initnc 'static const unsigned short atkbd_unxlate_table\[128\] =' drivers/input/keyboard/atkbd.c
+    initnc '		u8 buf, bufs\[\] =' drivers/media/dvb/dvb-usb/cxusb.c
+    initnc 'static struct dvb_pll_desc [^\n]* =' drivers/media/dvb/frontends/dvb-pll.c
     initnc '	static int sysdiv_to_div_x_2\[\] =' arch/powerpc/platforms/512x/clock.c
+    initnc 'static const __u8 cx_inits_\(176\|320\|352\|640\)\[\] =' drivers/media/video/gspca/conex.c
+    initnc 'static const __u8 cx_jpeg_init\[\]\[8\] =' drivers/media/video/gspca/conex.c
+    initnc 'static const __u8 cxjpeg_\(640\|352\|320\|176\|qtable\)\[\]\[8\] =' drivers/media/video/gspca/conex.c
+    initnc 'static const unsigned char quant\[\]\[0x88\] =' drivers/media/video/gspca/jpeg.h
+    initnc 'static unsigned char huffman\[\] =' drivers/media/video/gspca/jpeg.h
+    initc '	static const struct ov_i2c_regvals norm_76[1247]0\[\] =' drivers/media/video/gspca/ov519.c
+    initnc 'static const __u8 pac207_sensor_init\[\]\[8\] =' drivers/media/video/gspca/pac207.c
+    initnc 'static const __u8 pac7311_jpeg_header\[\] =' drivers/media/video/gspca/pac7311.c
+    initnc 'static const __u8 init\(Hv7131\|Ov\(6650\|7630\(_3\)\?\)\|Pas\(106\|202\)\|Tas51[13]0\)\[\] =' drivers/media/video/gspca/sonixb.c
+    initnc 'static const __u8 \(hv7131\|ov\(6650\|7630\(_3\)\?\)\|pas\(106\|202\)\|tas51[13]0\)_sensor_init\(_com\)\?\[\]\[8\] =' drivers/media/video/gspca/sonixb.c
+    initnc 'static const __u8 \(hv7131r\|mi0360\|mo4000\|ov76\(60\|48\)\)_sensor_init\[\]\[8\] =' drivers/media/video/gspca/sonixj.c
+    initnc 'static const __u8 qtable4\[\] =' drivers/media/video/gspca/sonixj.c
+    initnc 'static const __u16 \(spca500_visual\|Clicksmart510\)_defaults\[\]\[3\] =' drivers/media/video/gspca/spca500.c
+    initnc 'static const __u8 qtable_\(creative_pccam\|kodak_ez200\|pocketdv\)\[2\]\[64\] =' drivers/media/video/gspca/spca500.c
+    initnc 'static const __u16 spca501c\?_\(\(3com\|arowana\|mysterious\)_\)\?\(init\|open\)_data\[\]\[3\] =' drivers/media/video/gspca/spca501.c
+    initnc 'static const __u16 spca505b\?_\(init\|open\)_data\(_ccd\)\?\[\]\[3\] =' drivers/media/video/gspca/spca505.c
+    initnc 'static const __u16 spca508\(cs110\|_sightcam2\?\|_vista\)\?_init_data\[\]\[3\] =' drivers/media/video/gspca/spca508.c
+    initnc 'static const __u16 spca561_init_data\[\]\[2\] =' drivers/media/video/gspca/spca561.c
+    initnc 'static const __u16 spca504\(_pccam600\|A_clicksmart420\)_\(init\|open\)_data\[\]\[3\] =' drivers/media/video/gspca/sunplus.c
+    initnc 'static const __u8 qtable_\(creative_pccam\|spca504_default\)\[2\]\[64\] =' drivers/media/video/gspca/sunplus.c
+    initnc 'static const __u8 \(effects\|gamma\)_table\[MAX_[A-Z]*\]\[[0-9]*\] =' drivers/media/video/gspca/t631.c
+    initnc 'static const __u8 tas5130a_sensor_init\[\]\[8\] =' drivers/media/video/gspca/t613.c
+    initnc '	static const __u8 \(read_indexs\|n\(set\)\?[0-9]*\|missing\)\[[0-9x]*\] =' drivers/media/video/gspca/t613.c
+    initc 'static const __u8 \(mi13[12]0\|po3130\|hv7131r\|ov76[67]0\)_\(\(soc\)\?initQ\?VGA_\(JPG\|data\)\|rundata\)\[\]\[4\] =' drivers/media/video/gspca/vc032x.c
+    initnc 'static const struct usb_action \(cs2102\|hdcs2020xx\|icm105axx\|ov7630c\|pb0330[3x]x\)_Initial\(Scale\)\?\[\] =' drivers/media/video/gspca/zc3xx.c
+    initnc 'static const u8 rtl8225z2_agc\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_agc\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_ofdm\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck_ch14\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
     initnc 'static const __u16 t10_dif_crc_table\[256\] =' lib/crc-t10dif.c
     ;;
     
