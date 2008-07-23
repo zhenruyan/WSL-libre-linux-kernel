@@ -38,6 +38,9 @@
 #		Specifies the number of consecutive integral or
 #		character constants that trigger the blob detector.
 
+#    --reverse-patch: Test the removed parts of a patch, rather than
+#		the added ones.
+
 # The default sensitivity is 32 constants.
 
 # The sensitivity, if present, must be the first option.  The action
@@ -247,6 +250,14 @@ case $1 in
   fi
 
   sens=`expr $sens - 1`
+  ;;
+esac
+
+reverse_patch=false
+case $1 in
+--reverse-patch)
+  reverse_patch=:
+  shift;
   ;;
 esac
 
@@ -1930,17 +1941,22 @@ check () {
     cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'"
     ;;
   *.patch | */patch-* | *.diff)
-    sedpatch='
-      /^[-]/d;
-      /^\(@@\|+++\) / {
-	i\
-;/**/;\
-;/*end patchlet */;\
+    if $reverse_patch; then
+      s=- r=+
+    else
+      s=+ r=-
+    fi
+    sedpatch="
+      /^[$r]/d;
+      /^\\(@@\\|$s$s$s\\) / {
+	i\\
+;/**/;\\
+;/*end patchlet */;\\
 ;/*begin patchlet */;
-	s/^/;\/*/;
-	s/$/*\/;/;
+	s/^/;\\/*/;
+	s/\$/*\\/;/;
       };
-      s/^[ +]//;'
+      s/^[ $s]//;"
     cmd='sed "$sedpatch"'
     ;;
   *)
