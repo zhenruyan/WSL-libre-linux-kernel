@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-07-22
+# deblob-check version 2008-07-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1106,7 +1106,6 @@ set_except () {
   */patch*2.6.27-rc* | */patch*2.6.26-git* | */git-linus.diff)
     accept '	\.section __ex_table,"a"'"$sepx$blobpat*" 'arch/x86/lib/copy_user_\(nocache_\)\?64.S'
     initnc 'static struct cipher_testvec des3_ede_cbc_\(enc\|dec\)_tv_template\[\] =' crypto/tcrypt.h
-
     accept 'desc_config1:[\n]	\.byte 0x09, 0x02'"$sepx$blobpat*" 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
     accept 'string_mfg:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_mfg_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
     accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
@@ -1117,6 +1116,7 @@ set_except () {
 
     initnc 'static const unsigned short atkbd_set[23]_keycode\[512\] =' drivers/input/keyboard/atkbd.c
     initnc 'static const unsigned short atkbd_unxlate_table\[128\] =' drivers/input/keyboard/atkbd.c
+    initnc 'static const unsigned char usb_kbd_keycode\[256\] =' drivers/hid/usbhid/usbkbd.c
     initnc '		u8 buf, bufs\[\] =' drivers/media/dvb/dvb-usb/cxusb.c
     initnc 'static struct dvb_pll_desc [^\n]* =' drivers/media/dvb/frontends/dvb-pll.c
     initnc '	static int sysdiv_to_div_x_2\[\] =' arch/powerpc/platforms/512x/clock.c
@@ -1151,6 +1151,8 @@ set_except () {
     initnc 'static const u8 rtl8225z2_tx_power_cck\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
     initnc 'static const u8 rtl8225z2_tx_power_cck_ch14\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
     initnc 'static const __u16 t10_dif_crc_table\[256\] =' lib/crc-t10dif.c
+    initnc 'static crb_128M_2M_block_map_t crb_128M_2M_map\[64\] =' drivers/net/netxen/netxen_hw.c
+    initnc 'static const __u16 crc10_table\[256\] =' drivers/usb/serial/safe_serial.c
     ;;
     
   */patch*2.6.26-rc*)
