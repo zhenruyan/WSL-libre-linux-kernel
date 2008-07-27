@@ -98,8 +98,21 @@ function dummy_blob {
 	    echo $1 exists, something is wrong >&2
 	    exit 1
 	else
-	    echo '/*(DEBLOBBED)*/' > $1
+	    echo "\$(obj)/$1: ; mkdir -p \$(dir \$@) && : > \$@" >> firmware/Makefile
 	fi
+}
+
+function clean_fw {
+	#$1 = firmware text input, $2 = firmware output
+	if test ! -f $1; then
+		echo $1 does not exist, something is wrong >&2
+		exit 1
+	elif test -f $2; then
+		echo $2 exists, something is wrong >&2
+		exit 1
+	fi
+	clean_blob $1
+	dummy_blob $2
 }
 
 function clean_kconfig {
@@ -172,20 +185,12 @@ done
 # Identify the tarball.
 sed -i "s,^EXTRAVERSION.*,&-libre$extra," Makefile
 
-# We use `# clean_blob\nclean_file' to indicate that a file is
-# allegedly under the GPL or some other compatible license, but we
-# don't have its sources.  Using the default deblobbing machinery
-# doesn't work, because then the binary firmware generators would barf
-# at the deblobbed file.
-
 #######################
 # Removed ATM Drivers #
 #######################
 
 # ATM_AMBASSADOR -  Madge Ambassador (Collage PCI 155 Server)
-# clean_blob
-clean_file firmware/atmsar11.HEX
-empty_blob firmware/atmsar11.fw
+clean_fw firmware/atmsar11.HEX firmware/atmsar11.fw
 
 # ATM_FORE200E_PCA
 # ATM_FORE200E_SBA - SBA-200E
@@ -299,9 +304,7 @@ clean_kconfig drivers/media/video/pwc/Kconfig 'USB_PWC'
 clean_mk CONFIG_USB_PWC drivers/media/video/Makefile
 
 # VIDEO_CPIA - CPiA Video For Linux
-# clean_blob
-clean_file firmware/cpia2/stv0672_vp4.bin.ihex
-dummy_blob firmware/cpia2/stv0672_vp4.bin
+clean_fw firmware/cpia2/stv0672_vp4.bin.ihex firmware/cpia2/stv0672_vp4.bin
 clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA'
 clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_PP'
 clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_USB'
@@ -312,12 +315,8 @@ clean_mk CONFIG_VIDEO_CPIA_USB drivers/media/video/Makefile
 clean_mk CONFIG_VIDEO_CPIA2 drivers/media/video/Makefile
 
 # USB_DABUSB - DABUSB driver
-# clean_blob
-clean_file firmware/dabusb/bitstream.bin.ihex
-dummy_blob firmware/dabusb/bitstream.bin
-# clean_blob
-clean_file firmware/dabusb/firmware.HEX
-dummy_blob firmware/dabusb/firmware.fw
+clean_fw firmware/dabusb/bitstream.bin.ihex firmware/dabusb/bitstream.bin
+clean_fw firmware/dabusb/firmware.HEX firmware/dabusb/firmware.fw
 clean_kconfig drivers/media/Kconfig 'USB_DABUSB'
 clean_mk CONFIG_USB_DABUSB drivers/media/video/Makefile
 
@@ -609,25 +608,15 @@ clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49WLC'
 clean_mk CONFIG_USB_SERIAL_KEYSPAN drivers/usb/serial/Makefile
 
 # USB_SERIAL_EDGEPORT - USB Inside Out Edgeport Serial Driver
-# clean_blob
-clean_file firmware/edgeport/boot.H16
-dummy_blob firmware/edgeport/boot.fw
-# clean_blob
-clean_file firmware/edgeport/down.H16
-dummy_blob firmware/edgeport/down.fw
-# clean_blob
-clean_file firmware/edgeport/down2.H16
-dummy_blob firmware/edgeport/down2.fw
+clean_fw firmware/edgeport/boot.H16 firmware/edgeport/boot.fw
+clean_fw firmware/edgeport/down.H16 firmware/edgeport/down.fw
+clean_fw firmware/edgeport/down2.H16 firmware/edgeport/down2.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT drivers/usb/serial/Makefile
 
 # USB_SERIAL_EDGEPORT_TI - USB Inside Out Edgeport Serial Driver (TI devices)
-# clean_blob
-clean_file firmware/edgeport/boot2.H16
-dummy_blob firmware/edgeport/boot2.fw
-# clean_blob
-clean_file firmware/edgeport/down3.bin.ihex
-dummy_blob firmware/edgeport/down3.bin
+clean_fw firmware/edgeport/boot2.H16 firmware/edgeport/boot2.fw
+clean_fw firmware/edgeport/down3.bin.ihex firmware/edgeport/down3.bin
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT_TI'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT_TI drivers/usb/serial/Makefile
 
@@ -640,15 +629,9 @@ clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_TI'
 clean_mk CONFIG_USB_SERIAL_TI drivers/usb/serial/Makefile
 
 # USB_SERIAL_WHITEHEAT - USB ConnectTech WhiteHEAT Serial Driver
-# clean_blob
-clean_file firmware/whiteheat.HEX
-dummy_blob firmware/whiteheat.fw
-# clean_blob
-clean_file firmware/whiteheat_loader.HEX
-dummy_blob firmware/whiteheat_loader.fw
-# clean_blob
-clean_file firmware/whiteheat_loader_debug.HEX
-dummy_blob firmware/whiteheat_loader_debug.fw
+clean_fw firmware/whiteheat.HEX firmware/whiteheat.fw
+clean_fw firmware/whiteheat_loader.HEX firmware/whiteheat_loader.fw
+clean_fw firmware/whiteheat_loader_debug.HEX firmware/whiteheat_loader_debug.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_WHITEHEAT'
 clean_mk CONFIG_USB_SERIAL_WHITEHEAT drivers/usb/serial/Makefile
 
