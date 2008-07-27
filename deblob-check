@@ -1124,6 +1124,13 @@ set_except () {
     initnc 'static crb_128M_2M_block_map_t crb_128M_2M_map\[64\] =' drivers/net/netxen/netxen_hw.c
     initnc 'static const __u16 crc10_table\[256\] =' drivers/usb/serial/safe_serial.c
     accept '[ 	]*\( *0\)*\( *1\)*[\n][ 	]*0 1 2 3 4 5 6 7 8 9 0 1 *2 3 4 5 6 7' 'Documentation/bt8xxgpio.txt'
+    initnc '	static int exp_lut\[256\] =' drivers/isdn/mISDN/dsp_audio.c
+    initnc 'static const u32 bf_pbox\[16 \+ 2\] =' drivers/isdn/mISDN/dsp_blowfish.c
+    initnc 'static const u32 bf_sbox\[256 \* 4\] =' drivers/isdn/mISDN/dsp_blowfish.c
+    initnc 'static u8 sample_\(german_\(all\|old\)\|american_\(dialtone\|ringing\|busy\)\|special[123]\|silence\)\[\] =' drivers/isdn/mISDN/dsp_tones.c
+    initnc 'struct pattern {[^}]*int tone;[^}]*} pattern\[\] =' drivers/isdn/mISDN/dsp_tones.c
+    initnc 'static u8 \([au]\|_4\)law_to_\([ua]law\|4bit\)\[256\] =' drivers/isdn/mISDN/l1oip_codec.c
+
     ;;
     
   */patch*2.6.26-rc*)
