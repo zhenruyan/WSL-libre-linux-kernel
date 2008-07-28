@@ -98,7 +98,7 @@ function dummy_blob {
 	    echo $1 exists, something is wrong >&2
 	    exit 1
 	else
-	    echo "\$(obj)/$1: ; mkdir -p \$(dir \$@) && : > \$@" >> firmware/Makefile
+	    hack_fwmk "NONFREE_FW += $2"
 	fi
 }
 
@@ -113,6 +113,17 @@ function clean_fw {
 	fi
 	clean_blob $1
 	dummy_blob $2
+}
+
+function hack_fwmk {
+	if test ! -f firmware/Makefile; then
+	    echo firmware/Makefile does not exist, something is wrong >&2
+	    exit 1
+	fi
+
+	sed -i "/^[ 	]*fw-shipped-all[ 	]*:=[ 	]*/i\
+$1
+" firmware/Makefile
 }
 
 function clean_kconfig {
@@ -184,6 +195,8 @@ done
 
 # Identify the tarball.
 sed -i "s,^EXTRAVERSION.*,&-libre$extra," Makefile
+
+hack_fwmk 'NONFREE_FW :='
 
 #######################
 # Removed ATM Drivers #
@@ -703,5 +716,9 @@ dummy_blob firmware/sb16/ima_adpcm_playback.csp
 # Most of this file is not matched by deblob-check because of WAIT_IDLE.
 # Just remove it.
 clean_file sound/isa/wavefront/yss225.c
+
+hack_fwmk 'fw-shipped-y := $(filter-out $(NONFREE_FW), $(fw-shipped-y))'
+hack_fwmk 'fw-shipped-m := $(filter-out $(NONFREE_FW), $(fw-shipped-m))'
+hack_fwmk 'fw-shipped-  := $(filter-out $(NONFREE_FW), $(fw-shipped-) )'
 
 exit 0
