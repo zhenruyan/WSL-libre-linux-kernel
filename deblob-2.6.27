@@ -507,6 +507,24 @@ clean_blob drivers/s390/net/qeth_core_mpc.c
 clean_kconfig drivers/s390/net/Kconfig 'QETH'
 clean_mk CONFIG_QETH drivers/s390/net/Makefile
 
+
+#####################
+# Removed SH boards #
+#####################
+
+# SH_AP325RXA - Renesas AP-325RXA board
+clean_blob arch/sh/boards/renesas/ap325rxa/setup.c
+clean_kconfig arch/sh/Kconfig 'SH_AP325RXA'
+clean_mk CONFIG_SH_AP325RXA arch/sh/boards/renesas/Makefile
+
+# SH_MIGOR - Reneasas Migo-R
+clean_blob arch/sh/boards/renesas/migor/lcd_qvga.c -s 16
+clean_blob arch/sh/boards/renesas/migor/setup.c
+clean_kconfig arch/sh/boards/renesas/Kconfig 'SH_MIGOR'
+clean_kconfig arch/sh/boards/renesas/migor/Kconfig 'SH_MIGOR_QVGA'
+clean_mk CONFIG_MIGOR_QVGA arch/sh/boards/renesas/Makefile
+
+
 ########################
 # Removed SCSI Drivers #
 ########################
