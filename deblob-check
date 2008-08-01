@@ -1134,7 +1134,7 @@ set_except () {
     ;;
     
   */drm-modesetting-radeon.patch)
-    initnc 'static int atm_dst_to_src\[8\]\[4\] =' drivers/gpu/drm/radeon/atom.c
+    initnc 'static int atom_dst_to_src\[8\]\[4\] =' drivers/gpu/drm/radeon/atom.c
     ;;
 
   */patch*2.6.26-rc*)
