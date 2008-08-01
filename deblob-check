@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-07-26
+# deblob-check version 2008-08-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1133,6 +1133,10 @@ set_except () {
 
     ;;
     
+  */drm-modesetting-radeon.patch)
+    initnc 'static int atm_dst_to_src\[8\]\[4\] =' drivers/gpu/drm/radeon/atom.c
+    ;;
+
   */patch*2.6.26-rc*)
     initnc 'static u64 vec2off\[68\] =' arch/ia64/kvm/process.c
     initnc "			interrupts = <\\(0x\\)\\?3 \\(0x\\)\\?0 \\(0x\\)\\?0  $blobpat*>;" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
