@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-08-01
+# deblob-check version 2008-08-02
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -986,7 +986,7 @@ set_except () {
     initnc 'static unsigned char a2232_65EC02code\[\] ='
     initnc 'static unsigned char atkbd_set3_keycode\[512\] ='
     initnc 'static unsigned char atkbd_unxlate_table\[128\] ='
-    initnc 'static unsigned char banner_table\[\] ='
+    initnc 'static unsigned char banner_table\[\] =' arch/sh/boards/superh/microdev/led.c
     initnc 'static unsigned char bootlogo_bits\[\] ='
     initnc 'static unsigned char bus2core_8260\[\] ='
     initnc 'static unsigned char bus2core_8280\[\] ='
@@ -1130,6 +1130,7 @@ set_except () {
     initnc 'static u8 sample_\(german_\(all\|old\)\|american_\(dialtone\|ringing\|busy\)\|special[123]\|silence\)\[\] =' drivers/isdn/mISDN/dsp_tones.c
     initnc 'struct pattern {[^}]*int tone;[^}]*} pattern\[\] =' drivers/isdn/mISDN/dsp_tones.c
     initnc 'static u8 \([au]\|_4\)law_to_\([ua]law\|4bit\)\[256\] =' drivers/isdn/mISDN/l1oip_codec.c
+    initnc 'static unsigned char banner_table\[\] =' arch/sh/boards/mach-microdev/led.c
 
     ;;
     
