@@ -734,6 +734,7 @@ dummy_blob firmware/sb16/ima_adpcm_playback.csp
 # Most of this file is not matched by deblob-check because of WAIT_IDLE.
 # Just remove it.
 clean_file sound/isa/wavefront/yss225.c
+clean_kconfig sound/isa/Kconfig 'SND_WAVEFRONT_FIRMWARE_IN_KERNEL'
 
 hack_fwmk 'fw-shipped-y := $(filter-out $(NONFREE_FW), $(fw-shipped-y))'
 hack_fwmk 'fw-shipped-m := $(filter-out $(NONFREE_FW), $(fw-shipped-m))'
