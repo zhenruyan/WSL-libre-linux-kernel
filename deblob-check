@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-08-02
+# deblob-check version 2008-08-04
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -490,6 +490,11 @@ set_except () {
     addx "$1[^;]*;\\?" $2
   }
 
+  # Same as initnc, but require the terminating semicolon.
+  defsnc () {
+    addx "$1[^;]*;" $2
+  }
+
   # Look for a multi-line definition starting with a line that matches
   # $1 (implicitly anchored to the beginning of the line), and ending
   # at the first ';' that's not within comments.
@@ -526,7 +531,7 @@ set_except () {
     # sensitivity, so make sure the sequences of numbers that are not
     # blobs are not deblobbed.  FIXME: we should have patterns to
     # recognize the blobs instead.
-    accept "	static const u32 test_pat\[4\]\[6\] = {$sepx$blobpat*$sepx};" drivers/net/tg3.c
+    defsnc '	static const u32 test_pat\[4\]\[6\] =' drivers/net/tg3.c
     accept "	}\\(,\\? mem_tbl_5\\(70x\\|705\\|755\\|906\\)\\[\\] = {$sepx$blobpat*$sepx}\\)*;" drivers/net/tg3.c
     ;;
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
@@ -553,11 +558,9 @@ set_except () {
     # checked:
 
     accept '	\$3 = {{pge = {{ste = {\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\) =\|<repeats [0-9]\+ times>\)[{},\n 	]*\)*<repeats 11 times>}'"$eol"
-    # arch/sparc/lib/divdi3.S
-    accept '__clz_tab:[\n]	\.byte	0\(,[0-5]\)\+'"$sepx$blobpat*"
-    accept 'PITBL:[\n]  \.long  0xC0040000,0xC90FDAA2,'"$blobpat*"
-    # arch/m68k/mac/mac_penguin.S
-    accept '\(0x[0F][0F],\)\+\\[\n]\(\(0x[0F][0F],\)\+\\[\n]\)*\(0x[0F][0F],\)\+0x00'
+    accept '__clz_tab:[\n]	\.byte	0\(,[0-5]\)\+'"$sepx$blobpat*" arch/sparc/lib/divdi3.S
+    accept 'PITBL:[\n]  \.long  0xC0040000,0xC90FDAA2,'"$blobpat*" arch/sparc/lib/divdi3.S
+    accept '\(0x[0F][0F],\)\+\\[\n]\(\(0x[0F][0F],\)\+\\[\n]\)*\(0x[0F][0F],\)\+0x00' arch/m68k/mac/mac_penguin.S
     accept '\.lowcase:[\n]	\.byte 0x00\(,0x0[1-7]\)\+'"$sepx$blobpat*$eol" arch/s390/kernel/head.S
     accept '_zb_findmap:[\n]         \.byte  0\(,[123],0\)\+,4'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
     accept '_sb_findmap:[\n]         \.byte  8\(,0,[123]\)\+,0'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
@@ -601,6 +604,21 @@ set_except () {
     initnc 'static uint tas300\(1c\|4\)_\(master\|mixer\|treble\|bass\)_tab\[\]='
     initnc 'static short dmasound_[au]law2dma16\[\] ='
     initnc 'static const unsigned short DACVolTable\[101\] ='
+
+    # in 2.6.22
+    initnc 'static const UQItype __clz_tab\[\] =' arch/arm26/lib/udivdi3.c
+    initnc '	static unsigned char scale\[101\] =' sound/oss/opl3sa2.c
+    initnc '} syncs\[\] =' drivers/scsi/53c7xx.c
+    initnc 'genoa_md:'"$sepx$blobpat*"'[\n]	\.ascii	"Genoa"' arch/i386/boot/video.S
+
+    # in 2.6.21
+    initnc 'Vendor ID  Product ID[\n]-\+  -\+[\n]'"$blobpat*" Documentation/video4linux/sn9c102.txt
+    defsnc 'static short [au]law2dma16\[\]' arch/ppc/8xx_io/cs4218_tdm.c
+    defsnc '	static const char minimal_ascii_table\[\]' drivers/ieee1394/csr1212.c
+    defsnc 'static u16 key_map \[256\] =' drivers/media/dvb/ttpci/av7110_ir.c
+    defsnc 'static unsigned char gf64_inv\[64\] =' drivers/mtd/nand/cafe_ecc.c
+    defsnc 'static unsigned short err_pos_lut\[4096\] =' drivers/mtd/nand/cafe_ecc.c
+    defsnc 'static unsigned char testdata\[TESTDATA_LEN\] =' fs/jffs2/comprtest.c
 
     # new in 2.6.25
     accept "%canned_values = ([\\n]	\\([0-9]\\+ => \\[[ 	\\n]\\+\\(\\([0-9]\\+\\|'0x[0-9a-f]\\+'\\),[ 	\\n]*\\)*\\]\\(, \\|[\\n]\\)\\)*);"
@@ -652,7 +670,7 @@ set_except () {
 
     # These are regarded as ok
     initnc 'static const u8 SN9C102_\(Y\|UV\)_QTABLE[01]\[64\] = {'
-    initnc '	static const u8 jpeg_header\[589\] = {'
+    initnc '	static \(const \)\?u8 jpeg_header\[589\] = {' media/video/sn9c102/sn9c102_core.c
     accept '[	]\{1,2\}err = sn9c102_write_const_regs(cam\(,[ 	\n]\+{0x[0-9a-fA-F][0-9a-fA-F], 0x[0-9a-fA-F][0-9a-fA-F]}\)*);'
 
     # too lax?
@@ -716,7 +734,7 @@ set_except () {
     initnc '	static unsigned char CRCTable2\[\] ='
     initnc '	static unsigned char default_colors\[\] ='
     initnc '	static unsigned char iso_regs\[8\]\[4\] ='
-    initnc '	static unsigned char log_scale\[101\] ='
+    initnc '	static unsigned char log_scale\[101\] =' sound/oss/pss.c
     initnc '	static unsigned char msg\[\] ='
     initnc '	static unsigned char static_pad\[\] ='
     initnc '	static unsigned char table_alaw2ulaw\[\] ='
@@ -761,7 +779,7 @@ set_except () {
     initnc 'static __u8 init7121ntsc\[\] ='
     initnc 'static __u8 init7121pal\[\] ='
     initnc 'static byte capidtmf_leading_zeroes_table\[0x100\] ='
-    initnc 'static char channel_map_madi_ss\[HDSPM_MAX_CHANNELS\] ='
+    defsnc 'static char channel_map_madi_[sdq]s\[HDSPM_MAX_CHANNELS\] =' sound/pci/rme9652/hdspm.c
     initnc 'static char coefficients\[NM_TOTAL_COEFF_COUNT \* 4\] ='
     initnc 'static char ecc_syndrome_table\[\] ='
     initnc 'static char isdn_audio_alaw_to_ulaw\[\] ='
@@ -876,7 +894,7 @@ set_except () {
     initnc 'static const unsigned short wd7000_iobase\[\] ='
     initnc 'static const unsigned short x86_keycodes\[256\] ='
     initnc 'static const unsigned table\[\] ='
-    initnc 'static int MV300_reg_8bit\[256\] ='
+    initnc 'static int MV300_reg_8bit\[256\] \?=' drivers/video/atafb.c
     initnc 'static int fifo_map\[\]\[MAX_TX_FIFOS\] ='
     initnc 'static int initial_lfsr\[\] ='
     initnc 'static int log_tbl\[129\] ='
@@ -887,7 +905,7 @@ set_except () {
     initnc 'static int reserve_list\[MAX_RES_ARGS\] ='
     initnc 'static int reverse6\[64\] ='
     initnc 'static short attack_time_tbl\[128\] ='
-    initnc 'static short beep_wform\[256\] ='
+    defsnc 'static short beep_wform\[256\] =' 'sound/ppc/beep.c|sound/oss/dmasound/dmasound_awacs.c|arch/ppc/8xx_io/cs4218_tdm.c'
     initnc 'static short decay_time_tbl\[128\] ='
     initnc 'static short isdn_audio_[ua]law_to_s16\[\] ='
     initnc 'static struct cipher_testvec anubis_cbc_dec_tv_template\[\] ='
@@ -1131,6 +1149,7 @@ set_except () {
     initnc 'struct pattern {[^}]*int tone;[^}]*} pattern\[\] =' drivers/isdn/mISDN/dsp_tones.c
     initnc 'static u8 \([au]\|_4\)law_to_\([ua]law\|4bit\)\[256\] =' drivers/isdn/mISDN/l1oip_codec.c
     initnc 'static unsigned char banner_table\[\] =' arch/sh/boards/mach-microdev/led.c
+    initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const \(yytype_u\?int\(8\|16\)\|\(unsigned \)\?\(short\( int\)\?\|char\)\) yy[^[]*\[\] =[*][/];' scripts/genksyms/parse.c_shipped
 
     ;;
     
