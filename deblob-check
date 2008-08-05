@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-08-04
+# deblob-check version 2008-08-05
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -708,7 +708,7 @@ set_except () {
     initnc '	#define WakeupSeq    {'
     initnc '	SetRate44100\[\] ='
     initnc '	const short period\[32\] ='
-    initnc '	\(const static\|static const\) int desc_idx_table\[\] ='
+    defsnc '	\(const static\|static const\) int desc_idx_table\[\] =' 'arch/arm/include/asm/hardware/iop3xx-adma.h|include/asm-arm/hardware/iop3xx-adma.h'
     initnc '	int prop_bcomm_irq\[3\*16\] ='
     initnc '	static char logSlopeTable\[128\] ='
     initnc '	static const int uc_\(dup\|word\)_table\[\]\[2\] ='
@@ -759,7 +759,7 @@ set_except () {
     initnc '#define OV511_QUANTABLESIZE	64'
     initnc 'BYTE BtCard::SRAMTable_\(NTSC\|PAL\)\[\] ='
     initnc 'BYTE SRAMTable\[\]\[ 60 \] ='
-    accept 'irq_prio_[hdlc]*:'"$sepx$blobpat*"
+    accept 'irq_prio_\([hdl]\|l[cd]\):'"$sepx$blobpat*" 'arch/arm/inlcude/asm/hardware/entry-macro-iomd.S|include/asm-arm/hardware/entry-macro-iomd.S'
     initc '__u8 _ascebc\[256\] ='
     initc '__u8 _ebc_tolower\[256\] ='
     initc '__u8 _ebc_toupper\[256\] ='
@@ -1150,6 +1150,8 @@ set_except () {
     initnc 'static u8 \([au]\|_4\)law_to_\([ua]law\|4bit\)\[256\] =' drivers/isdn/mISDN/l1oip_codec.c
     initnc 'static unsigned char banner_table\[\] =' arch/sh/boards/mach-microdev/led.c
     initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const \(yytype_u\?int\(8\|16\)\|\(unsigned \)\?\(short\( int\)\?\|char\)\) yy[^[]*\[\] =[*][/];' scripts/genksyms/parse.c_shipped
+    accept 'irq_prio_\([hdl]\|l[cd]\):'"$sepx$blobpat*" arch/arm/inlcude/asm/hardware/entry-macro-iomd.S
+    defsnc '	static const int desc_idx_table\[\] =' arch/arm/include/asm/hardware/iop3xx-adma.h
 
     ;;
     
