@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-08-05.1
+# deblob-check version 2008-08-12
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1152,6 +1152,9 @@ set_except () {
     initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const \(yytype_u\?int\(8\|16\)\|\(unsigned \)\?\(short\( int\)\?\|char\)\) yy[^[]*\[\] =[*][/];' scripts/genksyms/parse.c_shipped
     accept 'irq_prio_\([hdl]\|l[cd]\):'"$sepx$blobpat*" arch/arm/inlcude/asm/hardware/entry-macro-iomd.S
     defsnc '	static const int desc_idx_table\[\] =' arch/arm/include/asm/hardware/iop3xx-adma.h
+    defsnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const __u8 \(hv7131r\|mi0360\|mo4000\|ov76\(60\|48\)\)_sensor_init\[\]\[8\] = {[*][/];' drivers/media/video/gspca/sonixj.c
+    defsnc 'static const struct ath_hal ar5416hal =' drivers/net/wireless/ath9k/hw.c
+    defsnc 'static \(const \)\?u32 ar\(5416\|9280\)\(Modes\(_fast_clock\)\?\|Common\|BB_RfGain\|Bank6\(TPC\)\?\|Addac\)\(_91[06]0\(1_1\)\?\|_9280\(_2\)\?\)\?\[\]\[[236]\] =' drivers/net/wireless/ath9k/initvals.h
 
     ;;
     
