@@ -52,6 +52,15 @@
 # behind, and then it will refuse to run again before you clean it up
 # by hand.  It takes extra care to avoid overwriting useful files.
 
+# If deblob-$mver finds any unexpected situation, it will error out,
+# and then deblob-main will quit.  Pass --force to deblob-main, before
+# any other argument, for deblob-main to ignore any such situations.
+
+case $1 in
+--force) force=--force; shift;;
+*) force=;;
+esac
+
 mver=$1 extra=$2 sver=$3
 kver=$mver$sver libre=libre$extra
 deblob= dir=`echo $0 | sed 's,/[^/]*$,,'`
@@ -165,10 +174,15 @@ cp linux-$kver.tar linux-$kver-$libre.tar
 cp -lR linux-$kver/. linux-$kver-$libre
 
 echo Deblobbing within linux-$kver-$libre
-(cd linux-$kver-$libre && /bin/sh ../$deblob) || exit 1
+if (cd linux-$kver-$libre && /bin/sh ../$deblob $force); then
+  :
+else
+  echo $deblob failed, aborting >&2
+  exit 1
+fi
 rm -f linux-$kver-$libre.patch
 
-# Do not copy these scripts for now, deblob-check regards itself as a blog.
+# Do not copy these scripts for now, deblob-check regards itself as a blob.
 # cp -p $0 $deblob deblob-check linux-$kver-$libre
 
 echo Generating linux-$kver-$libre.patch

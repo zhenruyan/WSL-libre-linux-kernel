@@ -46,9 +46,13 @@
 # from 1 if changes are needed that require rebuilding the tarball.
 kver=2.6.25 extra=3++
 
+case $1 in
+--force) die () { echo ERROR: "$@": ignored >&2; }; shift;;
+*) die () { echo "$@" >&2; exit 1; };;
+esac
+
 if unifdef -Utest /dev/null; then :; else
-    echo unifdef is required >&2
-    exit 1
+    die unifdef is required
 fi
 
 check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
@@ -62,19 +66,16 @@ fi
 function clean_file {
 	#$1 = filename
 	if test ! -f $1; then
-		echo $1 does not exist, something is wrong >&2
-		exit 1
+		die $1 does not exist, something is wrong
 	fi
 	rm -v $1
 }
 
 function check_changed {
 	if test ! -f $1; then
-		echo $1 does not exist, something is wrong >&2
-		exit 1
+		die $1 does not exist, something is wrong
 	elif cmp $1.deblob $1 > /dev/null; then
-		echo $1 did not change, something is wrong >&2
-		exit 1
+		die $1 did not change, something is wrong
 	fi
 	mv $1.deblob $1
 }
@@ -83,8 +84,7 @@ function clean_blob {
 	#$1 = filename
 	if $have_check; then
 	    if test ! -f $1; then
-		echo $1 does not exist, something is wrong >&2
-		exit 1
+		die $1 does not exist, something is wrong
 	    fi
 	    name=$1
 	    echo Removing blobs from $name
@@ -163,8 +163,7 @@ for f in \
     sound/pci/cs46xx/imgs/cwcdma.asp \
 ; do
   if test ! $f; then
-    echo $f is not present, something is amiss >&2
-    exit 1
+    die $f is not present, something is amiss
   fi
 done
 
