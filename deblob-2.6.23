@@ -46,7 +46,7 @@
 # from 1 if changes are needed that require rebuilding the tarball.
 kver=2.6.23 extra=3++
 
-if unifdef /dev/null; then :; else
+if unifdef -Utest /dev/null; then :; else
     echo unifdef is required >&2
     exit 1
 fi
@@ -122,7 +122,7 @@ function clean_mk {
 function clean_ifdef {
 	#$1 = filename $2 = macro to -U
 	echo unifdefing $1 with -U$2
-	unifdef $1 -U$2 > $1.deblob
+	unifdef -U$2 $1 > $1.deblob
 	check_changed $1
 }
 
