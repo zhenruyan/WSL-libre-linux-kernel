@@ -83,7 +83,7 @@ else
 fi
 
 x1="kver=$mver extra=$extra"
-x2=`grep "^kver=[^ ]* extra=[0-9]*$" $deblob`
+x2=`grep "^kver=[^ ]* extra=" $deblob`
 if test "$x1" = "$x2"; then
   :
 else
@@ -211,11 +211,14 @@ echo Wiping out extracted trees
 rm -rf linux-$kver orig-linux-$kver
 
 echo Creating xdelta between linux-$kver.tar and linux-$kver-$libre.tar
-xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || :
+xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || echo error running xdelta, ignored >&2
 
 echo Compressing linux-$kver-$libre.tar and linux-$kver-$libre.xdelta
 rm -f linux-$kver.tar
-bzip2 -9 linux-$kver-$libre.tar linux-$kver-$libre.xdelta
+bzip2 -9 linux-$kver-$libre.tar
+if test -f linux-$kver-$libre.xdelta; then
+  bzip2 -9 linux-$kver-$libre.xdelta
+fi
 
 trap "status=$?; (exit $status); exit" 0 1 2 15
 
@@ -223,8 +226,10 @@ echo Done except for signing, feel free to interrupt
 gpg -a --detach-sign linux-$kver-$libre.tar.bz2
 mv linux-$kver-$libre.tar.bz2.asc linux-$kver-$libre.tar.bz2.sign
 
-gpg -a --detach-sign linux-$kver-$libre.xdelta.bz2
-mv linux-$kver-$libre.xdelta.bz2.asc linux-$kver-$libre.xdelta.bz2.sign
+if test -f linux-$kver-$libre.xdelta.bz2; then
+  gpg -a --detach-sign linux-$kver-$libre.xdelta.bz2
+  mv linux-$kver-$libre.xdelta.bz2.asc linux-$kver-$libre.xdelta.bz2.sign
+fi
 
 echo All set, please review linux-$kver-$libre.patch
 
