@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-08-12
+# deblob-check version 2008-09-07
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1113,12 +1113,13 @@ set_except () {
     initnc 'static const __u8 cxjpeg_\(640\|352\|320\|176\|qtable\)\[\]\[8\] =' drivers/media/video/gspca/conex.c
     initnc 'static const unsigned char quant\[\]\[0x88\] =' drivers/media/video/gspca/jpeg.h
     initnc 'static unsigned char huffman\[\] =' drivers/media/video/gspca/jpeg.h
-    initc '	static const struct ov_i2c_regvals norm_76[1247]0\[\] =' drivers/media/video/gspca/ov519.c
+    initc '	\?static const struct ov_i2c_regvals norm_76[1247]0\[\] =' drivers/media/video/gspca/ov519.c
     initnc 'static const __u8 pac207_sensor_init\[\]\[8\] =' drivers/media/video/gspca/pac207.c
     initnc 'static const __u8 pac7311_jpeg_header\[\] =' drivers/media/video/gspca/pac7311.c
+    initnc 'static const __u8 \(start\|page[34]\)_73\(02\|11\)\[\] =' drivers/media/video/gspca/pac7311.c
     initnc 'static const __u8 init\(Hv7131\|Ov\(6650\|7630\(_3\)\?\)\|Pas\(106\|202\)\|Tas51[13]0\)\[\] =' drivers/media/video/gspca/sonixb.c
     initnc 'static const __u8 \(hv7131\|ov\(6650\|7630\(_3\)\?\)\|pas\(106\|202\)\|tas51[13]0\)_sensor_init\(_com\)\?\[\]\[8\] =' drivers/media/video/gspca/sonixb.c
-    initnc 'static const __u8 \(hv7131r\|mi0360\|mo4000\|ov76\(60\|48\)\)_sensor_init\[\]\[8\] =' drivers/media/video/gspca/sonixj.c
+    defsnc 'static \(const \)\?__u8 \(hv7131r\|mi0360\|mo4000\|ov76\([36]0\|48\)\|om6802\)_sensor_init\[\]\[8\] =' drivers/media/video/gspca/sonixj.c
     initnc 'static const __u8 qtable4\[\] =' drivers/media/video/gspca/sonixj.c
     initnc 'static const __u16 \(spca500_visual\|Clicksmart510\)_defaults\[\]\[3\] =' drivers/media/video/gspca/spca500.c
     initnc 'static const __u8 qtable_\(creative_pccam\|kodak_ez200\|pocketdv\)\[2\]\[64\] =' drivers/media/video/gspca/spca500.c
