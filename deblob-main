@@ -211,7 +211,7 @@ echo Wiping out extracted trees
 rm -rf linux-$kver orig-linux-$kver
 
 echo Creating xdelta between linux-$kver.tar and linux-$kver-$libre.tar
-xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || echo error running xdelta, ignored >&2
+xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || : # xdelta returns nonzero on success
 
 echo Compressing linux-$kver-$libre.tar and linux-$kver-$libre.xdelta
 rm -f linux-$kver.tar
