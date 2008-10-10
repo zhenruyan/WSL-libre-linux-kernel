@@ -99,7 +99,7 @@ function dummy_blob {
 	    echo $1 exists, something is wrong >&2
 	    exit 1
 	else
-	    hack_fwmk "NONFREE_FW += $2"
+	    hack_fwmk "NONFREE_FW += $1"
 	fi
 }
 
