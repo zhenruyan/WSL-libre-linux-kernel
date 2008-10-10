@@ -112,7 +112,7 @@ function clean_fw {
 		echo $2 exists, something is wrong >&2
 		exit 1
 	fi
-	clean_blob $1
+	clean_blob $1 -s 4
 	dummy_blob $2
 }
 
@@ -210,9 +210,6 @@ clean_fw firmware/atmsar11.HEX firmware/atmsar11.fw
 clean_kconfig drivers/atm/Kconfig 'ATM_FORE.*'
 clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 
-clean_file drivers/atm/pca200e.data
-clean_file drivers/atm/pca200e_ecd.data
-clean_file drivers/atm/sba200e_ecd.data
 clean_kconfig drivers/atm/Kconfig 'ATM_AMBASSADOR'
 clean_mk CONFIG_ATM_AMBASSADOR drivers/atm/Makefile
 
@@ -230,17 +227,17 @@ clean_mk CONFIG_COMPUTONE drivers/char/Makefile
 # gpu drm
 
 # DRM_MGA - Matrox g200/g400
-clean_blob drivers/gpu/drm/mga_ucode.h
+clean_blob drivers/gpu/drm/mga/mga_ucode.h
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_MGA'
 clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
 # DRM_R128 - ATI Rage 128
-clean_blob drivers/gpu/drm/r128_cce.c
+clean_blob drivers/gpu/drm/r128/r128_cce.c
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 # DRM_RADEON - ATI Radeon
-clean_blob drivers/gpu/drm/radeon_microcode.h
+clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
 
@@ -393,7 +390,7 @@ clean_kconfig drivers/net/Kconfig 'MYRI_SBUS'
 clean_mk CONFIG_MYRI_SBUS drivers/net/Makefile
 
 # TEHUTI - Tehuti Networks 10G Ethernet
-clean_blob drivers/net/tehuti_fw.h
+clean_blob drivers/net/tehuti_fw.h -s 4
 clean_kconfig drivers/net/Kconfig 'TEHUTI'
 clean_mk CONFIG_TEHUTI drivers/net/Makefile
 
@@ -513,16 +510,16 @@ clean_mk CONFIG_QETH drivers/s390/net/Makefile
 #####################
 
 # SH_AP325RXA - Renesas AP-325RXA board
-clean_blob arch/sh/boards/renesas/ap325rxa/setup.c
-clean_kconfig arch/sh/Kconfig 'SH_AP325RXA'
-clean_mk CONFIG_SH_AP325RXA arch/sh/boards/renesas/Makefile
+clean_blob arch/sh/boards/board-ap325rxa.c
+clean_kconfig arch/sh/boards/Kconfig 'SH_AP325RXA'
+clean_mk CONFIG_SH_AP325RXA arch/sh/boards/Makefile
 
 # SH_MIGOR - Reneasas Migo-R
-clean_blob arch/sh/boards/renesas/migor/lcd_qvga.c -s 16
-clean_blob arch/sh/boards/renesas/migor/setup.c
-clean_kconfig arch/sh/boards/renesas/Kconfig 'SH_MIGOR'
-clean_kconfig arch/sh/boards/renesas/migor/Kconfig 'SH_MIGOR_QVGA'
-clean_mk CONFIG_MIGOR_QVGA arch/sh/boards/renesas/Makefile
+clean_blob arch/sh/boards/mach-migor/lcd_qvga.c -s 16
+clean_blob arch/sh/boards/mach-migor/setup.c
+clean_kconfig arch/sh/boards/Kconfig 'SH_MIGOR'
+clean_kconfig arch/sh/boards/mach-migor/Kconfig 'SH_MIGOR_QVGA'
+clean_mk CONFIG_SH_MIGOR_QVGA arch/sh/boards/mach-migor/Makefile
 
 
 ########################
