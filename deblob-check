@@ -2025,7 +2025,7 @@ check () {
   *.tar*)
     cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'"
     ;;
-  *.patch | */patch-* | *.diff)
+  *.patch | *.patch.*z* | */patch-* | *.diff | *.diff.*z*)
     if $reverse_patch; then
       s=- r=+
     else
