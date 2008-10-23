@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-10-21
+# deblob-check version 2008-10-23
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1330,7 +1330,7 @@ set_except () {
 
     # initnc 'static uint32_t nv\(4[013467ace]\|49_4b\|8[46]\)_ctx_\(voodoo\|prog\)\[\] =' 'drivers/char/drm/nv40_graph.c|.*'
     ;;
-  */linux-2.6-lirc.patch)
+  */linux-2.6*-lirc.patch)
     initnc 'const unsigned char map_table\[\] ='
     ;;
   */linux-2.6-modsign-mpilib.patch)
