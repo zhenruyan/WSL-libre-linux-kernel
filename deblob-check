@@ -1339,7 +1339,8 @@ set_except () {
   */linux-2.6.27-net-r8169-2.6.28.patch)
     defsnc '		*struct phy_reg phy_reg_init_[01]\[\] =' drivers/net/r8169.c
     ;;
-  */linux-2.6-wireless*.patch)
+  */linux-2.6-wireless*.patch | */linux-2.6-ath5k.patch | \
+  */git-wireless-dev.patch | */linux-2.6-zd1211rw-mac80211.patch)
     initnc 'const u\(8\|16\|32\) b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\] ='
     initnc 'static const s8 \(b43\(legacy\)\?\|bcm43xx\)_tssi2dbm_[bg]_table\[\] ='
     initnc 'static struct iwl\(3945\)\?_tx_power power_gain_table\[2\]\[IWL_MAX_GAIN_ENTRIES\] ='
@@ -1380,31 +1381,23 @@ set_except () {
     initnc 'static const u8 rtl8225z2_tx_power_cck\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
     initnc 'static const u8 rtl8225z2_tx_power_cck_ch14\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
 
-    initnc 'const u16 crc_itu_t_table\[256\] ='
-    initnc 'static const u16 tkip_sbox\[256\] ='
-
     # git logs
     accept '   sudo modprobe ath5k debug=0x00000400[\n][ 	]*[\n]\([ 	]*Band[^\n]*[\n]\([ 	]*\(\(channels\|rates\):\|[- 	0-9a-f]*\|\[\.\.\. etc \]\)[\n]\)\+\)\+       540 000c 0000 0000'
     oprepline '	{ 1, MODULATION_XR, 3000, 1, 150, 3 },'
+
+    # Fedora 8ish kernel-xen builds
+    initnc 'const u16 crc_itu_t_table\[256\] ='
+    initnc 'static const u16 tkip_sbox\[256\] ='
+    initnc 'static const struct ath5k_ini_mode ar5211_ini_mode\[\] ='
+    initnc 'static const struct ath5k_ini_mode ar5212_rf511[12]_ini_mode\[\] ='
+    initnc '	static const u8 log10\[\] ='
+    initnc 'static const u8 rtl8225z2_tx_gain_cck_ofdm\[\] ='
+    initnc 'static const u32 rf_vals_abg_5222\[\] ='
     ;;
+
   */linux-2.6-netdev-e1000e*.patch)
     # drivers/net/e1000e/phy.c
     initnc 'static const u16 e1000_igp_2_cable_length_table\[\] ='
-    ;;
-  */git-wireless-dev.patch)
-    # Fedora 8ish kernel-xen builds
-    initnc '	static const u8 log10\[\] ='
-    initnc 'static const u16 rtl8225bcd_rxgain\[\] ='
-    initnc 'static const u8 rtl8225_agc\[\] ='
-    initnc 'static const u8 rtl8225_tx_power_cck\[\] ='
-    initnc 'static const u8 rtl8225_tx_power_cck_ch14\[\] ='
-    initnc 'static const u16 rtl8225z2_rxgain\[\] ='
-    initnc 'static const u8 rtl8225z2_tx_gain_cck_ofdm\[\] ='
-    initnc 'static const s8 bcm43xx_tssi2dbm_[bg]_table\[\] ='
-    initnc 'static struct iwl_tx_power power_gain_table\[2\]\[IWL_MAX_GAIN_ENTRIES\] ='
-    initnc 'static const struct gain_entry gain_table\[2\]\[108\] ='
-    initnc 'static const u32 rf_vals_abg_5222\[\] ='
-    initnc '	static const u8 t\[\] ='
     ;;
   esac
 }  
