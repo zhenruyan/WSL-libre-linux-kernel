@@ -1380,6 +1380,9 @@ set_except () {
     initnc 'static const u8 rtl8225z2_tx_power_cck\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
     initnc 'static const u8 rtl8225z2_tx_power_cck_ch14\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
 
+    initnc 'const u16 crc_itu_t_table\[256\] ='
+    initnc 'static const u16 tkip_sbox\[256\] ='
+
     # git logs
     accept '   sudo modprobe ath5k debug=0x00000400[\n][ 	]*[\n]\([ 	]*Band[^\n]*[\n]\([ 	]*\(\(channels\|rates\):\|[- 	0-9a-f]*\|\[\.\.\. etc \]\)[\n]\)\+\)\+       540 000c 0000 0000'
     oprepline '	{ 1, MODULATION_XR, 3000, 1, 150, 3 },'
