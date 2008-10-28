@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-10-23
+# deblob-check version 2008-10-28
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1387,6 +1387,21 @@ set_except () {
   */linux-2.6-netdev-e1000e*.patch)
     # drivers/net/e1000e/phy.c
     initnc 'static const u16 e1000_igp_2_cable_length_table\[\] ='
+    ;;
+  */git-wireless-dev.patch)
+    # Fedora 8ish kernel-xen builds
+    initnc '	static const u8 log10\[\] ='
+    initnc 'static const u16 rtl8225bcd_rxgain\[\] ='
+    initnc 'static const u8 rtl8225_agc\[\] ='
+    initnc 'static const u8 rtl8225_tx_power_cck\[\] ='
+    initnc 'static const u8 rtl8225_tx_power_cck_ch14\[\] ='
+    initnc 'static const u16 rtl8225z2_rxgain\[\] ='
+    initnc 'static const u8 rtl8225z2_tx_gain_cck_ofdm\[\] ='
+    initnc 'static const s8 bcm43xx_tssi2dbm_[bg]_table\[\] ='
+    initnc 'static struct iwl_tx_power power_gain_table\[2\]\[IWL_MAX_GAIN_ENTRIES\] ='
+    initnc 'static const struct gain_entry gain_table\[2\]\[108\] ='
+    initnc 'static const u32 rf_vals_abg_5222\[\] ='
+    initnc '	static const u8 t\[\] ='
     ;;
   esac
 }  
