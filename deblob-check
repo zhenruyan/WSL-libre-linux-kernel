@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-11-05
+# deblob-check version 2008-12-03
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -563,7 +563,7 @@ set_except () {
     initnc '	\.initial_reg_values	= (struct ixp2000_reg_value \[\]) {'
     # drivers/net/ixp2000/ixp2400_rx.ucode -> ixp2400_rx.uc
     initnc '	\.initial_reg_values	= (struct ixp2000_reg_value \[\]) {'
-    initnc '[ 	]*\.\(digest\|entries\|input\|key\|output\|plaintext\|result\)[ 	]*= [{"]' crypto/tcrypt.h
+
 
     # checked:
 
@@ -578,7 +578,7 @@ set_except () {
     accept '	memcpy(src, "\\x01\\x00\\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00".*PROGxxxx' arch/powerpc/platforms/iseries/mf.c
     initnc 'static const unsigned int cpu_745x\[2\]\[16\] =' arch/ppc/platforms/ev64260.c
     initnc 'const unsigned char __flsm1_tab\[256\] =' arch/alpha/lib/fls.c
-    accept '#define _MAP_0_32_ASCII_SEG7_NON_PRINTABLE	\\[\n]	\(0,\)\+'"$eol" drivers/input/misc/map_to_7segment.h
+    accept '#define _MAP_0_32_ASCII_SEG7_NON_PRINTABLE	\\[\n]	\(0,\)\+'"$eol" 'drivers/input/misc/map_to_7segment\.h\|include/linux/map_to_7segment\.h'
     initc '	static int      init_values_b\[\] =' sound/oss/ad1848.c
     initnc 'static unsigned char atkbd_set2_keycode\[512\] =' drivers/input/keyboard/atkbd.c
     accept 'desc_config1:[\n]	\.byte 0x09, 0x02'"$sepx$blobpat*" 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
@@ -586,7 +586,7 @@ set_except () {
     accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
     accept '   [/][*] \(SQCIF\|QSIF\|QCIF\|SIF\|CIF\|VGA\) [*][/][\n]   {[\n]      {'"$blobpat*" drivers/media/video/pwc/pwc-nala.h
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/*.ppm
-    accept 'for i in [ 	0-9\\\n]*[\n]do' Documentation/specialix.txt
+    defsnc 'for i in [ 	0-9\\\n]*[\n]do' Documentation/specialix.txt
     accept '         :   3600000   3400000   3200000   3000000   2800000 ' Documentation/cpu-freq/cpufreq-stats.txt
     accept '00 00[\n]64 01[\n]8e 0b[\n][\n][0-9a-f \n]*fe fe' 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
     accept '0f 00 08 08 64 00 0a 00 - id 0[\n]'"$blobpat*" 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
@@ -597,16 +597,35 @@ set_except () {
     accept '  (gdb) x\/100x \$25[\n]  0x507d2434:     0x507d2434      0x00000000      0x08048000      0x080a4f8c'"$sepx$blobpat*" Documentation/uml/UserModeLinux-HOWTO.txt
     accept '      1  0  0  0  0x308'"$sepx$blobpat*" Documentation/isdn/README.inc
     accept 'domain<N> <cpumask> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'"$eol" Documentation/sched-stats.txt
-    accept '[ *	]*0                   1                   2                   3[\n][ *	]*0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1' 'net/ipv4/ipvs/ip_vs_sync.c|net/sctp/sm_make_chunk.c|include/linux/scpt.h'
+    accept '[ *	]*0                   1                   2                   3[\n][ *	]*0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1' 'net/\(netfilter\|ipv4\)/ipvs/ip_vs_sync.c|net/sctp/sm_make_chunk.c|include/linux/scpt.h'
     accept ' \*  1 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0' arch/x86/lguest/boot.c
     ocomment '	[/][*] Configure the PCI bus bursts and FIFO thresholds.' drivers/net/fealnx.c
     ocomment '[/][*] the original LUT values from Alex van Kaam <darkside@chello\.nl>' drivers/hwmon/via686a.c
     initc 'static const unsigned char init\[\] = {[^;]*MODE=0 ;.*SAA_7114_NTSC_HSYNC_START' drivers/media/video/saa7114.c
 
+    defsnc 'static struct cipher_testvec \(aes\|anubis\|bf\|camellia\|cts_mode\|des3_ede\|cast6\|salsa20_stream\|serpent\|tf\|tnepres\|xeta\|x\?tea\)\(_\(cbc\|ctr\|xts\)\)\?_\(enc\|dec\)_tv_template\[\] =' 'crypto/\(tcrypt\|testmgr\).h'
+    defsnc 'static struct comp_testvec \(deflate\|lzo\)_\(de\)\?comp_tv_template\[\] =' 'crypto/\(tcrypt\|testmgr\).h'
+    defsnc 'static struct hash_testvec \(aes_xcbc128\|crc32c\|hmac_sha2\(24\|56\)\|\(sha\|wp\)\(256\|384\|512\)\)_tv_template\[\] =' 'crypto/\(tcrypt\|testmgr\).h'
+    # initnc '[ 	]*\.\(digest\|entries\|input\|key\|output\|plaintext\|result\)[ \n	]*= [{"]' 'crypto/\(tcrypt\|testmgr\).h'
+
+    defsnc 'static \(const \)\?RegInitializer initData\[\] __initdata =' 'drivers/ide/ali14xx\.c\|drivers/ide/legacy/ali14xx\.c'
+    defsnc 'static const u8 setup\[\] =' 'drivers/ide/delkin_cb\.c\|drivers/ide/pci/delkin_cb\.c'
+    defsnc 'static u8 cvs_time_value\[\]\[XFER_UDMA_6 - XFER_UDMA_0 + 1\] =' 'drivers/ide/sis5513\.c\|drivers/ide/pci/sis5513\.c'
+    defsnc 'static u8 \(act\|ini\|rco\)_time_value\[\]\[8\] =' 'drivers/ide/sis5513\.c\|drivers/ide/pci/sis5513\.c'
+    defsnc 'static const u8 speedtab \[3\]\[12\] =' 'drivers/ide/umc8672\.c\|drivers/ide/legacy/umc8672\.c'
+    defsnc 'static const s8 \(b43\(\|legacy\)\|bcm43xx\)_tssi2dbm_[bg]_table\[\] =' net/wireless/b43/phy.c
+    defsnc 'static const char zr360[56]0_dht\[0x1a4\] =' 'drivers/media/video/zr36060\.c\|drivers/media/video/zoran/zr36060\.c'
+    defsnc 'static const char zr360[56]0_dqt\[0x86\] =' 'drivers/media/video/zr36060\.c\|drivers/media/video/zoran/zr36060\.c'
+    defsnc 'static unsigned char irq_xlate\[32\] =' arch/sparc/kernel/sun4m_irq.c
+    defsnc 'static int logitech_expanded_keymap\[LOGITECH_EXPANDED_KEYMAP_SIZE\] =' drivers/hid/hid-input.c
+    defsnc 'static const u_char nand_ecc_precalc_table\[\] =' drivers/mtd/nand/nand_ecc.c
+
+    # end of generic checked expressions.
+    # version-specific checked bits start here
+
     # in 2.6.23 only
     accept " Psize    Ipps       Tput     Rxint     Txint    Done     Ndone[\\n] ---------------------------------------------------------------\\([\\n][ 0-9]\\+\\)\\+$eol"
     initnc 'static u_short ataplain_map\[NR_KEYS\] __initdata ='
-    initnc 'static RegInitializer initData\[\] __initdata ='
     initnc '	static const unsigned char invert5\[\] ='
     initnc 'static unsigned char alpa2target\[\] ='
     initnc 'static unsigned char target2alpa\[\] ='
@@ -642,11 +661,7 @@ set_except () {
     initnc 'static u8 bnx2x_stats_len_arr\[BNX2X_NUM_STATS\] ='
     initnc 'static const struct arb_line read_arb_data\[NUM_RD_Q\]\[MAX_RD_ORD + 1\] ='
     initnc 'static const struct arb_line write_arb_data\[NUM_WR_Q\]\[MAX_WR_ORD + 1\] ='
-    oprepline '#define AR5K_RATES_11A '
-    oprepline '#define AR5K_RATES_11B '
-    oprepline '#define AR5K_RATES_11G '
-    oprepline '#define AR5K_RATES_TURBO '
-    oprepline '#define AR5K_RATES_XR '
+    oprepline '#define AR5K_RATES_\(11[ABG]\|TURBO\|XR\) ' drivers/net/wireless/ath5k/ath5k.h
     initnc '		} blinkrates\[\] ='
     initnc 'static const struct ath5k_ini ar5212_ini\[\] ='
     initnc 'static const struct ath5k_ini_mode rf5413_ini_mode_end\[\] ='
@@ -672,7 +687,6 @@ set_except () {
 
     # new in 2.6.27
     accept '	\.section __ex_table,"a"'"$sepx$blobpat*" 'arch/x86/lib/copy_user_\(nocache_\)\?64.S'
-    initnc 'static struct cipher_testvec des3_ede_cbc_\(enc\|dec\)_tv_template\[\] =' crypto/tcrypt.h
     accept 'desc_config1:[\n]	\.byte 0x09, 0x02'"$sepx$blobpat*" 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
     accept 'string_mfg:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_mfg_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
     accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
@@ -707,7 +721,7 @@ set_except () {
     initnc 'static const __u16 spca561_init_data\[\]\[2\] =' drivers/media/video/gspca/spca561.c
     initnc 'static const __u16 spca504\(_pccam600\|A_clicksmart420\)_\(init\|open\)_data\[\]\[3\] =' drivers/media/video/gspca/sunplus.c
     initnc 'static const __u8 qtable_\(creative_pccam\|spca504_default\)\[2\]\[64\] =' drivers/media/video/gspca/sunplus.c
-    initnc 'static const __u8 \(effects\|gamma\)_table\[MAX_[A-Z]*\]\[[0-9]*\] =' drivers/media/video/gspca/t631.c
+    initnc 'static const __u8 \(effects\|gamma\)_table\[\(MAX_[A-Z]*\|[A-Z]*_MAX\)\]\[[0-9]*\] =' drivers/media/video/gspca/t631.c
     initnc 'static const __u8 tas5130a_sensor_init\[\]\[8\] =' drivers/media/video/gspca/t613.c
     initnc '	static const __u8 \(read_indexs\|n\(set\)\?[0-9]*\|missing\)\[[0-9x]*\] =' drivers/media/video/gspca/t613.c
     initc 'static const __u8 \(mi13[12]0\|po3130\|hv7131r\|ov76[67]0\)_\(\(soc\)\?initQ\?VGA_\(JPG\|data\)\|rundata\)\[\]\[4\] =' drivers/media/video/gspca/vc032x.c
@@ -719,7 +733,7 @@ set_except () {
     initnc 'static const __u16 t10_dif_crc_table\[256\] =' lib/crc-t10dif.c
     initnc 'static crb_128M_2M_block_map_t crb_128M_2M_map\[64\] =' drivers/net/netxen/netxen_hw.c
     initnc 'static const __u16 crc10_table\[256\] =' drivers/usb/serial/safe_serial.c
-    accept '[ 	]*\( *0\)*\( *1\)*[\n][ 	]*0 1 2 3 4 5 6 7 8 9 0 1 *2 3 4 5 6 7' 'Documentation/bt8xxgpio.txt'
+    accept '[ 	]*\( *0\)*\( *1\)*[\n][ 	]*0 1 2 3 4 5 6 7 8 9 0 1 *2 3 4 5 6 7' Documentation/bt8xxgpio.txt
     initnc '	static int exp_lut\[256\] =' drivers/isdn/mISDN/dsp_audio.c
     initnc 'static const u32 bf_pbox\[16 \+ 2\] =' drivers/isdn/mISDN/dsp_blowfish.c
     initnc 'static const u32 bf_sbox\[256 \* 4\] =' drivers/isdn/mISDN/dsp_blowfish.c
@@ -748,8 +762,8 @@ set_except () {
     accept '[	]\{1,2\}err = sn9c102_write_const_regs(cam\(,[ 	\n]\+{0x[0-9a-fA-F][0-9a-fA-F], 0x[0-9a-fA-F][0-9a-fA-F]}\)*);'
 
     # too lax?
-    initnc 'static yyconst \(flex_int\(16\|32\)_t\|\(\(short \)\?int\)\) yy_[^[]*\[[][0-9]*\] ='
-    initnc 'static const \(yytype_u\?int\(8\|16\)\|\(unsigned \)\?\(short\( int\)\?\|char\)\) yy[^[]*\[\] ='
+    defsnc 'static yyconst \(flex_int\(16\|32\)_t\|\(\(short \)\?int\)\) yy_[^[]*\[[][0-9]*\] ='
+    defsnc 'static const \(yytype_u\?int\(8\|16\)\|\(unsigned \)\?\(short\( int\)\?\|char\)\) yy[^[]*\[\] ='
     initnc '\(\|	\)static \(const \|\)\(unsigned \(short\|char\)\|struct SiS_[^ ]*\) SiS[^[]*\(\[[] [*0-9]*\]\)\+ *='
 
     initnc 'static const a3d_Hrtf_t A3dHrirZeros = {'
@@ -860,16 +874,12 @@ set_except () {
     initnc 'static char isdn_audio_ulaw_to_alaw\[\] ='
     initnc 'static char mix_cvt\[101\] ='
     initnc 'static char opl3_volume_table\[128\] ='
-    initnc 'static const RegInitializer initData\[\] __initdata ='
     initnc 'static const __u16 crc10_table\[256\] ='
     initnc 'static const __u32 crc_c\[256\] ='
-    initnc 'static const char zr360[56]0_dht\[0x1a4\] ='
-    initnc 'static const char zr360[56]0_dqt\[0x86\] ='
     initnc 'static const fixp_t cos_table\[46\] ='
     initnc 'static const int init_seq\[\] ='
     initnc 'static const int mobile_vid_table\[32\] ='
     initnc 'static const s16 snd_opl4_pitch_map\[0x600\] ='
-    initnc 'static const s8 \(b43\(\|legacy\)\|bcm43xx\)_tssi2dbm_[bg]_table\[\] ='
     initnc 'static const s8 budtab\[256\] ='
     initnc 'static const struct aper_size_info_32 u3_sizes\[8\] ='
     initnc 'static const struct aper_size_info_8 via_generic_sizes\[9\] ='
@@ -938,11 +948,8 @@ set_except () {
     initnc 'static const u8 rtl8225_tx_power_cck\[\] ='
     initnc 'static const u8 rtl8225_tx_power_cck_ch14\[\] ='
     initnc 'static const u8 rtl8225z2_tx_gain_cck_ofdm\[\] ='
-    initnc 'static const u8 setup\[\] ='
-    initnc 'static const u8 speedtab \[3\]\[12\] ='
     initnc 'static const u_char irq_to_siubit\[\] ='
     initnc 'static const u_char irq_to_siureg\[\] ='
-    initnc 'static const u_char nand_ecc_precalc_table\[\] ='
     initnc 'static const uint8_t parity\[256\] ='
     initnc 'static const unsigned char \(UV\|Y\)_QUANTABLE\[64\] ='
     initnc 'static const unsigned char __initdata mV_mobilevrm\[32\] ='
@@ -960,7 +967,6 @@ set_except () {
     initnc 'static const unsigned char red\[256\] ='
     initnc 'static \(const \)\?unsigned char sjisibm2euc_map\[\]\[2\] ='
     initnc 'static const unsigned char vol_cvt_datt\[128\] ='
-    initnc 'static const unsigned char wm_vol\[256\] ='
     initnc 'static const unsigned int MulIdx\[16\]\[16\] ='
     initnc 'static const unsigned int crctab32\[\] ='
     initnc 'static const unsigned short crc_flex_table\[\] ='
@@ -972,7 +978,6 @@ set_except () {
     initnc 'static int fifo_map\[\]\[MAX_TX_FIFOS\] ='
     initnc 'static int initial_lfsr\[\] ='
     initnc 'static int log_tbl\[129\] ='
-    initnc 'static int logitech_expanded_keymap\[LOGITECH_EXPANDED_KEYMAP_SIZE\] ='
     initnc 'static int miro_fmtuner\[\]  ='
     initnc 'static int miro_tunermap\[\] ='
     initnc 'static int register_size\[\] ='
@@ -982,37 +987,6 @@ set_except () {
     defsnc 'static short beep_wform\[256\] =' 'sound/ppc/beep.c|sound/oss/dmasound/dmasound_awacs.c|arch/ppc/8xx_io/cs4218_tdm.c'
     initnc 'static short decay_time_tbl\[128\] ='
     initnc 'static short isdn_audio_[ua]law_to_s16\[\] ='
-    initnc 'static struct cipher_testvec anubis_cbc_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec anubis_cbc_enc_tv_template\[\] ='
-    initnc 'static struct cipher_testvec anubis_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec anubis_enc_tv_template\[\] ='
-    initnc 'static struct cipher_testvec camellia_cbc_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec camellia_cbc_enc_tv_template\[\] ='
-    initnc 'static struct cipher_testvec camellia_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec camellia_enc_tv_template\[\] ='
-    initnc 'static struct cipher_testvec cast6_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec cast6_enc_tv_template\[\] ='
-    initnc 'static struct cipher_testvec serpent_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec serpent_enc_tv_template\[\] ='
-    initnc 'static struct cipher_testvec tea_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec tea_enc_tv_template\[\] ='
-    initnc 'static struct cipher_testvec tf_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec tf_enc_tv_template\[\] ='
-    initnc 'static struct cipher_testvec tnepres_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec xeta_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec xeta_enc_tv_template\[\] ='
-    initnc 'static struct cipher_testvec xtea_dec_tv_template\[\] ='
-    initnc 'static struct cipher_testvec xtea_enc_tv_template\[\] ='
-    initnc 'static struct comp_testvec deflate_decomp_tv_template\[\] ='
-    initnc 'static struct hash_testvec aes_xcbc128_tv_template\[\] =' crypto/tcrypt.h
-    initnc 'static struct hash_testvec crc32c_tv_template\[\] ='
-    initnc 'static struct hash_testvec hmac_sha256_tv_template\[\] =' crypto/tcrypt.h
-    initnc 'static struct hash_testvec sha256_tv_template\[\] ='
-    initnc 'static struct hash_testvec sha384_tv_template\[\] ='
-    initnc 'static struct hash_testvec sha512_tv_template\[\] ='
-    initnc 'static struct hash_testvec wp256_tv_template\[\] ='
-    initnc 'static struct hash_testvec wp384_tv_template\[\] ='
-    initnc 'static struct hash_testvec wp512_tv_template\[\] ='
     initnc 'static struct iwl\(3945\)\?_tx_power power_gain_table\[2\]\[IWL_MAX_GAIN_ENTRIES\] ='
     initnc 'static struct ovcamchip_regvals regvals_init_\(76be\|7[16]20\|7x10\)\[\] ='
     initnc 'static struct regval_list ov7670_default_regs\[\] ='
@@ -1035,14 +1009,11 @@ set_except () {
     initnc 'static u32 adwDecim8\[33\] ='
     initnc 'static u32 h_prescale\[64\] ='
     initnc 'static u32 v_gain\[64\] ='
-    initnc 'static u8 cvs_time_value\[\]\[XFER_UDMA_6 - XFER_UDMA_0 + 1\] ='
     initnc 'static u8 SRAM_Table\[\]\[60\] ='
-    initnc 'static u8 act_time_value\[\]\[8\] ='
     initnc 'static u8 alps_tdee4_stv0297_inittab\[\] ='
     initnc 'static u8 bnx2_5706_stats_len_arr\[BNX2_NUM_STATS\] ='
     initnc 'static u8 bnx2_5708_stats_len_arr\[BNX2_NUM_STATS\] ='
     initnc 'static u8 flit_desc_map\[\] ='
-    initnc 'static u8 ini_time_value\[\]\[8\] ='
     initnc 'static u8 init_tab \[\] ='
     initnc 'static u8 mac_reader\[\] ='
     initnc 'static u8 mt2131_config1\[\] =' drivers/media/dvb/frontends/mt2131.c # <= 2.6.25
@@ -1050,7 +1021,6 @@ set_except () {
     initnc 'static u8 mt2266_init2\[\] =' drivers/media/dvb/frontends/mt2266.c # <= 2.6.25
     initnc 'static u8 mt2266_init2\[\] =' drivers/media/common/tuners/mt2266.c # >= 2.6.26
     initnc 'static u8 opera1_inittab\[\] ='
-    initnc 'static u8 rco_time_value\[\]\[8\] ='
     initnc 'static u8 saa7113_init_regs\[\] ='
     initnc 'static u8 samsung_tbmu24112_inittab\[\] ='
     initnc 'static u8 tas3004_treble_table\[\] ='
@@ -1088,7 +1058,6 @@ set_except () {
     initnc 'static unsigned char expressiontab\[128\] ='
     initnc 'static unsigned char header2\[\] ='
     initnc 'static unsigned char hidp_keycode\[256\] ='
-    initnc 'static unsigned char irq_xlate\[32\] ='
     initnc 'static unsigned char nkbd_keycode\[128\] ='
     initnc 'static unsigned char pan_volumes\[256\] ='
     initnc 'static unsigned char parm_block\[32\] ='
@@ -1164,6 +1133,77 @@ set_except () {
     initnc '} vsb_snr_tab\[\] ='
     initnc '} yss225_registers\[\] __devinitdata ='
 
+    ;;
+
+  */patch*2.6.28-rc*)
+    # new in 2.6.28
+    accept '\(static \)\?const char \(inv\)\?parity\[256\] = {[	 \n01,]*};' 'Documentation/mtd/nand_ecc\.txt\|drivers/mtd/nand/nand_ecc\.c'
+    defsnc 'static const char \(bitsperbyte\|addressbits\)\[256\] =' drivers/mtd/nand/nand_ecc.c
+    defsnc 'static struct pinmux_cfg_reg pinmux_config_regs\[\] =' arch/sh/kernel/cpu/sh2a/pinmux-sh7203.c
+    defsnc '	static const u8 e_keymap\[\] =' drivers/hid/hid-lg.c
+    defsnc '		*struct phy_reg phy_reg_init_[01]\[\] =' drivers/net/r8169.c
+    defsnc 'DEFINE_DEFAULT_PDR(0x0161, 256,' drivers/net/wireless/hermes_dld.c
+    defsnc 'static const int isink_cur\[\] =' drivers/regulator/wm8350-regulator.c
+    defsnc 'static const s16 \(converge_speed_ipb\?\|LAMBDA_table\[4\]\)\[101\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc 'static const u32 addrinctab\[33\]\[2\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc 'static const u8 \(default_intra_quant_table\|\(val\|bits\)_[ad]c_\(lu\|chro\)minance\)\[\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc 'static const int zz\[64\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc '	u16 pack\[\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc 'static u8 \(initial\|channel\)_registers\[\] =' 'drivers/staging/go7007/wis-\(ov7640\|saa7113\|tw2804\).c'
+    defsnc 'u16 MTO_One_Exchange_Time_Tbl_[ls]\[MTO_MAX_FRAG_TH_LEVELS\]\[MTO_MAX_DATA_RATE_LEVELS\] =' drivers/staging/winbond/mto.c
+    defsnc 'u32 \(al2230_txvga_data\|w89rf242_txvga_old_mapping\)\[\]\[2\] =' drivers/staging/winbond/reg.c
+    defsnc 'static const UINT16 crc16tab\[256\] =' drivers/staging/wlan-ng/hfa384x.c
+    defsnc 'static const UINT32 wep_crc32_table\[256\] =' drivers/staging/wlan-ng/p80211wep.c
+    defsnc 'static const unsigned char wm_vol\[256\] =' sound/pci/ice1712/phase.c
+    defsnc 'static const u16 wm8900_reg_defaults\[WM8900_MAXREG\] =' sound/soc/wm8900.c
+    defsnc '} \(clk_sys_ratios\|bclk_divs\)\[\] =' sound/soc/wm8903.c
+    defsnc 'static u8 af9015_ir_table_\(leadtek\|twinhan\|a_link\|msi\|mygictv\|kworld\)\[\] =' drivers/media/dvb/dvb-usb/af9015.h
+    defsnc 'static struct snr_table \(qpsk\|qam\(16\|64\)\)_snr_table\[\] =' drivers/media/dvb/frontends/af9013_priv.h
+    defsnc 'static struct regdesc \(ofsm_init\|tuner_init_\(env77h11d5\|mt2060\(\|_2\)\|mxl500\(3d\|5\)\|qt1010\|mc44s803\|unknown\|tda18271\)\)\[\] =' drivers/media/dvb/frontends/af9013_priv.h
+    defsnc 'static u8 stv0288_earda_inittab\[\] =' drivers/media/dvb/frontends/eds1547.h
+    defsnc 'static u8 serit_sp1511lhb_inittab\[\] =' drivers/media/dvb/frontends/si21xx.c
+    defsnc 'static u8 stv0288_inittab\[\] =' drivers/media/dvb/frontends/stv0288.c
+
+    # Suspicious, deblob for now, until contributor responds.
+    # defsnc '	static u16 \(sr\|twinax\)_edc\[\] =' drivers/net/cxgb3/ael1002.cn
+    # Non-Free license in entire file.
+    blob 'static unsigned char xilinx_firm\(\|_4610\)\[\] = {'"$sepx$blobseq*$sepx"'};' 'drivers/staging/me4000/me4\(00\|61\)0_firmware\.h' # CONFIG_ME4000
+
+    # Deblobbing needed.
+    blob 'static u8 \(Mojave\|Oasis\)UCode\[2\]\[65536\] ='"$sepx$blobseq*$sepx"';' 'drivers/staging/slicoss/\(gb\|oasis\(dbg\)\?\)download\.h' # CONFIG_SLICOSS
+    blob 'static u8 \(GB\|Oasis\)RcvUCode\[2560\] ='"$sepx$blobseq*$sepx"';' 'drivers/staging/slicoss/\(gb\|oasis\)rcvucode\.h' # CONFIG_SLICOSS
+    blob 'static unsigned char SaharaUCode\[2\]\[57972\] ='"$sepx$blobseq*$sepx"';' drivers/staging/sxg/saharadbgdownload.h # CONFIG_SXG
+    blob 'static PHY_UCODE PhyUcode\[\] =[^;]*;' drivers/staging/sxg/sxgphycode.h # CONFIG_SXG
+
+    # ok from earlier releases
+    accept 'for i in [ 	0-9\\\n]*[\n]do' Documentation/specialix.txt
+    defsnc 'static yyconst flex_int\(16\|32\)_t yy_[^[]*\[[0-9]*\] =' '.*\.lex\.c_shipped'
+    defsnc 'static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =' '.*\.lex\.c_shipped'
+    initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =[*][/];' '.*\.tab\.c_shipped'
+    defsnc 'static struct cipher_testvec \(aes\|anubis\|bf\|camellia\|cts_mode\|des3_ede\|cast6\|salsa20_stream\|serpent\|tf\|tnepres\|xeta\|x\?tea\)\(_\(cbc\|ctr\|xts\)\)\?_\(enc\|dec\)_tv_template\[\] =' 'crypto/\(tcrypt\|testmgr\).h'
+    defsnc 'static struct comp_testvec \(deflate\|lzo\)_\(de\)\?comp_tv_template\[\] =' 'crypto/\(tcrypt\|testmgr\).h'
+    defsnc 'static struct hash_testvec \(aes_xcbc128\|crc32c\|hmac_sha2\(24\|56\)\|\(sha\|wp\)\(256\|384\|512\)\)_tv_template\[\] =' 'crypto/\(tcrypt\|testmgr\).h'
+    defsnc 'static \(const \)\?RegInitializer initData\[\] __initdata =' 'drivers/ide/ali14xx\.c\|drivers/ide/legacy/ali14xx\.c'
+    defsnc 'static const u8 setup\[\] =' 'drivers/ide/pci/delkin_cb\.c\|drivers/ide/delkin_cb\.c'
+    defsnc 'static u8 cvs_time_value\[\]\[XFER_UDMA_6 - XFER_UDMA_0 + 1\] =' 'drivers/ide/sis5513\.c\|drivers/ide/pci/sis5513\.c'
+    defsnc 'static u8 \(act\|ini\|rco\)_time_value\[\]\[8\] =' 'drivers/ide/sis5513\.c\|drivers/ide/pci/sis5513\.c'
+    defsnc 'static const u8 speedtab \[3\]\[12\] =' 'drivers/ide/umc8672\.c\|drivers/ide/legacy/umc8672\.c'
+    initnc 'static const __u8 \(effects\|gamma\)_table\[\(MAX_[A-Z]*\|[A-Z]*_MAX\)\]\[[0-9]*\] =' drivers/media/video/gspca/t631.c
+    defsnc 'static const s8 \(b43\(\|legacy\)\|bcm43xx\)_tssi2dbm_[bg]_table\[\] =' net/wireless/b43/phy.c
+    accept '#define _MAP_0_32_ASCII_SEG7_NON_PRINTABLE	\\[\n]	\(0,\)\+'"$eol" 'drivers/input/misc/map_to_7segment\.h\|include/linux/map_to_7segment\.h'
+    accept '[ *	]*0                   1                   2                   3[\n][ *	]*0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1' 'net/\(netfilter\|ipv4\)/ipvs/ip_vs_sync.c|net/sctp/sm_make_chunk.c|include/linux/scpt.h'
+    defsnc 'static const unsigned char wm_vol\[256\] =' sound/pci/ice1712/phase.c
+    defsnc 'static const char zr360[56]0_dht\[0x1a4\] =' 'drivers/media/video/zr36060\.c\|drivers/media/video/zoran/zr36060\.c'
+    defsnc 'static const char zr360[56]0_dqt\[0x86\] =' 'drivers/media/video/zr36060\.c\|drivers/media/video/zoran/zr36060\.c'
+
+    # These are removed in 2.6.28, they're here so --reverse-patch tests pass.
+    defsnc 'static unsigned char irq_xlate\[32\] =' arch/sparc/kernel/sun4m_irq.c
+    defsnc 'static int logitech_expanded_keymap\[LOGITECH_EXPANDED_KEYMAP_SIZE\] =' drivers/hid/hid-input.c
+    initc '	static const __u8 \(read_indexs\|n\(set\)\?[0-9]*\|missing\)\[[0-9x]*\] =' drivers/media/video/gspca/t613.c
+    defsnc 'static const u_char nand_ecc_precalc_table\[\] =' drivers/mtd/nand/nand_ecc.c
+    oprepline '#define AR5K_RATES_\(11[ABG]\|TURBO\|XR\) ' drivers/net/wireless/ath5k/ath5k.h
+    defsnc 'static const struct ath_hal ar5416hal =' drivers/net/wireless/ath9k/hw.c
+    initc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const __u8 ov7630_sensor_init\[\]\[8\] = {[*][/];' drivers/media/video/gspca/sonixj.c
     ;;
 
   */patch*2.6.27-rc* | */patch*2.6.26-git* | */git-linus.diff)
@@ -1253,8 +1293,8 @@ set_except () {
     oprepline '#define AR5K_RATES_11[ABG] ' drivers/net/wireless/ath5k/ath5k.h
     oprepline '	{ 1, MODULATION_XR, 1000, 2, 139, 1 },	' drivers/net/wireless/ath5k/ath5k.h
     initnc 'static const struct ath5k_ini_mode rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c
-    initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =[*][/];' scripts/kconfig/zconf.tab.c_shipped
-    initnc 'static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =' scripts/kconfig/zconf.tab.c_shipped
+    initnc 'static yyconst flex_int\(16\|32\)_t yy_[^[]*\[[0-9]*\] =' '.*\.lex\.c_shipped'
+    initnc 'static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =' '.*\.lex\.c_shipped'
     # new in 2.6.26
     initnc 'static struct mse2snr_tab \(vsb\|qam\(64\|256\)\)_mse2snr_tab\[\] =' drivers/media/dvb/frontends/au8522.c
     initnc '} \(VSB\|QAM\)_mod_tab\[\] =' drivers/media/dvb/frontends/au8522.c
