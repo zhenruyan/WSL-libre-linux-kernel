@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-12-03
+# deblob-check version 2008-12-04
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -616,14 +616,20 @@ set_except () {
     defsnc 'static const s8 \(b43\(\|legacy\)\|bcm43xx\)_tssi2dbm_[bg]_table\[\] =' net/wireless/b43/phy.c
     defsnc 'static const char zr360[56]0_dht\[0x1a4\] =' 'drivers/media/video/zr36060\.c\|drivers/media/video/zoran/zr36060\.c'
     defsnc 'static const char zr360[56]0_dqt\[0x86\] =' 'drivers/media/video/zr36060\.c\|drivers/media/video/zoran/zr36060\.c'
-    defsnc 'static unsigned char irq_xlate\[32\] =' arch/sparc/kernel/sun4m_irq.c
-    defsnc 'static int logitech_expanded_keymap\[LOGITECH_EXPANDED_KEYMAP_SIZE\] =' drivers/hid/hid-input.c
-    defsnc 'static const u_char nand_ecc_precalc_table\[\] =' drivers/mtd/nand/nand_ecc.c
 
     # end of generic checked expressions.
     # version-specific checked bits start here
 
-    # in 2.6.23 only
+    # removed in 2.6.28
+    defsnc 'static unsigned char irq_xlate\[32\] =' arch/sparc/kernel/sun4m_irq.c
+    defsnc 'static int logitech_expanded_keymap\[LOGITECH_EXPANDED_KEYMAP_SIZE\] =' drivers/hid/hid-input.c
+    initnc '	static const __u8 \(read_indexs\|n\(set\)\?[0-9]*\|missing\)\[[0-9x]*\] =' drivers/media/video/gspca/t613.c
+    defsnc 'static const u_char nand_ecc_precalc_table\[\] =' drivers/mtd/nand/nand_ecc.c
+    oprepline '#define AR5K_RATES_\(11[ABG]\|TURBO\|XR\) ' drivers/net/wireless/ath5k/ath5k.h
+    defsnc 'static const struct ath_hal ar5416hal =' drivers/net/wireless/ath9k/hw.c
+    defsnc 'const unsigned char INIT_2\[127\] =' drivers/video/omap/lcd_sx1.c
+
+    # removed in 2.6.24
     accept " Psize    Ipps       Tput     Rxint     Txint    Done     Ndone[\\n] ---------------------------------------------------------------\\([\\n][ 0-9]\\+\\)\\+$eol"
     initnc 'static u_short ataplain_map\[NR_KEYS\] __initdata ='
     initnc '	static const unsigned char invert5\[\] ='
@@ -634,13 +640,13 @@ set_except () {
     initnc 'static short dmasound_[au]law2dma16\[\] ='
     initnc 'static const unsigned short DACVolTable\[101\] ='
 
-    # in 2.6.22
+    # removed in 2.6.23
     initnc 'static const UQItype __clz_tab\[\] =' arch/arm26/lib/udivdi3.c
     initnc '	static unsigned char scale\[101\] =' sound/oss/opl3sa2.c
     initnc '} syncs\[\] =' drivers/scsi/53c7xx.c
     initnc 'genoa_md:'"$sepx$blobpat*"'[\n]	\.ascii	"Genoa"' arch/i386/boot/video.S
 
-    # in 2.6.21
+    # removed in 2.6.22
     initnc 'Vendor ID  Product ID[\n]-\+  -\+[\n]'"$blobpat*" Documentation/video4linux/sn9c102.txt
     defsnc 'static short [au]law2dma16\[\]' arch/ppc/8xx_io/cs4218_tdm.c
     defsnc '	static const char minimal_ascii_table\[\]' drivers/ieee1394/csr1212.c
@@ -649,7 +655,7 @@ set_except () {
     defsnc 'static unsigned short err_pos_lut\[4096\] =' drivers/mtd/nand/cafe_ecc.c
     defsnc 'static unsigned char testdata\[TESTDATA_LEN\] =' fs/jffs2/comprtest.c
 
-    # new in 2.6.25
+    # added in 2.6.25
     accept "%canned_values = ([\\n]	\\([0-9]\\+ => \\[[ 	\\n]\\+\\(\\([0-9]\\+\\|'0x[0-9a-f]\\+'\\),[ 	\\n]*\\)*\\]\\(, \\|[\\n]\\)\\)*);"
 
     # from 2.6.25-rc* patches
@@ -661,7 +667,6 @@ set_except () {
     initnc 'static u8 bnx2x_stats_len_arr\[BNX2X_NUM_STATS\] ='
     initnc 'static const struct arb_line read_arb_data\[NUM_RD_Q\]\[MAX_RD_ORD + 1\] ='
     initnc 'static const struct arb_line write_arb_data\[NUM_WR_Q\]\[MAX_WR_ORD + 1\] ='
-    oprepline '#define AR5K_RATES_\(11[ABG]\|TURBO\|XR\) ' drivers/net/wireless/ath5k/ath5k.h
     initnc '		} blinkrates\[\] ='
     initnc 'static const struct ath5k_ini ar5212_ini\[\] ='
     initnc 'static const struct ath5k_ini_mode rf5413_ini_mode_end\[\] ='
@@ -723,7 +728,6 @@ set_except () {
     initnc 'static const __u8 qtable_\(creative_pccam\|spca504_default\)\[2\]\[64\] =' drivers/media/video/gspca/sunplus.c
     initnc 'static const __u8 \(effects\|gamma\)_table\[\(MAX_[A-Z]*\|[A-Z]*_MAX\)\]\[[0-9]*\] =' drivers/media/video/gspca/t631.c
     initnc 'static const __u8 tas5130a_sensor_init\[\]\[8\] =' drivers/media/video/gspca/t613.c
-    initnc '	static const __u8 \(read_indexs\|n\(set\)\?[0-9]*\|missing\)\[[0-9x]*\] =' drivers/media/video/gspca/t613.c
     initc 'static const __u8 \(mi13[12]0\|po3130\|hv7131r\|ov76[67]0\)_\(\(soc\)\?initQ\?VGA_\(JPG\|data\)\|rundata\)\[\]\[4\] =' drivers/media/video/gspca/vc032x.c
     initnc 'static const struct usb_action \(cs2102\|hdcs2020xx\|icm105axx\|ov7630c\|pb0330[3x]x\)_Initial\(Scale\)\?\[\] =' drivers/media/video/gspca/zc3xx.c
     initnc 'static const u8 rtl8225z2_agc\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
@@ -745,7 +749,6 @@ set_except () {
     accept 'irq_prio_\([hdl]\|l[cd]\):'"$sepx$blobpat*" arch/arm/inlcude/asm/hardware/entry-macro-iomd.S
     defsnc '	static const int desc_idx_table\[\] =' arch/arm/include/asm/hardware/iop3xx-adma.h
     defsnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const __u8 \(hv7131r\|mi0360\|mo4000\|ov76\(60\|48\)\)_sensor_init\[\]\[8\] = {[*][/];' drivers/media/video/gspca/sonixj.c
-    defsnc 'static const struct ath_hal ar5416hal =' drivers/net/wireless/ath9k/hw.c
     defsnc 'static \(const \)\?u32 ar\(5416\|9280\)\(Modes\(_fast_clock\)\?\|Common\|BB_RfGain\|Bank6\(TPC\)\?\|Addac\)\(_91[06]0\(1_1\)\?\|_9280\(_2\)\?\)\?\[\]\[[236]\] =' drivers/net/wireless/ath9k/initvals.h
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
@@ -858,7 +861,6 @@ set_except () {
     initnc 'const u16 crc_itu_t_table\[256\] ='
     initnc 'const u8 byte_rev_table\[256\] ='
     initnc 'const u8 crc7_syndrome_table\[256\] ='
-    initnc 'const unsigned char INIT_2\[127\] ='
     initnc 'int snd_sf_vol_table\[128\] ='
     initnc 'static	u_char	irq_to_siubit\[\] ='
     initnc 'static	u_char	irq_to_siureg\[\] ='
@@ -1203,6 +1205,8 @@ set_except () {
     defsnc 'static const u_char nand_ecc_precalc_table\[\] =' drivers/mtd/nand/nand_ecc.c
     oprepline '#define AR5K_RATES_\(11[ABG]\|TURBO\|XR\) ' drivers/net/wireless/ath5k/ath5k.h
     defsnc 'static const struct ath_hal ar5416hal =' drivers/net/wireless/ath9k/hw.c
+    defsnc 'const unsigned char INIT_2\[127\] =' drivers/video/omap/lcd_sx1.c
+
     initc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const __u8 ov7630_sensor_init\[\]\[8\] = {[*][/];' drivers/media/video/gspca/sonixj.c
     ;;
 
