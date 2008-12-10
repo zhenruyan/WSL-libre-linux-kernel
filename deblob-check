@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-12-04
+# deblob-check version 2008-12-09
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -616,6 +616,7 @@ set_except () {
     defsnc 'static const s8 \(b43\(\|legacy\)\|bcm43xx\)_tssi2dbm_[bg]_table\[\] =' net/wireless/b43/phy.c
     defsnc 'static const char zr360[56]0_dht\[0x1a4\] =' 'drivers/media/video/zr36060\.c\|drivers/media/video/zoran/zr36060\.c'
     defsnc 'static const char zr360[56]0_dqt\[0x86\] =' 'drivers/media/video/zr36060\.c\|drivers/media/video/zoran/zr36060\.c'
+    defsnc 'static u8 tas3004_treble_table\[\] =' sound/aoa/codecs/tas-basstreble.h
 
     # end of generic checked expressions.
     # version-specific checked bits start here
@@ -1025,7 +1026,6 @@ set_except () {
     initnc 'static u8 opera1_inittab\[\] ='
     initnc 'static u8 saa7113_init_regs\[\] ='
     initnc 'static u8 samsung_tbmu24112_inittab\[\] ='
-    initnc 'static u8 tas3004_treble_table\[\] ='
     initnc 'static u8 w1_crc8_table\[\] ='
     initnc 'static u_char const data_sizes_32\[32\] ='
     initnc 'static u_long ident_map\[32\] ='
@@ -1277,6 +1277,13 @@ set_except () {
     
   */drm-modesetting-radeon.patch)
     initnc 'static int atom_dst_to_src\[8\]\[4\] =' drivers/gpu/drm/radeon/atom.c
+    ;;
+
+  */linux*alsa*.patch)
+    defsnc 'static u8 tas3004_treble_table\[\] =' sound/aoa/codecs/tas-basstreble.h
+    defsnc 'static const unsigned char wm_vol\[256\] =' sound/pci/ice1712/phase.c
+    defsnc 'static const u16 wm8900_reg_defaults\[WM8900_MAXREG\] =' sound/soc/wm8900.c
+    defsnc '} \(clk_sys_ratios\|bclk_divs\)\[\] =' sound/soc/wm8903.c
     ;;
 
   */patch*2.6.26-rc*)
