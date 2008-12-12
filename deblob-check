@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-12-09
+# deblob-check version 2008-12-11
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1275,6 +1275,18 @@ set_except () {
     defsnc 'static \(const \)\?u32 ar\(5416\|9280\)\(Modes\(_fast_clock\)\?\|Common\|BB_RfGain\|Bank6\(TPC\)\?\|Addac\)\(_91[06]0\(1_1\)\?\|_9280\(_2\)\?\)\?\[\]\[[236]\] =' drivers/net/wireless/ath9k/initvals.h
     ;;
     
+  */linux-2.6-gspca-git.patch)
+    # Probably for 2.6.28 or .29.
+    initnc 'static const __u8 ov\(534\|772x\)_reg_initdata\[\]\[2\] =' drivers/media/video/gspca/ov534.c
+    initnc 'static const __u8 \(mi0360\|po1200\)_initQ\?VGA_\(JPG\|data\)\[\]\[4\] =' drivers/media/video/gspca/vc032x.c
+    # Already in 2.6.27.
+    initnc 'static const __u8 initOv6650\[\] =' drivers/media/video/gspca/sonixb.c
+    initnc '	[/][*] Some more unknown stuff [*][/]' drivers/media/video/gspca/sonixb.c
+    defsnc 'static const __u8 ov7648_sensor_init\[\]\[8\] =' drivers/media/video/gspca/sonixj.c
+    # No merge needed
+    defsnc '#if 0[\n]	{0x30, 0x0154, 0x0008},' drivers/media/video/gspca/sunplus.c
+    ;;
+
   */drm-modesetting-radeon.patch)
     initnc 'static int atom_dst_to_src\[8\]\[4\] =' drivers/gpu/drm/radeon/atom.c
     ;;
