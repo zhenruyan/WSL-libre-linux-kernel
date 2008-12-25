@@ -114,8 +114,7 @@ function clean_mk {
 	if sed -n "/\\($1\\)/p" $2 | grep . > /dev/null; then
 	    :
 	else
-	    echo $2 does not contain matches for $1
-	    exit 1
+	    die $2 does not contain matches for $1
 	fi
 }
 
@@ -362,7 +361,9 @@ clean_kconfig drivers/net/Kconfig 'MYRI_SBUS'
 clean_mk CONFIG_MYRI_SBUS drivers/net/Makefile
 
 # TIGON3 - Broadcom Tigon3
-patch --no-backup-if-mismatch -p0 <<\EOF # patches/linux-2.6-tg3-clean.patch
+patch --no-backup-if-mismatch --batch -p0 <<\EOF || \
+  die failed to remove license comments from drivers/net/tg3.c \
+  # patches/linux-2.6-tg3-clean.patch
 --- drivers/net/tg3.c
 +++ drivers/net/tg3.c
 @@ -5,14 +5,6 @@
