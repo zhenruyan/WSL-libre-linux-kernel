@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-12-11
+# deblob-check version 2008-12-25
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -586,7 +586,7 @@ set_except () {
     accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
     accept '   [/][*] \(SQCIF\|QSIF\|QCIF\|SIF\|CIF\|VGA\) [*][/][\n]   {[\n]      {'"$blobpat*" drivers/media/video/pwc/pwc-nala.h
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/*.ppm
-    defsnc 'for i in [ 	0-9\\\n]*[\n]do' Documentation/specialix.txt
+    accept 'for i in [ 	0-9\\\n]*[\n]do' 'Documentation/specialix\.txt|Documentation/serial/specialix\.txt'
     accept '         :   3600000   3400000   3200000   3000000   2800000 ' Documentation/cpu-freq/cpufreq-stats.txt
     accept '00 00[\n]64 01[\n]8e 0b[\n][\n][0-9a-f \n]*fe fe' 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
     accept '0f 00 08 08 64 00 0a 00 - id 0[\n]'"$blobpat*" 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
@@ -751,6 +751,35 @@ set_except () {
     defsnc '	static const int desc_idx_table\[\] =' arch/arm/include/asm/hardware/iop3xx-adma.h
     defsnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const __u8 \(hv7131r\|mi0360\|mo4000\|ov76\(60\|48\)\)_sensor_init\[\]\[8\] = {[*][/];' drivers/media/video/gspca/sonixj.c
     defsnc 'static \(const \)\?u32 ar\(5416\|9280\)\(Modes\(_fast_clock\)\?\|Common\|BB_RfGain\|Bank6\(TPC\)\?\|Addac\)\(_91[06]0\(1_1\)\?\|_9280\(_2\)\?\)\?\[\]\[[236]\] =' drivers/net/wireless/ath9k/initvals.h
+
+    # new in 2.6.28
+    accept '\(static \)\?const char \(inv\)\?parity\[256\] = {[	 \n01,]*};' 'Documentation/mtd/nand_ecc\.txt\|drivers/mtd/nand/nand_ecc\.c'
+    defsnc 'static const char \(bitsperbyte\|addressbits\)\[256\] =' drivers/mtd/nand/nand_ecc.c
+    defsnc 'static struct pinmux_cfg_reg pinmux_config_regs\[\] =' arch/sh/kernel/cpu/sh2a/pinmux-sh7203.c
+    defsnc '	static const u8 e_keymap\[\] =' drivers/hid/hid-lg.c
+    defsnc '		*struct phy_reg phy_reg_init\(_[01]\)\?\[\] =' drivers/net/r8169.c
+    defsnc 'DEFINE_DEFAULT_PDR(0x0161, 256,' drivers/net/wireless/hermes_dld.c
+    defsnc 'static const int isink_cur\[\] =' drivers/regulator/wm8350-regulator.c
+    defsnc 'static const s16 \(converge_speed_ipb\?\|LAMBDA_table\[4\]\)\[101\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc 'static const u32 addrinctab\[33\]\[2\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc 'static const u8 \(default_intra_quant_table\|\(val\|bits\)_[ad]c_\(lu\|chro\)minance\)\[\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc 'static const int zz\[64\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc '	u16 pack\[\] =' drivers/staging/go7007/go7007-fw.c
+    defsnc 'static u8 \(initial\|channel\)_registers\[\] =' 'drivers/staging/go7007/wis-\(ov7640\|saa7113\|tw2804\).c'
+    defsnc 'u16 MTO_One_Exchange_Time_Tbl_[ls]\[MTO_MAX_FRAG_TH_LEVELS\]\[MTO_MAX_DATA_RATE_LEVELS\] =' drivers/staging/winbond/mto.c
+    defsnc 'u32 \(al2230_txvga_data\|w89rf242_txvga_old_mapping\)\[\]\[2\] =' drivers/staging/winbond/reg.c
+    defsnc 'static const UINT16 crc16tab\[256\] =' drivers/staging/wlan-ng/hfa384x.c
+    defsnc 'static const UINT32 wep_crc32_table\[256\] =' drivers/staging/wlan-ng/p80211wep.c
+    defsnc 'static const unsigned char wm_vol\[256\] =' sound/pci/ice1712/phase.c
+    defsnc 'static const u16 wm8900_reg_defaults\[WM8900_MAXREG\] =' sound/soc/wm8900.c
+    defsnc '} \(clk_sys_ratios\|bclk_divs\)\[\] =' sound/soc/wm8903.c
+    defsnc 'static u8 af9015_ir_table_\(leadtek\|twinhan\|a_link\|msi\|mygictv\|kworld\)\[\] =' drivers/media/dvb/dvb-usb/af9015.h
+    defsnc 'static struct snr_table \(qpsk\|qam\(16\|64\)\)_snr_table\[\] =' drivers/media/dvb/frontends/af9013_priv.h
+    defsnc 'static struct regdesc \(ofsm_init\|tuner_init_\(env77h11d5\|mt2060\(\|_2\)\|mxl500\(3d\|5\)\|qt1010\|mc44s803\|unknown\|tda18271\)\)\[\] =' drivers/media/dvb/frontends/af9013_priv.h
+    defsnc 'static u8 stv0288_earda_inittab\[\] =' drivers/media/dvb/frontends/eds1547.h
+    defsnc 'static u8 serit_sp1511lhb_inittab\[\] =' drivers/media/dvb/frontends/si21xx.c
+    defsnc 'static u8 stv0288_inittab\[\] =' drivers/media/dvb/frontends/stv0288.c
+    defsnc 'static const struct rf_channel rf_vals_b\[\] =' drivers/net/wireless/rt2x00/rt2400pci.c
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h
@@ -1017,7 +1046,7 @@ set_except () {
     initnc 'static u8 bnx2_5706_stats_len_arr\[BNX2_NUM_STATS\] ='
     initnc 'static u8 bnx2_5708_stats_len_arr\[BNX2_NUM_STATS\] ='
     initnc 'static u8 flit_desc_map\[\] ='
-    initnc 'static u8 init_tab \[\] ='
+    defsnc 'static u8 init_tab \?\[\] =' 'drivers/media/dvb/frontends/cx2270\(0\|2\)\.c'
     initnc 'static u8 mac_reader\[\] ='
     initnc 'static u8 mt2131_config1\[\] =' drivers/media/dvb/frontends/mt2131.c # <= 2.6.25
     initnc 'static u8 mt2131_config1\[\] =' drivers/media/common/tuners/mt2131.c # >= 2.6.26
@@ -1178,7 +1207,7 @@ set_except () {
     blob 'static PHY_UCODE PhyUcode\[\] =[^;]*;' drivers/staging/sxg/sxgphycode.h # CONFIG_SXG
 
     # ok from earlier releases
-    accept 'for i in [ 	0-9\\\n]*[\n]do' Documentation/specialix.txt
+    accept 'for i in [ 	0-9\\\n]*[\n]do' 'Documentation/specialix.txt|Documentation/serial/specialix.txt'
     defsnc 'static yyconst flex_int\(16\|32\)_t yy_[^[]*\[[0-9]*\] =' '.*\.lex\.c_shipped'
     defsnc 'static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =' '.*\.lex\.c_shipped'
     initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =[*][/];' '.*\.tab\.c_shipped'
