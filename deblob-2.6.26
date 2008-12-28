@@ -63,7 +63,7 @@ else
   have_check=:
 fi
 
-function clean_file {
+clean_file () {
 	#$1 = filename
 	if test ! -f $1; then
 		die $1 does not exist, something is wrong
@@ -71,7 +71,7 @@ function clean_file {
 	rm -v $1
 }
 
-function check_changed {
+check_changed () {
 	if test ! -f $1; then
 		die $1 does not exist, something is wrong
 	elif cmp $1.deblob $1 > /dev/null; then
@@ -80,7 +80,7 @@ function check_changed {
 	mv $1.deblob $1
 }
 
-function clean_blob {
+clean_blob () {
 	#$1 = filename
 	if $have_check; then
 	    if test ! -f $1; then
@@ -97,7 +97,7 @@ function clean_blob {
 	fi
 }
 
-function clean_kconfig {
+clean_kconfig () {
         #$1 = filename $2 = things to remove
         echo Marking config $2 as depending on NONFREE in $1
 	sed "/^config \\($2\\)\$/{p;i\
@@ -106,7 +106,7 @@ d;}" $1 > $1.deblob
 	check_changed $1
 }
 
-function clean_mk {
+clean_mk () {
 	#$1 = config $2 = Makefile name
 	# We don't clean up Makefiles any more --lxoliva
 	# sed -i "/\\($1\\)/d" $2
@@ -118,7 +118,7 @@ function clean_mk {
 	fi
 }
 
-function clean_ifdef {
+clean_ifdef () {
 	#$1 = filename $2 = macro to -U
 	echo unifdefing $1 with -U$2
 	unifdef -U$2 $1 > $1.deblob
