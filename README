@@ -1,0 +1,25 @@
+The scripts in this directory clean up and verify linux tarballs and
+patches for non-Free blobs.  They're used to create the Linux-libre
+releases (see http://fsfla.org/se-libre/linux-libre/), but you can use
+them to clean up and verify your own trees as well.
+
+deblob-check looks for blobs in tarballs, source files and patches,
+and performs a number of other tasks, such as cleaning up individual
+source files from non-Free blobs, while retaining known Free and
+apparent blobs.
+
+deblob-<version> is to be run in an expanded Linux-<version> tree, to
+clean it up from non-Free blobs.  As explained in the comments in the
+script, if deblob-check is alongside it, it will be used to remove
+only the blobs, otherwise entire files will be removed.
+
+deblob-main is used to clean up a Linux tarball and create a
+Linux-libre tarball.  The comments in the script detail the arguments
+it expects.  If you use it to deblob patched Linux trees, be sure to
+run deblob-check on the result, to make sure blobs haven't been added
+in the patches that it didn't know to clean up.
+
+Be Free!
+
+--
+Alex Oliva, FSFLA
