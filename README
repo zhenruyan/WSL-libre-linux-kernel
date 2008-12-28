@@ -11,7 +11,10 @@ apparent blobs.
 deblob-<version> is to be run in an expanded Linux-<version> tree, to
 clean it up from non-Free blobs.  As explained in the comments in the
 script, if deblob-check is alongside it, it will be used to remove
-only the blobs, otherwise entire files will be removed.
+only the blobs, otherwise entire files will be removed.  If you find a
+++ in the assignment to extra, this means the script was modified
+after the named release.  You might have to take the ++s out for the
+script to run.  Feel Free to edit it however you see fit.
 
 deblob-main is used to clean up a Linux tarball and create a
 Linux-libre tarball.  The comments in the script detail the arguments
