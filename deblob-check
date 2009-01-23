@@ -26,7 +26,7 @@
 
 
 # usage: deblob-check [-S] [-vv] [-s S] [-lDdBbCcXxPpFftVh?H] \
-#        [*.tar* patch-* *.patch *.diff]
+#        *.tar* patch-* [-i prefix/] *.patch *.diff...
 
 # Look for and report too-long undocumented sequences of numbers
 # (generally blobs in disguise) in source files, as well as requests
@@ -109,6 +109,27 @@
 
 # -v --verbose: increase verbosity level, for internal debugging.  May
 #		be given at most twice.
+
+
+# file options:
+
+# --: Don't process command-line options any further.  All following
+#		arguments are taken as filenames.
+
+# -i --implied-prefix --prefix: prepend the given prefix to each filename
+#		listed after this option, when configuring false positives
+#		and negatives.
+
+# *.tar*: iterate over all files in the named tar file.
+
+# *.patch, patch-*, *.diff: Look for blobs in the [ +] parts of the
+# 		*patch, unless --reverse-patch is given, in which case
+# 		the [ -] parts will be used.
+
+# Anything else is assumed to be a source file.
+
+# *.gz | *.bz2: Decompress automatically.
+
 
 # The exit status is only significant for the --list options: it will
 # be true if nothing was found, and false otherwise.
@@ -262,6 +283,20 @@ case $1 in
   ;;
 esac
 
+prefix=/
+case $1 in
+--implied-prefix | --prefix| -i)
+  prefix=$2
+  case $prefix in
+  /*/) ;;
+  */) prefix=/$prefix ;;
+  /*) prefix=$prefix/ ;;
+  *) prefix=/$prefix/ ;;
+  esac
+  shift 2 || exit 1
+  ;;
+esac
+
 test_mode=false
 
 name=deblob-check
@@ -387,9 +422,10 @@ q 1;"
 
 *)
   case $1 in
-  -- | -l | --list-blobs) shift;;
+  -l | --list-blobs) shift;;
   esac
   case $1 in
+  -- | --implied-prefix | --prefix | -i) ;;
   -*)
     if test ! -f "$1"; then
       echo "$name: \`$1' given too late or out of the proper sequence." >&2
@@ -410,7 +446,9 @@ q 1;"
 esac
 
 case $1 in
---) shift;;
+--)
+  sawdashdash=t
+  shift;;
 esac
 
 if $test_mode; then
@@ -534,7 +572,7 @@ set_except () {
 
   blobna "request_firmware\\(_nowait\\)\\?"
 
-  case /$1 in
+  case $prefix$1 in
   /drivers/net/tg3.c)
     # This file contains firmwares that we deblob with high
     # sensitivity, so make sure the sequences of numbers that are not
@@ -544,7 +582,7 @@ set_except () {
     accept "	}\\(,\\? mem_tbl_5\\(70x\\|705\\|755\\|906\\)\\[\\] = {$sepx$blobpat*$sepx}\\)*;" drivers/net/tg3.c
     ;;
 
-  /drivers/media/video/gspca/conex.c)
+  ---/drivers/media/video/gspca/conex.c)
     # FIXME: we shouldn't have to duplicate this here, but deblob
     # doesn't pass us a pathname that matches linux-*.*.*/, and then
     # we end up deblobbing false positives.
@@ -2256,9 +2294,37 @@ pass=:
 tempfiles=
 trap "status=$?; test -z \"$tempfiles\" || rm -f $tempfiles; (exit $status); exit" 0 1 2 15
 
+process_arg=
+
 # Go through each of the input files in the command line.
 for file
 do
+  case $process_arg in
+  "") ;;
+  --implied-prefix | --prefix | -i)
+    prefix=$file
+    case $prefix in
+    /*/) ;;
+    */) prefix=/$prefix ;;
+    /*) prefix=$prefix/ ;;
+    *) prefix=/$prefix/ ;;
+    esac
+    process_arg=
+    continue
+    ;;
+  *)
+    echo Internal error with process_arg=$process_arg >&2
+    exit 1
+    ;;
+  esac
+
+  case $sawdashdash$file in
+  --implied-prefix | --prefix | -i)
+    process_arg=$file
+    continue
+    ;;
+  esac
+  
   # If we print anything whatsoever (even a blank line) while
   # processing it, we've failed.
   if check "$file"; then
@@ -2269,6 +2335,14 @@ do
     #list: shift
   fi
 done
+
+case $process_arg in
+"") ;;
+*)
+  echo Missing argument to $process_arg >&2
+  exit 1
+  ;;
+esac
 
 #list: shift $n
 
