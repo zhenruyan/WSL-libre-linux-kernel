@@ -841,6 +841,12 @@ set_except () {
     accept 'static inline int request_ihex_firmware\?([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' include/linux/ihex.h
     ocomment '[/][*] Optional firmware\([^\n]*[\n] [*]\)*[^\n]* MODULE_FIRMWARE()'
     oprepline '#define MODULE_FIRMWARE(_firmware)' include/linux/module.h
+    accept ' [*] Sample code on how to use request_firmware() from drivers\.' samples/firmware_class/firmware_sample_driver.c
+    accept '[\t]\(retval\|error\) = request_firmware\(_nowait\)\?([^;]*"sample_driver_fw",[^;]*);' samples/firmware_class/firmware_sample_driver.c
+    ocomment '	[/][*] request_firmware blocks until userspace finished' samples/firmware_class/firmware_sample_driver.c
+    accept '		[ \t]*" request_firmware_nowait failed' samples/firmware_class/firmware_sample_driver.c
+    blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
+    blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h

@@ -95,7 +95,6 @@ drivers/net/wireless/libertas/if_cs.c
 drivers/net/wireless/libertas/if_sdio.c
 drivers/net/wireless/libertas/if_usb.c
 drivers/net/wireless/libertas_tf/if_usb.c
-drivers/net/wireless/orinoco.c
 drivers/net/wireless/p54/p54pci.c
 drivers/net/wireless/p54/p54usb.c
 drivers/net/wireless/prism54/islpci_dev.c
@@ -133,7 +132,6 @@ drivers/uwb/i1480/dfu/i1480-dfu.h
 drivers/uwb/i1480/dfu/mac.c
 drivers/uwb/i1480/dfu/phy.c
 drivers/video/metronomefb.c
-samples/firmware_class/firmware_sample_driver.c
 sound/drivers/vx/vx_hwdep.c
 sound/isa/sb/sb16_csp.c
 sound/isa/wavefront/wavefront_fx.c
@@ -161,3 +159,9 @@ sound/pci/rme9652/hdsp.c
 sound/pci/ymfpci/ymfpci_main.c
 sound/sh/aica.c
 sound/sound_firmware.c
+
+For these, the blob names are already matched and "deblobbed", but
+tweaking deblob-kver to adjust the request_firmware calls remains to
+be done:
+
+drivers/net/wireless/orinoco.c
