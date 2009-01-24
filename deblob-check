@@ -570,7 +570,10 @@ set_except () {
     badx "$1" $2
   }
 
-  blobna "request_firmware\\(_nowait\\)\\?"
+  blobna "request_firmware_nowait"
+  blobna "request_firmware"
+  blobna "request_ihex_firmware"
+  blobna "MODULE_FIRMWARE([^;]*)[^;]*;"
 
   case $prefix$1 in
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
@@ -816,6 +819,28 @@ set_except () {
     defsnc 'static u8 serit_sp1511lhb_inittab\[\] =' drivers/media/dvb/frontends/si21xx.c
     defsnc 'static u8 stv0288_inittab\[\] =' drivers/media/dvb/frontends/stv0288.c
     defsnc 'static const struct rf_channel rf_vals_b\[\] =' drivers/net/wireless/rt2x00/rt2400pci.c
+
+    # request_firmware matches for 2.6.28
+    accept 'D: Firmware loader (request_firmware)' CREDITS
+    accept 'FIRMWARE LOADER (request_firmware)' MAINTAINERS
+    accept '	- request_firmware() hotplug interface info.' Documentation/00-INDEX
+    accept 'This driver requires a patch for firmware_class[^\n]*[\n]request_firmware_nowait function\.' Documentation/dell_rbu.txt
+    accept ' request_firmware() hotplug interface:[\n] --*[\n].* - request_firmware_nowait() is also provided for convenience' Documentation/firmware_class/README
+    accept 'Still, there are kernel threads that may want.*For example, if request_.*_firmware() will fail regardless' Documentation/power/freezing-of-tasks.txt
+    accept 'Also, there may be some operations,.*calling request_firmware() from their .resume() routines' Documentation/power/notifiers.txt
+    accept 'There is an USB interface for downloading[/]uploading.*request_firmware interface\.' Documentation/video4linux/si470x.txt
+    accept '[\t]- move firmware loading to request_firmware()' drivers/staging/slicoss/README
+    accept 'config FIRMWARE_IN_KERNEL.*let firmware be loaded from userspace\.' drivers/base/Kconfig
+    accept 'static int[\n]_request_firmware(const struct firmware \*\*firmware_p, const char \*name,[^{]*[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/base/firmware_class.c
+    accept 'static int[\n]request_firmware_work_func(void \*arg)[\n]{[\n]\([^}]\|[^\n}]}*\)*ret = _request_firmware(\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/base/firmware_class.c
+    accept '[/][*][*][\n] [*] request_firmware: - send firmware [^{]*[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/base/firmware_class.c
+    accept '[/][*][*][\n] [*] request_firmware_nowait: asynchronous version[^{]*[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/base/firmware_class.c
+    accept 'EXPORT_SYMBOL(request_firmware\(_nowait\)\?);' drivers/base/firmware_class.c
+    accept 'int request_firmware\(_nowait\)\?([^;]*);' include/linux/firmware.h
+    accept 'static inline int request_firmware\(_nowait\)\?([^{]*)[\n]{[\n][\t]return -EINVAL;[\n]}[\n]' include/linux/firmware.h
+    accept 'static inline int request_ihex_firmware\?([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' include/linux/ihex.h
+    ocomment '[/][*] Optional firmware\([^\n]*[\n] [*]\)*[^\n]* MODULE_FIRMWARE()'
+    oprepline '#define MODULE_FIRMWARE(_firmware)' include/linux/module.h
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h
