@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-01-23
+# deblob-check version 2009-01-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -819,6 +819,7 @@ set_except () {
     defsnc 'static u8 serit_sp1511lhb_inittab\[\] =' drivers/media/dvb/frontends/si21xx.c
     defsnc 'static u8 stv0288_inittab\[\] =' drivers/media/dvb/frontends/stv0288.c
     defsnc 'static const struct rf_channel rf_vals_b\[\] =' drivers/net/wireless/rt2x00/rt2400pci.c
+    defsnc 'static const u8 rtl8187b_reg_table\[\]\[3\] =' drivers/net/wireless/rtl8187_dev.c
 
     # request_firmware matches for 2.6.28
     accept 'D: Firmware loader (request_firmware)' CREDITS
@@ -838,6 +839,8 @@ set_except () {
     accept 'EXPORT_SYMBOL(request_firmware\(_nowait\)\?);' drivers/base/firmware_class.c
     accept 'int request_firmware\(_nowait\)\?([^;]*);' include/linux/firmware.h
     accept 'static inline int request_firmware\(_nowait\)\?([^{]*)[\n]{[\n][\t]return -EINVAL;[\n]}[\n]' include/linux/firmware.h
+    accept 'static inline int \(maybe_\)\?reject_firmware\(_nowait\)\?([^{;]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' include/linux/firmware.h
+
     accept 'static inline int request_ihex_firmware\?([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' include/linux/ihex.h
     ocomment '[/][*] Optional firmware\([^\n]*[\n] [*]\)*[^\n]* MODULE_FIRMWARE()'
     oprepline '#define MODULE_FIRMWARE(_firmware)' include/linux/module.h
@@ -845,8 +848,18 @@ set_except () {
     accept '[\t]\(retval\|error\) = request_firmware\(_nowait\)\?([^;]*"sample_driver_fw",[^;]*);' samples/firmware_class/firmware_sample_driver.c
     ocomment '	[/][*] request_firmware blocks until userspace finished' samples/firmware_class/firmware_sample_driver.c
     accept '		[ \t]*" request_firmware_nowait failed' samples/firmware_class/firmware_sample_driver.c
+
+    # Hunting down non-Free firmware-loading code and instructions.
+
+    blob 'atmsar11\.fw' drivers/atm/ambassador.c
+
+    blob '    sprintf([^;]*fore200[^;]*FW_EXT[^;]*);' drivers/atm/fore200e.c
+    blobna '\(pc\|sb\)a200e\(_ecd\)\?\.bin[12]?' drivers/atm/fore200e.c
+    blobna 'The supplied firmware images.*fore.*Rebuild and reinstall[^.]*\.' Documentation/networking/fore200e.txt
+
     blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
     blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c
+
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h

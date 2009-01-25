@@ -59,6 +59,11 @@ else
   have_check=:
 fi
 
+announce () {
+	echo
+	echo "$@"
+}
+
 clean_file () {
 	#$1 = filename
 	if test ! -f $1; then
@@ -154,7 +159,16 @@ clean_mk () {
 	fi
 }
 
+clean_sed () {
+	#$1 = sed-script $2 = file
+	sed -e "$1" "$2" > "$2".deblob
+	check_changed "$2"
+}
 
+reject_firmware () {
+	#$1 = file
+	clean_sed 's,request\(_ihex\|\)_firmware(,reject_firmware(,' "$1"
+}
 
 # First, check that files that contain firmwares and their
 # corresponding sources are present.
@@ -199,22 +213,84 @@ for f in \
 done
 
 # Identify the tarball.
-sed -i "s,^EXTRAVERSION.*,&-libre$extra," Makefile
+clean_sed "s,^EXTRAVERSION.*,&-libre$extra," Makefile
+
+# Add reject_firmware and check_reject_firmware
+cat >> include/linux/firwmare.h <<\EOF
+#ifndef _LINUX_LIBRE_FIRMWARE_H
+#define _LINUX_LIBRE_FIRMWARE_H
+
+#define NONFREE_FIRMWARE "/*(DEBLOBBED)*/"
+
+static inline int reject_firmware(const struct firmware **fw,
+				  const char *name,
+				  struct device *device)
+{
+	struct firmware *xfw = NULL;
+	int retval = request_firmware(&xfw, NONFREE_FIRMWARE, device);
+	if (!retval)
+		release_firmware(xfw);
+	return -EINVAL;
+}
+static inline int maybe_reject_firmware(const struct firmware **fw,
+					const char *name,
+					struct device *device)
+{
+	if (strstr (name, NONFREE_FIRMWARE))
+		return reject_firmware(fw, name, device);
+	else
+		return request_firmware(fw, name, device);
+}
+static inline void discard_rejected_firmware(const struct firmware *fw,
+					      void *context)
+{
+	release_firmware(fw);
+}
+static inline int reject_firmware_nowait(
+	struct module *module, int uevent,
+	const char *name, struct device *device, void *context,
+	void (*cont)(const struct firmware *fw, void *context))
+{
+	int retval = request_firmware_nowait(module, uevent, NONFREE_FIRMWARE,
+					     device, NULL,
+					     discard_rejected_firmware);
+	if (retval)
+		return retval;
+	return -EINVAL;
+}
+static inline int maybe_reject_firmware_nowait(
+	struct module *module, int uevent,
+	const char *name, struct device *device, void *context,
+	void (*cont)(const struct firmware *fw, void *context))
+{
+	if (strstr (name, NONFREE_FIRMWARE))
+		return reject_firmware_nowait(module, uevent, name,
+					      device, context, cont);
+	else
+		return request_firmware_nowait(module, uevent, name,
+					       device, context, cont);
+}
+
+#endif /* _LINUX_LIBRE_FIRMWARE_H */
+EOF
 
 #######################
 # Removed ATM Drivers #
 #######################
 
-# ATM_AMBASSADOR -  Madge Ambassador (Collage PCI 155 Server)
+announce ATM_AMBASSADOR -  Madge Ambassador, Collage PCI 155 Server
+reject_firmware drivers/atm/ambassador.c
+clean_blob drivers/atm/ambassador.c
 clean_fw firmware/atmsar11.HEX firmware/atmsar11.fw
-
-# ATM_FORE200E_PCA
-# ATM_FORE200E_SBA - SBA-200E
-clean_kconfig drivers/atm/Kconfig 'ATM_FORE.*'
-clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
-
-clean_kconfig drivers/atm/Kconfig 'ATM_AMBASSADOR'
+$have_check || clean_kconfig drivers/atm/Kconfig 'ATM_AMBASSADOR'
 clean_mk CONFIG_ATM_AMBASSADOR drivers/atm/Makefile
+
+announce ATM_FORE200E_PCA, ATM_FORE200E_SBA - SBA-200E
+reject_firmware drivers/atm/fore200e.c
+clean_blob drivers/atm/fore200e.c
+clean_blob Documentation/networking/fore200e.txt
+$have_check || clean_kconfig drivers/atm/Kconfig 'ATM_FORE.*'
+clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 
 
 ########################
@@ -500,9 +576,6 @@ clean_mk CONFIG_USB_KAWETH drivers/net/usb/Makefile
 
 # wireless
 
-clean_blob drivers/net/wireless/rtl8187_dev.c
-# clean_kconfig drivers/net/wireless/Kconfig 'RTL8187'
-# clean_mk CONFIG_RTL8187 drivers/net/wireless/Makefile
 
 
 ########################

@@ -14,8 +14,6 @@ arch/cris/arch-v32/drivers/iop_fw_load.c
 arch/x86/kernel/microcode_amd.c
 arch/x86/kernel/microcode_core.c
 arch/x86/kernel/microcode_intel.c
-drivers/atm/ambassador.c
-drivers/atm/fore200e.c
 drivers/bluetooth/bcm203x.c
 drivers/bluetooth/bfusb.c
 drivers/bluetooth/bt3c_cs.c
