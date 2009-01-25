@@ -19,7 +19,6 @@ drivers/bluetooth/bfusb.c
 drivers/bluetooth/bt3c_cs.c
 drivers/char/cyclades.c
 drivers/char/dsp56k.c
-drivers/char/ip2/ip2main.c
 drivers/char/isicom.c
 drivers/char/moxa.c
 drivers/firmware/dell_rbu.c

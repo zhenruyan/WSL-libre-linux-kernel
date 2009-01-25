@@ -857,6 +857,8 @@ set_except () {
     blobna '\(pc\|sb\)a200e\(_ecd\)\?\.bin[12]?' drivers/atm/fore200e.c
     blobna 'The supplied firmware images.*fore.*Rebuild and reinstall[^.]*\.' Documentation/networking/fore200e.txt
 
+    blobna 'intelliport2\.bin' drivers/char/ip2/ip2main.c
+
     blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
     blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c
 
