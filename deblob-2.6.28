@@ -140,6 +140,16 @@ drop_fw_file () {
 
 clean_kconfig () {
         #$1 = filename $2 = things to remove
+	case $1 in
+	-f)
+		shift
+		;;
+	*)
+		if $have_check; then
+			return
+		fi
+		;;
+	esac
         echo Marking config $2 as depending on NONFREE in $1
 	sed "/^config \\($2\\)\$/{p;i\
 	depends on NONFREE
@@ -282,14 +292,14 @@ announce ATM_AMBASSADOR -  Madge Ambassador, Collage PCI 155 Server
 reject_firmware drivers/atm/ambassador.c
 clean_blob drivers/atm/ambassador.c
 clean_fw firmware/atmsar11.HEX firmware/atmsar11.fw
-$have_check || clean_kconfig drivers/atm/Kconfig 'ATM_AMBASSADOR'
+clean_kconfig drivers/atm/Kconfig 'ATM_AMBASSADOR'
 clean_mk CONFIG_ATM_AMBASSADOR drivers/atm/Makefile
 
 announce ATM_FORE200E_PCA, ATM_FORE200E_SBA - SBA-200E
 reject_firmware drivers/atm/fore200e.c
 clean_blob drivers/atm/fore200e.c
 clean_blob Documentation/networking/fore200e.txt
-$have_check || clean_kconfig drivers/atm/Kconfig 'ATM_FORE.*'
+clean_kconfig drivers/atm/Kconfig 'ATM_FORE.*'
 clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 
 
@@ -301,22 +311,47 @@ clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 drop_fw_file firmware/intelliport2.bin.ihex firmware/intelliport2.bin
 reject_firmware drivers/char/ip2/ip2main.c
 clean_blob drivers/char/ip2/ip2main.c
-$have_check || clean_kconfig drivers/char/Kconfig 'COMPUTONE'
+clean_kconfig drivers/char/Kconfig 'COMPUTONE'
 clean_mk CONFIG_COMPUTONE drivers/char/Makefile
 
 # gpu drm
 
 # DRM_MGA - Matrox g200/g400
 clean_blob drivers/gpu/drm/mga/mga_ucode.h
+clean_blob drivers/gpu/drm/mga/mga_warp.c
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_MGA'
 clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
 # DRM_R128 - ATI Rage 128
+clean_sed '/^static int r128_do_init_cce(/,/^}$/{
+  /^	r128_cce_load_microcode(dev_priv);$/{
+    i\
+	DRM_ERROR("Missing Free microcode!\\n");\
+	dev->dev_private = (void *)dev_priv;\
+	r128_do_cleanup_cce(dev);\
+	return -EINVAL;
+  }
+}' drivers/gpu/drm/r128/r128_cce.c
 clean_blob drivers/gpu/drm/r128/r128_cce.c
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 # DRM_RADEON - ATI Radeon
+clean_sed '/^static int radeon_do_init_cce(/,/^}$/{
+  /^	radeon_cp_load_microcode(dev_priv);$/{
+    i\
+	DRM_ERROR("Missing Free microcode!\\n");\
+	radeon_do_cleanup_cp(dev);\
+	return -EINVAL;
+  }
+}
+/^static int radeon_do_resume_cp(/,/^}$/{
+  /^	radeon_cp_load_microcode(dev_priv);$/{
+    i\
+	DRM_ERROR("Missing Free microcode!\\n");\
+	return -EINVAL;
+  }
+}' drivers/gpu/drm/radeon/radeon_cp.c
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile

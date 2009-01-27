@@ -859,6 +859,20 @@ set_except () {
 
     blobna 'intelliport2\.bin' drivers/char/ip2/ip2main.c
 
+    blob 'static unsigned char warp_g[24]00_t2\?gzs\?a\?f\?\[\] = {[^{};]*};\([\n][\n]*static unsigned char warp_g[24]00_t2\?gzs\?a\?f\?\[\] = {[^{};]*};\)*' drivers/gpu/drm/mga/mga_ucode.h
+    blob '#define \(MGA_WARP_CODE_ALIGN\|WARP_UCODE_\(SIZE\|INSTALL\)\)\([^\n]*\\[ 	]*[\n]\)*[^\n]*' drivers/gpu/drm/mga/mga_warp.c
+    blob 'static const unsigned int mga_warp_g[24]00_microcode_size =[^;]*;' drivers/gpu/drm/mga/mga_warp.c
+    blob 'static int mga_warp_install_g[24]00_microcode([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/gpu/drm/mga/mga_warp.c
+    blobna '\(case MGA_CARD_TYPE_G[^:]*:[ 	\n]*\)\+return [^;]*mga_warp[^;]*microcode[^;]*;\([ 	\n]*\(case MGA_CARD_TYPE_G[^:]*:[ 	\n]*\)\+return [^;]*mga_warp[^;]*microcode[^;]*;[ 	]*\)*' drivers/gpu/drm/mga/mga_warp.c
+
+    blob 'static u32 r128_cce_microcode\[\] = {[^{};]*};' drivers/gpu/drm/r128/r128_cce.c
+    blob 'static void r128_cce_load_microcode([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/gpu/drm/r128/r128_cce.c
+    blob '	r128_cce_load_microcode([^;]*);' drivers/gpu/drm/r128/r128_cce.c
+
+    blob 'static const u32 R[S0-9]*0_cp_microcode\[\]\[2\] = {[^{};]*};\([\n][\n]*static const u32 R[S0-9]*0_cp_microcode\[\]\[2\] = {[^{};]*};\)*' drivers/gpu/drm/radeon/radeon_microcode.h
+    blob 'static void radeon_cp_load_microcode([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/gpu/drm/radeon/radeon_cp.c
+    blob '	radeon_cp_load_microcode([^;]*);' drivers/gpu/drm/radeon/radeon_cp.c
+
     blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
     blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c
 
