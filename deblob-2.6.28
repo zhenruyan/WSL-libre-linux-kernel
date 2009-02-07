@@ -1,7 +1,7 @@
 #!/bin/sh
 
-#    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2008, 2009 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008 Jeff Moe
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -307,7 +307,7 @@ clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 # Removed char Drivers #
 ########################
 
-# COMPUTONE - Computone IntelliPort Plus serial
+announce COMPUTONE - Computone IntelliPort Plus serial
 drop_fw_file firmware/intelliport2.bin.ihex firmware/intelliport2.bin
 reject_firmware drivers/char/ip2/ip2main.c
 clean_blob drivers/char/ip2/ip2main.c
@@ -316,13 +316,13 @@ clean_mk CONFIG_COMPUTONE drivers/char/Makefile
 
 # gpu drm
 
-# DRM_MGA - Matrox g200/g400
+announce DRM_MGA - Matrox g200/g400
 clean_blob drivers/gpu/drm/mga/mga_ucode.h
 clean_blob drivers/gpu/drm/mga/mga_warp.c
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_MGA'
 clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
-# DRM_R128 - ATI Rage 128
+announce DRM_R128 - ATI Rage 128
 clean_sed '/^static int r128_do_init_cce(/,/^}$/{
   /^	r128_cce_load_microcode(dev_priv);$/{
     i\
@@ -336,7 +336,7 @@ clean_blob drivers/gpu/drm/r128/r128_cce.c
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
-# DRM_RADEON - ATI Radeon
+announce DRM_RADEON - ATI Radeon
 clean_sed '/^static int radeon_do_init_cce(/,/^}$/{
   /^	radeon_cp_load_microcode(dev_priv);$/{
     i\
@@ -362,8 +362,10 @@ clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
 #########################
 
 
-# dvb/dvb-usb
-clean_blob drivers/media/dvb/dvb-usb/af9005-script.h
+announce DVB_USB_AF9005 - Afatech AF9005 DVB-T USB1.1
+clean_file drivers/media/dvb/dvb-usb/af9005-script.h
+clean_sed 's,^	deb_info("load init script\\n");$,	{\n		err("Missing Free init script\\n");\n		return scriptlen = ret = -EINVAL;\n		,' drivers/media/dvb/dvb-usb/af9005-fe.c
+clean_blob drivers/media/dvb/dvb-usb/af9005-fe.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
 clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
 
