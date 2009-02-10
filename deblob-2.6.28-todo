@@ -40,8 +40,6 @@ drivers/media/dvb/frontends/nxt200x.c
 drivers/media/dvb/frontends/or51132.c
 drivers/media/dvb/frontends/or51211.c
 drivers/media/dvb/frontends/or51211.h
-drivers/media/dvb/frontends/sp8870.c
-drivers/media/dvb/frontends/sp8870.h
 drivers/media/dvb/frontends/sp887x.c
 drivers/media/dvb/frontends/sp887x.h
 drivers/media/dvb/frontends/tda10048.c

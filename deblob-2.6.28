@@ -225,7 +225,7 @@ done
 # Identify the tarball.
 clean_sed "s,^EXTRAVERSION.*,&-libre$extra," Makefile
 
-# Add reject_firmware and check_reject_firmware
+# Add reject_firmware and maybe_reject_firmware
 cat >> include/linux/firwmare.h <<\EOF
 #ifndef _LINUX_LIBRE_FIRMWARE_H
 #define _LINUX_LIBRE_FIRMWARE_H
@@ -362,6 +362,12 @@ clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
 #########################
 
 
+announce DVB non-Free firmware scripts and documentation
+clean_blob Documentation/dvb/get_dvb_firmware
+clean_blob Documentation/dvb/avermedia.txt
+clean_blob Documentation/dvb/opera-firmware.txt
+clean_blob Documentation/dvb/ttusb-dec.txt
+
 announce DVB_USB_AF9005 - Afatech AF9005 DVB-T USB1.1
 clean_file drivers/media/dvb/dvb-usb/af9005-script.h
 clean_sed 's,^	deb_info("load init script\\n");$,	{\n		err("Missing Free init script\\n");\n		return scriptlen = ret = -EINVAL;\n		,' drivers/media/dvb/dvb-usb/af9005-fe.c
@@ -369,32 +375,16 @@ clean_blob drivers/media/dvb/dvb-usb/af9005-fe.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
 clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
 
-# dvb/frontends
-
-# DVB_TDA10021 - Philips TDA10021 based
-clean_blob drivers/media/dvb/frontends/tda10021.c
-clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_TDA10021'
-clean_mk CONFIG_DVB_TDA10021 drivers/media/dvb/frontends/Makefile
-
-# DVB_TDA8083 - Philips TDA8083 based
-clean_blob drivers/media/dvb/frontends/tda8083.c
-clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_TDA8083'
-clean_mk CONFIG_DVB_TDA8083 drivers/media/dvb/frontends/Makefile
-
-# DVB_VES1820 - VLSI VES1820 based
-clean_blob drivers/media/dvb/frontends/ves1820.c
-clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_VES1820'
-clean_mk CONFIG_DVB_VES1820 drivers/media/dvb/frontends/Makefile
-
-# DVB_VES1X93 - VLSI VES1893 or VES1993 based
-clean_blob drivers/media/dvb/frontends/ves1x93.c
-clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_VES1X93'
-clean_mk CONFIG_DVB_VES1X93 drivers/media/dvb/frontends/Makefile
-
 # dvb/ttpci
 
-# DVB_AV7110 - AV7110 cards
+announce DVB_AV7110 - AV7110 cards
+# The bootcode is actually Free Software under GPLv2, but since it's
+# being distributed without source code, we're taking it out for now.
+clean_sed 's,^	\/\* boot \*\/$,	printk(KERN_ERR "dvb-ttpci: av7110_bootarm(): Missing Free bootcode\\n");\n	return -EINVAL;\n\n&,' drivers/media/dvb/ttpci/av7110_hw.c
+clean_sed 's,mwdebi(.*bootcode.*$,/* & */,' drivers/media/dvb/ttpci/av7110_hw.c
 clean_blob drivers/media/dvb/ttpci/av7110_hw.c
+clean_sed '/^static int get_firmware(/,/^}$/s, request_firmware(, reject_firmware(,' drivers/media/dvb/ttpci/av7110.c
+clean_sed '/^static int alps_tdlb7_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttpci/av7110.c
 clean_blob drivers/media/dvb/ttpci/av7110.c
 clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110'
 clean_mk CONFIG_DVB_AV7110 drivers/media/dvb/ttpci/Makefile
