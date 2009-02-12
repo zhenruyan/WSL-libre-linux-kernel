@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-02-09
+# deblob-check version 2009-02-12
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -574,6 +574,7 @@ set_except () {
   blobna "request_firmware"
   blobna "request_ihex_firmware"
   blobna "MODULE_FIRMWARE([^;]*)[^;]*;"
+  blobna "DEFAULT_FIRMWARE"
 
   case $prefix$1 in
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
@@ -656,16 +657,6 @@ set_except () {
     # recognize the blobs instead.
     defsnc '	static const u32 test_pat\[4\]\[6\] =' drivers/net/tg3.c
     accept "	}\\(,\\? mem_tbl_5\\(70x\\|705\\|755\\|906\\)\\[\\] = {$sepx$blobpat*$sepx}\\)*;" drivers/net/tg3.c
-
-    # These were removed in early versions of Linux-libre.  They're
-    # now believed to be mere initialization data, rather than code
-    # disguised as such, and it's not long enough that it renders the
-    # software non-Free.
-    defsnc 'static u8 tda10021_inittab\[0x40\]=' drivers/media/dvb/frontends/tda10021.c
-    defsnc 'static u8 tda8083_init_tab \[\] =' drivers/media/dvb/frontends/tda8083.c
-    defsnc 'static u8 ves1820_inittab\[\] =' drivers/media/dvb/frontends/ves1820.c
-    defsnc 'static u8 init_1[89]93_w\?tab \?\[\] =' drivers/media/dvb/frontends/ves1x93.c
-    defsnc 'static const u8 rtl8187b_reg_table\[\]\[3\] =' drivers/net/wireless/rtl8187_dev.c
 
     # end of generic checked expressions.
     # version-specific checked bits start here
@@ -858,6 +849,23 @@ set_except () {
     ocomment '	[/][*] request_firmware blocks until userspace finished' samples/firmware_class/firmware_sample_driver.c
     accept '		[ \t]*" request_firmware_nowait failed' samples/firmware_class/firmware_sample_driver.c
 
+    # We used to remove these in early versions of Linux-libre.
+    # They're now believed to be mere initialization data, rather than
+    # code disguised as such, and they're not long enough so as to
+    # render the software non-Free.
+    defsnc 'static u8 tda10021_inittab\[0x40\]=' drivers/media/dvb/frontends/tda10021.c
+    defsnc 'static u8 tda8083_init_tab \[\] =' drivers/media/dvb/frontends/tda8083.c
+    defsnc 'static u8 ves1820_inittab\[\] =' drivers/media/dvb/frontends/ves1820.c
+    defsnc 'static u8 init_1[89]93_w\?tab \?\[\] =' drivers/media/dvb/frontends/ves1x93.c
+    defsnc 'static const u8 saa7113_tab\[\] =' drivers/media/dvb/ttpci/budget-av.c
+    defsnc 'static u8 philips_sd1878_inittab\[\] =' drivers/media/dvb/ttpci/budget-av.c
+    defsnc 'const struct Kiara_table_entry Kiara_table\[PSZ_MAX\]\[6\]\[4\] =' drivers/media/video/pwc/pwc-kiara.c
+    defsnc 'const unsigned int KiaraRomTable \[8\]\[2\]\[16\]\[8\] =' drivers/media/video/pwc/pwc-kiara.c
+    defsnc 'const struct Timon_table_entry Timon_table\[PSZ_MAX\]\[PWC_FPS_MAX_TIMON\]\[4\] =' drivers/media/video/pwc/pwc-timon.c
+    defsnc 'const unsigned int TimonRomTable \[16\]\[2\]\[16\]\[8\] =' drivers/media/video/pwc/pwc-timon.c
+    defsnc '	static const struct struct_initData initData\[\] =' drivers/media/video/usbvideo/ibmcam.c
+    defsnc 'static const u8 rtl8187b_reg_table\[\]\[3\] =' drivers/net/wireless/rtl8187_dev.c
+
     # Hunting down non-Free firmware-loading code and instructions.
 
     blobna 'atmsar11\.fw' drivers/atm/ambassador.c
@@ -892,18 +900,38 @@ set_except () {
     blob '#include "af9005-script\.h"' drivers/media/dvb/dvb-usb/af9005-fe.c
     blobna '[\n]	scriptlen = sizeof(script)[^;]*;[\n]	for[^{]*scriptlen[^{]*{[^}]*[^\n	}]' drivers/media/dvb/dvb-usb/af9005-fe.c
 
+    accept 'struct \(sp8870\|tda1004x\)_config[\n]{[^}]*(\*request_firmware)[^}]*[\n]};' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.h'
+    blob '[/][*]\([^/]*\|[^*][/]\)*get_dvb_firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]#define \(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|"[^"]*"\) \([^\n]*\|[\\][\n]\)*\)*' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.c'
+    accept '[^\n]*->request_firmware([^{;]*NONFREE_FIRMWARE' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.c'
+    blobna 'dvb-fe-sp8870\.fw' drivers/media/dvb/frontends/sp8870.c
+    blobna 'dvb-fe-tda1004[56]\.fw' drivers/media/dvb/frontends/tda1004x.c
+    accept '	if (state->config->request_firmware != NULL) {' drivers/media/dvb/ttpci/tda1004x.c
+
     # This bootcode is actually Free Software under GPLv2, but since it's
     # being distributed without source code, we're taking it out.
     blob 'static u8 bootcode\[\] = {[^}]*};' drivers/media/dvb/ttpci/av7110_hw.c
     blobna 'dvb-ttpci-01\.fw' drivers/media/dvb/ttpci/av7110.c
     accept '\(static int\|	\.request_firmware =\) alps_tdlb7_request_firmware[(,]' drivers/media/dvb/ttpci/av7110.c
     defsnc 'static u8 nexusca_stv0297_inittab\[\] =' drivers/media/dvb/ttpci/av7110.c
-    accept 'struct sp8870_config[\n]{[^}]*(\*request_firmware)[^}]*[\n]};' drivers/media/dvb/frontends/sp8870.h
-    accept '	if (state->config->request_firmware(' drivers/media/dvb/frontends/sp8870.c
+
+    accept '\(static int\|	\.request_firmware =\) alps_tdhd1_204_request_firmware[(,]' drivers/media/dvb/ttpci/budget.c
+
+    accept '\(static int\|	\.request_firmware =\) philips_tu1216_request_firmware[(,]' drivers/media/dvb/ttpci/budget-av.c
+
+    accept '\(static int\|	\.request_firmware =\) philips_tdm1316l_request_firmware[(,]' drivers/media/dvb/ttpci/budget-ci.c
+    defsnc 'static u8 philips_su1278_tt_inittab\[\] =' drivers/media/dvb/ttpci/budget-ci.c
+    defsnc 'static u8 dvbc_philips_tdm1316l_inittab\[\] =' drivers/media/dvb/ttpci/budget-ci.c
+    accept '\(static int\|	\.request_firmware =\) philips_tdm1316l_request_firmware[(,]' drivers/media/dvb/ttpci/budget-ci.c
+
+    blobna 'ttusb-budget\/dspbootcode\.bin' drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
+
+    blobna 'cpia2\/stv0672_vp4\.bin' drivers/media/video/cpia2/cpia2_core.c
+
+    blobna 'dabusb\/\(firmware\.fw\|bitstream\.bin\)' drivers/media/video/dabusb.c
+
 
     blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
     blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c
-
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h

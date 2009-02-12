@@ -171,6 +171,7 @@ clean_mk () {
 
 clean_sed () {
 	#$1 = sed-script $2 = file
+	echo Cleaning "$2" with sed script "$1"
 	sed -e "$1" "$2" > "$2".deblob
 	check_changed "$2"
 }
@@ -375,6 +376,20 @@ clean_blob drivers/media/dvb/dvb-usb/af9005-fe.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
 clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
 
+# dvb/frontends
+
+announce DVB_SP8870 - Spase sp8870
+clean_sed 's,SP8870_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,g' drivers/media/dvb/frontends/sp8870.c
+clean_blob drivers/media/dvb/frontends/sp8870.c
+clean_kconfig drivers/media/dvb/frontends 'DVB_SP8870'
+clean_mk CONFIG_DVB_SP8870 drivers/media/dvb/frontends/Makefile
+
+announce DVB_TDA1004X - Philips TDA10045H/TDA10046H
+clean_sed 's,TDA1004[56]_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,g' drivers/media/dvb/frontends/tda1004x.c
+clean_blob drivers/media/dvb/frontends/tda1004x.c
+clean_kconfig drivers/media/dvb/frontends 'DVB_TDA1004X'
+clean_mk CONFIG_DVB_TDA1004X drivers/media/dvb/frontends/Makefile
+
 # dvb/ttpci
 
 announce DVB_AV7110 - AV7110 cards
@@ -389,62 +404,48 @@ clean_blob drivers/media/dvb/ttpci/av7110.c
 clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110'
 clean_mk CONFIG_DVB_AV7110 drivers/media/dvb/ttpci/Makefile
 
-# DVB_BUDGET_AV - Budget cards with analog video inputs
-clean_blob drivers/media/dvb/ttpci/budget-av.c
-clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET_AV'
-clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET_PATCH'
-clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET'
-clean_mk CONFIG_DVB_BUDGET_AV drivers/media/dvb/ttpci/Makefile
-clean_mk CONFIG_DVB_BUDGET_PATCH drivers/media/dvb/ttpci/Makefile
-clean_mk CONFIG_DVB_BUDGET drivers/media/dvb/ttpci/Makefile
+announce DVB_BUDGET - Budget cards
+clean_sed '/^static int alps_tdhd1_204_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttpci/budget.c
 
-# DVB_BUDGET_CI - Budget cards with onboard CI connector
-clean_blob drivers/media/dvb/ttpci/budget-ci.c
-clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET_CI'
-clean_mk CONFIG_DVB_BUDGET_CI drivers/media/dvb/ttpci/Makefile
+announce DVB_BUDGET_AV - Budget cards with analog video inputs
+clean_sed '/^static int philips_tu1216_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttpci/budget-av.c
+
+announce DVB_BUDGET_CI - Budget cards with onboard CI connector
+clean_sed '/^static int philips_tdm1316l_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttpci/budget-ci.c
 
 # dvb/ttusb-budget
 
-# DVB_TTUSB_BUDGET - Technotrend/Hauppauge Nova-USB devices
+announce DVB_TTUSB_BUDGET - Technotrend/Hauppauge Nova-USB devices
 drop_fw_file firmware/ttusb-budget/dspbootcode.bin.ihex firmware/ttusb-budget/dspbootcode.bin
+clean_sed '/^static int philips_tdm1316l_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
+reject_firmware drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_kconfig drivers/media/dvb/ttusb-budget/Kconfig 'DVB_TTUSB_BUDGET'
 clean_mk CONFIG_DVB_TTUSB_BUDGET drivers/media/dvb/ttusb-budget/Makefile
 
 # video
 
-# USB_PWC - USB Philips Cameras
-clean_blob drivers/media/video/pwc/pwc-kiara.c
-clean_blob drivers/media/video/pwc/pwc-timon.c
-clean_kconfig drivers/media/video/pwc/Kconfig 'USB_PWC'
-clean_mk CONFIG_USB_PWC drivers/media/video/Makefile
-
-# VIDEO_CPIA - CPiA Video For Linux
+announce VIDEO_CPIA2 - CPiA2 Video For Linux
 clean_fw firmware/cpia2/stv0672_vp4.bin.ihex firmware/cpia2/stv0672_vp4.bin
-clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA'
-clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_PP'
-clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_USB'
+reject_firmware drivers/media/video/cpia2/cpia2_core.c
+clean_blob drivers/media/video/cpia2/cpia2_core.c
 clean_kconfig drivers/media/video/cpia2/Kconfig 'VIDEO_CPIA2'
-clean_mk CONFIG_VIDEO_CPIA drivers/media/video/Makefile
-clean_mk CONFIG_VIDEO_CPIA_PP drivers/media/video/Makefile
-clean_mk CONFIG_VIDEO_CPIA_USB drivers/media/video/Makefile
-clean_mk CONFIG_VIDEO_CPIA2 drivers/media/video/Makefile
+clean_mk CONFIG_VIDEO_CPIA2 drivers/media/video/cpia2/Makefile
 
-# USB_DABUSB - DABUSB driver
+announce USB_DABUSB - DABUSB driver
 clean_fw firmware/dabusb/bitstream.bin.ihex firmware/dabusb/bitstream.bin
 clean_fw firmware/dabusb/firmware.HEX firmware/dabusb/firmware.fw
+reject_firmware drivers/media/video/dabusb.c
+clean_blob drivers/media/video/dabusb.c
 clean_kconfig drivers/media/Kconfig 'USB_DABUSB'
 clean_mk CONFIG_USB_DABUSB drivers/media/video/Makefile
 
 # video/usbvideo
 
-# USB_IBMCAM - USB IBM (Xirlink) C-it Camera support
-clean_blob drivers/media/video/usbvideo/ibmcam.c
-clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_IBMCAM'
-clean_mk CONFIG_USB_IBMCAM drivers/media/video/usbvideo/Makefile
-
-# USB_VICAM - USB 3com HomeConnect (aka vicam)
+announce USB_VICAM - USB 3com HomeConnect, AKA vicam
 drop_fw_file firmware/vicam/firmware.H16 firmware/vicam/firmware.fw
+reject_firmware drivers/media/video/vicam.c
+clean_blob drivers/media/video/vicam.c
 clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_VICAM'
 clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 
