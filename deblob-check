@@ -929,6 +929,12 @@ set_except () {
 
     blobna 'dabusb\/\(firmware\.fw\|bitstream\.bin\)' drivers/media/video/dabusb.c
 
+    blob 'static u32 tigon2\?Fw\(Text\|Rodata\|Data\)\[(MAX_\(TEXT\|RODATA\|DATA\)_LEN\/4) + 1\] __devinitdata = {[^}]*};\([\n]static u32 tigon2\?Fw\(Text\|Rodata\|Data\)\[(MAX_\(TEXT\|RODATA\|DATA\)_LEN\/4) + 1\] __devinitdata = {[^}]*};\)*' drivers/net/acenic_firwmare.h
+    blob '#define tigon2\?Fw[^ ]*\(Addr\|Len\) 0x[^\n]*\([\n]#define tigon2\?Fw[^ ]*\(Addr\|Len\) 0x[^\n]*\)\+' drivers/net/acenic_firmware.h
+    blob '\([/][*]\([^/]*\|[^*/][/]*\)*Do not try to clear\([^/]*\|[^*/][/]*\)*[*][/][\n]	\)\?ace_clear[^;]*;[\n]\([^}]*{[^}]*ace_copy[^}]*tigon2\?Fw[^}]*}\)*[\n]\+	return 0;[\n]}'
+
+    blob '#include "starfire_firmware\.h"' drivers/net/starfire.c
+    blob '[/][*]\([^/]*\|[^*/][/]*\)*Load Rx\/Tx firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]	for ([^)]*FIRMWARE_[RT]X_SIZE[^)]*)[\n]		writel[^;]*firmware_[rt]x[^;]*;\)\+' drivers/net/starfire.c
 
     blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
     blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c

@@ -454,19 +454,31 @@ clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 # Removed net Drivers #
 #######################
 
-# ACENIC - Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit
+announce ACENIC - Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit
 clean_blob drivers/net/acenic_firmware.h
+clean_sed 's,	\(ace_load_firmware[^;]*\),	if ((ecode = \1)) goto init_error,' drivers/net/acenic.c
+clean_sed '/^static int __devinit ace_load_firmware(/,/^}$/ { /^}$/i\
+}\
+	printk(KERN_ERR "%s: Missing Free firwmare\\n", ap->name);\
+	return -EINVAL;
+}' drivers/net/acenic.c
+clean_blob drivers/net/acenic.c
 clean_kconfig drivers/net/Kconfig 'ACENIC'
 clean_mk CONFIG_ACENIC drivers/net/Makefile
 
-# ADAPTEC_STARFIRE - Adaptec Starfire/DuraLAN support
-
+announce ADAPTEC_STARFIRE - Adaptec Starfire/DuraLAN support
 # This file requires prior acceptance of the GPL before you can even
 # run the code in it.  It's not clear whether this is a further
 # requirement that would make the distribution incompatible with the
 # GPL, but since nothing remains after we remove the blob, it's
 # irrelevant whether the explicit acceptance would be a problem.
-clean_blob drivers/net/starfire_firmware.h
+clean_file drivers/net/starfire_firmware.h
+clean_file drivers/net/starfire_firmware.pl
+clean_sed '/Load Rx\/Tx firmware/i\
+	printk (KERN_ERR "%s: Missing Free firmware\\n", dev->name);\
+	return -EINVAL;
+' drivers/net/starfire.c
+clean_blob drivers/net/starfire.c
 clean_kconfig drivers/net/Kconfig 'ADAPTEC_STARFIRE'
 clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
 
@@ -476,6 +488,7 @@ clean_blob drivers/net/bnx2_fw2.h
 clean_kconfig drivers/net/Kconfig 'BNX2'
 clean_mk CONFIG_BNX2 drivers/net/Makefile
 
+# BNX2X - Broadcom NetXtremeII 10Gb support
 clean_blob drivers/net/bnx2x_init_values.h
 clean_kconfig drivers/net/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/Makefile
