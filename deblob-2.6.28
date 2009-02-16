@@ -53,7 +53,7 @@ esac
 
 check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
 if [ ! -f $check ] ; then
-  echo optional deblob-check missing, will remove entire files >&2
+  die deblob-check script missing, will remove entire files
   have_check=false
 else
   have_check=:
@@ -482,14 +482,25 @@ clean_blob drivers/net/starfire.c
 clean_kconfig drivers/net/Kconfig 'ADAPTEC_STARFIRE'
 clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
 
-# BNX2 - Broadcom NetXtremeII
-clean_blob drivers/net/bnx2_fw.h
-clean_blob drivers/net/bnx2_fw2.h
+announce BNX2 - Broadcom NetXtremeII
+clean_file drivers/net/bnx2_fw.h
+clean_file drivers/net/bnx2_fw2.h
+clean_sed '/ bnx2_init_cpus(/i\
+	printk (KERN_ERR "%s: Missing Free firmware\\n", bp->dev->name);\
+	return -EINVAL;\
+#define bnx2_init_cpus(bp) (-EINVAL)' drivers/net/bnx2.c
+clean_blob drivers/net/bnx2.c
 clean_kconfig drivers/net/Kconfig 'BNX2'
 clean_mk CONFIG_BNX2 drivers/net/Makefile
 
-# BNX2X - Broadcom NetXtremeII 10Gb support
+announce BNX2X - Broadcom NetXtremeII 10Gb support
 clean_blob drivers/net/bnx2x_init_values.h
+clean_blob drivers/net/bnx2x_init.h
+clean_sed '/^#include "bnx2x_init\.h"/,/^$/ {/^$/i\
+#define bnx2x_init_block(bp, start, end) \\\
+  return printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\
+	 -EINVAL;
+}' drivers/net/bnx2x_main.c
 clean_kconfig drivers/net/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/Makefile
 
@@ -500,12 +511,8 @@ clean_mk CONFIG_CASSINI drivers/net/Makefile
 
 # CHELSIO_T3 - Chelsio AEL 2005 support
 clean_blob drivers/net/cxgb3/ael1002.c
-if $have_check; then
-  :
-else
-  clean_kconfig drivers/net/Kconfig 'CHELSIO_T3'
-  clean_mk CONFIG_CHELSIO_T3 drivers/net/cxgb3/Makefile
-fi
+clean_kconfig drivers/net/Kconfig 'CHELSIO_T3'
+clean_mk CONFIG_CHELSIO_T3 drivers/net/cxgb3/Makefile
 
 # E100 - Intel(R) PRO/100+
 clean_blob drivers/net/e100.c

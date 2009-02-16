@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-02-12
+# deblob-check version 2009-02-15
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -939,6 +939,15 @@ set_except () {
     blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
     blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c
 
+    blob 'static \(u8\|const u32\|struct fw_info\) bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)* = {[^}]*};\([\n][\n]*static \(u8\|const u32\|struct fw_info\) bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)* = {[^}]*};\)*' 'drivers/net/bnx2_fw2\?.h'
+    blob '#include "bnx2_fw2\?\.h"\([\n][\n]*#include "bnx2_fw2\?\.h"\)*' drivers/net/bnx2.c
+    blob 'static int[\n]bnx2_init_cpus([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}' drivers/net/bnx2.c
+
+    # init_data_e1h? might actually be just data, but it doesn't
+    # really matter.
+    blob 'static const u32 \(init\?\|[tucx]sem_\(int_table\|pram\)\)_data_e1h\?\[\] = {[^}]*};\([\n][\n]*static const u32 \(init\?\|[tucx]sem_\(int_table\|pram\)\)_data_e1h\?\[\] = {[^}]*};\)*' drivers/net/bnx2x_init_values.h
+    blob 'static \(void \|const u32 \*\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}\([\n][\n]*static \(void \|const u32 \*\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}\)*' drivers/net/bnx2x_init.h
+
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h
 
@@ -1018,13 +1027,13 @@ set_except () {
     initnc '	static unsigned char static_pad\[\] ='
     initnc '	static unsigned char table_alaw2ulaw\[\] ='
     initnc '	static unsigned char table_ulaw2alaw\[\] ='
-    initnc '	u32 reg_boundaries\[\] ='
+    defsnc '	u32 reg_boundaries\[\] =' drivers/net/bnx2.c
     initnc '	u8 b\[\] ='
     initnc '	uint8_t tx\[\] ='
     initnc '	unsigned char saa7111_regs\[\] ='
     initnc '	unsigned char sas_pcd_m_pg\[\] ='
     initnc '	} modedb\[5\] ='
-    initnc '	} reg_tbl\[\] ='
+    defsnc '	} reg_tbl\[\] =' drivers/net/bnx2.c
     initnc '	} vals\[\] ='
     initnc '	} vm_devices\[\] ='
     initnc '    static const code distfix\[32\] ='
@@ -1201,8 +1210,7 @@ set_except () {
     initnc 'static u32 v_gain\[64\] ='
     initnc 'static u8 SRAM_Table\[\]\[60\] ='
     initnc 'static u8 alps_tdee4_stv0297_inittab\[\] ='
-    initnc 'static u8 bnx2_5706_stats_len_arr\[BNX2_NUM_STATS\] ='
-    initnc 'static u8 bnx2_5708_stats_len_arr\[BNX2_NUM_STATS\] ='
+    defsnc 'static u8 bnx2_570[68]_stats_len_arr\[BNX2_NUM_STATS\] =' drivers/net/bnx2.c
     initnc 'static u8 flit_desc_map\[\] ='
     defsnc 'static u8 init_tab \?\[\] =' 'drivers/media/dvb/frontends/cx2270\(0\|2\)\.c'
     initnc 'static u8 mac_reader\[\] ='
