@@ -504,24 +504,42 @@ clean_sed '/^#include "bnx2x_init\.h"/,/^$/ {/^$/i\
 clean_kconfig drivers/net/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/Makefile
 
-# CASSINI - Sun Cassini
+announce CASSINI - Sun Cassini
 drop_fw_file firmware/sun/cassini.bin.ihex firmware/sun/cassini.bin
+reject_firmware drivers/net/cassini.c
+clean_blob drivers/net/cassini.c
 clean_kconfig drivers/net/Kconfig 'CASSINI'
 clean_mk CONFIG_CASSINI drivers/net/Makefile
 
-# CHELSIO_T3 - Chelsio AEL 2005 support
+announce CHELSIO_T3 - Chelsio AEL 2005 support
+clean_sed '/^static int ael2005_setup_\(sr\|twinax\)_edc(/,/^}$/ {
+  /for.*ARRAY_SIZE(\(sr\|twinax\)_edc)/i\
+}\
+	CH_ERR(phy->adapter, "Missing Free firwmare\\n");\
+	err = -EINVAL;
+}' drivers/net/cxgb3/ael1002.c
 clean_blob drivers/net/cxgb3/ael1002.c
 clean_kconfig drivers/net/Kconfig 'CHELSIO_T3'
 clean_mk CONFIG_CHELSIO_T3 drivers/net/cxgb3/Makefile
 
-# E100 - Intel(R) PRO/100+
+announce E100 - Intel PRO/100+
+clean_sed '/^static void e100_setup_ucode(/,/^}$/ {
+  /^	} ucode_opts\[\] = {$/,/^	}[,;]/ {
+    s,D[^,]*_RCVBUNDLE_UCODE,/*DEBLOBBED*/{0},g;
+    s,D[^,]*_CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD,/*DEBLOBBED*/0,g;
+  }
+  /^	for ([^;]*ucode_opts[^{]*) {$/,/^	}$/ {
+    /^	}$/ i\
+	}\
+		DPRINTK(DRV, ERR, "Missing Free firmware\\n");\
+		/* ??? We should error out somehow.  */\
+		goto noloaducode;
+  }
+}
+' drivers/net/e100.c
 clean_blob drivers/net/e100.c
-if $have_check; then
-  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/e100.c
-else
-  clean_kconfig drivers/net/Kconfig 'E100'
-  clean_mk CONFIG_E100 drivers/net/Makefile
-fi
+clean_kconfig drivers/net/Kconfig 'E100'
+clean_mk CONFIG_E100 drivers/net/Makefile
 
 # MYRI_SBUS - MyriCOM Gigabit Ethernet
 clean_blob drivers/net/myri_code.h

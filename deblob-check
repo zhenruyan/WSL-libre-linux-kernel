@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-02-15
+# deblob-check version 2009-02-19
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -936,9 +936,6 @@ set_except () {
     blob '#include "starfire_firmware\.h"' drivers/net/starfire.c
     blob '[/][*]\([^/]*\|[^*/][/]*\)*Load Rx\/Tx firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]	for ([^)]*FIRMWARE_[RT]X_SIZE[^)]*)[\n]		writel[^;]*firmware_[rt]x[^;]*;\)\+' drivers/net/starfire.c
 
-    blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
-    blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c
-
     blob 'static \(u8\|const u32\|struct fw_info\) bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)* = {[^}]*};\([\n][\n]*static \(u8\|const u32\|struct fw_info\) bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)* = {[^}]*};\)*' 'drivers/net/bnx2_fw2\?.h'
     blob '#include "bnx2_fw2\?\.h"\([\n][\n]*#include "bnx2_fw2\?\.h"\)*' drivers/net/bnx2.c
     blob 'static int[\n]bnx2_init_cpus([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}' drivers/net/bnx2.c
@@ -947,6 +944,17 @@ set_except () {
     # really matter.
     blob 'static const u32 \(init\?\|[tucx]sem_\(int_table\|pram\)\)_data_e1h\?\[\] = {[^}]*};\([\n][\n]*static const u32 \(init\?\|[tucx]sem_\(int_table\|pram\)\)_data_e1h\?\[\] = {[^}]*};\)*' drivers/net/bnx2x_init_values.h
     blob 'static \(void \|const u32 \*\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}\([\n][\n]*static \(void \|const u32 \*\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}\)*' drivers/net/bnx2x_init.h
+
+    blobna 'sun\/cassini\.bin' drivers/net/cassini.c
+
+    blobna 'static u16 \(sr\|twinax\)_edc\[\] = {[^;]*};' drivers/net/cxgb3/ael1002.c
+    blobna 'for ([^\n]*ARRAY_SIZE(\(sr\|twinax\)_edc)[^\n]*)[\n][^;]*mdio_write[^;]*;' drivers/net/cxgb3/ael1002.c
+
+    blob '\([/][*][*]*[*][/][\n]*\)*\([/][*]\([^/]\|[^*/][/]*\)*Micro code\([^/]\|[^*/][/]*\)*8086:\([^/]\|[^*/][/]*\)*[*][/]\([\n]*[/][*]\([^/]\|[^*/][/]*\)*[*][/]\)*\|#define  *D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)\([\n]*[/][*]\([^/]\|[^*/][/]*\|[*][/][\n]*[/][*]\)*Micro code\([^/]\|[^*/][/]*\)*8086:\([^/]\|[^*/][/]*\)*[*][/]\([\n]*[/][*]\([^/]\|[^*/][/]*\)*[*][/]\)*\|[\n][\n]*#define  *D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)*' drivers/net/e100.c
+    blobna '\([/][*]\([^/]\|[*][/]*\)*[*][/][\n]*		\)\(ucode\[opts->\(timer\|bundle\|min_size\)_dword\] .= [^;]*;[\n][\n]*		\)*[^}]*UCODE_SIZE[^}]*cb_ucode[^}]*return;[\n]	}' drivers/net/e100.c
+
+    blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
+    blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h
