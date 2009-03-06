@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-02-19
+# deblob-check version 2009-03-06
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -952,6 +952,20 @@ set_except () {
 
     blob '\([/][*][*]*[*][/][\n]*\)*\([/][*]\([^/]\|[^*/][/]*\)*Micro code\([^/]\|[^*/][/]*\)*8086:\([^/]\|[^*/][/]*\)*[*][/]\([\n]*[/][*]\([^/]\|[^*/][/]*\)*[*][/]\)*\|#define  *D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)\([\n]*[/][*]\([^/]\|[^*/][/]*\|[*][/][\n]*[/][*]\)*Micro code\([^/]\|[^*/][/]*\)*8086:\([^/]\|[^*/][/]*\)*[*][/]\([\n]*[/][*]\([^/]\|[^*/][/]*\)*[*][/]\)*\|[\n][\n]*#define  *D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)*' drivers/net/e100.c
     blobna '\([/][*]\([^/]\|[*][/]*\)*[*][/][\n]*		\)\(ucode\[opts->\(timer\|bundle\|min_size\)_dword\] .= [^;]*;[\n][\n]*		\)*[^}]*UCODE_SIZE[^}]*cb_ucode[^}]*return;[\n]	}' drivers/net/e100.c
+
+    blob 'static unsigned char __devinitdata lanai4_\(code\|data\)\[[0-9]*\] = {[^;]*};' drivers/net/myri_code.h
+    blob '#include "myri_code\.h"' drivers/net/myri_sbus.c
+    blobna '\([/][*]\([^/]\|[^*][/]*\)*[*][/][\n	 ]*\)\?for ([^\n]*sizeof(lanai4_\(code\|data\)[^\n]*)[\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_code_off[^;]*;\([\n	 ]*\([/][*]\([^/]\|[^*][/]*\)*[*][/][\n	 ]*\)\?for ([^\n]*sizeof(lanai4_\(code\|data\)[^\n]*)[\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_\(code\|data\)_off[^;]*;\)*' drivers/net/myri_sbus.c
+
+    blob 'static u32 s_firmLoad\[\] = {[^;]*};' drivers/net/tehuti_fw.h
+    blob 'bdx_tx_push_desc_safe[^;]*s_firmLoad[^;]*;' drivers/net/tehuti.c
+    blob 'for ([^\n]*ARRAY_SIZE(s_firmLoad)[^\n]*)[\n	 ]*s_firmLoad[^;]*=[^;]*s_firmLoad[^;]*;' drivers/net/tehuti.c
+
+    blob ' [*] Firmware is:[\n] [*]	Derived from proprietary[^/]*notice is accompanying it\.[\n] [*][/]' drivers/net/tg3.c
+    blob 'Derived from proprietary unpublished source code' drivers/net/tg3.c
+    blob '\(static const \)\?u32 tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\] = {[^}]*};\([\n][\n]*\(static const u32 tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\] = {[^}]*};\|#if 0\( [/][*]\([^/]\|[^*/][/]*\)*[*][/]\)\?[\n]\(static const \)\?u32 tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\] = {[^}]*};[\n]#endif\)\)*' drivers/net/tg3.c
+
+    blob 'static const u8 typhoon_firmware_image\[\] = {[^}]*};' drivers/net/typhoon-firmware.h
 
     blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
     blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c

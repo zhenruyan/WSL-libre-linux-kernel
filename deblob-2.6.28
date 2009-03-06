@@ -541,47 +541,47 @@ clean_blob drivers/net/e100.c
 clean_kconfig drivers/net/Kconfig 'E100'
 clean_mk CONFIG_E100 drivers/net/Makefile
 
-# MYRI_SBUS - MyriCOM Gigabit Ethernet
-clean_blob drivers/net/myri_code.h
+announce MYRI_SBUS - MyriCOM Gigabit Ethernet
+clean_file drivers/net/myri_code.h
+clean_sed '/myri_load_lanai.*;/i\
+	printk(KERN_ERR "Missing Free firmware\\n");\
+	goto err_free_irq;
+' drivers/net/myri_sbus.c
+clean_blob drivers/net/myri_sbus.c
 clean_kconfig drivers/net/Kconfig 'MYRI_SBUS'
 clean_mk CONFIG_MYRI_SBUS drivers/net/Makefile
 
-# TEHUTI - Tehuti Networks 10G Ethernet
-clean_blob drivers/net/tehuti_fw.h -s 4
+announce TEHUTI - Tehuti Networks 10G Ethernet
+clean_blob drivers/net/tehuti_fw.h
+clean_sed '/bdx_tx_push_desc_safe.*s_firmLoad.*/i\
+		ERR("%s: Missing Free firmware\\n", priv->ndev->name);\
+		RET(-EINVAL);
+' drivers/net/tehuti.c	
+clean_blob drivers/net/tehuti.c
 clean_kconfig drivers/net/Kconfig 'TEHUTI'
 clean_mk CONFIG_TEHUTI drivers/net/Makefile
 
-# TIGON3 - Broadcom Tigon3
-patch --no-backup-if-mismatch --batch -p0 <<\EOF || \
-  die failed to remove license comments from drivers/net/tg3.c \
-  # patches/linux-2.6-tg3-clean.patch
---- drivers/net/tg3.c
-+++ drivers/net/tg3.c
-@@ -5,14 +5,6 @@
-  * Copyright (C) 2001, 2002, 2003 Jeff Garzik (jgarzik@pobox.com)
-  * Copyright (C) 2004 Sun Microsystems Inc.
-  * Copyright (C) 2005-2007 Broadcom Corporation.
-- *
-- * Firmware is:
-- *	Derived from proprietary unpublished source code,
-- *	Copyright (C) 2000-2003 Broadcom Corporation.
-- *
-- *	Permission is hereby granted for the distribution of this firmware
-- *	data in hexadecimal or equivalent format, provided this copyright
-- *	notice is accompanying it.
-  */
- 
- 
-EOF
-clean_blob drivers/net/tg3.c -s 9
-if $have_check; then
-  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/tg3.c 
-else
-  clean_kconfig drivers/net/Kconfig 'TIGON3'
-  clean_mk CONFIG_TIGON3 drivers/net/Makefile
-fi
+announce TIGON3 - Broadcom Tigon3
+clean_sed 's,\&tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[0\],NULL,;
+/^static int tg3_load_firmware_cpu(/,/^}/{
+  /^	err = 0;/i\
+	printk(KERN_ERR PFX "Missing Free firmware for %s, hoping it works anyway\\n",\
+	       tp->dev->name);
+}' drivers/net/tg3.c
+clean_blob drivers/net/tg3.c
+clean_kconfig drivers/net/Kconfig 'TIGON3'
+clean_mk CONFIG_TIGON3 drivers/net/Makefile
 
-# TYPHOON - 3cr990 series Typhoon
+announce TYPHOON - 3cr990 series Typhoon
+clean_sed '/^typhoon_download_firmware(/,/^}/{
+  /typhoon_firmware_image/{
+    i\
+	printk(KERN_ERR "%s: Missing Free firmware\\n", tp->name);\
+	err = -EINVAL;\
+	goto err_out;
+    d;
+  }
+}' drivers/net/typhoon.c
 clean_blob drivers/net/typhoon-firmware.h
 clean_kconfig drivers/net/Kconfig 'TYPHOON'
 clean_mk CONFIG_TYPHOON drivers/net/Makefile
