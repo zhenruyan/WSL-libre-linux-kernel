@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-03-06
+# deblob-check version 2009-03-07
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -966,6 +966,11 @@ set_except () {
     blob '\(static const \)\?u32 tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\] = {[^}]*};\([\n][\n]*\(static const u32 tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\] = {[^}]*};\|#if 0\( [/][*]\([^/]\|[^*/][/]*\)*[*][/]\)\?[\n]\(static const \)\?u32 tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\] = {[^}]*};[\n]#endif\)\)*' drivers/net/tg3.c
 
     blob 'static const u8 typhoon_firmware_image\[\] = {[^}]*};' drivers/net/typhoon-firmware.h
+
+    blobna 'licensed[^\n]*strictly for use[^\n]*[\n]*[^\n]*COPS LocalTalk' 'drivers/net/appletalk/cops_\(ff\|lt\)drv\.h'
+    blob 'static const unsigned char ffdrv_code\[\] = {[^}]*};' drivers/net/appletalk/cops_ffdrv.h
+    blob 'static const unsgined char ltdrv_code\[\] = {[^}]*};' drivers/net/appletalk/cops_ltdrv.h
+    blob '#include "cops_\(lt\|ff\)drv\.h"[ 	]*\([/][*]\([^/]\|[^*][/]*\)*Firmware\([^/]\|[^*][/]*\)*[*][/]\)\?\([\n][\n]*#include "cops_\(lt\|ff\)drv\.h"[ 	]*\([/][*]\([^/]\|[^*][/]*\)*Firmware\([^/]\|[^*][/]*\)*[*][/]\)\?\)*' drivers/net/appletalk/cops.c
 
     blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
     blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c

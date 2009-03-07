@@ -588,11 +588,14 @@ clean_mk CONFIG_TYPHOON drivers/net/Makefile
 
 # appletalk
 
-# COPS - COPS LocalTalk PC
-# clean_blob drivers/net/appletalk/cops.c
-# clean_blob drivers/net/appletalk/cops.h
-clean_blob drivers/net/appletalk/cops_ffdrv.h
-clean_blob drivers/net/appletalk/cops_ltdrv.h
+announce COPS - COPS LocalTalk PC
+clean_sed '/sizeof(\(ff\|lt\)drv_code)/i\
+		printk(KERN_INFO "%s: Missing Free firmware.\\n", dev->name);\
+		return;
+/\(ff\|lt\)drv_code/d;' drivers/net/appletalk/cops.c
+clean_blob drivers/net/appletalk/cops.c
+clean_file drivers/net/appletalk/cops_ffdrv.h
+clean_file drivers/net/appletalk/cops_ltdrv.h
 clean_kconfig drivers/net/appletalk/Kconfig 'COPS'
 clean_mk CONFIG_COPS drivers/net/appletalk/Makefile
 
