@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-03-07
+# deblob-check version 2009-03-08
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -550,7 +550,7 @@ set_except () {
 
   # Match up to the end a comment started in $1.
   ocomment () {
-    addx "$1\\([^*]\\|[*][*]*[^*/]\\|[*]*[\\n]\\)*[*]*[*][/]" $2
+    addx "$1[/]*\\([^/]\\|[^*/][/]*\\)*[*][/]" $2
   }
 
   # Match $1 followed by backslash-terminated lines and a last
@@ -573,7 +573,7 @@ set_except () {
   blobna "request_firmware_nowait"
   blobna "request_firmware"
   blobna "request_ihex_firmware"
-  blobna "MODULE_FIRMWARE([^;]*)[^;]*;"
+  blobna "MODULE_FIRMWARE[ 	\n]*([^;]*)[ 	\n]*;\([ 	\n]*MODULE_FIRMWARE[ 	\n]*([^;]*)[ 	\n]*;\)*"
   blobna "DEFAULT_FIRMWARE"
 
   case $prefix$1 in
@@ -865,6 +865,15 @@ set_except () {
     defsnc 'const unsigned int TimonRomTable \[16\]\[2\]\[16\]\[8\] =' drivers/media/video/pwc/pwc-timon.c
     defsnc '	static const struct struct_initData initData\[\] =' drivers/media/video/usbvideo/ibmcam.c
     defsnc 'static const u8 rtl8187b_reg_table\[\]\[3\] =' drivers/net/wireless/rtl8187_dev.c
+    defsnc 'unsigned char \(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\|IPA_PDU_HEADER\|\(READ\|WRITE\)_CCW\)\[\] =' drivers/net/qeth_core_mpc.c
+    defsnc 'static unsigned char camera_ncm03j_magic\[\] =' arch/sh/boards/board-ap325rxa.c
+    defsnc 'static const unsigned short \(sync\|magic[0-3]\)_data\[\] =' arch/sh/boards/mach-migor/lcd_qvga.c
+    defsnc 'static unsigned char camera_ov772x_magic\[\] =' arch/sh/boards/mach-migor/setup.c
+    defsnc 'static struct chips_init_reg chips_init_[sgacfx]r\[\] =' 'drivers/video/\(asiliant\|chips\)fb.c'
+
+    # This one is quite suspicious, but it's small enough (64 bytes
+    # total) that it's believable that it could be actual source code.
+    defsnc 'static const __u8 cx11646_fw1\[\]\[3\] =' drivers/media/video/gspca/conex.c
 
     # Hunting down non-Free firmware-loading code and instructions.
 
@@ -901,7 +910,7 @@ set_except () {
     blobna '[\n]	scriptlen = sizeof(script)[^;]*;[\n]	for[^{]*scriptlen[^{]*{[^}]*[^\n	}]' drivers/media/dvb/dvb-usb/af9005-fe.c
 
     accept 'struct \(sp8870\|tda1004x\)_config[\n]{[^}]*(\*request_firmware)[^}]*[\n]};' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.h'
-    blob '[/][*]\([^/]*\|[^*][/]\)*get_dvb_firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]#define \(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|"[^"]*"\) \([^\n]*\|[\\][\n]\)*\)*' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.c'
+    blob '[/][*]\([^/]*\|[^*/][/]\)*get_dvb_firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]#define \(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|"[^"]*"\) \([^\n]*\|[\\][\n]\)*\)*' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.c'
     accept '[^\n]*->request_firmware([^{;]*NONFREE_FIRMWARE' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.c'
     blobna 'dvb-fe-sp8870\.fw' drivers/media/dvb/frontends/sp8870.c
     blobna 'dvb-fe-tda1004[56]\.fw' drivers/media/dvb/frontends/tda1004x.c
@@ -955,7 +964,7 @@ set_except () {
 
     blob 'static unsigned char __devinitdata lanai4_\(code\|data\)\[[0-9]*\] = {[^;]*};' drivers/net/myri_code.h
     blob '#include "myri_code\.h"' drivers/net/myri_sbus.c
-    blobna '\([/][*]\([^/]\|[^*][/]*\)*[*][/][\n	 ]*\)\?for ([^\n]*sizeof(lanai4_\(code\|data\)[^\n]*)[\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_code_off[^;]*;\([\n	 ]*\([/][*]\([^/]\|[^*][/]*\)*[*][/][\n	 ]*\)\?for ([^\n]*sizeof(lanai4_\(code\|data\)[^\n]*)[\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_\(code\|data\)_off[^;]*;\)*' drivers/net/myri_sbus.c
+    blobna '\([/][*]\([^/]\|[^*/][/]*\)*[*][/][\n	 ]*\)\?for ([^\n]*sizeof(lanai4_\(code\|data\)[^\n]*)[\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_code_off[^;]*;\([\n	 ]*\([/][*]\([^/]\|[^*/][/]*\)*[*][/][\n	 ]*\)\?for ([^\n]*sizeof(lanai4_\(code\|data\)[^\n]*)[\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_\(code\|data\)_off[^;]*;\)*' drivers/net/myri_sbus.c
 
     blob 'static u32 s_firmLoad\[\] = {[^;]*};' drivers/net/tehuti_fw.h
     blob 'bdx_tx_push_desc_safe[^;]*s_firmLoad[^;]*;' drivers/net/tehuti.c
@@ -970,10 +979,72 @@ set_except () {
     blobna 'licensed[^\n]*strictly for use[^\n]*[\n]*[^\n]*COPS LocalTalk' 'drivers/net/appletalk/cops_\(ff\|lt\)drv\.h'
     blob 'static const unsigned char ffdrv_code\[\] = {[^}]*};' drivers/net/appletalk/cops_ffdrv.h
     blob 'static const unsgined char ltdrv_code\[\] = {[^}]*};' drivers/net/appletalk/cops_ltdrv.h
-    blob '#include "cops_\(lt\|ff\)drv\.h"[ 	]*\([/][*]\([^/]\|[^*][/]*\)*Firmware\([^/]\|[^*][/]*\)*[*][/]\)\?\([\n][\n]*#include "cops_\(lt\|ff\)drv\.h"[ 	]*\([/][*]\([^/]\|[^*][/]*\)*Firmware\([^/]\|[^*][/]*\)*[*][/]\)\?\)*' drivers/net/appletalk/cops.c
+    blob '#include "cops_\(lt\|ff\)drv\.h"[ 	]*\([/][*]\([^/]\|[^*/][/]*\)*Firmware\([^/]\|[^*/][/]*\)*[*][/]\)\?\([\n][\n]*#include "cops_\(lt\|ff\)drv\.h"[ 	]*\([/][*]\([^/]\|[^*/][/]*\)*Firmware\([^/]\|[^*/][/]*\)*[*][/]\)\?\)*' drivers/net/appletalk/cops.c
+
+    blob 'static unsigned char bits_1200\[\] *= {[^}]*};' drivers/net/hamradio/yam1200.h
+    blob 'static unsigned char bits_9600\[\] *= {[^}]*};' drivers/net/hamradio/yam9600.h
+    blob '#include "yam\(96\|12\)00\.h"\([\n][\n]*#include "yam\(96\|12\)00\.h"\)*' drivers/net/hamradio/yam.c
+
+    blobna 'static const u_char __Xilinx7OD\[\] = {[^}]*};' drivers/net/pcmcia/ositech.h
+    blob '#include "ositech\.h"' drivers/net/pcmcia/smc91c92_cs.c
+    blobna '\([/][*] Download the Seven of Diamonds firmware[^/]*[*][/][\n	 ]*\)\?for *([^\n]*__Xilinx7OD[^{}]*{[\n][	 ]*outb *(__Xilinx7OD[^}]*}' drivers/net/pcmcia/smc91c92_cs.c
+
+    blob 'static const u8 microcode\[\] = {[^}]*} *;' drivers/net/tokenring/3c359_microcode.h
+    blob '#include "3c359_microcode\.h"' drivers/net/tokenring/3c359.c
+    blobna '\(printk(KERN_INFO "3C359: Uploading Microcode: ");[\n 	]*\)\?for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\([\n][ 	]*printk[^\n]*;[\n 	]*for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\)*' drivers/net/tokenring/3c359.c
+
+    blobna 'tr_smctr\.bin' drivers/net/tokenring/smctr.c
+
+    blobna 'kaweth[/]\(new\|trigger\)_code\(_fix\)\.bin' drivers/net/usb/kaweth.c
 
     blobna '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' drivers/net/wireless/orinoco.c
     blobna 'symbol_sp24t_\(prim\|sec\)_fw' drivers/net/wireless/orinoco.c
+
+    blob 'unsigned short sbus_risc_code01\[\] __devinitdata = {[^}]*};' drivers/scsi/qlogicpti_asm.c
+    blob '#include "qlogicpti_asm\.c"' drivers/scsi/qlogicpti.c
+
+    blob '\([/][*] Microcode\([^/]\|[^*/][/]*\)*[*][/][\n]*\)\?static \(u\(nsigned \)\?char\|unsigned short\|ADV_DCNT\) _\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\] = {[^}]*}\|size = sizeof[^;]*\|chksum = 0x[^;]*\);\([ 	]*[/][*]\([^/]\|[^*/][/]*\)*[*][/]\)\?\([\n][\n]*\([/][*] Microcode\([^/]\|[^*/][/]*\)*[*][/][\n]*\)\?static \(u\(nsigned \)\?char\|unsigned short\|ADV_DCNT\) _\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\] = {[^}]*}\|size = sizeof[^;]*\|chksum = 0x[^;]*\);\([ 	]*[/][*]\([^/]\|[^*/][/]*\)*[*][/]\)\?\)*' drivers/scsi/advansys.c
+
+    blob '\(#ifdef UNIQUE_FW_NAME[\n]\)\?static unsigned short \(risc\|fw12\(80e\|160\)i\)_code01\[\] = {\([\n]#else[\n]static unsigned short risc_code01\[\] = {[\n]#endif[\n]\)\?[^}]*};\([\n][\n]*\(#ifdef UNIQUE_FW_NAME[\n]\)\?static unsigned short \(risc_code\|fw12\(80e\|160\)i\)_length01 = [^;]*;\([\n]#else[\n]static unsigned short risc_code_length01 = [^;]*;[\n]#endif\)\?\)\?' 'drivers/scsi/ql1\(04\|2\(8\|16\)\)0_fw\.h'
+
+    blobna 'emi26[/]\(bitstream\|firmware\|loader\)\.fw' drivers/usb/misc/emi26.c
+
+    blobna 'emi62[/]\(bitstream\|midi\|spdif\|loader\)\.fw' drivers/usb/misc/emi62.c
+
+    blobna 'keyspan[/]\(mpr\|usa\(18x\|19\(q[iw]\|w\)\?\|28\(x\(a\|b\)\?\)\?\|49w\(lc\)\?\)\)\.fw' drivers/usb/serial/keyspan.c
+
+    accept '		fw_name = "keyspan_pda[/]\(keyspan_pda\|xircom_pgs\)\.fw";' drivers/usb/serial/keyspan_pda.c
+    blobna 'fw_name = \([^}]\|[^\n]}*\)*\([/][*]KEYSPAN_PDA[*][/]\)\?request_ihex_firmware' drivers/usb/serial/keyspan_pda.c
+    accept '	if ([/][*]KEYSPAN_PDA[*][/]request_ihex_firmware' drivers/usb/serial/keyspan_pda.c
+
+    blobna 'edgeport[/]\(boot\|down\)2\?\.fw' drivers/usb/serial/io_edgeport.c
+    blobna 'edgeport[/]down3\.bin' drivers/usb/serial/io_ti.c
+
+    blobna 'ti_\(usb-\)\?\(%d\|3410\|5052\)\.bin' drivers/usb/serial/ti_usb_3410_5052.c
+
+    blobna 'whiteheat\(_loader\(_debug\)\?\)\?\.fw' drivers/usb/serial/whiteheat.c
+
+    blob 'static struct BA1struct BA1Struct = {[^;]*};' sound/pci/cs46xx/cs46xx_image.h
+    
+    blob 'static u32 cwc\(4630\|async\|snoop\)_\(code\|parameter\)\[\] = {[^;]*};' 'sound/pci/cs46xx/imgs/cwc\(4630\|async\|snoop\)\.h'
+    # cwcbinhack appears to have been created by hand.
+    # cwcdma has sources (not verified) in cwcdma.asp.
+    accept 'static u32 cwc\(binhack\|dma\)_code\[\] = {[^;]*};' 'sound/pci/cs46xx/imgs/cwc\(binhack\|dma\)\.h'
+    blob '#include "\(cs46xx_image\|imgs[/]cwc\(4630\|async\|snoop\)\)\.h"\([\n][\n]*#include "\(cs46xx_image\|imgs[/]cwc\(4630\|async\|snoop\)\)\.h"\)*' sound/pci/cs46xx/cs46xx_lib.c
+
+    blobna 'korg[/]k1212\.dsp' sound/pci/korg1212/korg1212.c
+
+    blobna 'ess[/]maestro3_assp_\(kernel\|minisrc\)\.fw' sound/pci/maestro3.c
+
+    blobna 'yamaha[/]ds1e\?_\(ctrl\|dsp\)\.fw' sound/pci/ymfpci/ymfpci_main.c
+
+    blobna 'sb16[/]\(\(a\|mu\)law_main\|ima_adpcm_\(init\|capture\|playback\)\)\.csp' sound/isa/sb/sb16_dsp.c
+
+    blob 'static const struct {[^}]*} yss225_registers\[\] __devinitdata = {[^;]*};' sound/isa/wavefront/yss225.c
+    blob 'yamaha[/]yss225_registers\.bin' sound/isa/wavefront/wavefront_fx.c
+    blobna 'firmware = [&]yss225_registers_firmware;' sound/isa/wavefront/wavefront_fx.c
+    blob 'static const struct firmware yss225_registers_firmware = {[^;]*};' sound/isa/wavefront/wavefront_fx.c
+    blob 'wavefront\.os' sound/isa/wavefront/wavefront_synth.c
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h
@@ -1355,7 +1426,6 @@ set_except () {
     initnc '} qam64_snr_tab\[\] ='
     initnc '} sil_port\[\] ='
     initnc '} vsb_snr_tab\[\] ='
-    initnc '} yss225_registers\[\] __devinitdata ='
 
     ;;
 
