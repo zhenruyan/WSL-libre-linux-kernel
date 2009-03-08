@@ -78,7 +78,8 @@ clean_file () {
 	if test ! -f $1; then
 		die $1 does not exist, something is wrong
 	fi
-	rm -v $1
+	rm $1
+	echo $1: removed
 }
 
 check_changed () {
@@ -97,7 +98,7 @@ clean_blob () {
 		die $1 does not exist, something is wrong
 	    fi
 	    name=$1
-	    echo Removing blobs from $name
+	    echo $name: removing blobs
 	    set fnord "$@" -d
 	    shift 2
 	    $check "$@" -i linux-$kver $name > $name.deblob
@@ -110,25 +111,21 @@ clean_blob () {
 dummy_blob () {
 	#$1 = filename
 	if test -f $1; then
-	    echo $1 exists, something is wrong
-	    exit 1
+	    fatal $1 exists, something is wrong
 	elif test ! -f firmware/Makefile; then
-	    echo firmware/Makefile does not exist, something is wrong
-	    exit 1
+	    fatal firmware/Makefile does not exist, something is wrong
 	fi
 
-	sed -i "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
-	  firmware/Makefile
+	clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
+	  firmware/Makefile "dropping $1"
 }
 
 clean_fw () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
 		fatal $1 does not exist, something is wrong
-		exit 1
 	elif test -f $2; then
 		fatal $2 exists, something is wrong
-		exit 1
 	fi
 	clean_blob $1 -s 4
 	dummy_blob $2
@@ -138,10 +135,8 @@ drop_fw_file () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
 		fatal $1 does not exist, something is wrong
-		exit 1
 	elif test -f $2; then
 		fatal $2 exists, something is wrong
-		exit 1
 	fi
 	clean_file $1
 	dummy_blob $2
@@ -159,7 +154,7 @@ clean_kconfig () {
 		fi
 		;;
 	esac
-        echo Marking config $2 as depending on NONFREE in $1
+        echo $1: marking config $2 as depending on NONFREE
 	sed "/^config \\($2\\)\$/{p;i\
 	depends on NONFREE
 d;}" $1 > $1.deblob
@@ -169,6 +164,7 @@ d;}" $1 > $1.deblob
 clean_mk () {
 	#$1 = config $2 = Makefile name
 	# We don't clean up Makefiles any more --lxoliva
+	# echo $2: removing $1 support
 	# sed -i "/\\($1\\)/d" $2
 	# check_changed $2
 	if sed -n "/\\($1\\)/p" $2 | grep . > /dev/null; then
@@ -180,14 +176,16 @@ clean_mk () {
 
 clean_sed () {
 	#$1 = sed-script $2 = file $3 = comment
-	echo "$2": ${3-applying sed script "$1"}
+	echo $2: ${3-applying sed script $1}
 	sed -e "$1" "$2" > "$2".deblob
 	check_changed "$2"
 }
 
 reject_firmware () {
 	#$1 = file
-	clean_sed 's,request\(_ihex\|\)_firmware(,reject_firmware(,' "$1" "disablng non-Free firmware-loading machinery"
+	clean_sed '
+s,request\(_ihex\|\)_firmware(,reject_firmware(,
+' "$1" 'disabling non-Free firmware-loading machinery'
 }
 
 # First, check that files that contain firmwares and their
@@ -300,7 +298,7 @@ EOF
 # Removed ATM Drivers #
 #######################
 
-announce ATM_AMBASSADOR -  Madge Ambassador, Collage PCI 155 Server
+announce ATM_AMBASSADOR - Madge Ambassador, Collage PCI 155 Server
 reject_firmware drivers/atm/ambassador.c
 clean_blob drivers/atm/ambassador.c
 clean_fw firmware/atmsar11.HEX firmware/atmsar11.fw
