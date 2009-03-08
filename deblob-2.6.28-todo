@@ -102,7 +102,6 @@ drivers/usb/atm/cxacru.c
 drivers/usb/atm/speedtch.c
 drivers/usb/atm/ueagle-atm.c
 drivers/usb/misc/isight_firmware.c
-drivers/usb/serial/whiteheat.c
 drivers/uwb/i1480/dfu/i1480-dfu.h
 drivers/uwb/i1480/dfu/mac.c
 drivers/uwb/i1480/dfu/phy.c
