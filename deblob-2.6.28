@@ -98,10 +98,10 @@ clean_blob () {
 		die $1 does not exist, something is wrong
 	    fi
 	    name=$1
-	    echo $name: removing blobs
 	    set fnord "$@" -d
 	    shift 2
 	    $check "$@" -i linux-$kver $name > $name.deblob
+	    echo $name: removed blobs
 	    check_changed $name
 	else
 	    clean_file $1
@@ -117,7 +117,7 @@ dummy_blob () {
 	fi
 
 	clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
-	  firmware/Makefile "dropping $1"
+	  firmware/Makefile "dropped $1"
 }
 
 clean_fw () {
@@ -154,18 +154,18 @@ clean_kconfig () {
 		fi
 		;;
 	esac
-        echo $1: marking config $2 as depending on NONFREE
 	sed "/^config \\($2\\)\$/{p;i\
 	depends on NONFREE
 d;}" $1 > $1.deblob
+	echo $1: marked config $2 as depending on NONFREE
 	check_changed $1
 }
 
 clean_mk () {
 	#$1 = config $2 = Makefile name
 	# We don't clean up Makefiles any more --lxoliva
-	# echo $2: removing $1 support
 	# sed -i "/\\($1\\)/d" $2
+	# echo $2: removed $1 support
 	# check_changed $2
 	if sed -n "/\\($1\\)/p" $2 | grep . > /dev/null; then
 	    :
@@ -176,8 +176,8 @@ clean_mk () {
 
 clean_sed () {
 	#$1 = sed-script $2 = file $3 = comment
-	echo $2: ${3-applying sed script $1}
 	sed -e "$1" "$2" > "$2".deblob
+	echo $2: ${3-applied sed script $1}
 	check_changed "$2"
 }
 
@@ -185,7 +185,7 @@ reject_firmware () {
 	#$1 = file
 	clean_sed '
 s,request\(_ihex\|\)_firmware(,reject_firmware(,
-' "$1" 'disabling non-Free firmware-loading machinery'
+' "$1" 'disabled non-Free firmware-loading machinery'
 }
 
 # First, check that files that contain firmwares and their
@@ -233,7 +233,7 @@ done
 # Identify the tarball.
 clean_sed "
 s,^EXTRAVERSION.*,&-libre$extra,
-" Makefile 'Adding -libre to EXTRAVERSION'
+" Makefile 'added -libre to EXTRAVERSION'
 
 # Add reject_firmware and maybe_reject_firmware
 cat >> include/linux/firwmare.h <<\EOF
@@ -854,7 +854,7 @@ clean_mk CONFIG_USB_SERIAL_KEYSPAN drivers/usb/serial/Makefile
 announce USB_SERIAL_KEYSPAN_PDA - USB Keyspan PDA Single Port Serial Driver
 clean_sed '
 s,request_ihex_firmware,/*KEYSPAN_PDA*/&,
-' drivers/usb/serial/keyspan_pda.c 'accepting Free firmware'
+' drivers/usb/serial/keyspan_pda.c 'accept Free firmware'
 
 announce USB_SERIAL_EDGEPORT - USB Inside Out Edgeport Serial Driver
 clean_fw firmware/edgeport/boot.H16 firmware/edgeport/boot.fw
