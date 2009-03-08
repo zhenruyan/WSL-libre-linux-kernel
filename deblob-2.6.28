@@ -46,14 +46,23 @@
 # from 1 if changes are needed that require rebuilding the tarball.
 kver=2.6.28 extra=++
 
+fatal () {
+  echo "$@"
+  exit 1
+}
+
 case $1 in
---force) die () { echo ERROR: "$@": ignored >&2; }; shift;;
-*) die () { echo "$@" >&2; exit 1; };;
+--force) die () { echo ERROR: "$@": ignored >&2; }; forced=:; shift;;
+*) die () { fatal "$@"; }; forced=false;;
 esac
 
 check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
 if [ ! -f $check ] ; then
-  die deblob-check script missing, will remove entire files
+  if $forced; then
+    die deblob-check script missing, will remove entire files
+  else
+    die deblob-check script missing
+  fi
   have_check=false
 else
   have_check=:
@@ -101,10 +110,10 @@ clean_blob () {
 dummy_blob () {
 	#$1 = filename
 	if test -f $1; then
-	    echo $1 exists, something is wrong >&2
+	    echo $1 exists, something is wrong
 	    exit 1
 	elif test ! -f firmware/Makefile; then
-	    echo firmware/Makefile does not exist, something is wrong >&2
+	    echo firmware/Makefile does not exist, something is wrong
 	    exit 1
 	fi
 
@@ -115,10 +124,10 @@ dummy_blob () {
 clean_fw () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
-		echo $1 does not exist, something is wrong >&2
+		fatal $1 does not exist, something is wrong
 		exit 1
 	elif test -f $2; then
-		echo $2 exists, something is wrong >&2
+		fatal $2 exists, something is wrong
 		exit 1
 	fi
 	clean_blob $1 -s 4
@@ -128,10 +137,10 @@ clean_fw () {
 drop_fw_file () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
-		echo $1 does not exist, something is wrong >&2
+		fatal $1 does not exist, something is wrong
 		exit 1
 	elif test -f $2; then
-		echo $2 exists, something is wrong >&2
+		fatal $2 exists, something is wrong
 		exit 1
 	fi
 	clean_file $1
@@ -170,15 +179,15 @@ clean_mk () {
 }
 
 clean_sed () {
-	#$1 = sed-script $2 = file
-	echo Cleaning "$2" with sed script "$1"
+	#$1 = sed-script $2 = file $3 = comment
+	echo "$2": ${3-applying sed script "$1"}
 	sed -e "$1" "$2" > "$2".deblob
 	check_changed "$2"
 }
 
 reject_firmware () {
 	#$1 = file
-	clean_sed 's,request\(_ihex\|\)_firmware(,reject_firmware(,' "$1"
+	clean_sed 's,request\(_ihex\|\)_firmware(,reject_firmware(,' "$1" "disablng non-Free firmware-loading machinery"
 }
 
 # First, check that files that contain firmwares and their
@@ -224,7 +233,9 @@ for f in \
 done
 
 # Identify the tarball.
-clean_sed "s,^EXTRAVERSION.*,&-libre$extra," Makefile
+clean_sed "
+s,^EXTRAVERSION.*,&-libre$extra,
+" Makefile 'Adding -libre to EXTRAVERSION'
 
 # Add reject_firmware and maybe_reject_firmware
 cat >> include/linux/firwmare.h <<\EOF
@@ -324,7 +335,8 @@ clean_kconfig drivers/gpu/drm/Kconfig 'DRM_MGA'
 clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
 announce DRM_R128 - ATI Rage 128
-clean_sed '/^static int r128_do_init_cce(/,/^}$/{
+clean_sed '
+/^static int r128_do_init_cce(/,/^}$/{
   /^	r128_cce_load_microcode(dev_priv);$/{
     i\
 	DRM_ERROR("Missing Free microcode!\\n");\
@@ -332,13 +344,14 @@ clean_sed '/^static int r128_do_init_cce(/,/^}$/{
 	r128_do_cleanup_cce(dev);\
 	return -EINVAL;
   }
-}' drivers/gpu/drm/r128/r128_cce.c
+}' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/r128/r128_cce.c
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 announce DRM_RADEON - ATI Radeon
-clean_sed '/^static int radeon_do_init_cce(/,/^}$/{
+clean_sed '
+/^static int radeon_do_init_cce(/,/^}$/{
   /^	radeon_cp_load_microcode(dev_priv);$/{
     i\
 	DRM_ERROR("Missing Free microcode!\\n");\
@@ -352,7 +365,7 @@ clean_sed '/^static int radeon_do_init_cce(/,/^}$/{
 	DRM_ERROR("Missing Free microcode!\\n");\
 	return -EINVAL;
   }
-}' drivers/gpu/drm/radeon/radeon_cp.c
+}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
@@ -371,7 +384,9 @@ clean_blob Documentation/dvb/ttusb-dec.txt
 
 announce DVB_USB_AF9005 - Afatech AF9005 DVB-T USB1.1
 clean_file drivers/media/dvb/dvb-usb/af9005-script.h
-clean_sed 's,^	deb_info("load init script\\n");$,	{\n		err("Missing Free init script\\n");\n		return scriptlen = ret = -EINVAL;\n		,' drivers/media/dvb/dvb-usb/af9005-fe.c
+clean_sed '
+s,^	deb_info("load init script\\n");$,	{\n		err("Missing Free init script\\n");\n		return scriptlen = ret = -EINVAL;\n		,;
+' drivers/media/dvb/dvb-usb/af9005-fe.c 'report missing Free init script'
 clean_blob drivers/media/dvb/dvb-usb/af9005-fe.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
 clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
@@ -379,13 +394,17 @@ clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
 # dvb/frontends
 
 announce DVB_SP8870 - Spase sp8870
-clean_sed 's,SP8870_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,g' drivers/media/dvb/frontends/sp8870.c
+clean_sed '
+s,SP8870_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,g
+' drivers/media/dvb/frontends/sp8870.c 'disable non-Free firmware'
 clean_blob drivers/media/dvb/frontends/sp8870.c
 clean_kconfig drivers/media/dvb/frontends 'DVB_SP8870'
 clean_mk CONFIG_DVB_SP8870 drivers/media/dvb/frontends/Makefile
 
 announce DVB_TDA1004X - Philips TDA10045H/TDA10046H
-clean_sed 's,TDA1004[56]_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,g' drivers/media/dvb/frontends/tda1004x.c
+clean_sed '
+s,TDA1004[56]_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,g
+' drivers/media/dvb/frontends/tda1004x.c 'disable non-Free firmware'
 clean_blob drivers/media/dvb/frontends/tda1004x.c
 clean_kconfig drivers/media/dvb/frontends 'DVB_TDA1004X'
 clean_mk CONFIG_DVB_TDA1004X drivers/media/dvb/frontends/Makefile
@@ -395,29 +414,48 @@ clean_mk CONFIG_DVB_TDA1004X drivers/media/dvb/frontends/Makefile
 announce DVB_AV7110 - AV7110 cards
 # The bootcode is actually Free Software under GPLv2, but since it's
 # being distributed without source code, we're taking it out for now.
-clean_sed 's,^	\/\* boot \*\/$,	printk(KERN_ERR "dvb-ttpci: av7110_bootarm(): Missing Free bootcode\\n");\n	return -EINVAL;\n\n&,' drivers/media/dvb/ttpci/av7110_hw.c
-clean_sed 's,mwdebi(.*bootcode.*$,/* & */,' drivers/media/dvb/ttpci/av7110_hw.c
+clean_sed '
+s,^	\/\* boot \*\/$,	printk(KERN_ERR "dvb-ttpci: av7110_bootarm(): Missing Free bootcode\\n");\n	return -EINVAL;\n\n&,
+' drivers/media/dvb/ttpci/av7110_hw.c 'report missing Free bootcode'
+clean_sed '
+s,mwdebi(.*bootcode.*$,/* & */,
+' drivers/media/dvb/ttpci/av7110_hw.c 'adjust bootcode loader'
 clean_blob drivers/media/dvb/ttpci/av7110_hw.c
-clean_sed '/^static int get_firmware(/,/^}$/s, request_firmware(, reject_firmware(,' drivers/media/dvb/ttpci/av7110.c
-clean_sed '/^static int alps_tdlb7_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttpci/av7110.c
+clean_sed '
+/^static int get_firmware(/,/^}$/s, request_firmware(, reject_firmware(,
+' drivers/media/dvb/ttpci/av7110.c 'report missing Free firwmare'
+clean_sed '
+/^static int alps_tdlb7_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
+' drivers/media/dvb/ttpci/av7110.c 'accept Free firmware'
 clean_blob drivers/media/dvb/ttpci/av7110.c
 clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110'
 clean_mk CONFIG_DVB_AV7110 drivers/media/dvb/ttpci/Makefile
 
 announce DVB_BUDGET - Budget cards
-clean_sed '/^static int alps_tdhd1_204_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttpci/budget.c
+clean_sed '
+/^static int alps_tdhd1_204_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
+' drivers/media/dvb/ttpci/budget.c 'report missing Free firmware'
 
 announce DVB_BUDGET_AV - Budget cards with analog video inputs
-clean_sed '/^static int philips_tu1216_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttpci/budget-av.c
+clean_sed '
+/^static int philips_tu1216_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
+' drivers/media/dvb/ttpci/budget-av.c \
+  'report missing Free firmware, accept Free firmware'
 
 announce DVB_BUDGET_CI - Budget cards with onboard CI connector
-clean_sed '/^static int philips_tdm1316l_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttpci/budget-ci.c
+clean_sed '
+/^static int philips_tdm1316l_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
+' drivers/media/dvb/ttpci/budget-ci.c \
+  'report missing Free firmware, accept Free firmware'
 
 # dvb/ttusb-budget
 
 announce DVB_TTUSB_BUDGET - Technotrend/Hauppauge Nova-USB devices
 drop_fw_file firmware/ttusb-budget/dspbootcode.bin.ihex firmware/ttusb-budget/dspbootcode.bin
-clean_sed '/^static int philips_tdm1316l_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,' drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
+clean_sed '
+/^static int philips_tdm1316l_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
+' drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c \
+  'report missing Free firmware, accept Free firmware'
 reject_firmware drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_kconfig drivers/media/dvb/ttusb-budget/Kconfig 'DVB_TTUSB_BUDGET'
@@ -444,8 +482,8 @@ clean_mk CONFIG_USB_DABUSB drivers/media/video/Makefile
 
 announce USB_VICAM - USB 3com HomeConnect, AKA vicam
 drop_fw_file firmware/vicam/firmware.H16 firmware/vicam/firmware.fw
-reject_firmware drivers/media/video/vicam.c
-clean_blob drivers/media/video/vicam.c
+reject_firmware drivers/media/video/usbvideo/vicam.c
+clean_blob drivers/media/video/usbvideo/vicam.c
 clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_VICAM'
 clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 
@@ -456,12 +494,15 @@ clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 
 announce ACENIC - Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit
 clean_blob drivers/net/acenic_firmware.h
-clean_sed 's,	\(ace_load_firmware[^;]*\),	if ((ecode = \1)) goto init_error,' drivers/net/acenic.c
-clean_sed '/^static int __devinit ace_load_firmware(/,/^}$/ { /^}$/i\
+clean_sed '
+s,	\(ace_load_firmware[^;]*\),	if ((ecode = \1)) goto init_error,
+' drivers/net/acenic.c 'check for error in firmware loading'
+clean_sed '
+/^static int __devinit ace_load_firmware(/,/^}$/ { /^}$/i\
 }\
 	printk(KERN_ERR "%s: Missing Free firwmare\\n", ap->name);\
 	return -EINVAL;
-}' drivers/net/acenic.c
+}' drivers/net/acenic.c 'report missing Free firmware'
 clean_blob drivers/net/acenic.c
 clean_kconfig drivers/net/Kconfig 'ACENIC'
 clean_mk CONFIG_ACENIC drivers/net/Makefile
@@ -474,10 +515,11 @@ announce ADAPTEC_STARFIRE - Adaptec Starfire/DuraLAN support
 # irrelevant whether the explicit acceptance would be a problem.
 clean_file drivers/net/starfire_firmware.h
 clean_file drivers/net/starfire_firmware.pl
-clean_sed '/Load Rx\/Tx firmware/i\
+clean_sed '
+/Load Rx\/Tx firmware/i\
 	printk (KERN_ERR "%s: Missing Free firmware\\n", dev->name);\
 	return -EINVAL;
-' drivers/net/starfire.c
+' drivers/net/starfire.c 'report missing Free firmware'
 clean_blob drivers/net/starfire.c
 clean_kconfig drivers/net/Kconfig 'ADAPTEC_STARFIRE'
 clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
@@ -485,10 +527,12 @@ clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
 announce BNX2 - Broadcom NetXtremeII
 clean_file drivers/net/bnx2_fw.h
 clean_file drivers/net/bnx2_fw2.h
-clean_sed '/ bnx2_init_cpus(/i\
+clean_sed '
+/ bnx2_init_cpus(/i\
 	printk (KERN_ERR "%s: Missing Free firmware\\n", bp->dev->name);\
 	return -EINVAL;\
-#define bnx2_init_cpus(bp) (-EINVAL)' drivers/net/bnx2.c
+#define bnx2_init_cpus(bp) (-EINVAL)
+' drivers/net/bnx2.c 'report missing Free firmware'
 clean_blob drivers/net/bnx2.c
 clean_kconfig drivers/net/Kconfig 'BNX2'
 clean_mk CONFIG_BNX2 drivers/net/Makefile
@@ -496,11 +540,12 @@ clean_mk CONFIG_BNX2 drivers/net/Makefile
 announce BNX2X - Broadcom NetXtremeII 10Gb support
 clean_blob drivers/net/bnx2x_init_values.h
 clean_blob drivers/net/bnx2x_init.h
-clean_sed '/^#include "bnx2x_init\.h"/,/^$/ {/^$/i\
+clean_sed '
+/^#include "bnx2x_init\.h"/,/^$/ {/^$/i\
 #define bnx2x_init_block(bp, start, end) \\\
   return printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\
 	 -EINVAL;
-}' drivers/net/bnx2x_main.c
+}' drivers/net/bnx2x_main.c 'report missing Free firmware'
 clean_kconfig drivers/net/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/Makefile
 
@@ -512,18 +557,20 @@ clean_kconfig drivers/net/Kconfig 'CASSINI'
 clean_mk CONFIG_CASSINI drivers/net/Makefile
 
 announce CHELSIO_T3 - Chelsio AEL 2005 support
-clean_sed '/^static int ael2005_setup_\(sr\|twinax\)_edc(/,/^}$/ {
+clean_sed '
+/^static int ael2005_setup_\(sr\|twinax\)_edc(/,/^}$/ {
   /for.*ARRAY_SIZE(\(sr\|twinax\)_edc)/i\
 }\
 	CH_ERR(phy->adapter, "Missing Free firwmare\\n");\
 	err = -EINVAL;
-}' drivers/net/cxgb3/ael1002.c
+}' drivers/net/cxgb3/ael1002.c 'report missing Free firmware'
 clean_blob drivers/net/cxgb3/ael1002.c
 clean_kconfig drivers/net/Kconfig 'CHELSIO_T3'
 clean_mk CONFIG_CHELSIO_T3 drivers/net/cxgb3/Makefile
 
 announce E100 - Intel PRO/100+
-clean_sed '/^static void e100_setup_ucode(/,/^}$/ {
+clean_sed '
+/^static void e100_setup_ucode(/,/^}$/ {
   /^	} ucode_opts\[\] = {$/,/^	}[,;]/ {
     s,D[^,]*_RCVBUNDLE_UCODE,/*DEBLOBBED*/{0},g;
     s,D[^,]*_CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD,/*DEBLOBBED*/0,g;
@@ -536,44 +583,49 @@ clean_sed '/^static void e100_setup_ucode(/,/^}$/ {
 		goto noloaducode;
   }
 }
-' drivers/net/e100.c
+' drivers/net/e100.c 'report missing Free firmware for some variants'
 clean_blob drivers/net/e100.c
 clean_kconfig drivers/net/Kconfig 'E100'
 clean_mk CONFIG_E100 drivers/net/Makefile
 
 announce MYRI_SBUS - MyriCOM Gigabit Ethernet
 clean_file drivers/net/myri_code.h
-clean_sed '/myri_load_lanai.*;/i\
+clean_sed '
+/myri_load_lanai.*;/i\
 	printk(KERN_ERR "Missing Free firmware\\n");\
 	goto err_free_irq;
-' drivers/net/myri_sbus.c
+' drivers/net/myri_sbus.c 'report missing Free firmware'
 clean_blob drivers/net/myri_sbus.c
 clean_kconfig drivers/net/Kconfig 'MYRI_SBUS'
 clean_mk CONFIG_MYRI_SBUS drivers/net/Makefile
 
 announce TEHUTI - Tehuti Networks 10G Ethernet
 clean_blob drivers/net/tehuti_fw.h
-clean_sed '/bdx_tx_push_desc_safe.*s_firmLoad.*/i\
+clean_sed '
+/bdx_tx_push_desc_safe.*s_firmLoad.*/i\
 		ERR("%s: Missing Free firmware\\n", priv->ndev->name);\
 		RET(-EINVAL);
-' drivers/net/tehuti.c	
+' drivers/net/tehuti.c 'report missing Free firmware'
 clean_blob drivers/net/tehuti.c
 clean_kconfig drivers/net/Kconfig 'TEHUTI'
 clean_mk CONFIG_TEHUTI drivers/net/Makefile
 
 announce TIGON3 - Broadcom Tigon3
-clean_sed 's,\&tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[0\],NULL,;
+clean_sed '
+s,\&tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[0\],NULL,;
 /^static int tg3_load_firmware_cpu(/,/^}/{
   /^	err = 0;/i\
 	printk(KERN_ERR PFX "Missing Free firmware for %s, hoping it works anyway\\n",\
 	       tp->dev->name);
-}' drivers/net/tg3.c
+}' drivers/net/tg3.c 'report missing Free firmware, proceed without it'
 clean_blob drivers/net/tg3.c
 clean_kconfig drivers/net/Kconfig 'TIGON3'
 clean_mk CONFIG_TIGON3 drivers/net/Makefile
 
 announce TYPHOON - 3cr990 series Typhoon
-clean_sed '/^typhoon_download_firmware(/,/^}/{
+clean_blob drivers/net/typhoon-firmware.h
+clean_sed '
+/^typhoon_download_firmware(/,/^}/{
   /typhoon_firmware_image/{
     i\
 	printk(KERN_ERR "%s: Missing Free firmware\\n", tp->name);\
@@ -581,18 +633,19 @@ clean_sed '/^typhoon_download_firmware(/,/^}/{
 	goto err_out;
     d;
   }
-}' drivers/net/typhoon.c
-clean_blob drivers/net/typhoon-firmware.h
+}' drivers/net/typhoon.c 'report missing Free firmware'
 clean_kconfig drivers/net/Kconfig 'TYPHOON'
 clean_mk CONFIG_TYPHOON drivers/net/Makefile
 
 # appletalk
 
 announce COPS - COPS LocalTalk PC
-clean_sed '/sizeof(\(ff\|lt\)drv_code)/i\
+clean_sed '
+/sizeof(\(ff\|lt\)drv_code)/i\
 		printk(KERN_INFO "%s: Missing Free firmware.\\n", dev->name);\
 		return;
-/\(ff\|lt\)drv_code/d;' drivers/net/appletalk/cops.c
+/\(ff\|lt\)drv_code/d;
+' drivers/net/appletalk/cops.c 'report missing Free firmware'
 clean_blob drivers/net/appletalk/cops.c
 clean_file drivers/net/appletalk/cops_ffdrv.h
 clean_file drivers/net/appletalk/cops_ltdrv.h
@@ -602,27 +655,29 @@ clean_mk CONFIG_COPS drivers/net/appletalk/Makefile
 # hamradio
 
 announce YAM - YAM driver for AX.25
-clean_sed '/add_mcs(bits_\(12\|96\)00, bitrate)/{
+clean_file drivers/net/hamradio/yam1200.h
+clean_file drivers/net/hamradio/yam9600.h
+clean_sed '
+/add_mcs(bits_\(12\|96\)00, bitrate)/{
   i\
 		printk(KERN_ERR "yam: Missing Free firmware\\n");
   s:add_mcs(bits_\(12\|96\)00, bitrate):NULL:
-}' drivers/net/hamradio/yam.c
+}' drivers/net/hamradio/yam.c 'report missing Free firmware'
 clean_blob drivers/net/hamradio/yam.c
-clean_file drivers/net/hamradio/yam1200.h
-clean_file drivers/net/hamradio/yam9600.h
 clean_kconfig drivers/net/hamradio/Kconfig 'YAM'
 clean_mk CONFIG_YAM drivers/net/hamradio/Makefile
 
 # pcmcia
 
 announce PCMCIA_SMC91C92 - SMC 91Cxx PCMCIA
-clean_sed '/^osi_setup(/,/^}/{
+clean_blob drivers/net/pcmcia/ositech.h
+clean_sed '
+/^osi_setup(/,/^}/{
   s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1rc = -EINVAL;\n\1goto free_cfg_mem;/
-}' drivers/net/pcmcia/smc91c92_cs.c
+}' drivers/net/pcmcia/smc91c92_cs.c 'report missing Free firmware'
 clean_sed '/^smc9192_resume(/,/^}/{
   s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1return -EINVAL;/
-}' drivers/net/pcmcia/smc91c92_cs.c
-clean_blob drivers/net/pcmcia/ositech.h
+}' drivers/net/pcmcia/smc91c92_cs.c 'report another missing Free firmware'
 clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_SMC91C92'
 clean_mk CONFIG_PCMCIA_SMC91C92 drivers/net/pcmcia/Makefile
 
@@ -630,32 +685,33 @@ clean_mk CONFIG_PCMCIA_SMC91C92 drivers/net/pcmcia/Makefile
 # tokenring
 
 announce 3C359 - 3Com 3C359 Token Link Velocity XL adapter
-clean_sed '/^xl_hw_reset(/,/^}/{
+clean_file drivers/net/tokenring/3c359_microcode.h
+clean_sed '
+/^xl_hw_reset(/,/^}/{
   /printk.*Uploading Microcode/i\
 		printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\
 		return -EINVAL;
-}' drivers/net/tokenring/3c359.c
+}' drivers/net/tokenring/3c359.c 'report missing Free firmware'
 clean_blob drivers/net/tokenring/3c359.c
-clean_file drivers/net/tokenring/3c359_microcode.h
 clean_kconfig drivers/net/tokenring/Kconfig '3C359'
 clean_mk CONFIG_3C359 drivers/net/tokenring/Makefile
 
 # SMCTR - SMC ISA/MCA adapter
+drop_fw_file firmware/tr_smctr.bin.ihex firmware/tr_smctr.bin
 reject_firmware drivers/net/tokenring/smctr.c
 clean_blob drivers/net/tokenring/smctr.c
-drop_fw_file firmware/tr_smctr.bin.ihex firmware/tr_smctr.bin
 clean_kconfig drivers/net/tokenring/Kconfig 'SMCTR'
 clean_mk CONFIG_SMCTR drivers/net/tokenring/Makefile
 
 # usb
 
 announce USB_KAWETH - USB KLSI KL5USB101-based ethernet device support
-reject_firmware drivers/net/kaweth.c
-clean_blob drivers/net/kaweth.c
 drop_fw_file firmware/kaweth/new_code.bin.ihex firmware/kaweth/new_code.bin
 drop_fw_file firmware/kaweth/new_code_fix.bin.ihex firmware/kaweth/new_code_fix.bin
 drop_fw_file firmware/kaweth/trigger_code.bin.ihex firmware/kaweth/trigger_code.bin
 drop_fw_file firmware/kaweth/trigger_code_fix.bin.ihex firmware/kaweth/trigger_code_fix.bin
+reject_firmware drivers/net/usb/kaweth.c
+clean_blob drivers/net/usb/kaweth.c
 clean_kconfig drivers/net/usb/Kconfig 'USB_KAWETH'
 clean_mk CONFIG_USB_KAWETH drivers/net/usb/Makefile
 
@@ -673,20 +729,22 @@ clean_mk CONFIG_HERMES drivers/net/wireless/Makefile
 ########################
 
 announce SCSI_QLOGICPTI - PTI Qlogic, ISP Driver
-clean_sed '/^static int __devinit qlogicpti_load_firmware(/,/^}$/{
+clean_file drivers/scsi/qlogicpti_asm.c
+clean_sed '
+/^static int __devinit qlogicpti_load_firmware(/,/^}$/{
   /[&]sbus_risc_code01/i\
 	printk(KERN_ERR "qlogicpti%d: Missing Free firmware\\n", qpti->qpti_id);\
 	return -EINVAL;
   s,[&]sbus_risc_code01\[0\],NULL,
   s,sbus_risc_code_length01,0,
-}' drivers/scsi/qlogicpti.c
+}' drivers/scsi/qlogicpti.c 'report missing Free firmware'
 clean_blob drivers/scsi/qlogicpti.c
-clean_file drivers/scsi/qlogicpti_asm.c
 clean_kconfig drivers/scsi/Kconfig 'SCSI_QLOGICPTI'
 clean_mk CONFIG_SCSI_QLOGICPTI drivers/scsi/Makefile
 
 announce SCSI_ADVANSYS - AdvanSys SCSI
-clean_sed '/ASC_DBG.*_asc_mcode_chksum);/d;
+clean_sed '
+/ASC_DBG.*_asc_mcode_chksum);/d;
 /^\(static ASC_CNT \)\?AscLoadMicroCode(/,/^}$/ {
   /^}$/{p;i\
 #define AscLoadMicroCode(x1,x2,x3,x4) ((x1),(x2),(x3),(x4),printk(KERN_ERR "advansys: Missing Free firmware\\n"), -1)
@@ -701,13 +759,18 @@ clean_sed '/ASC_DBG.*_asc_mcode_chksum);/d;
 }
 s/\([ 	(]\)_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_buf,/\1NULL,/;
 s/\([ 	]\)_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_size\([,)]\)/\1(unsigned short)0\5/;
-s/\([ 	]\)_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_chksum\([,)]\)/\1(ADV_DCNT)0\5/;' drivers/scsi/advansys.c
+s/\([ 	]\)_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_chksum\([,)]\)/\1(ADV_DCNT)0\5/;
+' drivers/scsi/advansys.c 'report missing Free firmware'
 clean_blob drivers/scsi/advansys.c
 clean_kconfig drivers/scsi/Kconfig 'SCSI_ADVANSYS'
 clean_mk CONFIG_SCSI_ADVANSYS drivers/scsi/Makefile
 
 announce SCSI_QLOGIC_1280 - Qlogic QLA 1240/1x80/1x160 SCSI
-clean_sed 's,[&]\(fw12\(160\|80e\)i\|risc\(_code\)\?\)_\(code01\[0\]\|length01\),NULL,g;
+clean_blob drivers/scsi/ql1280_fw.h
+clean_blob drivers/scsi/ql1040_fw.h
+clean_blob drivers/scsi/ql12160_fw.h
+clean_sed '
+s,[&]\(fw12\(160\|80e\)i\|risc\(_code\)\?\)_\(code01\[0\]\|length01\),NULL,g;
 /^qla1280_load_firmware\(_pio\)\?(/,/^}$/{
   /risc_code_size = [*]/ {
     i\
@@ -726,10 +789,7 @@ clean_sed 's,[&]\(fw12\(160\|80e\)i\|risc\(_code\)\?\)_\(code01\[0\]\|length01\)
 		goto out;\
 	}
   }
-}' drivers/scsi/qla1280.c
-clean_blob drivers/scsi/ql1280_fw.h
-clean_blob drivers/scsi/ql1040_fw.h
-clean_blob drivers/scsi/ql12160_fw.h
+}' drivers/scsi/qla1280.c 'report missing Free firmware'
 clean_kconfig drivers/scsi/Kconfig 'SCSI_QLOGIC_1280'
 clean_mk CONFIG_SCSI_QLOGIC_1280 drivers/scsi/Makefile
 
@@ -741,104 +801,94 @@ clean_mk CONFIG_SCSI_QLOGIC_1280 drivers/scsi/Makefile
 # misc
 
 announce USB_EMI26 - EMI "2|6" USB Audio interface
-reject_firmware drivers/usb/misc/emi26.c
-clean_blob drivers/usb/misc/emi26.c
 # These files are not under the GPL, better remove them all.
 drop_fw_file firmware/emi26/bitstream.HEX firmware/emi26/bitstream.fw
 drop_fw_file firmware/emi26/firmware.HEX firmware/emi26/firmware.fw
 drop_fw_file firmware/emi26/loader.HEX firmware/emi26/loader.fw
+reject_firmware drivers/usb/misc/emi26.c
+clean_blob drivers/usb/misc/emi26.c
 clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI26'
 clean_mk CONFIG_USB_EMI26 drivers/usb/misc/Makefile
 
 announce USB_EMI62 - EMI "6|2m" USB Audio interface
-reject_firmware drivers/usb/misc/emi62.c
-clean_blob drivers/usb/misc/emi62.c
 # These files are probably not under the GPL, better remove them all.
 drop_fw_file firmware/emi62/bitstream.HEX firmware/emi62/bitstream.fw
 drop_fw_file firmware/emi62/loader.HEX firmware/emi62/loader.fw
 drop_fw_file firmware/emi62/midi.HEX firmware/emi62/midi.fw
 drop_fw_file firmware/emi62/spdif.HEX firmware/emi62/spdif.fw
+reject_firmware drivers/usb/misc/emi62.c
+clean_blob drivers/usb/misc/emi62.c
 clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI62'
 clean_mk CONFIG_USB_EMI62 drivers/usb/misc/Makefile
 
 # serial
 
 announce USB_SERIAL_KEYSPAN - USB Keyspan USA-xxx Serial Driver
+drop_fw_file firmware/keyspan/mpr.HEX firmware/keyspan/mpr.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_MPR'
+drop_fw_file firmware/keyspan/usa18x.HEX firmware/keyspan/usa18x.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA18X'
+drop_fw_file firmware/keyspan/usa19.HEX firmware/keyspan/usa19.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19'
+drop_fw_file firmware/keyspan/usa19qi.HEX firmware/keyspan/usa19qi.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QI'
+drop_fw_file firmware/keyspan/usa19qw.HEX firmware/keyspan/usa19qw.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QW'
+drop_fw_file firmware/keyspan/usa19w.HEX firmware/keyspan/usa19w.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19W'
+drop_fw_file firmware/keyspan/usa28.HEX firmware/keyspan/usa28.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28'
+drop_fw_file firmware/keyspan/usa28xa.HEX firmware/keyspan/usa28xa.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XA'
+drop_fw_file firmware/keyspan/usa28xb.HEX firmware/keyspan/usa28xb.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XB'
+drop_fw_file firmware/keyspan/usa28x.HEX firmware/keyspan/usa28x.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28X'
+drop_fw_file firmware/keyspan/usa49w.HEX firmware/keyspan/usa49w.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49W'
+drop_fw_file firmware/keyspan/usa49wlc.HEX firmware/keyspan/usa49wlc.fw
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49WLC'
 reject_firmware drivers/usb/serial/keyspan.c
 clean_blob drivers/usb/serial/keyspan.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN'
 clean_mk CONFIG_USB_SERIAL_KEYSPAN drivers/usb/serial/Makefile
-announce USB_SERIAL_KEYSPAN_MPR - USB Keyspan MPR Firmware
-drop_fw_file firmware/keyspan/mpr.HEX firmware/keyspan/mpr.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_MPR'
-announce USB_SERIAL_KEYSPAN_USA18X - USB Keyspan USA-18X Firmware
-drop_fw_file firmware/keyspan/usa18x.HEX firmware/keyspan/usa18x.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA18X'
-announce USB_SERIAL_KEYSPAN_USA19 - USB Keyspan USA-19 Firmware
-drop_fw_file firmware/keyspan/usa19.HEX firmware/keyspan/usa19.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19'
-announce USB_SERIAL_KEYSPAN_USA19QI - USB Keyspan USA-19QI Firmware
-drop_fw_file firmware/keyspan/usa19qi.HEX firmware/keyspan/usa19qi.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QI'
-announce USB_SERIAL_KEYSPAN_USA19QW - USB Keyspan USA-19QW Firmware
-drop_fw_file firmware/keyspan/usa19qw.HEX firmware/keyspan/usa19qw.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QW'
-announce USB_SERIAL_KEYSPAN_USA19W - USB Keyspan USA-19W Firmware
-drop_fw_file firmware/keyspan/usa19w.HEX firmware/keyspan/usa19w.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19W'
-announce USB_SERIAL_KEYSPAN_USA28 - USB Keyspan USA-28 Firmware
-drop_fw_file firmware/keyspan/usa28.HEX firmware/keyspan/usa28.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28'
-announce USB_SERIAL_KEYSPAN_USA28XA - USB Keyspan USA-28XA Firmware
-drop_fw_file firmware/keyspan/usa28xa.HEX firmware/keyspan/usa28xa.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XA'
-announce USB_SERIAL_KEYSPAN_USA28XB - USB Keyspan USA-28XB Firmware
-drop_fw_file firmware/keyspan/usa28xb.HEX firmware/keyspan/usa28xb.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XB'
-announce USB_SERIAL_KEYSPAN_USA28X - USB Keyspan USA-28X Firmware
-drop_fw_file firmware/keyspan/usa28x.HEX firmware/keyspan/usa28x.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28X'
-announce USB_SERIAL_KEYSPAN_USA49W - USB Keyspan USA-49W Firmware
-drop_fw_file firmware/keyspan/usa49w.HEX firmware/keyspan/usa49w.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49W'
-announce USB_SERIAL_KEYSPAN_USA49WLC - USB Keyspan USA-49WLC Firmware
-drop_fw_file firmware/keyspan/usa49wlc.HEX firmware/keyspan/usa49wlc.fw
-clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49WLC'
 
-announce USB_SERIAL_KEYSPAN_PDA - blob-clean, marking to aid deblob-check
-clean_sed 's,request_ihex_firmware,/*KEYSPAN_PDA*/&,' drivers/usb/serial/keyspan_pda.c
+announce USB_SERIAL_KEYSPAN_PDA - USB Keyspan PDA Single Port Serial Driver
+clean_sed '
+s,request_ihex_firmware,/*KEYSPAN_PDA*/&,
+' drivers/usb/serial/keyspan_pda.c 'accepting Free firmware'
 
 announce USB_SERIAL_EDGEPORT - USB Inside Out Edgeport Serial Driver
-reject_firmware drivers/usb/serial/io_edgeport.c
-clean_blob drivers/usb/serial/io_edgeport.c
 clean_fw firmware/edgeport/boot.H16 firmware/edgeport/boot.fw
 clean_fw firmware/edgeport/boot2.H16 firmware/edgeport/boot2.fw
 clean_fw firmware/edgeport/down.H16 firmware/edgeport/down.fw
 clean_fw firmware/edgeport/down2.H16 firmware/edgeport/down2.fw
+reject_firmware drivers/usb/serial/io_edgeport.c
+clean_blob drivers/usb/serial/io_edgeport.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT drivers/usb/serial/Makefile
 
-announce USB_SERIAL_EDGEPORT_TI - USB Inside Out Edgeport Serial Driver (TI devices)
+announce USB_SERIAL_EDGEPORT_TI - USB Inside Out Edgeport Serial Driver "(TI devices)"
+clean_fw firmware/edgeport/down3.bin.ihex firmware/edgeport/down3.bin
 reject_firmware drivers/usb/serial/io_ti.c
 clean_blob drivers/usb/serial/io_ti.c
-clean_fw firmware/edgeport/down3.bin.ihex firmware/edgeport/down3.bin
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT_TI'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT_TI drivers/usb/serial/Makefile
 
 announce USB_SERIAL_TI - USB TI 3410/5052 Serial Driver
-reject_firmware drivers/usb/serial/ti_usb_3410_5052.c
-clean_blob drivers/usb/serial/ti_usb_3410_5052.c
 drop_fw_file firmware/ti_3410.fw.ihex firmware/ti_3410.fw
 drop_fw_file firmware/ti_5052.fw.ihex firmware/ti_5052.fw
+reject_firmware drivers/usb/serial/ti_usb_3410_5052.c
+clean_blob drivers/usb/serial/ti_usb_3410_5052.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_TI'
 clean_mk CONFIG_USB_SERIAL_TI drivers/usb/serial/Makefile
 
 announce USB_SERIAL_WHITEHEAT - USB ConnectTech WhiteHEAT Serial Driver
-reject_firmware drivers/usb/serial/whiteheat.c
-clean_blob drivers/usb/serial/whiteheat.c
 clean_fw firmware/whiteheat.HEX firmware/whiteheat.fw
 clean_fw firmware/whiteheat_loader.HEX firmware/whiteheat_loader.fw
 clean_fw firmware/whiteheat_loader_debug.HEX firmware/whiteheat_loader_debug.fw
+reject_firmware drivers/usb/serial/whiteheat.c
+clean_blob drivers/usb/serial/whiteheat.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_WHITEHEAT'
 clean_mk CONFIG_USB_SERIAL_WHITEHEAT drivers/usb/serial/Makefile
 
@@ -848,6 +898,12 @@ clean_mk CONFIG_USB_SERIAL_WHITEHEAT drivers/usb/serial/Makefile
 #########################
 
 announce SND_CS46XX - Cirrus Logic "(Sound Fusion)" CS4280/CS461x/CS462x/CS463x
+# This appears to have been extracted from some non-Free driver
+clean_file sound/pci/cs46xx/cs46xx_image.h
+# The following blobs are definitely extracted from non-Free drivers.
+clean_file sound/pci/cs46xx/imgs/cwc4630.h
+clean_file sound/pci/cs46xx/imgs/cwcasync.h
+clean_file sound/pci/cs46xx/imgs/cwcsnoop.h
 clean_sed '
 /^\(int \)\?snd_cs46xx_download_image(/,/^}$/{
   /for.*BA1_MEMORY_COUNT/i\
@@ -860,65 +916,60 @@ clean_sed '
   }
 }
 s/cs46xx_dsp_load_module(chip, [&]cwc\(4630\|async\|snoop\)_module)/(snd_printk(KERN_ERR "cs46xx: Missing Free firmware\\n"),-EINVAL)/
-' sound/pci/cs46xx/cs46xx_lib.c
+' sound/pci/cs46xx/cs46xx_lib.c 'report missing Free firmware'
 clean_blob sound/pci/cs46xx/cs46xx_lib.c
-# This appears to have been extracted from some non-Free driver
-clean_file sound/pci/cs46xx/cs46xx_image.h
-# The following blobs are definitely extracted from non-Free drivers.
-clean_file sound/pci/cs46xx/imgs/cwc4630.h
-clean_file sound/pci/cs46xx/imgs/cwcasync.h
-clean_file sound/pci/cs46xx/imgs/cwcsnoop.h
 clean_kconfig sound/pci/Kconfig 'SND_CS46XX'
 clean_mk 'CONFIG_SND_CS46XX' sound/pci/cs46xx/Makefile
 
 announce SND_KORG1212 - Korg 1212 IO
+drop_fw_file firmware/korg/k1212.dsp.ihex firmware/korg/k1212.dsp
 reject_firmware sound/pci/korg1212/korg1212.c
 clean_blob sound/pci/korg1212/korg1212.c
-drop_fw_file firmware/korg/k1212.dsp.ihex firmware/korg/k1212.dsp
 clean_kconfig sound/pci/Kconfig 'SND_KORG1212'
 clean_mk 'CONFIG_SND_KORG1212' sound/pci/korg1212/Makefile
 
 announce SND_MAESTRO3 - ESS Allegro/Maestro3
-reject_firmware sound/pci/maestro3.c
-clean_blob sound/pci/maestro3.c
 drop_fw_file firmware/ess/maestro3_assp_kernel.fw.ihex firmware/ess/maestro3_assp_kernel.fw
 drop_fw_file firmware/ess/maestro3_assp_minisrc.fw.ihex firmware/ess/maestro3_assp_minisrc.fw
+reject_firmware sound/pci/maestro3.c
+clean_blob sound/pci/maestro3.c
 clean_kconfig sound/pci/Kconfig 'SND_MAESTRO3'
 clean_mk 'CONFIG_SND_MAESTRO3' sound/pci/Makefile
 
 announce SND_YMFPCI - Yamaha YMF724/740/744/754
-reject_firmware sound/pci/ymfpci/ymfpci_main.c
-clean_blob sound/pci/ymfpci/ymfpci_main.c
 drop_fw_file firmware/yamaha/ds1_ctrl.fw.ihex firmware/yamaha/ds1_ctrl.fw
 drop_fw_file firmware/yamaha/ds1_dsp.fw.ihex firmware/yamaha/ds1_dsp.fw
 drop_fw_file firmware/yamaha/ds1e_ctrl.fw.ihex firmware/yamaha/ds1e_ctrl.fw
+reject_firmware sound/pci/ymfpci/ymfpci_main.c
+clean_blob sound/pci/ymfpci/ymfpci_main.c
 clean_kconfig sound/pci/Kconfig 'SND_YMFPCI'
 clean_mk 'CONFIG_SND_YMFPCI' sound/pci/ymfpci/Makefile
 
 announce SND_SB16_CSP_FIRMWARE_IN_KERNEL - SB16 Advanced Signal Processor
-reject_firmware sound/isa/sb/sb16_csp.c
-clean_blob sound/isa/sb/sb16_csp.c
 drop_fw_file firmware/sb16/alaw_main.csp.ihex firmware/sb16/alaw_main.csp
 drop_fw_file firmware/sb16/mulaw_main.csp.ihex firmware/sb16/mulaw_main.csp
 drop_fw_file firmware/sb16/ima_adpcm_init.csp.ihex firmware/sb16/ima_adpcm_init.csp
 drop_fw_file firmware/sb16/ima_adpcm_capture.csp.ihex firmware/sb16/ima_adpcm_capture.csp
 drop_fw_file firmware/sb16/ima_adpcm_playback.csp.ihex firmware/sb16/ima_adpcm_playback.csp
+reject_firmware sound/isa/sb/sb16_csp.c
+clean_blob sound/isa/sb/sb16_csp.c
 clean_kconfig sound/isa/Kconfig 'SND_SB16_CSP'
 clean_mk 'CONFIG_SND_SB16_CSP' sound/isa/sb/Makefile
 
 announce SND_WAVEFRONT - Turtle Beach Maui,Tropez,Tropez+" (Wavefront)"
-clean_sed '/firmware = &yss225_registers_firmware/i\
+clean_blob sound/isa/wavefront/yss225.c
+clean_sed '
+/firmware = &yss225_registers_firmware/i\
 	snd_printk(KERN_ERR "FX: Missing Free firmware\\n");\
 	err = -EINVAL;\
 	goto out;
-' sound/isa/wavefront/wavefront_fx.c
+' sound/isa/wavefront/wavefront_fx.c 'report missing Free firmware'
 reject_firmware sound/isa/wavefront/wavefront_fx.c
 clean_blob sound/isa/wavefront/wavefront_fx.c
-clean_blob sound/isa/wavefront/yss225.c
 reject_firmware sound/isa/wavefront/wavefront_synth.c
 clean_blob sound/isa/wavefront/wavefront_synth.c
 clean_kconfig sound/isa/Kconfig 'SND_WAVEFRONT_FIRMWARE_IN_KERNEL'
-clean_kconfig sound/isa/Kcofnig 'SND_WAVEFRONT'
+clean_kconfig sound/isa/Kconfig 'SND_WAVEFRONT'
 clean_mk 'CONFIG_SND_WAVEFRONT' sound/isa/wavefront/Makefile
 
 
