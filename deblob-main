@@ -178,10 +178,15 @@ echo Copying linux-$kver to linux-$kver-$libre
 cp linux-$kver.tar linux-$kver-$libre.tar
 cp -lR linux-$kver/. linux-$kver-$libre
 
+rm -f linux-$kver-$libre.log linux-$kver-$libre.log.tmp
 echo Deblobbing within linux-$kver-$libre, saving output to linux-$kver-$libre.log
-if (cd linux-$kver-$libre && /bin/sh ../$deblob $force) 2>&1 | tee -a linux-$kver-$libre.log; then
-  :
-else
+# We can't just pipe deblob into tee, for then we fail to detect 
+# error conditions.  Use file renaming to tell whether we succeeded.
+if (cd linux-$kver-$libre && /bin/sh ../$deblob $force) 2>&1; then
+  mv linux-$kver-$libre.log.tmp linux-$kver-$libre.log
+fi | tee linux-$kver-$libre.log.tmp
+if test ! -f linux-$kver-$libre.log; then
+  mv linux-$kver-$libre.log.tmp linux-$kver-$libre.log
   echo $deblob failed, aborting >&2
   exit 1
 fi
