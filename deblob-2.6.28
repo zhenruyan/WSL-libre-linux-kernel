@@ -704,7 +704,7 @@ clean_sed '
   s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1rc = -EINVAL;\n\1goto free_cfg_mem;\n&/
 }' drivers/net/pcmcia/smc91c92_cs.c 'report missing Free firmware'
 clean_sed '
-/^\(static int \)\?smc9192_resume([^;]*$/,/^}$/{
+/^\(static int \)\?smc91c92_resume([^;]*$/,/^}$/{
   s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1return -EINVAL;\n&/
 }' drivers/net/pcmcia/smc91c92_cs.c 'report another missing Free firmware'
 clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_SMC91C92'
