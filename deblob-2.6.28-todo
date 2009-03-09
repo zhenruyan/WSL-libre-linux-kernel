@@ -127,9 +127,3 @@ sound/pci/riptide/riptide.c
 sound/pci/rme9652/hdsp.c
 sound/sh/aica.c
 sound/sound_firmware.c
-
-For these, the blob names are already matched and "deblobbed", but
-tweaking deblob-kver to adjust the request_firmware calls remains to
-be done:
-
-drivers/net/wireless/orinoco.c
