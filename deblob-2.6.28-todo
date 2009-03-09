@@ -7,23 +7,6 @@ user-notification.
 http://www.fsfla.org/pipermail/linux-libre/2009-January/000413.html
 has some details.
 
-arch/arm/mach-ixp4xx/ixp4xx_npe.c
-arch/arm/mach-netx/include/mach/xc.h
-arch/arm/mach-netx/xc.c
-arch/cris/arch-v32/drivers/iop_fw_load.c
-arch/x86/kernel/microcode_amd.c
-arch/x86/kernel/microcode_core.c
-arch/x86/kernel/microcode_intel.c
-drivers/bluetooth/bcm203x.c
-drivers/bluetooth/bfusb.c
-drivers/bluetooth/bt3c_cs.c
-drivers/char/cyclades.c
-drivers/char/dsp56k.c
-drivers/char/isicom.c
-drivers/char/moxa.c
-drivers/firmware/dell_rbu.c
-drivers/media/common/tuners/tuner-xc2028.c
-drivers/media/common/tuners/xc5000.c
 drivers/media/dvb/b2c2/flexcop-fe-tuner.c
 drivers/media/dvb/bt8xx/dvb-bt8xx.c
 drivers/media/dvb/dvb-usb/dvb-usb-firmware.c
@@ -60,7 +43,6 @@ drivers/media/video/s2255drv.c
 drivers/media/video/saa7134/saa7134-dvb.c
 drivers/net/irda/irda-usb.c
 drivers/net/myri10ge/myri10ge.c
-drivers/net/netx-eth.c
 drivers/net/spider_net.c
 drivers/net/tokenring/smctr.c
 drivers/net/tokenring/tms380tr.c
