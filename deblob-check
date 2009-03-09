@@ -899,7 +899,7 @@ set_except () {
     blob 'static void radeon_cp_load_microcode([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/gpu/drm/radeon/radeon_cp.c
     blob '	radeon_cp_load_microcode([^;]*);' drivers/gpu/drm/radeon/radeon_cp.c
 
-    blob 'sub \(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\) *{\([^}]*\|[^\n]}*\)[\n]}' Documentation/dvb/get_dvb_firmware
+    blob 'sub \(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\) *{\([^}]*\|[^\n]}*\)[\n]}\([\n][\n]*sub \(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\) *{\([^}]*\|[^\n]}*\)[\n]}\)*' Documentation/dvb/get_dvb_firmware
     blobna 'Please use[^\n]*firmware[^\n]*sp887x[^\n]*\([\n][^\n]\+\)\+' Documentation/dvb/avermedia.txt
     blob 'To extract the firmware[^\n]*Opera DVB-S1 USB-Box.*\/lib\/firmware\/ \.' Documentation/dvb/opera-firmware.txt
     blobna '\(dvb-usb-opera[^\n]*\.fw\|2830S[^\n]*2\.sys\)' Documentation/dvb/opera-firmware.txt
