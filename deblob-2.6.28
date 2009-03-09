@@ -308,7 +308,7 @@ maybe_reject_firmware_nowait(struct module *module, int uevent,\
 }\
 \
 #endif /* _LINUX_LIBRE_FIRMWARE_H */\
-' include/linux/firwmare.h 'added non-Free firmware notification support'
+' include/linux/firmware.h 'added non-Free firmware notification support'
 
 #######################
 # Removed ATM Drivers #
