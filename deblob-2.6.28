@@ -236,63 +236,79 @@ s,^EXTRAVERSION.*,&-libre$extra,
 " Makefile 'added -libre to EXTRAVERSION'
 
 # Add reject_firmware and maybe_reject_firmware
-cat >> include/linux/firwmare.h <<\EOF
-#ifndef _LINUX_LIBRE_FIRMWARE_H
-#define _LINUX_LIBRE_FIRMWARE_H
-
-#define NONFREE_FIRMWARE "/*(DEBLOBBED)*/"
-
-static inline int reject_firmware(const struct firmware **fw,
-				  const char *name,
-				  struct device *device)
-{
-	struct firmware *xfw = NULL;
-	int retval = request_firmware(&xfw, NONFREE_FIRMWARE, device);
-	if (!retval)
-		release_firmware(xfw);
-	return -EINVAL;
-}
-static inline int maybe_reject_firmware(const struct firmware **fw,
-					const char *name,
-					struct device *device)
-{
-	if (strstr (name, NONFREE_FIRMWARE))
-		return reject_firmware(fw, name, device);
-	else
-		return request_firmware(fw, name, device);
-}
-static inline void discard_rejected_firmware(const struct firmware *fw,
-					      void *context)
-{
-	release_firmware(fw);
-}
-static inline int reject_firmware_nowait(
-	struct module *module, int uevent,
-	const char *name, struct device *device, void *context,
-	void (*cont)(const struct firmware *fw, void *context))
-{
-	int retval = request_firmware_nowait(module, uevent, NONFREE_FIRMWARE,
-					     device, NULL,
-					     discard_rejected_firmware);
-	if (retval)
-		return retval;
-	return -EINVAL;
-}
-static inline int maybe_reject_firmware_nowait(
-	struct module *module, int uevent,
-	const char *name, struct device *device, void *context,
-	void (*cont)(const struct firmware *fw, void *context))
-{
-	if (strstr (name, NONFREE_FIRMWARE))
-		return reject_firmware_nowait(module, uevent, name,
-					      device, context, cont);
-	else
-		return request_firmware_nowait(module, uevent, name,
-					       device, context, cont);
-}
-
-#endif /* _LINUX_LIBRE_FIRMWARE_H */
-EOF
+clean_sed '
+$i\
+#ifndef _LINUX_LIBRE_FIRMWARE_H\
+#define _LINUX_LIBRE_FIRMWARE_H\
+\
+#define NONFREE_FIRMWARE "/*(DEBLOBBED)*/"\
+\
+static inline int\
+report_missing_free_firmware(const char *name, const char *what)\
+{\
+	printk(KERN_ERR "%s: Missing Free %s\\n", name,\
+	       what ? what : "firmware");\
+	return -EINVAL;\
+}\
+static inline int\
+reject_firmware(const struct firmware **fw,
+		const char *name, struct device *device)\
+{\
+	struct firmware *xfw = NULL;\
+	int retval;\
+	report_missing_free_firmware(device->name, NULL);\
+	retval = request_firmware(&xfw, NONFREE_FIRMWARE, device);\
+	if (!retval)\
+		release_firmware(xfw);\
+	return -EINVAL;\
+}\
+static inline int\
+maybe_reject_firmware(const struct firmware **fw,\
+		      const char *name, struct device *device)\
+{\
+	if (strstr (name, NONFREE_FIRMWARE))\
+		return reject_firmware(fw, name, device);\
+	else\
+		return request_firmware(fw, name, device);\
+}\
+static inline void\
+discard_rejected_firmware(const struct firmware *fw, void *context)\
+{\
+	release_firmware(fw);\
+}\
+static inline int\
+reject_firmware_nowait(struct module *module, int uevent,\
+		       const char *name, struct device *device,\
+		       void *context,\
+		       void (*cont)(const struct firmware *fw,\
+				    void *context))\
+{\
+	int retval;\
+	report_missing_free_firmware(device->name, NULL);\
+	retval = request_firmware_nowait(module, uevent, NONFREE_FIRMWARE,\
+					 device, NULL,\
+					 discard_rejected_firmware);\
+	if (retval)\
+		return retval;\
+	return -EINVAL;\
+}\
+static inline int\
+maybe_reject_firmware_nowait(struct module *module, int uevent,\
+			     const char *name, struct device *device,\
+			     void *context,\
+			     void (*cont)(const struct firmware *fw,\
+					  void *context))\
+{\
+	if (strstr (name, NONFREE_FIRMWARE))\
+		return reject_firmware_nowait(module, uevent, name,\
+					      device, context, cont);\
+	else\
+		return request_firmware_nowait(module, uevent, name,\
+					       device, context, cont);\
+}\
+\
+#endif /* _LINUX_LIBRE_FIRMWARE_H */\
+' include/linux/firwmare.h 'added non-Free firmware notification support'
 
 #######################
 # Removed ATM Drivers #
@@ -334,7 +350,7 @@ clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
 announce DRM_R128 - ATI Rage 128
 clean_sed '
-/^static int r128_do_init_cce(/,/^}$/{
+/^static int r128_do_init_cce([^;]*$/,/^}$/{
   /^	r128_cce_load_microcode(dev_priv);$/{
     i\
 	DRM_ERROR("Missing Free microcode!\\n");\
@@ -349,7 +365,7 @@ clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 announce DRM_RADEON - ATI Radeon
 clean_sed '
-/^static int radeon_do_init_cce(/,/^}$/{
+/^static int radeon_do_init_cce([^;]*$/,/^}$/{
   /^	radeon_cp_load_microcode(dev_priv);$/{
     i\
 	DRM_ERROR("Missing Free microcode!\\n");\
@@ -357,7 +373,7 @@ clean_sed '
 	return -EINVAL;
   }
 }
-/^static int radeon_do_resume_cp(/,/^}$/{
+/^static int radeon_do_resume_cp([^;]*$/,/^}$/{
   /^	radeon_cp_load_microcode(dev_priv);$/{
     i\
 	DRM_ERROR("Missing Free microcode!\\n");\
@@ -420,30 +436,35 @@ s,mwdebi(.*bootcode.*$,/* & */,
 ' drivers/media/dvb/ttpci/av7110_hw.c 'adjust bootcode loader'
 clean_blob drivers/media/dvb/ttpci/av7110_hw.c
 clean_sed '
-/^static int get_firmware(/,/^}$/s, request_firmware(, reject_firmware(,
-' drivers/media/dvb/ttpci/av7110.c 'report missing Free firwmare'
+/^static int get_firmware([^;]*$/,/^}$/{
+  s, request_firmware(, reject_firmware(,
+}' drivers/media/dvb/ttpci/av7110.c 'report missing Free firwmare'
 clean_sed '
-/^static int alps_tdlb7_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
-' drivers/media/dvb/ttpci/av7110.c 'accept Free firmware'
+/^static int alps_tdlb7_request_firmware([^;]*$/,/^}$/{
+  s, request_firmware(, maybe_reject_firmware(,
+}' drivers/media/dvb/ttpci/av7110.c 'accept Free firmware'
 clean_blob drivers/media/dvb/ttpci/av7110.c
 clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110'
 clean_mk CONFIG_DVB_AV7110 drivers/media/dvb/ttpci/Makefile
 
 announce DVB_BUDGET - Budget cards
 clean_sed '
-/^static int alps_tdhd1_204_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
-' drivers/media/dvb/ttpci/budget.c 'report missing Free firmware'
+/^static int alps_tdhd1_204_request_firmware([^;]*$/,/^}$/{
+  s, request_firmware(, maybe_reject_firmware(,
+}' drivers/media/dvb/ttpci/budget.c 'report missing Free firmware'
 
 announce DVB_BUDGET_AV - Budget cards with analog video inputs
 clean_sed '
-/^static int philips_tu1216_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
-' drivers/media/dvb/ttpci/budget-av.c \
+/^static int philips_tu1216_request_firmware([^;]*$/,/^}$/{
+  s, request_firmware(, maybe_reject_firmware(,
+}' drivers/media/dvb/ttpci/budget-av.c \
   'report missing Free firmware, accept Free firmware'
 
 announce DVB_BUDGET_CI - Budget cards with onboard CI connector
 clean_sed '
-/^static int philips_tdm1316l_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
-' drivers/media/dvb/ttpci/budget-ci.c \
+/^static int philips_tdm1316l_request_firmware([^;]*$/,/^}$/{
+  s, request_firmware(, maybe_reject_firmware(,
+}' drivers/media/dvb/ttpci/budget-ci.c \
   'report missing Free firmware, accept Free firmware'
 
 # dvb/ttusb-budget
@@ -451,8 +472,9 @@ clean_sed '
 announce DVB_TTUSB_BUDGET - Technotrend/Hauppauge Nova-USB devices
 drop_fw_file firmware/ttusb-budget/dspbootcode.bin.ihex firmware/ttusb-budget/dspbootcode.bin
 clean_sed '
-/^static int philips_tdm1316l_request_firmware(/,/^}$/s, request_firmware(, maybe_reject_firmware(,
-' drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c \
+/^static int philips_tdm1316l_request_firmware([^;]*$/,/^}$/{
+  s, request_firmware(, maybe_reject_firmware(,
+}' drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c \
   'report missing Free firmware, accept Free firmware'
 reject_firmware drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
@@ -496,7 +518,8 @@ clean_sed '
 s,	\(ace_load_firmware[^;]*\),	if ((ecode = \1)) goto init_error,
 ' drivers/net/acenic.c 'check for error in firmware loading'
 clean_sed '
-/^static int __devinit ace_load_firmware(/,/^}$/ { /^}$/i\
+/^static int __devinit ace_load_firmware([^;]*$/,/^}$/{
+  /^}$/i\
 }\
 	printk(KERN_ERR "%s: Missing Free firwmare\\n", ap->name);\
 	return -EINVAL;
@@ -539,7 +562,8 @@ announce BNX2X - Broadcom NetXtremeII 10Gb support
 clean_blob drivers/net/bnx2x_init_values.h
 clean_blob drivers/net/bnx2x_init.h
 clean_sed '
-/^#include "bnx2x_init\.h"/,/^$/ {/^$/i\
+/^#include "bnx2x_init\.h"/,/^$/{
+  /^$/i\
 #define bnx2x_init_block(bp, start, end) \\\
   return printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\
 	 -EINVAL;
@@ -556,7 +580,7 @@ clean_mk CONFIG_CASSINI drivers/net/Makefile
 
 announce CHELSIO_T3 - Chelsio AEL 2005 support
 clean_sed '
-/^static int ael2005_setup_\(sr\|twinax\)_edc(/,/^}$/ {
+/^static int ael2005_setup_\(sr\|twinax\)_edc([^;]*$/,/^}$/{
   /for.*ARRAY_SIZE(\(sr\|twinax\)_edc)/i\
 }\
 	CH_ERR(phy->adapter, "Missing Free firwmare\\n");\
@@ -568,7 +592,7 @@ clean_mk CONFIG_CHELSIO_T3 drivers/net/cxgb3/Makefile
 
 announce E100 - Intel PRO/100+
 clean_sed '
-/^static void e100_setup_ucode(/,/^}$/ {
+/^static void e100_setup_ucode([^;]*$/,/^}$/{
   /^	} ucode_opts\[\] = {$/,/^	}[,;]/ {
     s,D[^,]*_RCVBUNDLE_UCODE,/*DEBLOBBED*/{0},g;
     s,D[^,]*_CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD,/*DEBLOBBED*/0,g;
@@ -589,10 +613,11 @@ clean_mk CONFIG_E100 drivers/net/Makefile
 announce MYRI_SBUS - MyriCOM Gigabit Ethernet
 clean_file drivers/net/myri_code.h
 clean_sed '
-/myri_load_lanai.*;/i\
+/myri_load_lanai.*;/{
+  i\
 	printk(KERN_ERR "Missing Free firmware\\n");\
 	goto err_free_irq;
-' drivers/net/myri_sbus.c 'report missing Free firmware'
+}' drivers/net/myri_sbus.c 'report missing Free firmware'
 clean_blob drivers/net/myri_sbus.c
 clean_kconfig drivers/net/Kconfig 'MYRI_SBUS'
 clean_mk CONFIG_MYRI_SBUS drivers/net/Makefile
@@ -600,10 +625,11 @@ clean_mk CONFIG_MYRI_SBUS drivers/net/Makefile
 announce TEHUTI - Tehuti Networks 10G Ethernet
 clean_blob drivers/net/tehuti_fw.h
 clean_sed '
-/bdx_tx_push_desc_safe.*s_firmLoad.*/i\
+/bdx_tx_push_desc_safe.*s_firmLoad.*/{
+  i\
 		ERR("%s: Missing Free firmware\\n", priv->ndev->name);\
 		RET(-EINVAL);
-' drivers/net/tehuti.c 'report missing Free firmware'
+}' drivers/net/tehuti.c 'report missing Free firmware'
 clean_blob drivers/net/tehuti.c
 clean_kconfig drivers/net/Kconfig 'TEHUTI'
 clean_mk CONFIG_TEHUTI drivers/net/Makefile
@@ -611,10 +637,12 @@ clean_mk CONFIG_TEHUTI drivers/net/Makefile
 announce TIGON3 - Broadcom Tigon3
 clean_sed '
 s,\&tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[0\],NULL,;
-/^static int tg3_load_firmware_cpu(/,/^}/{
-  /^	err = 0;/i\
+/^static int tg3_load_firmware_cpu([^;]*$/,/^}/{
+  /^	err = 0;/{
+    i\
 	printk(KERN_ERR PFX "Missing Free firmware for %s, hoping it works anyway\\n",\
 	       tp->dev->name);
+  }
 }' drivers/net/tg3.c 'report missing Free firmware, proceed without it'
 clean_blob drivers/net/tg3.c
 clean_kconfig drivers/net/Kconfig 'TIGON3'
@@ -623,7 +651,7 @@ clean_mk CONFIG_TIGON3 drivers/net/Makefile
 announce TYPHOON - 3cr990 series Typhoon
 clean_blob drivers/net/typhoon-firmware.h
 clean_sed '
-/^typhoon_download_firmware(/,/^}/{
+/^typhoon_download_firmware([^;]*$/,/^}/{
   /typhoon_firmware_image/{
     i\
 	printk(KERN_ERR "%s: Missing Free firmware\\n", tp->name);\
@@ -639,9 +667,11 @@ clean_mk CONFIG_TYPHOON drivers/net/Makefile
 
 announce COPS - COPS LocalTalk PC
 clean_sed '
-/sizeof(\(ff\|lt\)drv_code)/i\
+/sizeof(\(ff\|lt\)drv_code)/{
+  i\
 		printk(KERN_INFO "%s: Missing Free firmware.\\n", dev->name);\
 		return;
+}
 /\(ff\|lt\)drv_code/d;
 ' drivers/net/appletalk/cops.c 'report missing Free firmware'
 clean_blob drivers/net/appletalk/cops.c
@@ -670,11 +700,12 @@ clean_mk CONFIG_YAM drivers/net/hamradio/Makefile
 announce PCMCIA_SMC91C92 - SMC 91Cxx PCMCIA
 clean_blob drivers/net/pcmcia/ositech.h
 clean_sed '
-/^osi_setup(/,/^}/{
-  s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1rc = -EINVAL;\n\1goto free_cfg_mem;/
+/^\(static int \)\?osi_setup([^;]*$/,/^}$/{
+  s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1rc = -EINVAL;\n\1goto free_cfg_mem;\n&/
 }' drivers/net/pcmcia/smc91c92_cs.c 'report missing Free firmware'
-clean_sed '/^smc9192_resume(/,/^}/{
-  s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1return -EINVAL;/
+clean_sed '
+/^\(static int \)\?smc9192_resume([^;]*$/,/^}$/{
+  s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1return -EINVAL;\n&/
 }' drivers/net/pcmcia/smc91c92_cs.c 'report another missing Free firmware'
 clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_SMC91C92'
 clean_mk CONFIG_PCMCIA_SMC91C92 drivers/net/pcmcia/Makefile
@@ -685,7 +716,7 @@ clean_mk CONFIG_PCMCIA_SMC91C92 drivers/net/pcmcia/Makefile
 announce 3C359 - 3Com 3C359 Token Link Velocity XL adapter
 clean_file drivers/net/tokenring/3c359_microcode.h
 clean_sed '
-/^xl_hw_reset(/,/^}/{
+/^\(static int \)\?xl_hw_reset([^;]*$/,/^}/{
   /printk.*Uploading Microcode/i\
 		printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\
 		return -EINVAL;
@@ -729,10 +760,12 @@ clean_mk CONFIG_HERMES drivers/net/wireless/Makefile
 announce SCSI_QLOGICPTI - PTI Qlogic, ISP Driver
 clean_file drivers/scsi/qlogicpti_asm.c
 clean_sed '
-/^static int __devinit qlogicpti_load_firmware(/,/^}$/{
-  /[&]sbus_risc_code01/i\
+/^static int __devinit qlogicpti_load_firmware([^;]*$/,/^}$/{
+  /[&]sbus_risc_code01/{
+    i\
 	printk(KERN_ERR "qlogicpti%d: Missing Free firmware\\n", qpti->qpti_id);\
 	return -EINVAL;
+  }
   s,[&]sbus_risc_code01\[0\],NULL,
   s,sbus_risc_code_length01,0,
 }' drivers/scsi/qlogicpti.c 'report missing Free firmware'
@@ -743,14 +776,18 @@ clean_mk CONFIG_SCSI_QLOGICPTI drivers/scsi/Makefile
 announce SCSI_ADVANSYS - AdvanSys SCSI
 clean_sed '
 /ASC_DBG.*_asc_mcode_chksum);/d;
-/^\(static ASC_CNT \)\?AscLoadMicroCode(/,/^}$/ {
-  /^}$/{p;i\
+/^\(static ASC_CNT \)\?AscLoadMicroCode([^;]*$/,/^}$/{
+  /^}$/{
+    p;
+    i\
 #define AscLoadMicroCode(x1,x2,x3,x4) ((x1),(x2),(x3),(x4),printk(KERN_ERR "advansys: Missing Free firmware\\n"), -1)
     d;
   }
 }
-/^\(static int \)\?AdvLoadMicrocode(/,/^}$/ {
-  /^}$/{p;i\
+/^\(static int \)\?AdvLoadMicrocode([^;]*$/,/^}$/{
+  /^}$/{
+    p;
+    i\
 #define AdvLoadMicrocode(x1,x2,x3,x4,x5) ((x1),(x2),(x3),(x4),(x5),printk(KERN_ERR "advansys: Missing Free firmware\\n"), ASC_IERR_MCODE_CHKSUM)
     d;
   }
@@ -769,8 +806,8 @@ clean_blob drivers/scsi/ql1040_fw.h
 clean_blob drivers/scsi/ql12160_fw.h
 clean_sed '
 s,[&]\(fw12\(160\|80e\)i\|risc\(_code\)\?\)_\(code01\[0\]\|length01\),NULL,g;
-/^qla1280_load_firmware\(_pio\)\?(/,/^}$/{
-  /risc_code_size = [*]/ {
+/^qla1280_load_firmware\(_pio\)\?([^;]*$/,/^}$/{
+  /risc_code_size = [*]/{
     i\
 	if (!risc_code_address) {\
 		printk(KERN_ERR "scsi(%li): Missing Free firmware\\n", ha->host_no);\
@@ -778,8 +815,8 @@ s,[&]\(fw12\(160\|80e\)i\|risc\(_code\)\?\)_\(code01\[0\]\|length01\),NULL,g;
 	}
   }
 }
-/^qla1280_load_firmware_dma(/,/^}$/{
-  /risc_code_size = [*]/ {
+/^qla1280_load_firmware_dma([^;]*$/,/^}$/{
+  /risc_code_size = [*]/{
     i\
 	if (!risc_code_address) {\
 		printk(KERN_ERR "scsi(%li): Missing Free firmware\\n", ha->host_no);\
@@ -903,10 +940,11 @@ clean_file sound/pci/cs46xx/imgs/cwc4630.h
 clean_file sound/pci/cs46xx/imgs/cwcasync.h
 clean_file sound/pci/cs46xx/imgs/cwcsnoop.h
 clean_sed '
-/^\(int \)\?snd_cs46xx_download_image(/,/^}$/{
+/^\(int \)\?snd_cs46xx_download_image([^;]*$/,/^}$/{
   /for.*BA1_MEMORY_COUNT/i\
 #if 0
-  /^}$/{i\
+  /^}$/{
+    i\
 #else\
 	snd_printk(KERN_ERR "cs46xx: Missing Free firmware\\n");\
 	return -EINVAL;\
