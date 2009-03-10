@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-03-08
+# deblob-check version 2009-03-09
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1099,7 +1099,65 @@ set_except () {
     blobname 'xc3028L-v36\.fw' drivers/media/common/tuners/tuner-xc2028.h
     blobname 'dvb-fe-xc5000-1\.1\.fw' drivers/media/common/tuners/xc5000.c
     accept '#define XC5000_DEFAULT_FIRMWARE NONFREE_FIRMWARE' drivers/media/common/tuners/xc5000.c
-    accept '\([ 	]*\(\(ctl\)\?\(->\|[.]\)fname[ 	]*=[ 	]*\|if (fw->size != \|ret = reject_firmware([&]fw, \)XC\(2028\|3028L\|5000\)_DEFAULT_FIRMWARE' 'drivers/media/video/\(common/tuners/\(xc5000\.c\|tuner-xc2028\.h\)\|saa7134/saa7134-cards\.c\|em28xx/em28xx-cards\.c\|cx23885/cx23885-dvb\.c\|cx88/cx88-\(cards\|dvb\)\.c\|cx18/cx18-driver\.c\|ivtv/ivtv-driver\.c\|dvb/dvb-usb/\(dib0700_devices\|cxusb\)\.c\)'
+    accept '[ 	]*\(\(ctl\)\?\(->\|[.]\)fname[ 	]*=[ 	]*\|if (fw->size != \|ret = reject_firmware([&]fw, \)XC\(2028\|3028L\|5000\)_DEFAULT_FIRMWARE' 'drivers/media/video/\(common/tuners/\(xc5000\.c\|tuner-xc2028\.h\)\|saa7134/saa7134-cards\.c\|em28xx/em28xx-cards\.c\|cx23885/cx23885-dvb\.c\|cx88/cx88-\(cards\|dvb\)\.c\|cx18/cx18-driver\.c\|ivtv/ivtv-driver\.c\|dvb/dvb-usb/\(dib0700_devices\|cxusb\)\.c\)'
+
+    blobname '4210\(100[12]\|%4X\)\.sb' drivers/net/irda/irda-usb.c
+
+    blobname 'myri10ge_\(rss_\)\?ethp\?_z8e\.dat' drivers/net/myri10ge.c
+
+    blobname 'spider_fw\.bin' drivers/net/spider_net.h
+
+    blobname 'tms380tr\.bin' drivers/net/tokenring/tms380tr.c
+
+    blobname 'atmel_at76c50\(2\([de]\|_3com\)\?\|4a\?\(_2958\)\?\|6\)\(\.bin\)\?' drivers/net/wireless/atmel.c
+
+    blobname 'b43[^/]*[/]\(%s\|ucode\(5\|1[13]\)\|pcm5\|[abn]0g[01]initvals\(5\|1[13]\)\)\.fw' 'drivers/net/wireless/b43\(legacy\)\?/main.c'
+
+    blob '#define IPW2100_FW_\(\(MAJOR\|MINOR\)\(_VERSION\|(x)\)\|VERSION\) \([^\n]\|[\\][\n]\)*' drivers/net/wireless/ipw2100.c
+    blobname 'ipw2100-\("\([^"\n]\|[\\][\n]\)*"\([^"]\|[\\]["]\)*\)*' drivers/net/wireless/ipw2100.c
+    blobname '__stringify(IPW2100_FW_MINOR_VERSION)' drivers/net/wireless/ipw2100.c
+
+    accept '[/][*] Call this function from process context\([^/]\|[^*][/]*\)*request_firmware' drivers/net/wireless/ipw2200.c
+    blobname 'ipw2200-\(i\?bss\|sniffer\)\.fw' drivers/net/wireless/ipw2200.c
+    accept '		IPW_ERROR("%s request_firmware failed' drivers/net/wireless/ipw2200.c
+
+    blobname 'iwlwifi-\(3945\|4965\|5000\)" IWL\(3945\|4965\|5000\)_UCODE_API "\.ucode' 'drivers/net/iwlwifi/iwl\(3945-base\|-4965\|-5000\)\.c'
+    accept '	 [*] request_firmware() is synchronous' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\)\.c'
+
+    blobname 'libertas_cs\(_helper\)\?\.fw' drivers/net/wireless/libertas/if_cs.c
+
+    blobname 'sd\(8385\|8686\)\(_helper\)\?\.bin' drivers/net/wireless/libertas/if_sdio.c
+
+    blobname 'usb8388\(-5\.126\.0\.p5\)\?\.bin' drivers/net/wireless/libertas/if_usb.c
+    accept '		lbs_pr_err("request_firmware() failed' drivers/net/wireless/ipw2200.c
+
+    blobname 'lbtf_usb\.bin' drivers/net/wireless/libertas_tf/if_usb.c
+
+    blobname 'isl38\(86\|87usb_bare\|90usb\)' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
+
+    blobname 'isl38\(77\|86\|90\)' drivers/net/wireless/prism54/islpci_dev.c
+
+    blobname 'rt2[56]61s\?\.bin' drivers/net/wireless/rt2x00/rt61pci.h
+    blobname 'rt73\.bin' drivers/net/wireless/rt2x00/rt73usb.h
+
+    blobname 'zd1201\(-ap\)\?\.fw' drivers/net/wireless/zd1201.c
+
+    blobname 'zd1211[/]zd1211b\?\(_u\([rb]\|phr\)\?\)\?' drivers/net/wireless/zd1211/zd_usb.c
+
+    # ??? gotta introduce some means to match false-positives
+    # including post context containing blobs, so that the macro name
+    # is not flagged or deblobbed, but the blob name is.
+    # blobna 'PCMCIA_\([PM]FC_\)\?DEVICE_CIS_\(MANF_CARD\|PROD_ID[1-4]*\)'
+    # accept '	    PCMCIA_\([PM]FC_\)\?DEVICE_CIS_\(MANF_CARD\|PROD_ID[1-4]*\)([^)]*, "[/][*](DEBLOBBED)[*][/]")'
+    # accept '#define PCMCIA_\([PM]FC_\)\?DEVICE_CIS_\(MANF_CARD\|PROD_ID[1-4]*\)(' include/pcmcia/device_id.h
+
+    blobname '3CCFEM556\.cis' drivers/net/pcmcia/3c574_cs.c
+
+    blobname '3CXEM556\.cis' drivers/net/pcmcia/3c589_cs.c
+
+    blobname '\(PCMLM28\|DP83903\|LA-PCM\|PE520\|NE2K\|PE-200\|tamarack\)\.cis' drivers/net/pcmcia/pcnet_cs.c
+
+    blobname '\(PCMLM28\|DP83903\|3C\(CF\|X\)EM556\|SW_\([78]xx\|555\)_SER\|MT5634ZLX\|COMpad[24]\|RS-COM-2P\|GLOBETROTTER\)\.cis' drivers/serial/serial_cs.c
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h
