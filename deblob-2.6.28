@@ -452,6 +452,9 @@ clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC2028'
 clean_mk CONFIG_MEDIA_TUNER_XC2028 drivers/media/common/tuners/Makefile
 
 announce MEDIA_TUNER_XC5000 - "Xceive XC5000 silicon tuner"
+clean_sed '
+s,XC5000_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,
+' drivers/media/common/tuners/xc5000.c 'disable non-Free firmware'
 reject_firmware drivers/media/common/tuners/xc5000.c
 clean_blob drivers/media/common/tuners/xc5000.c
 clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC5000'

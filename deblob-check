@@ -1086,6 +1086,7 @@ set_except () {
     blobname 'isi\(6\(08\|\(08\|16\)em\)\|46\(08\|16\)\)\.bin' drivers/char/isicom.c
 
     blobname 'c\(218t\|p204\|320t\)unx\.code' drivers/char/moxa.c
+    accept '		printk(KERN_ERR "MOXA: request_firmware failed' drivers/char/moxa.c
 
     # This driver enables the user to update the non-Free BIOS, but it
     # only issues a firmware request if specifically told to.  It
@@ -1098,8 +1099,8 @@ set_except () {
     accept '#define XC\(2028\|3028L\)_DEFAULT_FIRMWARE NONFREE_FIRMWARE' drivers/media/common/tuners/tuner-xc2028.h
     blobname 'xc3028L-v36\.fw' drivers/media/common/tuners/tuner-xc2028.h
     blobname 'dvb-fe-xc5000-1\.1\.fw' drivers/media/common/tuners/xc5000.c
-    accept '#define XC5000_DEFAULT_FIRMWARE NONFREE_FIRMWARE' drivers/media/common/tuners/xc5000.c
-    accept '[ 	]*\(\(ctl\)\?\(->\|[.]\)fname[ 	]*=[ 	]*\|if (fw->size != \|ret = reject_firmware([&]fw, \)XC\(2028\|3028L\|5000\)_DEFAULT_FIRMWARE' 'drivers/media/video/\(common/tuners/\(xc5000\.c\|tuner-xc2028\.h\)\|saa7134/saa7134-cards\.c\|em28xx/em28xx-cards\.c\|cx23885/cx23885-dvb\.c\|cx88/cx88-\(cards\|dvb\)\.c\|cx18/cx18-driver\.c\|ivtv/ivtv-driver\.c\|dvb/dvb-usb/\(dib0700_devices\|cxusb\)\.c\)'
+    accept '#define XC5000_DEFAULT_FIRMWARE\( NONFREE_FIRMWARE\|_SIZE\)' drivers/media/common/tuners/xc5000.c
+    accept '[ 	]*\(\(ctl\)\?\(->\|[.]\)fname[ 	]*=[ 	]*\|if (fw->size != \|ret = reject_firmware([&]fw, \)\?XC\(2028\|3028L\|5000\)_DEFAULT_FIRMWARE' 'drivers/media/video/\(common/tuners/\(xc5000\.c\|tuner-xc2028\.h\)\|saa7134/saa7134-cards\.c\|em28xx/em28xx-cards\.c\|cx23885/cx23885-dvb\.c\|cx88/cx88-\(cards\|dvb\)\.c\|cx18/cx18-driver\.c\|ivtv/ivtv-driver\.c\|dvb/dvb-usb/\(dib0700_devices\|cxusb\)\.c\)'
 
     blobname '4210\(100[12]\|%4X\)\.sb' drivers/net/irda/irda-usb.c
 
@@ -1113,8 +1114,8 @@ set_except () {
 
     blobname 'b43[^/]*[/]\(%s\|ucode\(5\|1[13]\)\|pcm5\|[abn]0g[01]initvals\(5\|1[13]\)\)\.fw' 'drivers/net/wireless/b43\(legacy\)\?/main.c'
 
-    blob '#define IPW2100_FW_\(\(MAJOR\|MINOR\)\(_VERSION\|(x)\)\|VERSION\) \([^\n]\|[\\][\n]\)*' drivers/net/wireless/ipw2100.c
-    blobname 'ipw2100-\("\([^"\n]\|[\\][\n]\)*"\([^"]\|[\\]["]\)*\)*' drivers/net/wireless/ipw2100.c
+    blob '#define IPW2100_FW_\(\(MAJOR\|MINOR\)\(_VERSION\|(x)\)\|VERSION\) \([^\n]\|[\\][\n]\)*\([\n][\n]*#define IPW2100_FW_\(\(MAJOR\|MINOR\)\(_VERSION\|(x)\)\|VERSION\) \([^\n]\|[\\][\n]\)*\)*' drivers/net/wireless/ipw2100.c
+    blobname 'ipw2100-\("\([^"\n]\|[\\][\n]\)*"\([^"]\|[\\]["]\)*\)\+' drivers/net/wireless/ipw2100.c
     blobname '__stringify(IPW2100_FW_MINOR_VERSION)' drivers/net/wireless/ipw2100.c
 
     accept '[/][*] Call this function from process context\([^/]\|[^*][/]*\)*request_firmware' drivers/net/wireless/ipw2200.c
@@ -1142,7 +1143,7 @@ set_except () {
 
     blobname 'zd1201\(-ap\)\?\.fw' drivers/net/wireless/zd1201.c
 
-    blobname 'zd1211[/]zd1211b\?\(_u\([rb]\|phr\)\?\)\?' drivers/net/wireless/zd1211/zd_usb.c
+    blobname 'zd1211[/]zd1211b\?_\(u\([rb]\|phr\)\?\)\?' drivers/net/wireless/zd1211/zd_usb.c
 
     # ??? gotta introduce some means to match false-positives
     # including post context containing blobs, so that the macro name
@@ -1294,7 +1295,7 @@ set_except () {
     initnc 'static const struct aper_size_info_32 u3_sizes\[8\] ='
     initnc 'static const struct aper_size_info_8 via_generic_sizes\[9\] ='
     initnc 'static const struct color clut_vga16\[16\] ='
-    initnc 'static const struct gain_entry gain_table\[2\]\[108\] ='
+    defsnc 'static const struct gain_entry gain_table\[2\]\[108\] =' drivers/net/wireless/iwl-4965.c
     initnc 'static const struct mV_pos __initdata mobilevrm_mV\[32\] ='
     initnc 'static const struct mV_pos __initdata vrm85_mV\[32\] ='
     initnc 'static const struct menelaus_vtg_value vcore_values\[\] ='
@@ -1424,7 +1425,7 @@ set_except () {
     defsnc 'static u8 bnx2_570[68]_stats_len_arr\[BNX2_NUM_STATS\] =' drivers/net/bnx2.c
     initnc 'static u8 flit_desc_map\[\] ='
     defsnc 'static u8 init_tab \?\[\] =' 'drivers/media/dvb/frontends/cx2270\(0\|2\)\.c'
-    initnc 'static u8 mac_reader\[\] ='
+    defsnc 'static u8 mac_reader\[\] =' drivers/net/wireless/atmel.c
     initnc 'static u8 mt2131_config1\[\] =' drivers/media/dvb/frontends/mt2131.c # <= 2.6.25
     initnc 'static u8 mt2131_config1\[\] =' drivers/media/common/tuners/mt2131.c # >= 2.6.26
     initnc 'static u8 mt2266_init2\[\] =' drivers/media/dvb/frontends/mt2266.c # <= 2.6.25
@@ -1815,15 +1816,15 @@ set_except () {
     initnc 'static struct iwl\(3945\)\?_tx_power power_gain_table\[2\]\[IWL_MAX_GAIN_ENTRIES\] ='
     initnc 'static const struct gain_entry gain_table\[2\]\[108\] ='
     initnc 'static const struct rf_channel rf_vals_5222\[\] ='
-    initnc 'static const struct rf_channel rf_vals_5225_2527\[\] ='
-    initnc 'static const struct rf_channel rf_vals_5226\[\] ='
+    initnc 'static const struct rf_channel rf_vals_5225_2527\[\] =' drivers/net/wireless/rt2x00/rt73usb.c
+    initnc 'static const struct rf_channel rf_vals_5226\[\] =' drivers/net/wireless/rt2x00/rt73usb.c
     initnc 'static const struct rf_channel rf_vals_bg\[\] ='
     initnc 'static const struct rf_channel rf_vals_bg_2522\[\] ='
     initnc 'static const struct rf_channel rf_vals_bg_2523\[\] ='
     initnc 'static const struct rf_channel rf_vals_bg_2524\[\] ='
     initnc 'static const struct rf_channel rf_vals_bg_2525\[\] ='
     initnc 'static const struct rf_channel rf_vals_bg_2525e\[\] ='
-    initnc 'static const struct rf_channel rf_vals_bg_2528\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2528\[\] =' drivers/net/wireless/rt2x00/rt73usb.c
     initnc 'static const struct rf_channel rf_vals_noseq\[\] ='
     initnc 'static const struct rf_channel rf_vals_seq\[\] ='
     initnc '	static const u8 t\[\] ='
