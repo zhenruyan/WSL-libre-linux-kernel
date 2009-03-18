@@ -184,7 +184,7 @@ clean_sed () {
 reject_firmware () {
 	#$1 = file
 	clean_sed '
-s,request\(_ihex\|\)_firmware(,reject_firmware(,
+s,request\(_ihex\|\)_firmware,reject_firmware,
 ' "$1" 'disabled non-Free firmware-loading machinery'
 }
 
