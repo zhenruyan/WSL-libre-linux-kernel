@@ -188,6 +188,18 @@ s,request\(_ihex\|\)_firmware(,reject_firmware(,
 ' "$1" 'disabled non-Free firmware-loading machinery'
 }
 
+undefault_firmware () {
+  #$1 - pattern such that $1_DEFAULT_FIRMWARE is #defined to non-Free firmware
+  #$@ other than $1 - file names
+  macro="$1"_DEFAULT_FIRMWARE; shift
+  for f in "$@"; do
+    clean_sed "
+  s,^#define $macro \"[^\"]*\",/*(DEBLOBBED)*/,;
+  s,$macro,\"/*(DEBLOBBED)*/\",g" \
+      "$f" "disabled non-Free firmware"
+  done
+}
+
 # First, check that files that contain firmwares and their
 # corresponding sources are present.
 
@@ -310,9 +322,9 @@ maybe_reject_firmware_nowait(struct module *module, int uevent,\
 #endif /* _LINUX_LIBRE_FIRMWARE_H */\
 ' include/linux/firmware.h 'added non-Free firmware notification support'
 
-########################
-# Removed Arch Drivers #
-########################
+########
+# Arch #
+########
 
 # x86
 
@@ -340,9 +352,9 @@ s,\([" ]\)request_firmware(,\1reject_firmware(,
 ' arch/arm/mach-netx/xc.c 'disabled non-Free firmware-loading machinery'
 
 
-#######################
-# Removed ATM Drivers #
-#######################
+#######
+# ATM #
+#######
 
 announce ATM_AMBASSADOR - "Madge Ambassador, Collage PCI 155 Server"
 reject_firmware drivers/atm/ambassador.c
@@ -359,9 +371,9 @@ clean_kconfig drivers/atm/Kconfig 'ATM_FORE200E'
 clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 
 
-########################
-# Removed char Drivers #
-########################
+########
+# char #
+########
 
 announce COMPUTONE - "Computone IntelliPort Plus serial"
 drop_fw_file firmware/intelliport2.bin.ihex firmware/intelliport2.bin
@@ -433,38 +445,47 @@ clean_kconfig drivers/gpu/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
 
 
-#########################
-# Removed Media Drivers #
-#########################
-
-# media/tuner
-
-announce MEDIA_TUNER_XC2028 - "XCeive xc2028/xc3028 tuners"
-clean_sed '
-s,\(#define XC\(2028\|3028L\)_DEFAULT_FIRMWARE \)"[^"]*",\1NONFREE_FIRMWARE,
-' drivers/media/common/tuners/tuner-xc2028.h 'report missing non-Free firmware'
-clean_blob drivers/media/common/tuners/tuner-xc2028.h
-clean_sed '
-s,request_firmware(,maybe_reject_firmware(,
-' drivers/media/common/tuners/tuner-xc2028.c \
-  'disabled non-Free firmware loading machinery'
-clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC2028'
-clean_mk CONFIG_MEDIA_TUNER_XC2028 drivers/media/common/tuners/Makefile
-
-announce MEDIA_TUNER_XC5000 - "Xceive XC5000 silicon tuner"
-clean_sed '
-s,XC5000_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,
-' drivers/media/common/tuners/xc5000.c 'disable non-Free firmware'
-reject_firmware drivers/media/common/tuners/xc5000.c
-clean_blob drivers/media/common/tuners/xc5000.c
-clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC5000'
-clean_mk CONFIG_MEDIA_TUNER_XC5000 drivers/media/common/tuners/Makefile
+#########
+# Media #
+#########
 
 announce DVB - "non-Free firmware scripts and documentation"
 clean_blob Documentation/dvb/get_dvb_firmware
 clean_blob Documentation/dvb/avermedia.txt
 clean_blob Documentation/dvb/opera-firmware.txt
 clean_blob Documentation/dvb/ttusb-dec.txt
+
+# media/tuner
+
+announce MEDIA_TUNER_XC2028 - "XCeive xc2028/xc3028 tuners"
+undefault_firmware 'XC\(2028\|3028L\)' \
+  drivers/media/common/tuners/tuner-xc2028.h \
+  drivers/media/video/saa7134/saa7134-cards.c \
+  drivers/media/video/ivtv/ivtv-driver.c \
+  drivers/media/video/cx18/cx18-driver.c \
+  drivers/media/video/cx23885/cx23885-dvb.c \
+  drivers/media/video/cx88/cx88-dvb.c \
+  drivers/media/video/cx88/cx88-cards.c \
+  drivers/media/video/em28xx/em28xx-cards.c \
+  drivers/media/dvb/dvb-usb/dib0700_devices.c \
+  drivers/media/dvb/dvb-usb/cxusb.c
+clean_blob drivers/media/common/tuners/tuner-xc2028.h
+reject_firmware drivers/media/common/tuners/tuner-xc2028.c
+clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC2028'
+clean_mk CONFIG_MEDIA_TUNER_XC2028 drivers/media/common/tuners/Makefile
+
+announce MEDIA_TUNER_XC5000 - "Xceive XC5000 silicon tuner"
+undefault_firmware 'XC5000' drivers/media/common/tuners/xc5000.c
+reject_firmware drivers/media/common/tuners/xc5000.c
+clean_blob drivers/media/common/tuners/xc5000.c
+clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC5000'
+clean_mk CONFIG_MEDIA_TUNER_XC5000 drivers/media/common/tuners/Makefile
+
+announce DVB_USB - "Support for various USB DVB devices"
+reject_firmware drivers/media/dvb/dvb-usb/dvb-usb-firmware.c
+clean_blob drivers/media/dvb/dvb-usb/dvb-usb-firmware.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB'
+clean_mk CONFIG_DVB_USB drivers/media/dvb/dvb-usb/Makefile
 
 announce DVB_USB_AF9005 - "Afatech AF9005 DVB-T USB1.1"
 clean_file drivers/media/dvb/dvb-usb/af9005-script.h
@@ -481,25 +502,167 @@ reject_firmware drivers/media/dvb/b2c2/flexcop-fe-tuner.c
 announce DVB_BT8XX - "BT8xx based PCI cards"
 reject_firmware drivers/media/dvb/bt8xx/dvb-bt8xx.c
 
+announce DVB_USB_A800 - "AVerMedia AverTV DVB-T USB 2.0 (A800)"
+clean_blob drivers/media/dvb/dvb-usb/a800.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_A800'
+clean_mk CONFIG_DVB_USB_A800 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_AF9005 - "Afatech AF9005 DVB-T USB1.1 support"
+clean_blob drivers/media/dvb/dvb-usb/af9005.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
+clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_AF9015 - "Afatech AF9015 DVB-T USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/af9015.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9015'
+clean_mk CONFIG_DVB_USB_AF9015 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_CXUSB - "Conexant USB2.0 hybrid reference design support"
+clean_blob drivers/media/dvb/dvb-usb/cxusb.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_CXUSB'
+clean_mk CONFIG_DVB_USB_CXUSB drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DIB0700 - "DiBcom DiB0700 USB DVB devices (see help for supported devices)"
+clean_blob drivers/media/dvb/dvb-usb/dib0700_devices.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIB0700'
+clean_mk CONFIG_DVB_USB_DIB0700 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DIBUSB_MB - "DiBcom USB DVB-T devices (based on the DiB3000M-B) (see help for device list)"
+clean_blob drivers/media/dvb/dvb-usb/dibusb-mb.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIBUSB_MB'
+clean_mk CONFIG_DVB_USB_DIBUSB_MB drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DIBUSB_MC - "DiBcom USB DVB-T devices (based on the DiB3000M-C/P) (see help for device list)"
+clean_blob drivers/media/dvb/dvb-usb/dibusb-mc.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIBUSB_MC'
+clean_mk CONFIG_DVB_USB_DIBUSB_MC drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DIGITV - "Nebula Electronics uDigiTV DVB-T USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/digitv.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIGITV'
+clean_mk CONFIG_DVB_USB_DIGITV drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DTT200U - "WideView WT-200U and WT-220U (pen) DVB-T USB2.0 support (Yakumo/Hama/Typhoon/Yuan)"
+clean_blob drivers/media/dvb/dvb-usb/dtt200u.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DTT200U'
+clean_mk CONFIG_DVB_USB_DTT200U drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DW2102 - "DvbWorld DVB-S/S2 USB2.0 support"
+reject_firmware drivers/media/dvb/dvb-usb/dw2102.c
+clean_blob drivers/media/dvb/dvb-usb/dw2102.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DW2102'
+clean_mk CONFIG_DVB_USB_DW2102 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_GP8PSK - "GENPIX 8PSK->USB module support"
+reject_firmware drivers/media/dvb/dvb-usb/gp8psk.c
+clean_blob drivers/media/dvb/dvb-usb/gp8psk.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_GP8PSK'
+clean_mk CONFIG_DVB_USB_GP8PSK drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_M920X - "Uli m920x DVB-T USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/m920x.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_M920X'
+clean_mk CONFIG_DVB_USB_M920X drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_NOVA_T_USB2 - "Hauppauge WinTV-NOVA-T usb2 DVB-T USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/nova-t-usb2.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_NOVA_T_USB2'
+clean_mk CONFIG_DVB_USB_NOVA_T_USB2 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_OPERA1 - "Opera1 DVB-S USB2.0 receiver"
+reject_firmware drivers/media/dvb/dvb-usb/opera1.c
+clean_blob drivers/media/dvb/dvb-usb/opera1.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_OPERA1'
+clean_mk CONFIG_DVB_USB_OPERA1 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_TTUSB2 - "Pinnacle 400e DVB-S USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/ttusb2.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_TTUSB2'
+clean_mk CONFIG_DVB_USB_TTUSB2 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_UMT_010 - "HanfTek UMT-010 DVB-T USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/umt-010.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_UMT_010'
+clean_mk CONFIG_DVB_USB_UMT_010 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_VP702X - "TwinhanDTV StarBox and clones DVB-S USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/vp702x.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_VP702X'
+clean_mk CONFIG_DVB_USB_VP702X drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_VP7045 - "TwinhanDTV Alpha/MagicBoxII, DNTV tinyUSB2, Beetle USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/vp7045.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_VP7045'
+clean_mk CONFIG_DVB_USB_VP7045 drivers/media/dvb/dvb-usb/Makefile
+
 # dvb/frontends
 
+announce DVB_AF9013 - "Afatech AF9013 demodulator"
+undefault_firmware 'AF9013' drivers/media/dvb/frontends/af9013.c
+reject_firmware drivers/media/dvb/frontends/af9013.c
+clean_blob drivers/media/dvb/frontends/af9013_priv.h
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_AF9013'
+clean_mk CONFIG_DVB_AF9013 drivers/media/dvb/frontends/Makefile
+
+announce DVB_BCM3510 - "Broadcom BCM3510"
+undefault_firmware 'BCM3510' drivers/media/dvb/frontends/bcm3510.[ch]
+reject_firmware drivers/media/dvb/frontends/bcm3510.c
+reject_firmware drivers/media/dvb/frontends/bcm3510.h
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_BCM3510'
+clean_mk CONFIG_DVB_BCM3510 drivers/media/dvb/frontends/Makefile
+
+announce DVB_NXT200X - "NxtWave Communications NXT2002/NXT2004 based"
+undefault_firmware 'NXT200[24]' drivers/media/dvb/frontends/nxt200x.c
+reject_firmware drivers/media/dvb/frontends/nxt200x.c
+clean_blob drivers/media/dvb/frontends/nxt200x.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_NXT200X'
+clean_mk CONFIG_DVB_NXT200X drivers/media/dvb/frontends/Makefile
+
+announce DVB_OR51132 - "Oren OR51132 based"
+undefault_firmware 'OR51211' drivers/media/dvb/frontends/or51132.c
+reject_firmware drivers/media/dvb/frontends/or51132.c
+clean_blob drivers/media/dvb/frontends/or51132.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_OR51132'
+clean_mk CONFIG_DVB_OR51132 drivers/media/dvb/frontends/Makefile
+
+announce DVB_OR51211 - "Oren OR51211 based"
+reject_firmware drivers/media/dvb/frontends/or51211.c
+reject_firmware drivers/media/dvb/frontends/or51211.h
+clean_blob drivers/media/dvb/frontends/or51211.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_OR51211'
+clean_mk CONFIG_DVB_OR51211 drivers/media/dvb/frontends/Makefile
+
 announce DVB_SP8870 - "Spase sp8870"
-clean_sed '
-s,SP8870_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,g
-' drivers/media/dvb/frontends/sp8870.c 'disable non-Free firmware'
+undefault_firmware 'SP8870' drivers/media/dvb/frontends/sp8870.c
+reject_firmware drivers/media/dvb/frontends/sp8870.c
+reject_firmware drivers/media/dvb/frontends/sp8870.h
 clean_blob drivers/media/dvb/frontends/sp8870.c
 clean_kconfig drivers/media/dvb/frontends 'DVB_SP8870'
 clean_mk CONFIG_DVB_SP8870 drivers/media/dvb/frontends/Makefile
 
+announce DVB_SP887X - "Spase sp887x based"
+undefault_firmware 'SP887X' drivers/media/dvb/frontends/sp887x.c
+reject_firmware drivers/media/dvb/frontends/sp887x.c
+reject_firmware drivers/media/dvb/frontends/sp887x.h
+clean_blob drivers/media/dvb/frontends/sp887x.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_SP887X'
+clean_mk CONFIG_DVB_SP887X drivers/media/dvb/frontends/Makefile
+
+announce DVB_TDA10048 - "Philips TDA10048HN based"
+undefault_firmware 'TDA10048' drivers/media/dvb/frontends/tda10048.c
+reject_firmware drivers/media/dvb/frontends/tda10048.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_TDA10048'
+clean_mk CONFIG_DVB_TDA10048 drivers/media/dvb/frontends/Makefile
+
 announce DVB_TDA1004X - "Philips TDA10045H/TDA10046H"
-clean_sed '
-s,TDA1004[56]_DEFAULT_FIRMWARE,NONFREE_FIRMWARE,g
-' drivers/media/dvb/frontends/tda1004x.c 'disable non-Free firmware'
+undefault_firmware 'TDA1004[56]' drivers/media/dvb/frontends/tda1004x.c
+reject_firmware drivers/media/dvb/frontends/tda1004x.c
+reject_firmware drivers/media/dvb/frontends/tda1004x.h
 clean_blob drivers/media/dvb/frontends/tda1004x.c
 clean_kconfig drivers/media/dvb/frontends 'DVB_TDA1004X'
 clean_mk CONFIG_DVB_TDA1004X drivers/media/dvb/frontends/Makefile
 
-# dvb/ttpci
+# dvb
 
 announce DVB_AV7110 - "AV7110 cards"
 # The bootcode is actually Free Software under GPLv2, but since it's
@@ -511,53 +674,59 @@ clean_sed '
 s,mwdebi(.*bootcode.*$,/* & */,
 ' drivers/media/dvb/ttpci/av7110_hw.c 'adjust bootcode loader'
 clean_blob drivers/media/dvb/ttpci/av7110_hw.c
-clean_sed '
-/^static int get_firmware([^;]*$/,/^}$/{
-  s, request_firmware(, reject_firmware(,
-}' drivers/media/dvb/ttpci/av7110.c 'report missing Free firwmare'
-clean_sed '
-/^static int alps_tdlb7_request_firmware([^;]*$/,/^}$/{
-  s, request_firmware(, maybe_reject_firmware(,
-}' drivers/media/dvb/ttpci/av7110.c 'accept Free firmware'
+reject_firmware drivers/media/dvb/ttpci/av7110.c
+reject_firmware drivers/media/dvb/ttpci/av7110.c
 clean_blob drivers/media/dvb/ttpci/av7110.c
 clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110'
 clean_mk CONFIG_DVB_AV7110 drivers/media/dvb/ttpci/Makefile
 
 announce DVB_BUDGET - "Budget cards"
-clean_sed '
-/^static int alps_tdhd1_204_request_firmware([^;]*$/,/^}$/{
-  s, request_firmware(, maybe_reject_firmware(,
-}' drivers/media/dvb/ttpci/budget.c 'report missing Free firmware'
+reject_firmware drivers/media/dvb/ttpci/budget.c
 
 announce DVB_BUDGET_AV - "Budget cards with analog video inputs"
-clean_sed '
-/^static int philips_tu1216_request_firmware([^;]*$/,/^}$/{
-  s, request_firmware(, maybe_reject_firmware(,
-}' drivers/media/dvb/ttpci/budget-av.c \
-  'report missing Free firmware, accept Free firmware'
+reject_firmware drivers/media/dvb/ttpci/budget-av.c
 
 announce DVB_BUDGET_CI - "Budget cards with onboard CI connector"
-clean_sed '
-/^static int philips_tdm1316l_request_firmware([^;]*$/,/^}$/{
-  s, request_firmware(, maybe_reject_firmware(,
-}' drivers/media/dvb/ttpci/budget-ci.c \
-  'report missing Free firmware, accept Free firmware'
+reject_firmware drivers/media/dvb/ttpci/budget-ci.c
 
-# dvb/ttusb-budget
+announce DVB_DRX397XD - "Micronas DRX3975D/DRX3977D based"
+reject_firmware drivers/media/dvb/frontends/drx397xD.c
+clean_blob drivers/media/dvb/frontends/drx397xD_fw.h
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_DRX397XD'
+clean_mk CONFIG_DVB_DRX397XD drivers/media/dvb/frontends/Makefile
+
+announce DVB_PLUTO2 - "Pluto2 cards"
+reject_firmware drivers/media/dvb/pluto2/pluto2.c
+
+announce DVB_SIANO_SMS1XXX - "Siano SMS1XXX USB dongle support"
+reject_firmware drivers/media/dvb/siano/smscoreapi.c
+reject_firmware drivers/media/dvb/siano/smsusb.c
+clean_blob drivers/media/dvb/siano/smscoreapi.c
+clean_blob drivers/media/dvb/siano/smsusb.c
+clean_kconfig drivers/media/dvb/siano/Kconfig 'DVB_SIANO_SMS1XXX'
+clean_mk CONFIG_DVB_SIANO_SMS1XXX drivers/media/dvb/siano/Makefile
 
 announce DVB_TTUSB_BUDGET - "Technotrend/Hauppauge Nova-USB devices"
 drop_fw_file firmware/ttusb-budget/dspbootcode.bin.ihex firmware/ttusb-budget/dspbootcode.bin
-clean_sed '
-/^static int philips_tdm1316l_request_firmware([^;]*$/,/^}$/{
-  s, request_firmware(, maybe_reject_firmware(,
-}' drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c \
-  'report missing Free firmware, accept Free firmware'
+reject_firmware drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 reject_firmware drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_kconfig drivers/media/dvb/ttusb-budget/Kconfig 'DVB_TTUSB_BUDGET'
 clean_mk CONFIG_DVB_TTUSB_BUDGET drivers/media/dvb/ttusb-budget/Makefile
 
+announce DVB_TTUSB_DEC - "Technotrend/Hauppauge USB DEC devices"
+reject_firmware drivers/media/dvb/ttusb-dec/ttusb_dec.c
+clean_blob drivers/media/dvb/ttusb-dec/ttusb_dec.c
+clean_kconfig drivers/media/dvb/ttusb-dec/Kconfig 'DVB_TTUSB_DEC'
+clean_mk CONFIG_DVB_TTUSB_DEC drivers/media/dvb/ttusb-dec/Makefile
+
 # video
+
+announce VIDEO_BT848 - "BT848 Video For Linux"
+reject_firmware drivers/media/video/bt8xx/bttv-cards.c
+clean_blob drivers/media/video/bt8xx/bttv-cards.c
+clean_kconfig drivers/media/video/bt8xx/Kconfig 'VIDEO_BT848'
+clean_mk CONFIG_VIDEO_BT848 drivers/media/video/bt8xx/Makefile
 
 announce VIDEO_CPIA2 - "CPiA2 Video For Linux"
 clean_fw firmware/cpia2/stv0672_vp4.bin.ihex firmware/cpia2/stv0672_vp4.bin
@@ -565,6 +734,61 @@ reject_firmware drivers/media/video/cpia2/cpia2_core.c
 clean_blob drivers/media/video/cpia2/cpia2_core.c
 clean_kconfig drivers/media/video/cpia2/Kconfig 'VIDEO_CPIA2'
 clean_mk CONFIG_VIDEO_CPIA2 drivers/media/video/cpia2/Makefile
+
+announce VIDEO_CX18 - "Conexant cx23418 MPEG encoder support"
+reject_firmware drivers/media/video/cx18/cx18-av-firmware.c
+reject_firmware drivers/media/video/cx18/cx18-firmware.c
+clean_blob drivers/media/video/cx18/cx18-av-firmware.c
+clean_blob drivers/media/video/cx18/cx18-firmware.c
+clean_kconfig drivers/media/video/cx18/Kconfig 'VIDEO_CX18'
+clean_mk CONFIG_VIDEO_CX18 drivers/media/video/cx18/Makefile
+
+announce VIDEO_CX23885 - "Conexant cx23885 (2388x successor) support"
+reject_firmware drivers/media/video/cx23885/cx23885-417.c
+clean_blob drivers/media/video/cx23885/cx23885-417.c
+clean_kconfig drivers/media/video/cx23885/Kconfig 'VIDEO_CX23885'
+clean_mk CONFIG_VIDEO_CX23885 drivers/media/video/cx23885/Makefile
+
+announce VIDEO_CX25840 - "Conexant CX2584x audio/video decoders"
+reject_firmware drivers/media/video/cx25840/cx25840-firmware.c
+clean_blob drivers/media/video/cx25840/cx25840-firmware.c
+clean_kconfig drivers/media/video/cx25840/Kconfig 'VIDEO_CX25840'
+clean_mk CONFIG_VIDEO_CX25840 drivers/media/video/cx25840/Makefile
+
+announce VIDEO_CX88_BLACKBIRD - "Blackbird MPEG encoder support (cx2388x + cx23416)"
+reject_firmware drivers/media/video/cx88/cx88-blackbird.c
+clean_kconfig drivers/media/video/cx88/Kconfig 'VIDEO_CX88_BLACKBIRD'
+clean_mk CONFIG_VIDEO_CX88_BLACKBIRD drivers/media/video/cx88/Makefile
+
+announce VIDEO_IVTV - "Conexant cx23416/cx23415 MPEG encoder/decoder support"
+reject_firmware drivers/media/video/ivtv/ivtv-firmware.c
+clean_blob drivers/media/video/ivtv/ivtv-firmware.c
+clean_kconfig drivers/media/video/ivtv/Kconfig 'VIDEO_IVTV'
+clean_mk CONFIG_VIDEO_IVTV drivers/media/video/ivtv/Makefile
+
+announce VIDEO_PVRUSB2 - "Hauppauge WinTV-PVR USB2 support"
+reject_firmware drivers/media/video/pvrusb2/pvrusb2-hdw.c
+clean_blob drivers/media/video/pvrusb2/pvrusb2-devattr.c
+clean_kconfig drivers/media/video/pvrusb2/Kconfig 'VIDEO_PVRUSB2'
+clean_mk CONFIG_VIDEO_PVRUSB2 drivers/media/video/pvrusb2/Makefile
+
+announce "VIDEO_CX23885, VIDEO_CX88_BLACKBIRD, VIDEO_IVTV, VIDEO_PVRUSB2" - "See above"
+clean_blob include/media/cx2341x.h
+
+announce VIDEO_GO7007 - "Go 7007 support"
+reject_firmware drivers/staging/go7007/go7007-driver.c
+clean_blob drivers/staging/go7007/go7007-driver.c
+reject_firmware drivers/staging/go7007/go7007-fw.c
+clean_blob drivers/staging/go7007/go7007-usb.c
+clean_blob drivers/staging/go7007/saa7134-go7007.c
+clean_kconfig drivers/staging/go7007/Kconfig 'VIDEO_GO7007'
+clean_mk CONFIG_VIDEO_GO7007 drivers/staging/go7007/Makefile
+
+announce VIDEO_SAA7134_DVB - "DVB/ATSC Support for saa7134 based TV cards"
+reject_firmware drivers/media/video/saa7134/saa7134-dvb.c
+clean_blob drivers/media/video/saa7134/saa7134-dvb.c
+clean_kconfig drivers/media/video/saa7134/Kconfig 'VIDEO_SAA7134_DVB'
+clean_mk CONFIG_VIDEO_SAA7134_DVB drivers/media/video/saa7134/Makefile
 
 announce USB_DABUSB - "DABUSB driver"
 clean_fw firmware/dabusb/bitstream.bin.ihex firmware/dabusb/bitstream.bin
@@ -574,7 +798,11 @@ clean_blob drivers/media/video/dabusb.c
 clean_kconfig drivers/media/Kconfig 'USB_DABUSB'
 clean_mk CONFIG_USB_DABUSB drivers/media/video/Makefile
 
-# video/usbvideo
+announce USB_S2255 - "USB Sensoray 2255 video capture device"
+reject_firmware drivers/media/video/s2255drv.c
+clean_blob drivers/media/video/s2255drv.c
+clean_kconfig drivers/media/video/Kconfig 'USB_S2255'
+clean_mk CONFIG_USB_S2255 drivers/media/video/Makefile
 
 announce USB_VICAM - "USB 3com HomeConnect, AKA vicam"
 drop_fw_file firmware/vicam/firmware.H16 firmware/vicam/firmware.fw
@@ -584,9 +812,9 @@ clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_VICAM'
 clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 
 
-#######################
-# Removed net Drivers #
-#######################
+#######
+# net #
+#######
 
 announce ACENIC - "Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit"
 clean_blob drivers/net/acenic_firmware.h
@@ -670,8 +898,8 @@ announce E100 - "Intel PRO/100+"
 clean_sed '
 /^static void e100_setup_ucode([^;]*$/,/^}$/{
   /^	} ucode_opts\[\] = {$/,/^	}[,;]/ {
-    s,D[^,]*_RCVBUNDLE_UCODE,/*DEBLOBBED*/{0},g;
-    s,D[^,]*_CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD,/*DEBLOBBED*/0,g;
+    s,D[^,]*_RCVBUNDLE_UCODE,/*(DEBLOBBED)*/{0},g;
+    s,D[^,]*_CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD,/*(DEBLOBBED)*/0,g;
   }
   /^	for ([^;]*ucode_opts[^{]*) {$/,/^	}$/ {
     /^	}$/ i\
@@ -704,11 +932,26 @@ clean_blob drivers/net/myri10ge/myri10ge.c
 clean_kconfig drivers/net/Kconfig 'MYRI10GE'
 clean_mk CONFIG_MYRI10GE drivers/net/myri10ge/Makefile
 
+announce SLICOSS - "Alacritech Gigabit IS-NIC cards"
+clean_blob drivers/staging/slicoss/gbdownload.h
+clean_blob drivers/staging/slicoss/oasisdownload.h
+clean_blob drivers/staging/slicoss/oasisdbgdownload.h
+clean_blob drivers/staging/slicoss/gbrcvucode.h
+clean_blob drivers/staging/slicoss/oasisrcvucode.h
+clean_kconfig drivers/staging/slicoss/Kconfig 'SLICOSS'
+clean_mk CONFIG_SLICOSS drivers/staging/slicoss/Makefile
+
 announce SPIDER_NET - "Spider Gigabit Ethernet driver"
 reject_firmware drivers/net/spider_net.c
 clean_blob drivers/net/spider_net.h
 clean_kconfig drivers/net/Kconfig 'SPIDER_NET'
 clean_mk CONFIG_SPIDER_NET drivers/net/Makefile
+
+announce SXG - "Alacritech SLIC Technology Non-Accelerated 10Gbe cards"
+clean_blob drivers/staging/sxg/saharadbgdownload.h
+clean_blob drivers/staging/sxg/sxgphycode.h
+clean_kconfig drivers/staging/sxg/Kconfig 'SXG'
+clean_mk CONFIG_SXG drivers/staging/sxg/Makefile
 
 announce TEHUTI - "Tehuti Networks 10G Ethernet"
 clean_blob drivers/net/tehuti_fw.h
@@ -827,11 +1070,6 @@ clean_blob drivers/net/pcmcia/pcnet_cs.c
 clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_PCNET'
 clean_mk CONFIG_PCMCIA_PCNET drivers/net/pcmcia/Makefile
 
-announce SERIAL_8250_CS - "8250/16550 PCMCIA device support"
-clean_blob drivers/serial/serial_cs.c
-clean_kconfig drivers/serial/Kconfig 'SERIAL_8250_CS'
-clean_mk CONFIG_SERIAL_8250_CS drivers/serial/Makefile
-
 # tokenring
 
 announce 3C359 - "3Com 3C359 Token Link Velocity XL adapter"
@@ -878,6 +1116,12 @@ reject_firmware drivers/net/wireless/atmel.c
 clean_blob drivers/net/wireless/atmel.c
 clean_kconfig drivers/net/wireless/Kconfig 'ATMEL'
 clean_mk CONFIG_ATMEL drivers/net/wireless/Makefile
+
+announce USB_ATMEL - "Atmel at76c503/at76c505/at76c505a USB cards"
+reject_firmware drivers/staging/at76_usb/at76_usb.c
+clean_blob drivers/staging/at76_usb/at76_usb.c
+clean_kconfig drivers/staging/at76_usb/Kconfig 'USB_ATMEL'
+clean_mk CONFIG_USB_ATMEL drivers/staging/at76_usb/Makefile
 
 announce B43 - "Broadcom 43xx wireless support (mac80211 stack)"
 reject_firmware drivers/net/wireless/b43/main.c
@@ -1026,9 +1270,38 @@ clean_kconfig drivers/bluetooth/Kconfig 'BT_HCIBT3C'
 clean_mk CONFIG_BT_HCIBT3C drivers/bluetooth/Makefile
 
 
-########################
-# Removed SCSI Drivers #
-########################
+##########
+# Serial #
+##########
+
+announce SERIAL_8250_CS - "8250/16550 PCMCIA device support"
+clean_blob drivers/serial/serial_cs.c
+clean_kconfig drivers/serial/Kconfig 'SERIAL_8250_CS'
+clean_mk CONFIG_SERIAL_8250_CS drivers/serial/Makefile
+
+announce SERIAL_ICOM - "IBM Multiport Serial Adapter"
+reject_firmware drivers/serial/icom.c
+clean_blob drivers/serial/icom.c
+clean_kconfig drivers/serial/Kconfig 'SERIAL_ICOM'
+clean_mk CONFIG_SERIAL_ICOM drivers/serial/Makefile
+
+announce SERIAL_QE - "Freescale QUICC Engine serial port support"
+reject_firmware drivers/serial/ucc_uart.c
+clean_blob drivers/serial/ucc_uart.c
+clean_kconfig drivers/serial/Kconfig 'SERIAL_QE'
+clean_mk CONFIG_SERIAL_QE drivers/serial/Makefile
+
+announce ME4000 - "Meilhaus ME-4000 I/O board"
+clean_file drivers/staging/me4000/me4000_firmware.h
+clean_file drivers/staging/me4000/me4610_firmware.h
+clean_kconfig drivers/staging/me4000/Kconfig 'ME4000'
+clean_mk CONFIG_ME4000 drivers/staging/me4000/Makefile
+
+
+
+########
+# SCSI #
+########
 
 announce SCSI_QLOGICPTI - "PTI Qlogic, ISP Driver"
 clean_file drivers/scsi/qlogicpti_asm.c
@@ -1101,10 +1374,45 @@ s,[&]\(fw12\(160\|80e\)i\|risc\(_code\)\?\)_\(code01\[0\]\|length01\),NULL,g;
 clean_kconfig drivers/scsi/Kconfig 'SCSI_QLOGIC_1280'
 clean_mk CONFIG_SCSI_QLOGIC_1280 drivers/scsi/Makefile
 
+announce SCSI_AIC94XX - "Adaptec AIC94xx SAS/SATA support"
+reject_firmware drivers/scsi/aic94xx/aic94xx_seq.c
+clean_blob drivers/scsi/aic94xx/aic94xx_seq.c
+clean_blob drivers/scsi/aic94xx/aic94xx_seq.h
+clean_kconfig drivers/scsi/aic94xx/Kconfig 'SCSI_AIC94XX'
+clean_mk CONFIG_SCSI_AIC94XX drivers/scsi/aic94xx/Makefile
 
-#######################
-# Removed USB Drivers #
-#######################
+announce SCSI_QLA_FC - "QLogic QLA2XXX Fibre Channel Support"
+reject_firmware drivers/scsi/qla2xxx/qla_gbl.h
+reject_firmware drivers/scsi/qla2xxx/qla_init.c
+reject_firmware drivers/scsi/qla2xxx/qla_os.c
+clean_blob drivers/scsi/qla2xxx/qla_os.c
+clean_kconfig drivers/scsi/qla2xxx/Kconfig 'SCSI_QLA_FC'
+clean_mk CONFIG_SCSI_QLA_FC drivers/scsi/qla2xxx/Makefile
+
+
+#######
+# USB #
+#######
+
+# atm
+
+announce USB_CXACRU - "Conexant AccessRunner USB support"
+reject_firmware drivers/usb/atm/cxacru.c
+clean_blob drivers/usb/atm/cxacru.c
+clean_kconfig drivers/usb/atm/Kconfig 'USB_CXACRU'
+clean_mk CONFIG_USB_CXACRU drivers/usb/atm/Makefile
+
+announce USB_SPEEDTOUCH - "Speedtouch USB support"
+reject_firmware drivers/usb/atm/speedtch.c
+clean_blob drivers/usb/atm/speedtch.c
+clean_kconfig drivers/usb/atm/Kconfig 'USB_SPEEDTOUCH'
+clean_mk CONFIG_USB_SPEEDTOUCH drivers/usb/atm/Makefile
+
+announce USB_UEAGLEATM - "ADI 930 and eagle USB DSL modem"
+reject_firmware drivers/usb/atm/ueagle-atm.c
+clean_blob drivers/usb/atm/ueagle-atm.c
+clean_kconfig drivers/usb/atm/Kconfig 'USB_UEAGLEATM'
+clean_mk CONFIG_USB_UEAGLEATM drivers/usb/atm/Makefile
 
 # misc
 
@@ -1128,6 +1436,12 @@ reject_firmware drivers/usb/misc/emi62.c
 clean_blob drivers/usb/misc/emi62.c
 clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI62'
 clean_mk CONFIG_USB_EMI62 drivers/usb/misc/Makefile
+
+announce USB_ISIGHTFW - "iSight firmware loading support"
+reject_firmware drivers/usb/misc/isight_firmware.c
+clean_blob drivers/usb/misc/isight_firmware.c
+clean_kconfig drivers/usb/misc/Kconfig 'USB_ISIGHTFW'
+clean_mk CONFIG_USB_ISIGHTFW drivers/usb/misc/Makefile
 
 # serial
 
@@ -1200,10 +1514,21 @@ clean_blob drivers/usb/serial/whiteheat.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_WHITEHEAT'
 clean_mk CONFIG_USB_SERIAL_WHITEHEAT drivers/usb/serial/Makefile
 
+# uwb
 
-#########################
-# Removed Sound Drivers #
-#########################
+announce UWB_I1480U - Support for Intel Wireless UWB Link 1480 HWA
+reject_firmware drivers/uwb/i1480/dfu/i1480-dfu.h
+reject_firmware drivers/uwb/i1480/dfu/mac.c
+reject_firmware drivers/uwb/i1480/dfu/phy.c
+clean_blob drivers/uwb/i1480/dfu/usb.c
+clean_kconfig drivers/uwb/Kconfig 'UWB_I1480U'
+clean_mk CONFIG_UWB_I1480U drivers/uwb/i1480/dfu/Makefile
+
+
+
+#########
+# Sound #
+#########
 
 announce SND_CS46XX - "Cirrus Logic (Sound Fusion) CS4280/CS461x/CS462x/CS463x"
 # This appears to have been extracted from some non-Free driver
@@ -1280,31 +1605,148 @@ clean_blob sound/isa/wavefront/wavefront_synth.c
 clean_kconfig sound/isa/Kconfig 'SND_WAVEFRONT'
 clean_mk 'CONFIG_SND_WAVEFRONT' sound/isa/wavefront/Makefile
 
+announce SND_VX_LIB - Digigram VX soundcards
+reject_firmware sound/drivers/vx/vx_hwdep.c
+clean_blob sound/drivers/vx/vx_hwdep.c
+clean_kconfig sound/drivers/Kconfig 'SND_VX_LIB'
+clean_mk CONFIG_SND_VX_LIB sound/drivers/vx/Makefile
 
-###########################
-# Removed Staging Drivers #
-###########################
+announce SND_DARLA20 - "(Echoaudio) Darla20"
+clean_blob sound/pci/echoaudio/darla20.c
+clean_kconfig sound/pci/Kconfig 'SND_DARLA20'
+clean_mk CONFIG_SND_DARLA20 sound/pci/echoaudio/Makefile
 
-# ME4000 - Meilhaus ME-4000 I/O board
-clean_file drivers/staging/me4000/me4000_firmware.h
-clean_file drivers/staging/me4000/me4610_firmware.h
-clean_kconfig drivers/staging/me4000/Kconfig 'ME4000'
-clean_mk CONFIG_ME4000 drivers/staging/me4000/Makefile
+announce SND_DARLA24 - "(Echoaudio) Darla24"
+clean_blob sound/pci/echoaudio/darla24.c
+clean_kconfig sound/pci/Kconfig 'SND_DARLA24'
+clean_mk CONFIG_SND_DARLA24 sound/pci/echoaudio/Makefile
 
-# SLICOSS - Alacritech Gigabit IS-NIC cards
-clean_blob drivers/staging/slicoss/gbdownload.h
-clean_blob drivers/staging/slicoss/oasisdownload.h
-clean_blob drivers/staging/slicoss/oasisdbgdownload.h
-clean_blob drivers/staging/slicoss/gbrcvucode.h
-clean_blob drivers/staging/slicoss/oasisrcvucode.h
-clean_kconfig drivers/staging/slicoss/Kconfig 'SLICOSS'
-clean_mk CONFIG_SLICOSS drivers/staging/slicoss/Makefile
+announce SND_ECHO3G - "(Echoaudio) 3G cards"
+clean_blob sound/pci/echoaudio/echo3g.c
+clean_kconfig sound/pci/Kconfig 'SND_ECHO3G'
+clean_mk CONFIG_SND_ECHO3G sound/pci/echoaudio/Makefile
 
-# SXG - Alacritech SLIC Technology Non-Accelerated 10Gbe cards
-clean_blob drivers/staging/sxg/saharadbgdownload.h
-clean_blob drivers/staging/sxg/sxgphycode.h
-clean_kconfig drivers/staging/sxg/Kconfig 'SXG'
-clean_mk CONFIG_SXG drivers/staging/sxg/Makefile
+announce SND_GINA20 - "(Echoaudio) Gina20"
+clean_blob sound/pci/echoaudio/gina20.c
+clean_kconfig sound/pci/Kconfig 'SND_GINA20'
+clean_mk CONFIG_SND_GINA20 sound/pci/echoaudio/Makefile
 
+announce SND_GINA24 - "(Echoaudio) Gina24"
+clean_blob sound/pci/echoaudio/gina24.c
+clean_kconfig sound/pci/Kconfig 'SND_GINA24'
+clean_mk CONFIG_SND_GINA24 sound/pci/echoaudio/Makefile
+
+announce SND_INDIGO - "(Echoaudio) Indigo"
+clean_blob sound/pci/echoaudio/indigo.c
+clean_kconfig sound/pci/Kconfig 'SND_INDIGO'
+clean_mk CONFIG_SND_INDIGO sound/pci/echoaudio/Makefile
+
+announce SND_INDIGODJ - "(Echoaudio) Indigo DJ"
+clean_blob sound/pci/echoaudio/indigodj.c
+clean_kconfig sound/pci/Kconfig 'SND_INDIGODJ'
+clean_mk CONFIG_SND_INDIGODJ sound/pci/echoaudio/Makefile
+
+announce SND_INDIGOIO - "(Echoaudio) Indigo IO"
+clean_blob sound/pci/echoaudio/indigoio.c
+clean_kconfig sound/pci/Kconfig 'SND_INDIGOIO'
+clean_mk CONFIG_SND_INDIGOIO sound/pci/echoaudio/Makefile
+
+announce SND_LAYLA20 - "(Echoaudio) Layla20"
+clean_blob sound/pci/echoaudio/layla20.c
+clean_kconfig sound/pci/Kconfig 'SND_LAYLA20'
+clean_mk CONFIG_SND_LAYLA20 sound/pci/echoaudio/Makefile
+
+announce SND_LAYLA24 - "(Echoaudio) Layla24"
+clean_blob sound/pci/echoaudio/layla24.c
+clean_kconfig sound/pci/Kconfig 'SND_LAYLA24'
+clean_mk CONFIG_SND_LAYLA24 sound/pci/echoaudio/Makefile
+
+announce SND_MIA - "(Echoaudio) Mia"
+clean_blob sound/pci/echoaudio/mia.c
+clean_kconfig sound/pci/Kconfig 'SND_MIA'
+clean_mk CONFIG_SND_MIA sound/pci/echoaudio/Makefile
+
+announce SND_MONA - "(Echoaudio) Mona"
+clean_blob sound/pci/echoaudio/mona.c
+clean_kconfig sound/pci/Kconfig 'SND_MONA'
+clean_mk CONFIG_SND_MONA sound/pci/echoaudio/Makefile
+
+announce SND_'<(Echoaudio)>' - "(Echoaudio) all of the above "
+reject_firmware sound/pci/echoaudio/echoaudio.c
+clean_blob sound/pci/echoaudio/echoaudio.c
+
+announce SND_EMU10K1 - "Emu10k1 (SB Live!, Audigy, E-mu APS)"
+reject_firmware sound/pci/emu10k1/emu10k1_main.c
+clean_blob sound/pci/emu10k1/emu10k1_main.c
+clean_kconfig sound/pci/Kconfig 'SND_EMU10K1'
+clean_mk CONFIG_SND_EMU10K1 sound/pci/emu10k1/Makefile
+
+announce SND_MIXART - "Digigram miXart"
+reject_firmware sound/pci/mixart/mixart_hwdep.c
+clean_blob sound/pci/mixart/mixart_hwdep.c
+clean_kconfig sound/pci/Kconfig 'SND_MIXART'
+clean_mk CONFIG_SND_MIXART sound/pci/mixart/Makefile
+
+announce SND_PCXHR - "Digigram PCXHR"
+reject_firmware sound/pci/pcxhr/pcxhr_hwdep.c
+clean_blob sound/pci/pcxhr/pcxhr_hwdep.c
+clean_kconfig sound/pci/Kconfig 'SND_PCXHR'
+clean_mk CONFIG_SND_PCXHR sound/pci/pcxhr/Makefile
+
+announce SND_RIPTIDE - "Conexant Riptide"
+reject_firmware sound/pci/riptide/riptide.c
+clean_blob sound/pci/riptide/riptide.c
+clean_kconfig sound/pci/Kconfig 'SND_RIPTIDE'
+clean_mk CONFIG_SND_RIPTIDE sound/pci/riptide/Makefile
+
+announce SND_HDSP - "RME Hammerfall DSP Audio"
+reject_firmware sound/pci/rme9652/hdsp.c
+clean_blob sound/pci/rme9652/hdsp.c
+clean_kconfig sound/pci/Kconfig 'SND_HDSP'
+clean_mk CONFIG_SND_HDSP sound/pci/rme9652/Makefile
+
+announce SND_AICA - "Dreamcast Yamaha AICA sound"
+reject_firmware sound/sh/aica.c
+clean_blob sound/sh/aica.c
+clean_kconfig sound/sh/Kconfig 'SND_AICA'
+clean_mk CONFIG_SND_AICA sound/sh/Makefile
+
+announce SOUND_MSNDCLAS - "Support for Turtle Beach MultiSound Classic, Tahiti, Monterey"
+clean_blob sound/oss/msnd_classic.h
+clean_kconfig sound/oss/Kconfig 'SOUND_MSNDCLAS'
+clean_mk CONFIG_SOUND_MSNDCLAS sound/oss/Makefile
+
+announce SOUND_MSNDPIN - "Support for Turtle Beach MultiSound Pinnacle"
+clean_blob sound/oss/msnd_pinnacle.h
+clean_kconfig sound/oss/Kconfig 'SOUND_MSNDPIN'
+clean_mk CONFIG_SOUND_MSNDPIN sound/oss/Makefile
+
+announce SOUND_SSCAPE - "Ensoniq SoundScape support"
+reject_firmware sound/oss/sscape.c
+clean_blob sound/oss/sscape.c
+clean_kconfig sound/oss/Kconfig 'SOUND_SSCAPE'
+clean_mk CONFIG_SOUND_SSCAPE sound/oss/Makefile
+
+announce SOUND_TRIX - "MediaTrix AudioTrix Pro support"
+reject_firmware sound/oss/trix.c
+clean_blob sound/oss/trix.c
+clean_kconfig sound/oss/Kconfig 'SOUND_TRIX'
+clean_mk CONFIG_SOUND_TRIX sound/oss/Makefile
+
+announce SOUND_TRIX - "MediaTrix AudioTrix Pro support"
+announce SOUND_PAS - "ProAudioSpectrum 16 support"
+announce SOUND_SB - "100% Sound Blaster compatibles (SB16/32/64, ESS, Jazz16) support"
+reject_firmware sound/oss/sb_common.c
+clean_blob sound/oss/sb_common.c
+clean_kconfig sound/oss/Kconfig 'SOUND_PAS'
+clean_kconfig sound/oss/Kconfig 'SOUND_SB'
+clean_mk CONFIG_SOUND_PAS sound/oss/Makefile
+clean_mk CONFIG_SOUND_SB sound/oss/Makefile
+
+announce SOUND_PSS - "PSS (AD1848, ADSP-2115, ESC614) support"
+reject_firmware sound/oss/pss.c
+clean_blob sound/oss/pss.c
+clean_kconfig sound/oss/Kconfig 'SOUND_PSS'
+clean_mk CONFIG_SOUND_PSS sound/oss/Makefile
 
 exit 0

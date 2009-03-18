@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-03-09
+# deblob-check version 2009-03-17
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -575,11 +575,13 @@ set_except () {
     badx "$1" $2
   }
 
-  blobna "request_firmware_nowait"
-  blobna "request_firmware"
-  blobna "request_ihex_firmware"
-  blobna "MODULE_FIRMWARE[ 	\n]*([^;]*)[ 	\n]*;\([ 	\n]*MODULE_FIRMWARE[ 	\n]*([^;]*)[ 	\n]*;\)*"
-  blobna "DEFAULT_FIRMWARE"
+  blobna 'request_firmware_nowait'
+  blobna 'request_firmware'
+  blobna 'request_ihex_firmware'
+  blobna 'MODULE_FIRMWARE[ 	\n]*([^;]*)[ 	\n]*;\([ 	\n]*MODULE_FIRMWARE[ 	\n]*([^;]*)[ 	\n]*;\)*'
+  blobna 'DEFAULT_FIRMWARE'
+  blobna '\(\.\|->\)firmware[ 	\n]*=[^=]'
+  blobna 'mod_firmware_load' # sound/
 
   case $prefix$1 in
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
@@ -916,27 +918,18 @@ set_except () {
     blobna '[\n]	scriptlen = sizeof(script)[^;]*;[\n]	for[^{]*scriptlen[^{]*{[^}]*[^\n	}]' drivers/media/dvb/dvb-usb/af9005-fe.c
 
     accept 'struct \(sp8870\|tda1004x\)_config[\n]{[^}]*(\*request_firmware)[^}]*[\n]};' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.h'
-    blob '[/][*]\([^/]*\|[^*/][/]\)*get_dvb_firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]#define \(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|"[^"]*"\) \([^\n]*\|[\\][\n]\)*\)*' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.c'
-    accept '[^\n]*->request_firmware([^{;]*NONFREE_FIRMWARE' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.c'
+    blob '[/][*]\([^/]*\|[^*/][/]\)*get_dvb_firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]\(#define \(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|"[^"]*"\) \([^\n]*\|[\\][\n]\)*\|[/][*](DEBLOBBED)[*][/]\)\)*' 'drivers/media/dvb/frontends/\(nxt200x\|or51211\|sp887[0x]\|tda1004[8x]\)\.c'
     blobname 'dvb-fe-sp8870\.fw' drivers/media/dvb/frontends/sp8870.c
     blobname 'dvb-fe-tda1004[56]\.fw' drivers/media/dvb/frontends/tda1004x.c
-    accept '	if (state->config->request_firmware != NULL) {' drivers/media/dvb/ttpci/tda1004x.c
 
     # This bootcode is actually Free Software under GPLv2, but since it's
     # being distributed without source code, we're taking it out.
     blob 'static u8 bootcode\[\] = {[^}]*};' drivers/media/dvb/ttpci/av7110_hw.c
     blobname 'dvb-ttpci-01\.fw' drivers/media/dvb/ttpci/av7110.c
-    accept '\(static int\|	\.request_firmware =\) alps_tdlb7_request_firmware[(,]' drivers/media/dvb/ttpci/av7110.c
     defsnc 'static u8 nexusca_stv0297_inittab\[\] =' drivers/media/dvb/ttpci/av7110.c
 
-    accept '\(static int\|	\.request_firmware =\) alps_tdhd1_204_request_firmware[(,]' drivers/media/dvb/ttpci/budget.c
-
-    accept '\(static int\|	\.request_firmware =\) philips_tu1216_request_firmware[(,]' drivers/media/dvb/ttpci/budget-av.c
-
-    accept '\(static int\|	\.request_firmware =\) philips_tdm1316l_request_firmware[(,]' drivers/media/dvb/ttpci/budget-ci.c
     defsnc 'static u8 philips_su1278_tt_inittab\[\] =' drivers/media/dvb/ttpci/budget-ci.c
     defsnc 'static u8 dvbc_philips_tdm1316l_inittab\[\] =' drivers/media/dvb/ttpci/budget-ci.c
-    accept '\(static int\|	\.request_firmware =\) philips_tdm1316l_request_firmware[(,]' drivers/media/dvb/ttpci/budget-ci.c
 
     blobname 'ttusb-budget\/dspbootcode\.bin' drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 
@@ -1096,11 +1089,9 @@ set_except () {
     accept '			req_firm_rc = request_firmware_nowait([^;], "dell_rbu",' drivers/firmware/dell_rbu.c
 
     blobname 'xc3028-v27\.fw' drivers/media/common/tuners/tuner-xc2028.h
-    accept '#define XC\(2028\|3028L\)_DEFAULT_FIRMWARE NONFREE_FIRMWARE' drivers/media/common/tuners/tuner-xc2028.h
     blobname 'xc3028L-v36\.fw' drivers/media/common/tuners/tuner-xc2028.h
+
     blobname 'dvb-fe-xc5000-1\.1\.fw' drivers/media/common/tuners/xc5000.c
-    accept '#define XC5000_DEFAULT_FIRMWARE\( NONFREE_FIRMWARE\|_SIZE\)' drivers/media/common/tuners/xc5000.c
-    accept '[ 	]*\(\(ctl\)\?\(->\|[.]\)fname[ 	]*=[ 	]*\|if (fw->size != \|ret = reject_firmware([&]fw, \)\?XC\(2028\|3028L\|5000\)_DEFAULT_FIRMWARE' 'drivers/media/video/\(common/tuners/\(xc5000\.c\|tuner-xc2028\.h\)\|saa7134/saa7134-cards\.c\|em28xx/em28xx-cards\.c\|cx23885/cx23885-dvb\.c\|cx88/cx88-\(cards\|dvb\)\.c\|cx18/cx18-driver\.c\|ivtv/ivtv-driver\.c\|dvb/dvb-usb/\(dib0700_devices\|cxusb\)\.c\)'
 
     blobname '4210\(100[12]\|%4X\)\.sb' drivers/net/irda/irda-usb.c
 
@@ -1159,6 +1150,175 @@ set_except () {
     blobname '\(PCMLM28\|DP83903\|LA-PCM\|PE520\|NE2K\|PE-200\|tamarack\)\.cis' drivers/net/pcmcia/pcnet_cs.c
 
     blobname '\(PCMLM28\|DP83903\|3C\(CF\|X\)EM556\|SW_\([78]xx\|555\)_SER\|MT5634ZLX\|COMpad[24]\|RS-COM-2P\|GLOBETROTTER\)\.cis' drivers/serial/serial_cs.c
+
+    # This enables but does not encourage firmware updates.
+    accept '	err = request_firmware([&]asd_ha->bios_image,[\n 	]*filename_ptr,[\n 	]*[&]asd_ha->pcidev->dev);' drivers/scsi/aic94xx/aic94xx_init.c
+    blobname 'aic94xx-seq\.fw' drivers/scsi/aic94xx/aic94xx_seq.h
+
+    # This enables but does not encourage firmware updates.
+    accept '	if(request_firmware(&fw_entry, fname, &ioa_cfg->pdev->dev))' drivers/scsi/ipr.c
+
+    accept '	res = request_firmware(&fw, "sas_addr", &shost->shost_gendev);' drivers/scsi/libsas/sas_scsi_host.c
+
+    blobname 'ql2\([12345]00\|322\)\.bin' drivers/scsi/qla2xxx/qla_os.c
+
+    blobname 'icom_\(asc\|res_dce\|call_setup\)\.bin' drivers/serial/icom.c
+
+    blobname 'fsl_qe_ucode_uart_\(%u\|0-9]*\)_\(%u\|[0-9]*\)\(%u\|[0-9]*\)\.bin' drivers/serial/ucc_uart.c
+
+    blobname 'atmel_at76c50\(3-\(i386[13]\|rfmd\(-acc\)\?\|5\(a\(mx\)\?\)\?-rfmd\(2958\)\?\)\)\.bin' drivers/staging/at76_usb/at76_usb.c
+
+    blobname 'go7007\(fw\|tv\)\.bin' 'drivers/staging/go7007/\(go7007-\(driver\|usb\)\|saa7134-go7007\)\.c'
+
+    blobname 'cxacru-\(%s\|fw\|bp\|cf\)\.bin' drivers/usb/atm/cxacru.c
+
+    blobname 'speedtch-\(%d\|[0-9]*\)\.bin\(\.\(%x\|\(0x\)\?[0-9a-fA-F]*\)\(\.\(%02x\|[0-9a-fA-F][0-9a-fA-F]\)\)\?\)\?' drivers/usb/atm/speedtch.c
+
+    blobname 'ueagle-atm[/]' drivers/usb/atm/ueagle-atm.c
+    blobname '\(adi930\|eagle\(I*\|IV\)\)\.fw' drivers/usb/atm/ueagle-atm.c
+    blobname 'DSP[49e][ip]\.bin' drivers/usb/atm/ueagle-atm.c
+    blobname '930-fpga\.bin' drivers/usb/atm/ueagle-atm.c
+    blobname 'CMV[x9ae][yip]\.bin\(\.v2\)\?' drivers/usb/atm/ueagle-atm.c
+
+    blobname 'isight\.fw' drivers/usb/misc/isight_firwmare.c
+
+    blobname '\(i1480-\(pre-phy\|usb\|phy\)\|ptc\)-0\.0\.bin' drivers/uwb/i1480/dfu/usb.c
+
+    accept '	retval = request_firmware([&]fw_entry, "metronome.wbf", [&]dev->dev);' drivers/video/metronomefb.c
+
+    blobname '\(vx[/]\)\?\(bx_1_v\(xp\|p4\)\.b56\|x1_\(1_v\(x[2p]\|p4\)\|2_v22\)\.xlx\|bd56\(002\|3v2\|3s3\)\.boot\|l_1_v\(x[2p]\|p4\|22\)\.d56\)' sound/drivers/vx/vx_hwdep.c
+
+    blobname '\(ea[/]\)\?darla20_dsp\.fw' sound/pci/echoaudio/darla20.c
+    blobname '\(ea[/]\)\?darla24_dsp\.fw' sound/pci/echoaudio/darla24.c
+    blobname '\(ea[/]\)\?\(\(loader\|echo3g\)_dsp\|3g_asic\)\.fw' sound/pci/echoaudio/echo3g.c
+    blobname '\(ea[/]\)\?gina20_dsp\.fw' sound/pci/echoaudio/gina20.c
+    blobname '\(ea[/]\)\?\(\(loader\|gina24_3[06]1\)_dsp\|gina24_3[06]1_asic\)\.fw' sound/pci/echoaudio/gina24.c
+    blobname '\(ea[/]\)\?\(loader\|indigo\)_dsp\.fw' sound/pci/echoaudio/indigo.c
+    blobname '\(ea[/]\)\?\(loader\|indigo_dj\)_dsp\.fw' sound/pci/echoaudio/indigodj.c
+    blobname '\(ea[/]\)\?\(loader\|indigo_io\)_dsp\.fw' sound/pci/echoaudio/indigoio.c
+    blobname '\(ea[/]\)\?layla20_\(dsp\|asic\)\.fw' sound/pci/echoaudio/layla20.c
+    blobname '\(ea[/]\)\?\(\(loader\|layla24\)_dsp\|layla24_\(1\|2[AS]\)_asic\)\.fw' sound/pci/echoaudio/layla24.c
+    blobname '\(ea[/]\)\?\(loader\|mia\)_dsp\.fw' sound/pci/echoaudio/mia.c
+    blobname '\(ea[/]\)\?\(\(loader\|mona_3[06]1\)_dsp\|mona_3[06]1\(_1\)\?_asic_\(48\|96\)\|mona_2_asic\)\.fw' sound/pci/echoaudio/gina24.mona
+    blobname 'ea[/]%s' sound/pci/echoaudio/echoaudio.c
+
+    blobname 'emu[/]\(hana\|\(audio\|micro\)_dock\|emu\(0404\|1010\(b\|_notebook\)\)\)\.fw' sound/pci/emu10k1/emu10k1_main.c
+
+    blobname '\(mixart[/]\)\?miXart8\(AES\)\?\.\(xlx\|elf\)' sound/pci/mixart/mixart_hwdep.c
+
+    blobname '\(pcxhr[/]\)\?\(x[ic]_1_882\.dat\|[ebd]321_512\.[ebd]56\)' sound/pci/pcxhr/pcxhr_hwdep.c
+
+    blobname 'riptide\.hex' sound/pci/riptide/riptide.c
+
+    blobname '\(multi\|digi\)face_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
+
+    blobname 'aica_firmware\.bin' sound/sh/aica.c
+
+    accept ' [*]\([^/]\|[^*]*[/]*\)*Caution: This API\([^/]\|[^*]*[/]*\)*request_firmware.' sound/sound_firmware.c
+    accept 'static int do_mod_firmware_load(' sound/sound_firmware.c
+    accept 'int mod_firmware_load(' sound/sound_firmware.c
+    accept '	r = do_mod_firmware_load(' sound/sound_firmware.c
+    accept 'EXPORT_SYMBOL(mod_firmware_load);' sound/sound_firmware.c
+    accept 'extern int mod_firmware_load(' sound/oss/sound_firmware.h
+
+    accept '	INITCODESIZE = mod_firmware_load(INITCODEFILE, [&]INITCODE);' sound/oss/msnd_pinnacle.c
+    accept '	PERMCODESIZE = mod_firmware_load(PERMCODEFILE, [&]PERMCODE);' sound/oss/msnd_pinnacle.c
+    blobname '\([/]etc[/]sound[/]\)\?pndsp\(ini\|erm\)\.bin' sound/oss/msnd_pinnacle.h
+    blobname '\([/]etc[/]sound[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/msnd_classic.h
+
+    accept '	len = mod_firmware_load(fn, [&]data);[\n]	if [^{]* {[\n]		printk(KERN_ERR "sscape:' sound/oss/sscape.c
+    blobname '[/]sndscape[/]scope\.co[dx]' sound/oss/sscape.c
+
+    accept '		trix_boot_len = mod_firmware_load(' sound/oss/trix.c
+    blobname '\([/]etc[/]sound[/]\)\?trxpro\.bin' sound/oss/trix.c
+
+    accept '		smw_ucodeLen = mod_firwmare_load(' sound/oss/sb_common.c
+    blobname '\([/]etc[/]sound[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/sb_common.c
+
+    accept '		pss_synthLen = mod_firmware_load(pss_firmware' sound/oss/pss.c
+    blobname '\([/]etc[/]sound[/]\)\?pss_synth' sound/oss/pss.c
+    
+    accept '	\.request_firmware = NULL,' drivers/media/dvb/dvb-usb/m920x.c
+
+    accept '[	 ]*"request_firmware \(fatal error\|unable to locate\|: Failed to find\)' drivers/media/video/pvrusb2/pvrusb2-hdw.c
+    accept ' [*] NOTE : the pointer to the firmware data given by request_firmware()' drivers/media/video/pvrusb2-hdw.c
+
+    blobname 'dvb-usb-dw210[24]\.fw' drivers/media/dvb/dvb-usb/dw2102.c
+
+    blobname 'dvb-usb-gp8psk-02\.fw' drivers/media/dvb/dvb-usb/gp8psk.c
+
+    blobname 'dvb-usb-opera-\(fpga-\)\?-01\.fw' drivers/media/dvb/dvb-usb/opera1.c
+
+    blobname 'dvb-fe-af9013\.fw' drivers/media/dvb/frontends/af9013_priv.h
+
+    blobname 'dvb-fe-bcm3510-01\.fw' drivers/media/dvb/frontends/bcm3510.c
+
+    blobname 'dvb-fe-cx24116\.fw' drivers/media/dvb/frontends/cx24116.c
+
+    blobname 'dvb-fe-nxt2002\.fw' drivers/media/dvb/frontends/nxt200x.c
+
+    blobname 'dvb-fe-or51132-\(vsb\|qam\)\.fw' drivers/media/dvb/frontends/or51132.c
+
+    blobname 'dvb-fe-or51211\.fw' drivers/media/dvb/frontends/or51211.c
+
+    blobname 'dvb-fe-sp887x\.fw' drivers/media/dvb/frontends/sp887x.c
+
+    blobname 'dvb-fe-tda10048-1\.0\.fw' drivers/media/dvb/frontends/tda10048.c
+
+    blobname '\(\(dvb\|tdmb\|isdbt\)_nova\|cmmb_vega\)_12mhz\(_b0\)\?\.inp' drivers/media/dvb/siano/smscoreapi.c
+
+    blobname '\(dvb[th]\(_bda\)\?\|tdmb\)_stellar_usb\.inp' drivers/media/dvb/siano/smsusb.c
+
+    blobname 'dvb-ttusb-dec-\(2000t\|2540t\|3000s\)\.fw' drivers/media/dvb/ttusb-dec/ttusb_dec.c
+
+    blobname 'hcwamc\.rfb' drivers/media/video/bt8xx/bttv-cards.c
+
+    blobname 'v4l-cx23418-dig\.fw' drivers/media/video/cx18/cx18-av-firmware.c
+    blobname 'v4l-cx23148-[ac]pu\.fw' drivers/media/video/cx18/cx18-firwmare.c
+
+    blobname 'v4l-cx23885-enc\.fw' drivers/media/video/cx23885/cx23885-417.c
+
+    blobname 'v4l-\(cx23885-avcore-01\|cx25840\)\.fw' drivers/media/video/cx25840/cx25840-firmware.c
+
+    blobname 'v4l-cx2341x-\(enc\|dec\)\.fw' include/media/cr2341x.h
+
+    blobname 'v4l-cx2341x-init\.mpg' drivers/media/video/ivtv/ivtv-firwmare.c
+
+    blobname 'v4l-pvrusb2-\(2[49]\|73\)xxx-01\.fw' drivers/media/video/pvrusb2/pvrusb2-devattr.c
+
+    blobname 'f2255usb\.bin' drivers/media/video/s2255drv.c
+
+    blobname 'drx397xD\.\(A2\|B1\)\.fw' drivers/media/dvb/frontends/drx397xD_fw.h
+
+    blobname 'dvb-usb-dib0700-1\.20\.fw' drivers/media/dvb/dvb-usb/dib0700_devices.c
+
+    blobname 'dvb-usb-nova-t-usb2-02\.fw' drivers/media/dvb/dvb-usb/nova-t-usb2.c
+
+    blobname 'dvb-usb-umt-010-02\.fw' drivers/media/dvb/dvb-usb/umt-010.c
+
+    blobname 'dvb-usb-\(pctv-400e\|tt-s2400\)-01\.fw' drivers/media/dvb/dvb-usb/ttusb2.c
+
+    blobname 'dvb-usb-bluebird-0[12]\.fw' drivers/media/dvb/dvb-usb/cxusb.c
+
+    blobname 'dvb-usb-\(dtt200u-01\|wt220u-\(02\|fc03\|\(zl0353\|miglia\)-01\)\)\.fw' drivers/media/dvb/dvb-usb/dtt200u.c
+
+    blobname 'dvb-usb-vp7045-01\.fw' drivers/media/dvb/dvb-usb/vp7045.c
+
+    blobname 'dvb-usb-\(dibusb-\(5\.0\.0\.11\|an2235-01\|6\.0\.0\.8\)\|adstech-usb2-02\)\.fw' drivers/media/dvb/dvb-usb/dibusb-mb.c
+
+    blobname 'dvb-usb-avertv-a800-02\.fw' drivers/media/dvb/dvb-usb/a800.c
+
+    blobname 'af9005\.fw' drivers/media/dvb/dvb-usb/af9005.c
+
+    blobname 'dvb-usb-af9015\.fw' drivers/media/dvb/dvb-usb/af9015.c
+
+    blobname 'dvb-usb-dibusb-6\.0\.0\.8\.fw' drivers/media/dvb/dvb-usb/dibusb-mc.c
+
+    blobname 'dvb-usb-\(\(megasky\|digivox\)-02\|tvwalkert\|dposh-01\)\.fw' drivers/media/dvb/dvb-usb/m920x.c
+
+    blobname 'dvb-usb-vp702x-02\.fw' drivers/media/dvb/dvb-usb/vp702x.c
+
+    blobname 'dvb-usb-digitv-02\.fw' drivers/media/dvb/dvb-usb/digitv.c
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h
