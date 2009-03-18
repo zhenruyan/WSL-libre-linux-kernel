@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-03-17
+# deblob-check version 2009-03-18
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -80,14 +80,14 @@
 #		context around the blobs.
 
 # -X --print-all-matches: print all blobs, be they known false
-#		positives or blobs.
+#		positives or actual blobs.
 
 # -x --list-all-matches: list files that contain sequences that appear
 #		to be blobs, be they known false positives or not.
 
 # -p --mark-false-positives: print the processed input, replacing
-#		sequences that match the blob detector test, but that
-#		are known to be false positives, with /*(DEBLOBBED)*/.
+#		sequences that match the blob detector test, even those 
+#		known to be false positives, with /*(DEBLOBBED)*/.
 
 # -P --list-false-positives: list files that contain false positives.
 
@@ -2113,7 +2113,7 @@ set_sedmain () {
 
   # Regular expression that matches one or more blobs without
   # intervening line breaks.
-  sblobctx="\\([^\\n]*$bloblong\\)\\+"
+  sblobctx="\\(\([^\\n]\|[/][*](DEBLOB-\\nBED)[*][/]\)*$bloblong\\)\\+"
 
   # Regular expression that matches the context for a long blob match.
   lblobctx="\\($initblob\\|$defineblob\\|$asmblob\\|$sblobctx\\)"
@@ -2255,6 +2255,7 @@ $v:print_blobs
   # This is tricky.  We don't want to print the false positive.
   /^$falsepos[^\\n]*$blobfast/ {
     $v:delete false positive immediately followed by blob
+    s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//;
     h;
     s/^\\($falsepos\\).*/\\1/;
     $v:matched false positive
@@ -2269,10 +2270,12 @@ $v:print_blobs
     G;
     b print_blobs_delete_to_eol;
   }
-  s/^$falsepos//;
-  b print_blobs_delete_to_eol;
+  /^$falsepos[/][*](DEBLOB-\\nBED)[*][/]/! {
+    s/^$falsepos//;
+    b print_blobs_delete_to_eol;
+  }
 }
-/^[^\\n]*$blobfast/! {
+/^\([^\\n]\|[/][*](DEBLOB-\\nBED)[*][/]\)*$blobfast/! {
   $v:delete non-blob header
   h;
   s/[\\n]\\($falsepos\\|[^\\n]*$blobfast\\).*//;
@@ -2288,9 +2291,15 @@ $v:print_blobs
   x;
   b print_blobs_delete_to_eol;
 }
-h;
 i\\
 ::: $file :::
+: print_blobs_output_false_positive;
+/[^\\n]*[/][*](DEBLOB-[\\n]BED)[*][/]/ {
+  P;
+  s,^[^\\n]*[\\n],,
+  b print_blobs_output_false_positive;
+}
+h;
 s/^\\([^\\n]*\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/;
 $v:narrowed to blob
 p;
@@ -2310,6 +2319,7 @@ $v:print_marked_blobs
   # This is tricky.  We don't want to print the false positive.
   /^$falsepos[^\\n]*$blobfast/ {
     $v:delete false positive immediately followed by blob
+    s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//;
     h;
     s/^\\($falsepos\\).*/\\1/;
     $v:matched false positive
@@ -2324,10 +2334,12 @@ $v:print_marked_blobs
     G;
     b print_marked_blobs_delete_to_eol;
   }
-  s/^falsepos//;
-  b print_marked_blobs_delete_to_eol;
+  /^$falsepos[/][*](DEBLOB-\\nBED)[*][/]/! {
+    s/^falsepos//;
+    b print_marked_blobs_delete_to_eol;
+  }
 }
-/^[^\\n]*$blobfast/! {
+/^\([^\\n]\|[/][*](DEBLOB-\\nBED)[*][/]\)*$blobfast/! {
   $v:delete non-blob header
   h;
   s/[\\n]\\($falsepos\\|[^\\n]*$blobfast\\).*//;
@@ -2343,9 +2355,15 @@ $v:print_marked_blobs
   x;
   b print_marked_blobs_delete_to_eol;
 }
-h;
 i\\
 ::: $file :::
+: print_marked_blobs_output_false_positive;
+/[^\\n]*[/][*](DEBLOB-[\\n]BED)[*][/]/ {
+  P;
+  s,^[^\\n]*[\\n],,
+  b print_marked_blobs_output_false_positive;
+}
+h;
 s/^\\([^\\n]*\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/;
 $v:narrowed to blob
 s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g;
@@ -2367,6 +2385,7 @@ $v:print_cblobs
   # This is tricky.  We don't want to print the false positive.
   /^$falsepos[^\\n]*$blobfast/ {
     $v:delete false positive immediately followed by blob
+    s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//;
     h;
     s/^\\($falsepos\\).*/\\1/;
     $v:matched false positive
@@ -2381,8 +2400,10 @@ $v:print_cblobs
     G;
     b print_cblobs_delete_to_eol;
   }
-  s/^$falsepos//;
-  b print_cblobs_delete_to_eol;
+  /^$falsepos[/][*](DEBLOB-\\nBED)[*][/]/! {
+    s/^$falsepos//;
+    b print_cblobs_delete_to_eol;
+  }
 }
 /^$lblobctx/! {
   $v:delete non-blob header
@@ -2400,9 +2421,15 @@ $v:print_cblobs
   x;
   b print_cblobs_delete_to_eol;
 }
-h;
 i\\
 ::: $file :::
+: print_cblobs_output_false_positive;
+/[^\\n]*[/][*](DEBLOB-[\\n]BED)[*][/]/ {
+  P;
+  s,^[^\\n]*[\\n],,
+  b print_cblobs_output_false_positive;
+}
+h;
 s/^\\($lblobctx[^\\n]*\\($bloblong[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/;
 $v:narrowed to blob
 p;
@@ -2422,6 +2449,7 @@ $v:print_marked_cblobs
   # This is tricky.  We don't want to print the false positive.
   /^$falsepos[^\\n]*$blobfast/ {
     $v:delete false positive immediately followed by blob
+    s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//;
     h;
     s/^\\($falsepos\\).*/\\1/;
     $v:matched false positive
@@ -2436,8 +2464,10 @@ $v:print_marked_cblobs
     G;
     b print_marked_cblobs_delete_to_eol;
   }
-  s/^$falsepos//;
-  b print_marked_cblobs_delete_to_eol;
+  /^$falsepos[/][*](DEBLOB-\\nBED)[*][/]/! {
+    s/^$falsepos//;
+    b print_marked_cblobs_delete_to_eol;
+  }
 }
 /^$lblobctx/! {
   $v:delete non-blob header
@@ -2455,9 +2485,15 @@ $v:print_marked_cblobs
   x;
   b print_marked_cblobs_delete_to_eol;
 }
-h;
 i\\
 ::: $file :::
+: print_marked_cblobs_output_false_positive;
+/[^\\n]*[/][*](DEBLOB-[\\n]BED)[*][/]/ {
+  P;
+  s,^[^\\n]*[\\n],,
+  b print_marked_cblobs_output_false_positive;
+}
+h;
 s/^\\($lblobctx[^\\n]*\\($bloblong[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/;
 $v:narrowed to blob
 s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g;
@@ -2547,8 +2583,9 @@ $v:list_blobs
   # This is tricky.  We don't want to deblob the false positive.
   /^$falsepos[^\\n]*$blobfast/ {
     $v:print false positive immediately followed by blob
+    s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//;
     h;
-    s/^\\($falsepos\\)[^\\n]*$blobfast.*/\\1/;
+    s/^\\($falsepos\\).*/\\1/;
     : list_blobs_match_loop
     /[\\n]/ {
       P;
@@ -2742,7 +2779,17 @@ check () {
   fi
   set "$@" "$cmd"
 
-  test $# != 1 || set "$@" "cat"
+  sedunbreak='
+: restart;
+/[/][*](DEBLOB-$/ {
+  N;
+  s,[/][*](DEBLOB-[\n]BED)[*][/],,
+  b restart;
+}'
+  cmd='sed "$sedunbreak"'
+  set "$@" "$cmd"
+
+  # test $# = 1 || set "$@" "cat"
 
   shift # fnord goes out here
 
