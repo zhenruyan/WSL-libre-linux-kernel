@@ -196,9 +196,9 @@ undefine_macro () {
   macro=$1 repl=$2 msg=$3; shift 3
   for f in "$@"; do
     clean_sed "
-  s,^#define $macro \"[^\"]*\",/*(DEBLOBBED)*/,;
-  s,$macro,$repl,g" \
-      "$f" "$msg"
+  s,^#define $macro .*\$,/*(DEBLOBBED)*/,;
+  s,$macro,$repl,g;
+" "$f" "$msg"
   done
 }
 
