@@ -1120,13 +1120,15 @@ set_except () {
     blobname 'atmel_at76c50\(2\([de]\|_3com\)\?\|4a\?\(_2958\)\?\|6\)\(\.bin\)\?' drivers/net/wireless/atmel.c
     accept '	*priv->firmware = \(NULL\|new_firmware\);' drivers/net/wireless/atmel.c
 
-    blobname 'b43[^/]*[/]\(%s\|ucode\(5\|1[13]\)\|pcm5\|[abn]0g[01]initvals\(5\|1[13]\)\)\.fw' 'drivers/net/wireless/b43\(legacy\)\?/main.c'
+    blobname 'b43\(legacy\)\?\(%s\)\?[/]\(%s\|ucode\(5\|1[13]\)\|pcm5\|[abn]0g[01]initvals\(5\|1[13]\)\)\.fw' 'drivers/net/wireless/b43\(legacy\)\?/main.c'
+    blobna 'b43legacyerr([^;]*must go to http[^;]*b43#devicefirmware[^;]*);' drivers/net/wireless/b43legacy/main.c
 
-    blob '#define IPW2100_FW_\(\(MINOR_\)\?VERSION\|\(MAJOR\|MINOR\)(x)\)\([^\n]*\\[\n]\)*[^\n]*\([\n][\n]*#define IPW2100_FW_\(\(MINOR_\)\?VERSION\|\(MAJOR\|MINOR\)(x)\)\([^\n]*\\[\n]\)*[^\n]*\)*' drivers/net/wireless/ipw2100.c
+    blob '#define IPW2100_FW_\(\(\(MAJOR\|MINOR\)_VERSION\|\(MAJOR\|MINOR\)(x)\)\|VERSION\)\([^\n]*\\[\n]\)*[^\n]*\([\n][\n]*#define IPW2100_FW_\(\(\(MAJOR\|MINOR\)_VERSION\|\(MAJOR\|MINOR\)(x)\)\|VERSION\)\([^\n]*\\[\n]\)*[^\n]*\)*' drivers/net/wireless/ipw2100.c
     blobname 'ipw2100-\("\([^"\n]\|[\\][\n]\)*"\([^"]\|[\\]["]\)*\)\+' drivers/net/wireless/ipw2100.c
     blobname '__stringify(IPW2100_FW_MINOR_VERSION)' drivers/net/wireless/ipw2100.c
     accept ' *Portions of ipw2100_\(do_\)\?mod_firmware_load[, 	]*\(ipw2100_\(do_\)\?mod_firmware_load[, 	and\n]*\)*' drivers/net/wireless/ipw2100.c
-    accept '\(static int \|	\)ipw2100_mod_firmware_load(' drivers/net/wireless/ipw2100.c
+    blob 'static int ipw2100_mod_firmware_load([^{]*)[\n]{\([^}]\|[^\n]}*\)*[\n]}' drivers/net/wireless/ipw2100.c
+    blob 'ipw2100_mod_firmware_load([^;]*);' drivers/net/wireless/ipw2100.c
 
     accept '[/][*] Call this function from process context\([^/]\|[^*/][/]*\)*request_firmware' drivers/net/wireless/ipw2200.c
     blobname 'ipw2200-\(i\?bss\|sniffer\)\.fw' drivers/net/wireless/ipw2200.c
@@ -1137,7 +1139,9 @@ set_except () {
 
     blobname 'libertas_cs\(_helper\)\?\.fw' drivers/net/wireless/libertas/if_cs.c
     blobname 'sd\(8385\|8686\)\(_helper\)\?\.bin' drivers/net/wireless/libertas/if_sdio.c
+    accept '	*card->firmware = \(if_sdio\|lbs_fw\)' drivers/net/wireless/libertas/if_sdio.c
     blobname 'usb8388\(-5\.126\.0\.p5\)\?\.bin' drivers/net/wireless/libertas/if_usb.c
+    blobname '[/][*]\([^/]\|[^*/][/]*\)*usb8388\(-5\.126\.0\.p5\)\?\.bin[/][*]\([^/]\|[^*/][/]*\)*' drivers/net/wireless/libertas/if_usb.c
     accept '		lbs_pr_err("request_firmware() failed' drivers/net/wireless/if_usb.c
     blobna 'o\. Copy the firmware image[^\n]*usb8388\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/libertas/README
     blobna '\[fw_name=usb8388[^]]*\]' drivers/net/wireless/libertas/README
