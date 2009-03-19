@@ -845,8 +845,8 @@ set_except () {
     accept '[/][*][*][\n] [*] request_firmware_nowait: asynchronous version[^{]*[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/base/firmware_class.c
     accept 'EXPORT_SYMBOL(request_firmware\(_nowait\)\?);' drivers/base/firmware_class.c
     accept 'int request_firmware\(_nowait\)\?([^;]*);' include/linux/firmware.h
-    accept 'static inline int request_firmware\(_nowait\)\?([^{]*)[\n]{[\n][\t]return -EINVAL;[\n]}[\n]' include/linux/firmware.h
-    accept 'static inline int \(maybe_\)\?reject_firmware\(_nowait\)\?([^{;]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' include/linux/firmware.h
+    accept 'static inline int request_firmware\(_nowait\)\?([^{]*)[\n]{[\n][\t]return -EINVAL;[\n]}' include/linux/firmware.h
+    accept 'static inline int[\n]\(maybe_\)\?reject_firmware\(_nowait\)\?([^{;]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}' include/linux/firmware.h
 
     accept 'static inline int request_ihex_firmware\?([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' include/linux/ihex.h
     ocomment '[/][*] Optional firmware\([^\n]*[\n] [*]\)*[^\n]* MODULE_FIRMWARE()'
@@ -889,7 +889,7 @@ set_except () {
 
     blob '    sprintf([^;]*fore200[^;]*FW_EXT[^;]*);' drivers/atm/fore200e.c
     blobname '\(pc\|sb\)a200e\(_ecd\)\?\.bin[12]?' drivers/atm/fore200e.c
-    blobna 'The supplied firmware images.*fore.*Rebuild and reinstall[^.]*\.' Documentation/networking/fore200e.txt
+    blobna 'The supplied firmware images.*fore.*Rebuild and re-install[^.]*\.' Documentation/networking/fore200e.txt
 
     blobname 'intelliport2\.bin' drivers/char/ip2/ip2main.c
 
@@ -957,6 +957,7 @@ set_except () {
 
     blobna 'static u16 \(sr\|twinax\)_edc\[\] = {[^;]*};' drivers/net/cxgb3/ael1002.c
     blobna 'for ([^\n]*ARRAY_SIZE(\(sr\|twinax\)_edc)[^\n]*)[\n][^;]*mdio_write[^;]*;' drivers/net/cxgb3/ael1002.c
+    blobname 't3fw\(_protocol_sram\)\?-\(%d\|[0-9]*\)\.\(%d\|[0-9]*\)\.\(%d\|[0-9]*\)\.bin' drivers/net/cxgb3/cxgb3_main.c
 
     blob '\([/][*][*]*[*][/][\n]*\)*\([/][*]\([^/]\|[^*/][/]*\)*Micro code\([^/]\|[^*/][/]*\)*8086:\([^/]\|[^*/][/]*\)*[*][/]\([\n]*[/][*]\([^/]\|[^*/][/]*\)*[*][/]\)*\|#define  *D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)\([\n]*[/][*]\([^/]\|[^*/][/]*\|[*][/][\n]*[/][*]\)*Micro code\([^/]\|[^*/][/]*\)*8086:\([^/]\|[^*/][/]*\)*[*][/]\([\n]*[/][*]\([^/]\|[^*/][/]*\)*[*][/]\)*\|[\n][\n]*#define  *D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)*' drivers/net/e100.c
     blobna '\([/][*]\([^/]\|[*][/]*\)*[*][/][\n]*		\)\(ucode\[opts->\(timer\|bundle\|min_size\)_dword\] .= [^;]*;[\n][\n]*		\)*[^}]*UCODE_SIZE[^}]*cb_ucode[^}]*return;[\n]	}' drivers/net/e100.c
@@ -1051,6 +1052,7 @@ set_except () {
 
     accept 'int xc_request_firmware(struct xc *[*] *x);' arch/arm/mach-netx/include/mach/xc.h
     accept 'int xc_request_firmware(struct xc *[*] *x)[\n]{' arch/arm/mach-netx/xc.c
+    accept '		dev_err(x->dev, "request_firmware failed\\n");' arch/arm/mach-netx/xc.c
     accept 'EXPORT_SYMBOL(xc_request_firmware);' arch/arm/mach-netx/xc.c
     accept '		if (xc_request_firmware(priv->xc)) {' drivers/net/netx-eth.c
 
@@ -1079,7 +1081,7 @@ set_except () {
 
     blobname 'isi\(6\(08\|\(08\|16\)em\)\|46\(08\|16\)\)\.bin' drivers/char/isicom.c
 
-    blobname 'c\(218t\|p204\|320t\)unx\.code' drivers/char/moxa.c
+    blobname 'c\(218t\|p204\|320t\)unx\.cod' drivers/char/moxa.c
     accept '		printk(KERN_ERR "MOXA: request_firmware failed' drivers/char/moxa.c
 
     # This driver enables the user to update the non-Free BIOS, but it
@@ -1130,6 +1132,7 @@ set_except () {
     blobname 'lbtf_usb\.bin' drivers/net/wireless/libertas_tf/if_usb.c
 
     blobname 'isl38\(86\|87usb_bare\|90usb\)' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
+    blob '[/][*] for isl3886 register definitions\([^/]\|[^*][/]*\)*[*][/]' drivers/net/wireless/p54/p54usb.h
     blobna 'If you enable this\([^\n]\|[\n][ 	]*[^ 	\n]\)*isl3890\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/Kconfig
 
     blobname 'isl38\(77\|86\|90\)' drivers/net/wireless/prism54/islpci_dev.c
@@ -2151,12 +2154,14 @@ g;
   fi
 
   sedmain="
+/^$/N;
 /^[\n]\?;[/][*]\\(end .*\\)\\?[*][/];$/{
   $4;
   d;
 }
 /^;[/][*]begin /!{
   : internal_error
+  $v:internal_error
   i\\
 Internal error at
   p;
@@ -2174,8 +2179,9 @@ n;
 H;
 g;
 $4
-s/^\(;[/][*]begin [^\n]*[\n]\)*//;
-s/\\($bol;[/][*]\\(end [^\n]*\\)\\?[*][/];\\)*$//;
+$v:read all
+s/^\\(;[/][*]begin [^\n]*[\\n]\\)*//;
+s/\\($bol[\n]\?;[/][*]\\(end [^\\n]*\\)\\?[*][/];\\)*$//;
 $v:???!blobfast
 /$blobfast/!b clean;
 $check_false_positives
