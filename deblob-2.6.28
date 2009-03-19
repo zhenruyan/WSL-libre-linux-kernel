@@ -253,6 +253,8 @@ $i\
 #ifndef _LINUX_LIBRE_FIRMWARE_H\
 #define _LINUX_LIBRE_FIRMWARE_H\
 \
+#include <linux/device.h>\
+\
 #define NONFREE_FIRMWARE "/*(DEBLOBBED)*/"\
 \
 static inline int\
@@ -425,7 +427,7 @@ clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 announce DRM_RADEON - "ATI Radeon"
 clean_sed '
-/^static int radeon_do_init_cce([^;]*$/,/^}$/{
+/^static int radeon_do_init_cp([^;]*$/,/^}$/{
   /^	radeon_cp_load_microcode(dev_priv);$/{
     i\
 	DRM_ERROR("Missing Free microcode!\\n");\
@@ -433,13 +435,15 @@ clean_sed '
 	return -EINVAL;
   }
 }
+}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on init'
+clean_sed '
 /^static int radeon_do_resume_cp([^;]*$/,/^}$/{
   /^	radeon_cp_load_microcode(dev_priv);$/{
     i\
 	DRM_ERROR("Missing Free microcode!\\n");\
 	return -EINVAL;
   }
-}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode'
+}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on resume'
 clean_blob drivers/gpu/drm/radeon/radeon_cp.c
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_RADEON'

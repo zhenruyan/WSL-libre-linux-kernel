@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-03-18
+# deblob-check version 2009-03-19
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -395,7 +395,9 @@ case $1 in
   set_sed_cmd () {
     set_sedmain "" "" "
 i\\
-$file
+$file\\
+/*(DEBLOB-\\
+ERROR)*/
 q 1;"
   }
   ;;
@@ -405,10 +407,14 @@ q 1;"
   set_sed_cmd () {
     set_sedmain "
 i\\
-$file
+$file\\
+/*(DEBLOB-\\
+ERROR)*/
 q 1;" "" "
 i\\
-$file
+$file\\
+/*(DEBLOB-\\
+ERROR)*/
 q 1;"
   }
   ;;
@@ -438,7 +444,9 @@ q 1;"
   set_sed_cmd () {
     set_sedmain "
 i\\
-$file
+$file\\
+/*(DEBLOB-\\
+ERROR)*/
 q 1;"
   }
   ;;
@@ -904,8 +912,8 @@ set_except () {
     blob '	r128_cce_load_microcode([^;]*);' drivers/gpu/drm/r128/r128_cce.c
 
     blob 'static const u32 R[S0-9]*0_cp_microcode\[\]\[2\] = {[^{};]*};\([\n][\n]*static const u32 R[S0-9]*0_cp_microcode\[\]\[2\] = {[^{};]*};\)*' drivers/gpu/drm/radeon/radeon_microcode.h
-    blob 'static void radeon_cp_load_microcode([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/gpu/drm/radeon/radeon_cp.c
-    blob '	radeon_cp_load_microcode([^;]*);' drivers/gpu/drm/radeon/radeon_cp.c
+    blob '\([/][*] Load the microcode\([^/]\|[^*][/]*\)*[*][/][\n]\)\?static void radeon_cp_load_microcode([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/gpu/drm/radeon/radeon_cp.c
+    blobna 'radeon_cp_load_microcode([^;]*);' drivers/gpu/drm/radeon/radeon_cp.c
 
     blob 'sub \(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\) *{\([^}]*\|[^\n]}*\)[\n]}\([\n][\n]*sub \(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\) *{\([^}]*\|[^\n]}*\)[\n]}\)*' Documentation/dvb/get_dvb_firmware
     blobna 'Please use[^\n]*firmware[^\n]*sp887x[^\n]*\([\n][^\n]\+\)\+' Documentation/dvb/avermedia.txt
@@ -1174,7 +1182,7 @@ set_except () {
 
     blobname 'fsl_qe_ucode_uart_\(%u\|0-9]*\)_\(%u\|[0-9]*\)\(%u\|[0-9]*\)\.bin' drivers/serial/ucc_uart.c
 
-    blobname 'atmel_at76c50\(3-\(i386[13]\|rfmd\(-acc\)\?\|5\(a\(mx\)\?\)\?-rfmd\(2958\)\?\)\)\.bin' drivers/staging/at76_usb/at76_usb.c
+    blobname 'atmel_at76c50\(3-\(i386[13]\|rfmd\(-acc\)\?\)\|5\(a\(mx\)\?\)\?-rfmd\(2958\)\?\)\.bin' 'drivers/\(staging\|net/wireless\)/at76_usb/at76_usb\.c'
 
     blobname 'go7007\(fw\|tv\)\.bin' 'drivers/staging/go7007/\(go7007-\(driver\|usb\)\|saa7134-go7007\)\.c'
 
@@ -1218,6 +1226,7 @@ set_except () {
 
     blobna 'You need to install[\n]*riptide\.hex[\n]\.[\n]' Documentation/sound/alsa/ALSA-Configuration.txt
     blobname 'riptide\.hex' sound/pci/riptide/riptide.c
+    defsnc 'static union firmware_version firmware_versions\[\] =' sound/pci/riptide/riptide.c
 
     blobname '\(multi\|digi\)face_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
 
@@ -1748,6 +1757,8 @@ set_except () {
     defsnc 'static u8 serit_sp1511lhb_inittab\[\] =' drivers/media/dvb/frontends/si21xx.c
     defsnc 'static u8 stv0288_inittab\[\] =' drivers/media/dvb/frontends/stv0288.c
 
+    blobname 'haup-ir-blaster\.bin' drivers/input/lirc/lirc_zilog.c
+
     # Suspicious, deblob for now, until contributor responds.
     # defsnc '	static u16 \(sr\|twinax\)_edc\[\] =' drivers/net/cxgb3/ael1002.cn
     # Non-Free license in entire file.
@@ -1977,6 +1988,10 @@ set_except () {
     ;;
   */linux-2.6*-lirc.patch)
     initnc 'const unsigned char map_table\[\] ='
+    blobname 'haup-ir-blaster\.bin' drivers/input/lirc/lirc_zilog.c
+    ;;
+  */linux-2.6*-at76.patch)
+    blobname 'atmel_at76c50\(3-\(i386[13]\|rfmd\(-acc\)\?\)\|5\(a\(mx\)\?\)\?-rfmd\(2958\)\?\)\.bin' drivers/net/wireless/at76_usb/at76_usb.c
     ;;
   */linux-2.6-modsign-mpilib.patch)
     initnc 'const unsigned char __clz_tab\[\] ='
@@ -2165,6 +2180,9 @@ g;
   i\\
 Internal error at
   p;
+  i\\
+/*(DEBLOB-\\
+ERROR)*/
   q 2;
 }
 $v:reading file in
@@ -2802,10 +2820,13 @@ check () {
 : restart;
 /[/][*](DEBLOB-$/ {
   N;
+  /[/][*](DEBLOB-[\n]ERROR)[*][/]/{q 1;}
   s,[/][*](DEBLOB-[\n]BED)[*][/],,
   b restart;
-}'
-  cmd='sed "$sedunbreak"'
+}
+p
+'
+  cmd='sed -n "$sedunbreak"'
   set "$@" "$cmd"
 
   # test $# = 1 || set "$@" "cat"
