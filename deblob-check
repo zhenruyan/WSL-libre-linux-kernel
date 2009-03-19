@@ -1043,7 +1043,8 @@ set_except () {
     blob 'yamaha[/]yss225_registers\.bin' sound/isa/wavefront/wavefront_fx.c
     blobna 'firmware = [&]yss225_registers_firmware;' sound/isa/wavefront/wavefront_fx.c
     blob 'static const struct firmware yss225_registers_firmware = {[^;]*};' sound/isa/wavefront/wavefront_fx.c
-    blob 'wavefront\.os' sound/isa/wavefront/wavefront_synth.c
+    blob 'ospath[	 ]*- Pathname[^\n]ICS2115.*wavefront\.os\([^\n]\|[^.][\n]\)*' Documentation/sound/alsa/ALSA-Configuration.txt
+    blobname 'wavefront\.os' sound/isa/wavefront/wavefront_synth.c
 
     blobna 'and[\n]require the use of[^\n]*propr\?ietary[^:]*' Documentation/arm/IXP4xx
     blob 'If you need to use any of the above[^\n]*download[^:]*:[\n 	]*http:[^\n]*ixp4[^\n]*' Documentation/arm/IXP4xx
@@ -1086,7 +1087,8 @@ set_except () {
     # doesn't require any non-Free firwmare to function, and it
     # doesn't actually recommend users to perform updates, so I'm
     # leaving it in.
-    accept '			req_firm_rc = request_firmware_nowait([^;], "dell_rbu",' drivers/firmware/dell_rbu.c
+    accept '			req_firm_rc = request_firmware_nowait([^;]*, "dell_rbu",' drivers/firmware/dell_rbu.c
+    accept '	*"dell_rbu:%s request_firmware_nowait"' drivers/firmware/dell_rbu.c
 
     blobname 'xc3028-v27\.fw' drivers/media/common/tuners/tuner-xc2028.h
     blobname 'xc3028L-v36\.fw' drivers/media/common/tuners/tuner-xc2028.h
@@ -1117,15 +1119,18 @@ set_except () {
     accept '	 [*] request_firmware() is synchronous' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\)\.c'
 
     blobname 'libertas_cs\(_helper\)\?\.fw' drivers/net/wireless/libertas/if_cs.c
-
     blobname 'sd\(8385\|8686\)\(_helper\)\?\.bin' drivers/net/wireless/libertas/if_sdio.c
-
     blobname 'usb8388\(-5\.126\.0\.p5\)\?\.bin' drivers/net/wireless/libertas/if_usb.c
-    accept '		lbs_pr_err("request_firmware() failed' drivers/net/wireless/ipw2200.c
+    accept '		lbs_pr_err("request_firmware() failed' drivers/net/wireless/if_usb.c
+    blobna 'o\. Copy the firmware image[^\n]*usb8388\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/libertas/README
+    blobna '\[fw_name=usb8388[^]]*\]' drivers/net/wireless/libertas/README
+
+    blobname 'usb8388\.bin' drivers/base/Kconfig
 
     blobname 'lbtf_usb\.bin' drivers/net/wireless/libertas_tf/if_usb.c
 
     blobname 'isl38\(86\|87usb_bare\|90usb\)' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
+    blobna 'If you enable this\([^\n]\|[\n][ 	]*[^ 	\n]\)*isl3890\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/Kconfig
 
     blobname 'isl38\(77\|86\|90\)' drivers/net/wireless/prism54/islpci_dev.c
 
@@ -1208,6 +1213,7 @@ set_except () {
 
     blobname '\(pcxhr[/]\)\?\(x[ic]_1_882\.dat\|[ebd]321_512\.[ebd]56\)' sound/pci/pcxhr/pcxhr_hwdep.c
 
+    blobna 'You need to install[\n]*riptide\.hex[\n]\.[\n]' Documentation/sound/alsa/ALSA-Configuration.txt
     blobname 'riptide\.hex' sound/pci/riptide/riptide.c
 
     blobname '\(multi\|digi\)face_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
@@ -1225,6 +1231,7 @@ set_except () {
     accept '	PERMCODESIZE = mod_firmware_load(PERMCODEFILE, [&]PERMCODE);' sound/oss/msnd_pinnacle.c
     blobname '\([/]etc[/]sound[/]\)\?pndsp\(ini\|erm\)\.bin' sound/oss/msnd_pinnacle.h
     blobname '\([/]etc[/]sound[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/msnd_classic.h
+    blobna '\(Important Notes - Read Before Using\|Obtaining and Creating Firmware Files\)[\n]#  ~*\([^\n]\|[\n]# *\([\n]# *\([\n]# *For the[^\n]*[\n]# *~*[\n]\)\?\)\?[^\n ]\)*\.' Documentation/sound/oss/MultiSound
 
     accept '	len = mod_firmware_load(fn, [&]data);[\n]	if [^{]* {[\n]		printk(KERN_ERR "sscape:' sound/oss/sscape.c
     blobname '[/]sndscape[/]scope\.co[dx]' sound/oss/sscape.c
@@ -1235,8 +1242,12 @@ set_except () {
     accept '		smw_ucodeLen = mod_firwmare_load(' sound/oss/sb_common.c
     blobname '\([/]etc[/]sound[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/sb_common.c
 
+    blob 'When the module is loaded\([^\n]\|[\n][^\n]\)*[/]pss_synth\([^\n]\|[\n][^\n]\)*' Documentation/sound/oss/PSS
+    blob 'pss_firmware[ \n	]*This parameter\([^\n]\|[\n][^\n]\)*[/]pss_synth\([^\n]\|[\n][^\n]\)*' Documentation/sound/oss/PSS-updates
     accept '		pss_synthLen = mod_firmware_load(pss_firmware' sound/oss/pss.c
     blobname '\([/]etc[/]sound[/]\)\?pss_synth' sound/oss/pss.c
+    accept '	\$(obj)[/]bin2hex pss_synth' sound/oss/Makefile
+    accept '	 *echo '"'"'static \(unsigned char [*] *\|int \)pss_synth\(Len\)\? = \(NULL\|0\);' sound/oss/Makefile
     
     accept '	\.request_firmware = NULL,' drivers/media/dvb/dvb-usb/m920x.c
 
@@ -1319,6 +1330,8 @@ set_except () {
     blobname 'dvb-usb-vp702x-02\.fw' drivers/media/dvb/dvb-usb/vp702x.c
 
     blobname 'dvb-usb-digitv-02\.fw' drivers/media/dvb/dvb-usb/digitv.c
+
+    blob 'Driver: \(korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|tu_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\) --* \([^\n]\|[\n]*[^\n\-]\)*\([\n][\n]--*[\n][\n]Driver: \(korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|tu_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\) --* \([^\n]\|[\n]*[^\n\-]\)*\)*' firmware/WHENCE
 
     # This looks suspicious, but it pretty much just sets stuff to zero.
     initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h

@@ -184,7 +184,7 @@ clean_sed () {
 reject_firmware () {
 	#$1 = file
 	clean_sed '
-s,request\(_ihex\|\)_firmware,reject_firmware,
+s,request\(_ihex\)\?_firmware\(_nowait\)\?,reject_firmware\2,
 ' "$1" 'disabled non-Free firmware-loading machinery'
 }
 
@@ -388,7 +388,7 @@ clean_blob drivers/char/cyclades.c
 clean_kconfig drivers/char/Kconfig 'CYCLADES'
 clean_mk CONFIG_CYCLADES drivers/char/Makefile
 
-announce ISI - "Multi-Tech multiport card support (EXPERIMENTAL)"
+announce ISI - "Multi-Tech multiport card support"
 reject_firmware drivers/char/isicom.c
 clean_blob drivers/char/isicom.c
 clean_kconfig drivers/char/Kconfig 'ISI'
@@ -448,12 +448,6 @@ clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
 #########
 # Media #
 #########
-
-announce DVB - "non-Free firmware scripts and documentation"
-clean_blob Documentation/dvb/get_dvb_firmware
-clean_blob Documentation/dvb/avermedia.txt
-clean_blob Documentation/dvb/opera-firmware.txt
-clean_blob Documentation/dvb/ttusb-dec.txt
 
 # media/tuner
 
@@ -522,17 +516,17 @@ clean_blob drivers/media/dvb/dvb-usb/cxusb.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_CXUSB'
 clean_mk CONFIG_DVB_USB_CXUSB drivers/media/dvb/dvb-usb/Makefile
 
-announce DVB_USB_DIB0700 - "DiBcom DiB0700 USB DVB devices (see help for supported devices)"
+announce DVB_USB_DIB0700 - "DiBcom DiB0700 USB DVB devices"
 clean_blob drivers/media/dvb/dvb-usb/dib0700_devices.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIB0700'
 clean_mk CONFIG_DVB_USB_DIB0700 drivers/media/dvb/dvb-usb/Makefile
 
-announce DVB_USB_DIBUSB_MB - "DiBcom USB DVB-T devices (based on the DiB3000M-B) (see help for device list)"
+announce DVB_USB_DIBUSB_MB - "DiBcom USB DVB-T devices (based on the DiB3000M-B)"
 clean_blob drivers/media/dvb/dvb-usb/dibusb-mb.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIBUSB_MB'
 clean_mk CONFIG_DVB_USB_DIBUSB_MB drivers/media/dvb/dvb-usb/Makefile
 
-announce DVB_USB_DIBUSB_MC - "DiBcom USB DVB-T devices (based on the DiB3000M-C/P) (see help for device list)"
+announce DVB_USB_DIBUSB_MC - "DiBcom USB DVB-T devices (based on the DiB3000M-C/P)"
 clean_blob drivers/media/dvb/dvb-usb/dibusb-mc.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIBUSB_MC'
 clean_mk CONFIG_DVB_USB_DIBUSB_MC drivers/media/dvb/dvb-usb/Makefile
@@ -605,7 +599,7 @@ clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_AF9013'
 clean_mk CONFIG_DVB_AF9013 drivers/media/dvb/frontends/Makefile
 
 announce DVB_BCM3510 - "Broadcom BCM3510"
-undefault_firmware 'BCM3510' drivers/media/dvb/frontends/bcm3510.[ch]
+undefault_firmware 'BCM3510' drivers/media/dvb/frontends/bcm3510.c
 reject_firmware drivers/media/dvb/frontends/bcm3510.c
 reject_firmware drivers/media/dvb/frontends/bcm3510.h
 clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_BCM3510'
@@ -619,7 +613,6 @@ clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_NXT200X'
 clean_mk CONFIG_DVB_NXT200X drivers/media/dvb/frontends/Makefile
 
 announce DVB_OR51132 - "Oren OR51132 based"
-undefault_firmware 'OR51211' drivers/media/dvb/frontends/or51132.c
 reject_firmware drivers/media/dvb/frontends/or51132.c
 clean_blob drivers/media/dvb/frontends/or51132.c
 clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_OR51132'
@@ -639,6 +632,13 @@ reject_firmware drivers/media/dvb/frontends/sp8870.h
 clean_blob drivers/media/dvb/frontends/sp8870.c
 clean_kconfig drivers/media/dvb/frontends 'DVB_SP8870'
 clean_mk CONFIG_DVB_SP8870 drivers/media/dvb/frontends/Makefile
+
+announce DVB_CX24116 - "Conexant CX24116 based"
+undefault_firmware CX24116 drivers/media/dvb/frontends/cx24116.c
+reject_firmware drivers/media/dvb/frontends/cx24116.c
+clean_blob drivers/media/dvb/frontends/cx24116.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_CX24116'
+clean_mk CONFIG_DVB_CX24116 drivers/media/dvb/frontends/Makefile
 
 announce DVB_SP887X - "Spase sp887x based"
 undefault_firmware 'SP887X' drivers/media/dvb/frontends/sp887x.c
@@ -677,11 +677,17 @@ clean_blob drivers/media/dvb/ttpci/av7110_hw.c
 reject_firmware drivers/media/dvb/ttpci/av7110.c
 reject_firmware drivers/media/dvb/ttpci/av7110.c
 clean_blob drivers/media/dvb/ttpci/av7110.c
+clean_sed '
+/^config DVB_AV7110_FIRMWARE_FILE$/, /^config / {
+  /^	default.*dvb-ttpci-01/ s,".*","/*(DEBLOBBED)*/",;
+}' drivers/media/dvb/ttpci/Kconfig 'removed default firmware'
+clean_kconfig -f drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110_FIRMWARE'
 clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110'
 clean_mk CONFIG_DVB_AV7110 drivers/media/dvb/ttpci/Makefile
 
 announce DVB_BUDGET - "Budget cards"
 reject_firmware drivers/media/dvb/ttpci/budget.c
+reject_firmware drivers/media/dvb/frontends/tdhd1.h
 
 announce DVB_BUDGET_AV - "Budget cards with analog video inputs"
 reject_firmware drivers/media/dvb/ttpci/budget-av.c
@@ -1158,6 +1164,7 @@ clean_mk CONFIG_IPW2200 drivers/net/wireless/Makefile
 announce IWL3945 - "Intel PRO/Wireless 3945ABG/BG Network Connection"
 reject_firmware drivers/net/wireless/iwlwifi/iwl3945-base.c
 clean_blob drivers/net/wireless/iwlwifi/iwl3945-base.c
+clean_blob drivers/net/wireless/iwlwifi/iwl-3945.c
 clean_kconfig drivers/net/wireless/iwlwifi/Kconfig 'IWL3945'
 clean_mk CONFIG_IWL3945 drivers/net/wireless/iwlwifi/Makefile
 
@@ -1192,6 +1199,7 @@ clean_mk CONFIG_LIBERTAS_SDIO drivers/net/wireless/libertas/Makefile
 announce LIBERTAS_USB - "Marvell Libertas 8388 USB 802.11b/g cards"
 reject_firmware drivers/net/wireless/libertas/if_usb.c
 clean_blob drivers/net/wireless/libertas/if_usb.c
+clean_blob drivers/net/wireless/libertas/README
 clean_kconfig drivers/net/wireless/Kconfig 'LIBERTAS_USB'
 clean_mk CONFIG_LIBERTAS_USB drivers/net/wireless/libertas/Makefile
 
@@ -1216,6 +1224,10 @@ clean_mk CONFIG_P54_USB drivers/net/wireless/p54/Makefile
 announce PRISM54 - 'Intersil Prism GT/Duette/Indigo PCI/Cardbus'
 reject_firmware drivers/net/wireless/prism54/islpci_dev.c
 clean_blob drivers/net/wireless/prism54/islpci_dev.c
+clean_sed '
+/^config PRISM54$/,/^config /{
+  /If you enable this/,/^$/d;
+}' drivers/net/wireless/Kconfig 'removed firmware notes'
 clean_kconfig drivers/net/wireless/Kconfig 'PRISM54'
 clean_mk CONFIG_PRISM54 drivers/net/wireless/prism54/Makefile
 
@@ -1714,29 +1726,38 @@ clean_mk CONFIG_SND_AICA sound/sh/Makefile
 announce SOUND_MSNDCLAS - "Support for Turtle Beach MultiSound Classic, Tahiti, Monterey"
 clean_blob sound/oss/msnd_classic.h
 clean_kconfig sound/oss/Kconfig 'SOUND_MSNDCLAS'
+clean_sed '
+/^config MSNDCLAS_\(INIT\|PERM\)_FILE$/, /^config / {
+  /^	default.*msnd\(init\|perm\)\.bin/ s,".*","/*(DEBLOBBED)*/",;
+}' sound/oss/Kconfig 'removed default firmware'
 clean_mk CONFIG_SOUND_MSNDCLAS sound/oss/Makefile
 
 announce SOUND_MSNDPIN - "Support for Turtle Beach MultiSound Pinnacle"
 clean_blob sound/oss/msnd_pinnacle.h
 clean_kconfig sound/oss/Kconfig 'SOUND_MSNDPIN'
+clean_sed '
+/^config MSNDPIN_\(INIT\|PERM\)_FILE$/, /^config / {
+  /^	default.*pndsp\(ini\|erm\)\.bin/ s,".*","/*(DEBLOBBED)*/",;
+}' sound/oss/Kconfig 'removed default firmware'
 clean_mk CONFIG_SOUND_MSNDPIN sound/oss/Makefile
 
 announce SOUND_SSCAPE - "Ensoniq SoundScape support"
-reject_firmware sound/oss/sscape.c
 clean_blob sound/oss/sscape.c
 clean_kconfig sound/oss/Kconfig 'SOUND_SSCAPE'
 clean_mk CONFIG_SOUND_SSCAPE sound/oss/Makefile
 
 announce SOUND_TRIX - "MediaTrix AudioTrix Pro support"
-reject_firmware sound/oss/trix.c
 clean_blob sound/oss/trix.c
 clean_kconfig sound/oss/Kconfig 'SOUND_TRIX'
+clean_sed '
+/^config TRIX_BOOT_FILE$/, /^config / {
+  /^	default.*trxpro\.hex/ s,".*","/*(DEBLOBBED)*/",;
+}' sound/oss/Kconfig 'removed default firmware'
 clean_mk CONFIG_SOUND_TRIX sound/oss/Makefile
 
-announce SOUND_TRIX - "MediaTrix AudioTrix Pro support"
-announce SOUND_PAS - "ProAudioSpectrum 16 support"
+announce SOUND_TRIX - "See above,"
+announce SOUND_PAS - "ProAudioSpectrum 16 support,"
 announce SOUND_SB - "100% Sound Blaster compatibles (SB16/32/64, ESS, Jazz16) support"
-reject_firmware sound/oss/sb_common.c
 clean_blob sound/oss/sb_common.c
 clean_kconfig sound/oss/Kconfig 'SOUND_PAS'
 clean_kconfig sound/oss/Kconfig 'SOUND_SB'
@@ -1744,9 +1765,29 @@ clean_mk CONFIG_SOUND_PAS sound/oss/Makefile
 clean_mk CONFIG_SOUND_SB sound/oss/Makefile
 
 announce SOUND_PSS - "PSS (AD1848, ADSP-2115, ESC614) support"
-reject_firmware sound/oss/pss.c
 clean_blob sound/oss/pss.c
 clean_kconfig sound/oss/Kconfig 'SOUND_PSS'
+clean_sed '
+/^config PSS_BOOT_FILE$/, /^config / {
+  /^	default.*dsp001\.ld/ s,".*","/*(DEBLOBBED)*/",;
+}' sound/oss/Kconfig 'removed default firmware'
 clean_mk CONFIG_SOUND_PSS sound/oss/Makefile
+
+#################
+# Documentation #
+#################
+
+announce Documentation - "non-Free firmware scripts and documentation"
+clean_blob Documentation/dvb/avermedia.txt
+clean_blob Documentation/dvb/opera-firmware.txt
+clean_blob Documentation/dvb/ttusb-dec.txt
+clean_blob Documentation/sound/alsa/ALSA-Configuration.txt
+clean_blob Documentation/sound/oss/MultiSound
+clean_blob Documentation/sound/oss/PSS
+clean_blob Documentation/sound/oss/PSS-updates
+clean_file Documentation/dvb/get_dvb_firmware
+clean_file Documentation/video4linux/extract_xc3028.pl
+clean_blob drivers/base/Kconfig
+clean_blob firmware/WHENCE
 
 exit 0
