@@ -912,7 +912,7 @@ set_except () {
     blob '	r128_cce_load_microcode([^;]*);' drivers/gpu/drm/r128/r128_cce.c
 
     blob 'static const u32 R[S0-9]*0_cp_microcode\[\]\[2\] = {[^{};]*};\([\n][\n]*static const u32 R[S0-9]*0_cp_microcode\[\]\[2\] = {[^{};]*};\)*' drivers/gpu/drm/radeon/radeon_microcode.h
-    blob '\([/][*] Load the microcode\([^/]\|[^*][/]*\)*[*][/][\n]\)\?static void radeon_cp_load_microcode([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/gpu/drm/radeon/radeon_cp.c
+    blob '\([/][*] Load the microcode\([^/]\|[^*/][/]*\)*[*][/][\n]\)\?static void radeon_cp_load_microcode([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/gpu/drm/radeon/radeon_cp.c
     blobna 'radeon_cp_load_microcode([^;]*);' drivers/gpu/drm/radeon/radeon_cp.c
 
     blob 'sub \(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\) *{\([^}]*\|[^\n]}*\)[\n]}\([\n][\n]*sub \(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\) *{\([^}]*\|[^\n]}*\)[\n]}\)*' Documentation/dvb/get_dvb_firmware
@@ -947,7 +947,8 @@ set_except () {
 
     blob 'static u32 tigon2\?Fw\(Text\|Rodata\|Data\)\[(MAX_\(TEXT\|RODATA\|DATA\)_LEN\/4) + 1\] __devinitdata = {[^}]*};\([\n]static u32 tigon2\?Fw\(Text\|Rodata\|Data\)\[(MAX_\(TEXT\|RODATA\|DATA\)_LEN\/4) + 1\] __devinitdata = {[^}]*};\)*' drivers/net/acenic_firwmare.h
     blob '#define tigon2\?Fw[^ ]*\(Addr\|Len\) 0x[^\n]*\([\n]#define tigon2\?Fw[^ ]*\(Addr\|Len\) 0x[^\n]*\)\+' drivers/net/acenic_firmware.h
-    blob '\([/][*]\([^/]*\|[^*/][/]*\)*Do not try to clear\([^/]*\|[^*/][/]*\)*[*][/][\n]	\)\?ace_clear[^;]*;[\n]\([^}]*{[^}]*ace_copy[^}]*tigon2\?Fw[^}]*}\)*[\n]\+	return 0;[\n]}'
+    blob '\([/][*]\([^/]*\|[^*/][/]*\)*Do not try to clear\([^/]*\|[^*/][/]*\)*[*][/][\n]	\)\?ace_clear[^;]*;[\n]\([^}]*{[^}]*ace_copy[^}]*tigon2\?Fw[^}]*}\)*[\n]\+	return 0;[\n]}' drivers/net/acenic.c
+    blob 'if (\(ACE_IS_TIGON_I(ap)\|ap->version == 2\))[\n]		writel(tigon2\?FwStartAddr, [&]regs->Pc);\([\n]	if (\(ACE_IS_TIGON_I(ap)\|ap->version == 2\))[\n]		writel(tigon2\?FwStartAddr, [&]regs->Pc);\)*' drivers/net/acenic.c
 
     blob '#include "starfire_firmware\.h"' drivers/net/starfire.c
     blob '[/][*]\([^/]*\|[^*/][/]*\)*Load Rx\/Tx firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]	for ([^)]*FIRMWARE_[RT]X_SIZE[^)]*)[\n]		writel[^;]*firmware_[rt]x[^;]*;\)\+' drivers/net/starfire.c
@@ -1121,7 +1122,7 @@ set_except () {
     blobname 'ipw2100-\("\([^"\n]\|[\\][\n]\)*"\([^"]\|[\\]["]\)*\)\+' drivers/net/wireless/ipw2100.c
     blobname '__stringify(IPW2100_FW_MINOR_VERSION)' drivers/net/wireless/ipw2100.c
 
-    accept '[/][*] Call this function from process context\([^/]\|[^*][/]*\)*request_firmware' drivers/net/wireless/ipw2200.c
+    accept '[/][*] Call this function from process context\([^/]\|[^*/][/]*\)*request_firmware' drivers/net/wireless/ipw2200.c
     blobname 'ipw2200-\(i\?bss\|sniffer\)\.fw' drivers/net/wireless/ipw2200.c
     accept '		IPW_ERROR("%s request_firmware failed' drivers/net/wireless/ipw2200.c
 
@@ -1140,7 +1141,7 @@ set_except () {
     blobname 'lbtf_usb\.bin' drivers/net/wireless/libertas_tf/if_usb.c
 
     blobname 'isl38\(86\|87usb_bare\|90usb\)' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
-    blob '[/][*] for isl3886 register definitions\([^/]\|[^*][/]*\)*[*][/]' drivers/net/wireless/p54/p54usb.h
+    blob '[/][*] for isl3886 register definitions\([^/]\|[^*/][/]*\)*[*][/]' drivers/net/wireless/p54/p54usb.h
     blobna 'If you enable this\([^\n]\|[\n][ 	]*[^ 	\n]\)*isl3890\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/Kconfig
 
     blobname 'isl38\(77\|86\|90\)' drivers/net/wireless/prism54/islpci_dev.c
@@ -1232,7 +1233,7 @@ set_except () {
 
     blobname 'aica_firmware\.bin' sound/sh/aica.c
 
-    accept ' [*]\([^/]\|[^*]*[/]*\)*Caution: This API\([^/]\|[^*]*[/]*\)*request_firmware.' sound/sound_firmware.c
+    accept ' [*]\([^/]\|[^*/][/]*\)*Caution: This API\([^/]\|[^*/][/]*\)*request_firmware.' sound/sound_firmware.c
     accept 'static int do_mod_firmware_load(' sound/sound_firmware.c
     accept 'int mod_firmware_load(' sound/sound_firmware.c
     accept '	r = do_mod_firmware_load(' sound/sound_firmware.c
@@ -1280,6 +1281,7 @@ set_except () {
 
     blobname 'dvb-fe-nxt2002\.fw' drivers/media/dvb/frontends/nxt200x.c
 
+    blob '[/][*][\n] [*] This driver needs two external firmware files\([^/]\|[^*/][/]*\)*dvb-fe-or51132-\(vsb\|qam\)\.fw\([^/]\|[^*/][/]*\)*[*][/]' drivers/media/dvb/frontends/or51132.c
     blobname 'dvb-fe-or51132-\(vsb\|qam\)\.fw' drivers/media/dvb/frontends/or51132.c
 
     blobname 'dvb-fe-or51211\.fw' drivers/media/dvb/frontends/or51211.c
@@ -2098,7 +2100,7 @@ bol="\\(^\\|[\\n]\\)"
 eol="\\([\\n]\\|\$\\)"
 
 # Regular expression that matches a C-style comment.
-comment="\\([/][*]\\([^*]*\\|[*]\\+[^/*]\\)*[*]\\+[/]\\|[/][/][^\\n]*[\\n]\\)"
+comment="\\([/][*]\\([^/]\\|[^*/][/]*\\)*[*][/]\\|[/][/][^\\n]*[\\n]\\)"
 
 # Regular expression that matches comments typically used in assembly.
 asmcomment="\\($comment\\|[;#][^\\n]*[\\n]\\)"
