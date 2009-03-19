@@ -188,16 +188,26 @@ s,request\(_ihex\)\?_firmware\(_nowait\)\?,reject_firmware\2,g
 ' "$1" 'disabled non-Free firmware-loading machinery'
 }
 
+undefine_macro () {
+  #$1 - macro name
+  #$2 - substitution
+  #$3 - message
+  #rest - file names
+  macro=$1 repl=$2 msg=$3; shift 3
+  for f in "$@"; do
+    clean_sed "
+  s,^#define $macro \"[^\"]*\",/*(DEBLOBBED)*/,;
+  s,$macro,$repl,g" \
+      "$f" "$msg"
+  done
+}
+
 undefault_firmware () {
   #$1 - pattern such that $1_DEFAULT_FIRMWARE is #defined to non-Free firmware
   #$@ other than $1 - file names
   macro="$1"_DEFAULT_FIRMWARE; shift
-  for f in "$@"; do
-    clean_sed "
-  s,^#define $macro \"[^\"]*\",/*(DEBLOBBED)*/,;
-  s,$macro,\"/*(DEBLOBBED)*/\",g" \
-      "$f" "disabled non-Free firmware"
-  done
+  undefine_macro "$macro" "\"/*(DEBLOBBED)*/\"" \
+    "disabled non-Free firmware" "$@"
 }
 
 # First, check that files that contain firmwares and their
@@ -472,6 +482,8 @@ clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC2028'
 clean_mk CONFIG_MEDIA_TUNER_XC2028 drivers/media/common/tuners/Makefile
 
 announce MEDIA_TUNER_XC5000 - "Xceive XC5000 silicon tuner"
+undefine_macro 'XC5000_DEFAULT_FIRMWARE_SIZE' 0 \
+  'removed non-Free firmware size' drivers/media/common/tuners/xc5000.c
 undefault_firmware 'XC5000' drivers/media/common/tuners/xc5000.c
 reject_firmware drivers/media/common/tuners/xc5000.c
 clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC5000'
@@ -555,6 +567,7 @@ clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_GP8PSK'
 clean_mk CONFIG_DVB_USB_GP8PSK drivers/media/dvb/dvb-usb/Makefile
 
 announce DVB_USB_M920X - "Uli m920x DVB-T USB2.0 support"
+reject_firmware drivers/media/dvb/dvb-usb/m920x.c
 clean_blob drivers/media/dvb/dvb-usb/m920x.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_M920X'
 clean_mk CONFIG_DVB_USB_M920X drivers/media/dvb/dvb-usb/Makefile
@@ -624,6 +637,7 @@ clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_OR51132'
 clean_mk CONFIG_DVB_OR51132 drivers/media/dvb/frontends/Makefile
 
 announce DVB_OR51211 - "Oren OR51211 based"
+undefault_firmware 'OR51211' drivers/media/dvb/frontends/or51211.c
 reject_firmware drivers/media/dvb/frontends/or51211.c
 reject_firmware drivers/media/dvb/frontends/or51211.h
 clean_blob drivers/media/dvb/frontends/or51211.c
