@@ -434,7 +434,6 @@ clean_sed '
 	radeon_do_cleanup_cp(dev);\
 	return -EINVAL;
   }
-}
 }' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on init'
 clean_sed '
 /^static int radeon_do_resume_cp([^;]*$/,/^}$/{
