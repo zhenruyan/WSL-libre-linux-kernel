@@ -955,6 +955,7 @@ set_except () {
 
     blob 'static \(u8\|const u32\|struct fw_info\) bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)* = {[^}]*};\([\n][\n]*static \(u8\|const u32\|struct fw_info\) bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)* = {[^}]*};\)*' 'drivers/net/bnx2_fw2\?.h'
     blob '#include "bnx2_fw2\?\.h"\([\n][\n]*#include "bnx2_fw2\?\.h"\)*' drivers/net/bnx2.c
+    blob 'static void[\n]load_rv2p_fw([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}' drivers/net/bnx2.c
     blob 'static int[\n]bnx2_init_cpus([^{]*)[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}' drivers/net/bnx2.c
 
     # init_data_e1h? might actually be just data, but it doesn't
@@ -1000,7 +1001,7 @@ set_except () {
 
     blob 'static const u8 microcode\[\] = {[^}]*} *;' drivers/net/tokenring/3c359_microcode.h
     blob '#include "3c359_microcode\.h"' drivers/net/tokenring/3c359.c
-    blobna '\(printk(KERN_INFO "3C359: Uploading Microcode: ");[\n 	]*\)\?for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\([\n][ 	]*printk[^\n]*;[\n 	]*for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\)*' drivers/net/tokenring/3c359.c
+    blobna '[/][*][ 	\n*]* Now to write the microcode\([^/]\|[^*/][/]*\)*[*][/][\n 	]*start = (0xFFFF - (mc_size)[^;]*;[\n 	]*[/][*]\([^/]\|[^*/][/]*\)*[*][/][\n 	]*printk(KERN_INFO "3C359: Uploading Microcode: ");[\n 	]*for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\([\n][ 	]*printk[^\n]*;[\n 	]*for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\)*' drivers/net/tokenring/3c359.c
 
     blobname 'tr_smctr\.bin' drivers/net/tokenring/smctr.c
 
@@ -1107,20 +1108,25 @@ set_except () {
     blobname 'dvb-fe-xc5000-1\.1\.fw' drivers/media/common/tuners/xc5000.c
 
     blobname '4210\(100[12]\|%4X\)\.sb' drivers/net/irda/irda-usb.c
+    blobna '[/][*][ 	\n*]* Known firmware\([^/]\|[^*/][/]*\)*\(STIR421x\|4210\(100[12]\|%4X\)\.sb\)\([^/]\|[^*/][/]*\)*[*][/]' drivers/net/irda/irda-usb.c
 
     blobname 'myri10ge_\(rss_\)\?ethp\?_z8e\.dat' drivers/net/myri10ge.c
+    blobna 'If the driver can neither enable ECRC\([^/]\|[^*/][/]*\)*myri10ge_\(rss_\)\?ethp\?_z8e\.dat\([^/]\|[^*/][/]*\)*[*][/]' drivers/net/myri10ge.c
 
     blobname 'spider_fw\.bin' drivers/net/spider_net.h
 
     blobname 'tms380tr\.bin' drivers/net/tokenring/tms380tr.c
 
     blobname 'atmel_at76c50\(2\([de]\|_3com\)\?\|4a\?\(_2958\)\?\|6\)\(\.bin\)\?' drivers/net/wireless/atmel.c
+    accept '	*priv->firmware = \(NULL\|new_firmware\);' drivers/net/wireless/atmel.c
 
     blobname 'b43[^/]*[/]\(%s\|ucode\(5\|1[13]\)\|pcm5\|[abn]0g[01]initvals\(5\|1[13]\)\)\.fw' 'drivers/net/wireless/b43\(legacy\)\?/main.c'
 
-    blob '#define IPW2100_FW_\(\(MAJOR\|MINOR\)\(_VERSION\|(x)\)\|VERSION\) \([^\n]\|[\\][\n]\)*\([\n][\n]*#define IPW2100_FW_\(\(MAJOR\|MINOR\)\(_VERSION\|(x)\)\|VERSION\) \([^\n]\|[\\][\n]\)*\)*' drivers/net/wireless/ipw2100.c
+    blob '#define IPW2100_FW_\(\(MINOR_\)\?VERSION\|\(MAJOR\|MINOR\)(x)\)\([^\n]*\\[\n]\)*[^\n]*\([\n][\n]*#define IPW2100_FW_\(\(MINOR_\)\?VERSION\|\(MAJOR\|MINOR\)(x)\)\([^\n]*\\[\n]\)*[^\n]*\)*' drivers/net/wireless/ipw2100.c
     blobname 'ipw2100-\("\([^"\n]\|[\\][\n]\)*"\([^"]\|[\\]["]\)*\)\+' drivers/net/wireless/ipw2100.c
     blobname '__stringify(IPW2100_FW_MINOR_VERSION)' drivers/net/wireless/ipw2100.c
+    accept ' *Portions of ipw2100_\(do_\)\?mod_firmware_load[, 	]*\(ipw2100_\(do_\)\?mod_firmware_load[, 	and\n]*\)*' drivers/net/wireless/ipw2100.c
+    accept '\(static int \|	\)ipw2100_mod_firmware_load(' drivers/net/wireless/ipw2100.c
 
     accept '[/][*] Call this function from process context\([^/]\|[^*/][/]*\)*request_firmware' drivers/net/wireless/ipw2200.c
     blobname 'ipw2200-\(i\?bss\|sniffer\)\.fw' drivers/net/wireless/ipw2200.c

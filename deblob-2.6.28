@@ -667,6 +667,8 @@ clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_SP887X'
 clean_mk CONFIG_DVB_SP887X drivers/media/dvb/frontends/Makefile
 
 announce DVB_TDA10048 - "Philips TDA10048HN based"
+undefine_macro 'TDA10048_DEFAULT_FIRMWARE_SIZE' 0 \
+  'removed non-Free firmware size' drivers/media/dvb/frontends/tda10048.c
 undefault_firmware 'TDA10048' drivers/media/dvb/frontends/tda10048.c
 reject_firmware drivers/media/dvb/frontends/tda10048.c
 clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_TDA10048'
@@ -888,8 +890,8 @@ clean_sed '
 /^#include "bnx2x_init\.h"/,/^$/{
   /^$/i\
 #define bnx2x_init_block(bp, start, end) \\\
-  return printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\
-	 -EINVAL;
+  return (printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\\\
+	  -EINVAL)
 }' drivers/net/bnx2x_main.c 'report missing Free firmware'
 clean_kconfig drivers/net/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/Makefile
@@ -906,7 +908,6 @@ reject_firmware drivers/net/cxgb3/cxgb3_main.c
 clean_sed '
 /^static int ael2005_setup_\(sr\|twinax\)_edc([^;]*$/,/^}$/{
   /for.*ARRAY_SIZE(\(sr\|twinax\)_edc)/i\
-}\
 	CH_ERR(phy->adapter, "Missing Free firwmare\\n");\
 	err = -EINVAL;
 }' drivers/net/cxgb3/ael1002.c 'report missing Free firmware'
@@ -1099,7 +1100,7 @@ announce 3C359 - "3Com 3C359 Token Link Velocity XL adapter"
 clean_file drivers/net/tokenring/3c359_microcode.h
 clean_sed '
 /^\(static int \)\?xl_hw_reset([^;]*$/,/^}/{
-  /printk.*Uploading Microcode/i\
+  /start = .*mc_size/i\
 		printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\
 		return -EINVAL;
 }' drivers/net/tokenring/3c359.c 'report missing Free firmware'
