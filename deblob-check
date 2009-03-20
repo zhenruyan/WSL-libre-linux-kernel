@@ -1001,7 +1001,7 @@ set_except () {
 
     blob 'static const u8 microcode\[\] = {[^}]*} *;' drivers/net/tokenring/3c359_microcode.h
     blob '#include "3c359_microcode\.h"' drivers/net/tokenring/3c359.c
-    blobna '[/][*][ 	\n*]* Now to write the microcode\([^/]\|[^*/][/]*\)*[*][/][\n 	]*start = (0xFFFF - (mc_size)[^;]*;[\n 	]*[/][*]\([^/]\|[^*/][/]*\)*[*][/][\n 	]*printk(KERN_INFO "3C359: Uploading Microcode: ");[\n 	]*for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\([\n][ 	]*printk[^\n]*;[\n 	]*for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\)*' drivers/net/tokenring/3c359.c
+    blobna 'start = (0xFFFF - (mc_size)[^;]*;[\n 	]*[/][*]\([^/]\|[^*/][/]*\)*[*][/][\n 	]*printk(KERN_INFO "3C359: Uploading Microcode: ");[\n 	]*for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\([\n][ 	]*printk[^\n]*;[\n 	]*for ([^{]*\(mc_size[^{]*) {[^}]*writeb(microcode\[\|) {[^}]*writeb(microcode\[mc_size\)[^}]*}\)*' drivers/net/tokenring/3c359.c
 
     blobname 'tr_smctr\.bin' drivers/net/tokenring/smctr.c
 
@@ -1127,8 +1127,9 @@ set_except () {
     blobname 'ipw2100-\("\([^"\n]\|[\\][\n]\)*"\([^"]\|[\\]["]\)*\)\+' drivers/net/wireless/ipw2100.c
     blobname '__stringify(IPW2100_FW_MINOR_VERSION)' drivers/net/wireless/ipw2100.c
     accept ' *Portions of ipw2100_\(do_\)\?mod_firmware_load[, 	]*\(ipw2100_\(do_\)\?mod_firmware_load[, 	and\n]*\)*' drivers/net/wireless/ipw2100.c
-    blob 'static int ipw2100_mod_firmware_load([^{]*)[\n]{\([^}]\|[^\n]}*\)*[\n]}' drivers/net/wireless/ipw2100.c
-    blob 'ipw2100_mod_firmware_load([^;]*);' drivers/net/wireless/ipw2100.c
+    accept '	ipw2100_mod_firmware_load(fw);' drivers/net/wireless/ipw2100.c
+    accept 'static int ipw2100_mod_firmware_load(' drivers/net/wireless/ipw2100.c
+    blobna 'if (IPW2100_FW_MAJOR[^{]*{[^}]*	}' drivers/net/wireless/ipw2100.c
 
     accept '[/][*] Call this function from process context\([^/]\|[^*/][/]*\)*request_firmware' drivers/net/wireless/ipw2200.c
     blobname 'ipw2200-\(i\?bss\|sniffer\)\.fw' drivers/net/wireless/ipw2200.c
@@ -1141,7 +1142,7 @@ set_except () {
     blobname 'sd\(8385\|8686\)\(_helper\)\?\.bin' drivers/net/wireless/libertas/if_sdio.c
     accept '	*card->firmware = \(if_sdio\|lbs_fw\)' drivers/net/wireless/libertas/if_sdio.c
     blobname 'usb8388\(-5\.126\.0\.p5\)\?\.bin' drivers/net/wireless/libertas/if_usb.c
-    blobname '[/][*]\([^/]\|[^*/][/]*\)*usb8388\(-5\.126\.0\.p5\)\?\.bin[/][*]\([^/]\|[^*/][/]*\)*' drivers/net/wireless/libertas/if_usb.c
+    blob '[/][*]\([^/]\|[^*/][/]*\)*usb8388\(-5\.126\.0\.p5\)\?\.bin\([^/]\|[^*/][/]*\)*[*][/]' drivers/net/wireless/libertas/if_usb.c
     accept '		lbs_pr_err("request_firmware() failed' drivers/net/wireless/if_usb.c
     blobna 'o\. Copy the firmware image[^\n]*usb8388\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/libertas/README
     blobna '\[fw_name=usb8388[^]]*\]' drivers/net/wireless/libertas/README
