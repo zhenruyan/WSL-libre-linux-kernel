@@ -1788,6 +1788,7 @@ clean_mk CONFIG_SOUND_PAS sound/oss/Makefile
 clean_mk CONFIG_SOUND_SB sound/oss/Makefile
 
 announce SOUND_PSS - "PSS (AD1848, ADSP-2115, ESC614) support"
+clean_sed 's,^\( [*] .*synth"\)\.$,\1/*.,' sound/oss/pss.c 'avoid nested comments'
 clean_blob sound/oss/pss.c
 clean_kconfig sound/oss/Kconfig 'SOUND_PSS'
 clean_sed '

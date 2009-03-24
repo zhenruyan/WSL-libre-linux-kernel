@@ -1289,7 +1289,11 @@ set_except () {
 
     blob 'When the module is loaded\([^\n]\|[\n][^\n]\)*[/]pss_synth\([^\n]\|[\n][^\n]\)*' Documentation/sound/oss/PSS
     blob 'pss_firmware[ \n	]*This parameter\([^\n]\|[\n][^\n]\)*[/]pss_synth\([^\n]\|[\n][^\n]\)*' Documentation/sound/oss/PSS-updates
-    accept '		pss_synthLen = mod_firmware_load(pss_firmware' sound/oss/pss.c
+    accept '		pss_synthLen = mod_firmware_load(pss_firmware, (void [*]) [&]pss_synth);' sound/oss/pss.c
+    accept '	*if \?(\(!\|fw_load [&][&] \)\?pss_synth' sound/oss/pss.c
+    accept '	*if (!pss_download_boot(devc, pss_synth, pss_synthLen,' sound/oss/pss.c
+    accept '	*vfree(pss_synth);' sound/oss/pss.c
+    blob 'to allow the user \([^/"]\|[^*"][/]*\)*fir[em]ware file\([^/"]\|[^*"][/]*\)*"[^"]*"' sound/oss/pss.c
     blobname '\([/]etc[/]sound[/]\)\?pss_synth' sound/oss/pss.c
     accept '	\$(obj)[/]bin2hex pss_synth' sound/oss/Makefile
     accept '	 *echo '"'"'static \(unsigned char [*] *\|int \)pss_synth\(Len\)\? = \(NULL\|0\);' sound/oss/Makefile
