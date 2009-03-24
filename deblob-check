@@ -1283,7 +1283,7 @@ set_except () {
     accept '		trix_boot_len = mod_firmware_load(' sound/oss/trix.c
     blobname '\([/]etc[/]sound[/]\)\?trxpro\.bin' sound/oss/trix.c
 
-    accept '		smw_ucodeLen = mod_firwmare_load(' sound/oss/sb_common.c
+    accept '		smw_ucodeLen = mod_firmware_load(' sound/oss/sb_common.c
     blobname '\([/]etc[/]sound[/]\)\?midi0001\.bin' sound/oss/sb_common.c
     blobname '\([/]etc[/]sound[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/Kconfig
 
