@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-03-19
+# deblob-check version 2009-03-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -226,6 +226,25 @@
 case ${LANG+set} in set) LANG=C; export LANG;; esac
 
 rm="rm -f"
+
+for echo in 'echo' 'printf %s\n'; do
+  case `$echo '\nx'` in 
+  '\nx') break;;
+  esac
+done
+case `$echo '\nx'` in 
+'\nx') ;; *) echo Cannot find out what echo to use >&2; exit 1;;
+esac
+
+for echo_n in "echo -n" "printf %s"; do
+  case `$echo_n '\na'; $echo_n '\nb'` in 
+  '\na\nb') break;;
+  esac
+done
+case `$echo_n a; $echo_n b` in 
+'ab') ;; *) echo Cannot find out an echo -n equivalent to use >&2; exit 1;;
+esac
+
 case $1 in
 --save-scripts | -S)
   shift
@@ -2183,7 +2202,7 @@ g;
 
   sedmain="
 /^$/N;
-/^[\n]\?;[/][*]\\(end .*\\)\\?[*][/];$/{
+/^[\\n]\\?;[/][*]\\(end .*\\)\\?[*][/];$/{
   $4;
   d;
 }
@@ -2211,7 +2230,7 @@ H;
 g;
 $4
 $v:read all
-s/^\\(;[/][*]begin [^\n]*[\\n]\\)*//;
+s/^\\(;[/][*]begin [^\\n]*[\\n]\\)*//;
 s/\\($bol[\n]\?;[/][*]\\(end [^\\n]*\\)\\?[*][/];\\)*$//;
 $v:???!blobfast
 /$blobfast/!b clean;
@@ -2742,7 +2761,7 @@ check () {
   # falsepos matches to files that match it.
   addx () {
     if test -n "$1"; then
-      echo -n "\\|$1" >> $falsepos_name
+      $echo_n "\\|$1" >> $falsepos_name
     fi
   }
 
@@ -2751,7 +2770,7 @@ check () {
   # the falseneg matches to files that match it.
   badx () {
     if test -n "$1"; then
-      echo -n "\\|$1" >> $falseneg_name
+      $echo_n "\\|$1" >> $falseneg_name
     fi
   }
 
@@ -2819,10 +2838,10 @@ check () {
   esac
 
   # Then run through the selected action.
-  if test "$rm" != "rm -f" || test ! `echo "$sedmain" | wc -c` -lt 1024; then
+  if test "$rm" != "rm -f" || test ! `$echo "$sedmain" | wc -c` -lt 1024; then
     scriptname=`mktemp -t deblob-check-sedmain-XXXXXX`
     tempfiles="$tempfiles $scriptname"
-    echo "$sedmain" > $scriptname
+    $echo "$sedmain" > $scriptname
     cmd="sed -n -f \"$scriptname\""
   else
     cmd='sed -n "$sedmain"'
