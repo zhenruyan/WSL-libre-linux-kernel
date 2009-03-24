@@ -866,6 +866,7 @@ set_except () {
     accept 'There is an USB interface for downloading[/]uploading.*request_firmware interface\.' Documentation/video4linux/si470x.txt
     accept '[\t]- move firmware loading to request_firmware()' drivers/staging/slicoss/README
     accept 'config FIRMWARE_IN_KERNEL.*let firmware be loaded from userspace\.' drivers/base/Kconfig
+    accept '[	 ]*and request_firmware() in the source' drivers/base/Kconfig
     accept 'static int[\n]_request_firmware(const struct firmware \*\*firmware_p, const char \*name,[^{]*[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/base/firmware_class.c
     accept 'static int[\n]request_firmware_work_func(void \*arg)[\n]{[\n]\([^}]\|[^\n}]}*\)*ret = _request_firmware(\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/base/firmware_class.c
     accept '[/][*][*][\n] [*] request_firmware: - send firmware [^{]*[\n]{[\n]\([^}]\|[^\n}]}*\)*[\n]}[\n]' drivers/base/firmware_class.c
@@ -1283,7 +1284,8 @@ set_except () {
     blobname '\([/]etc[/]sound[/]\)\?trxpro\.bin' sound/oss/trix.c
 
     accept '		smw_ucodeLen = mod_firwmare_load(' sound/oss/sb_common.c
-    blobname '\([/]etc[/]sound[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/sb_common.c
+    blobname '\([/]etc[/]sound[/]\)\?midi0001\.bin' sound/oss/sb_common.c
+    blobname '\([/]etc[/]sound[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/Kconfig
 
     blob 'When the module is loaded\([^\n]\|[\n][^\n]\)*[/]pss_synth\([^\n]\|[\n][^\n]\)*' Documentation/sound/oss/PSS
     blob 'pss_firmware[ \n	]*This parameter\([^\n]\|[\n][^\n]\)*[/]pss_synth\([^\n]\|[\n][^\n]\)*' Documentation/sound/oss/PSS-updates

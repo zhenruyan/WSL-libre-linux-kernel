@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.28 extra=1
+kver=2.6.28 extra=1++
 
 fatal () {
   echo "$@"
@@ -1810,7 +1810,7 @@ clean_blob Documentation/sound/oss/PSS
 clean_blob Documentation/sound/oss/PSS-updates
 clean_file Documentation/dvb/get_dvb_firmware
 clean_file Documentation/video4linux/extract_xc3028.pl
-clean_blob drivers/base/Kconfig
+clean_sed s,usb8388,whatever,g drivers/base/Kconfig 'removed blob name'
 clean_blob firmware/WHENCE
 
 exit 0
