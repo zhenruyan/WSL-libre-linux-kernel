@@ -1277,7 +1277,7 @@ set_except () {
     blobname '\([/]etc[/]sound[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/msnd_classic.h
     blobna '\(Important Notes - Read Before Using\|Obtaining and Creating Firmware Files\)[\n]#  ~*\([^\n]\|[\n]# *\([\n]# *\([\n]# *For the[^\n]*[\n]# *~*[\n]\)\?\)\?[^\n ]\)*\.' Documentation/sound/oss/MultiSound
 
-    accept '	len = mod_firmware_load(fn, [&]data);[\n]	if [^{]* {[\n]		printk(KERN_ERR "sscape:' sound/oss/sscape.c
+    accept '	len = mod_firmware_load(fn, [&]data);[\n]	if [^{]* {[\n]	[	 ]*printk(KERN_ERR "sscape:' sound/oss/sscape.c
     blobname '[/]sndscape[/]scope\.co[dx]' sound/oss/sscape.c
 
     accept '		trix_boot_len = mod_firmware_load(' sound/oss/trix.c
