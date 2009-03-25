@@ -1159,6 +1159,7 @@ set_except () {
     accept '	 [*] request_firmware() is synchronous' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\)\.c'
 
     blobname 'libertas_cs\(_helper\)\?\.fw' drivers/net/wireless/libertas/if_cs.c
+    blob 'sd\(8385\|8686\)_helper\.bin",[\n]		\.firmware = "sd\(8385\|8686\)\.bin' drivers/net/wireless/libertas/if_sdio.c
     blobname 'sd\(8385\|8686\)\(_helper\)\?\.bin' drivers/net/wireless/libertas/if_sdio.c
     accept '	*card->firmware = \(if_sdio\|lbs_fw\)' drivers/net/wireless/libertas/if_sdio.c
     blobname 'usb8388\(-5\.126\.0\.p5\)\?\.bin' drivers/net/wireless/libertas/if_usb.c
@@ -1216,6 +1217,8 @@ set_except () {
 
     blobname 'atmel_at76c50\(3-\(i386[13]\|rfmd\(-acc\)\?\)\|5\(a\(mx\)\?\)\?-rfmd\(2958\)\?\)\.bin' 'drivers/\(staging\|net/wireless\)/at76_usb/at76_usb\.c'
 
+    accept 'static struct go7007_usb_board board_\(matrix_\(ii\|reload\|revolution\)\|star_trek\|px_tv402u\|xmen\|lifeview_lr192\|endura\|adlink_mpg24\) = {[\n]\(	\.flags[ 	]*= [^",]*,[\n]*\)*	\.main_info[ 	]*= {[\n]		\.firmware[ 	]*= ' drivers/media/dvb/dvb-usb/go7007-usb.c
+    accept 'static struct go7007_board_info board_voyager = {[\n]	\.firmware[	 ]*= ' drivers/staging/go7007/saa7134-go7007.c
     blobname 'go7007\(fw\|tv\)\.bin' 'drivers/staging/go7007/\(go7007-\(driver\|usb\)\|saa7134-go7007\)\.c'
 
     blobname 'cxacru-\(%s\|fw\|bp\|cf\)\.bin' drivers/usb/atm/cxacru.c
@@ -1303,10 +1306,13 @@ set_except () {
     accept '[	 ]*"request_firmware \(fatal error\|unable to locate\|: Failed to find\)' drivers/media/video/pvrusb2/pvrusb2-hdw.c
     accept ' [*] NOTE : the pointer to the firmware data given by request_firmware()' drivers/media/video/pvrusb2-hdw.c
 
+    accept 'static struct dvb_usb_device_properties dw210[24]_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/dw2102.c
     blobname 'dvb-usb-dw210[24]\.fw' drivers/media/dvb/dvb-usb/dw2102.c
 
-    blobname 'dvb-usb-gp8psk-02\.fw' drivers/media/dvb/dvb-usb/gp8psk.c
+    accept 'static struct dvb_usb_device_properties gp8psk_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/gp8psk.c
+    blobname 'dvb-usb-gp8psk-0[12]\.fw' drivers/media/dvb/dvb-usb/gp8psk.c
 
+    accept 'static struct dvb_usb_device_properties opera1_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/nova-t-usb2.c
     blobname 'dvb-usb-opera-\(fpga-\)\?-01\.fw' drivers/media/dvb/dvb-usb/opera1.c
 
     blobname 'dvb-fe-af9013\.fw' drivers/media/dvb/frontends/af9013_priv.h
@@ -1351,34 +1357,49 @@ set_except () {
 
     blobname 'drx397xD\.\(A2\|B1\)\.fw' drivers/media/dvb/frontends/drx397xD_fw.h
 
+    accept '#define DIB0700_DEFAULT_DEVICE_PROPERTIES \\[\n]\(	\.\(caps\|usb_ctrl\) *= [^\n",]*, \\[\n]\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/dib0700_devices.c
     blobname 'dvb-usb-dib0700-1\.20\.fw' drivers/media/dvb/dvb-usb/dib0700_devices.c
 
+    accept 'static struct dvb_usb_device_properties nova_t_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/nova-t-usb2.c
     blobname 'dvb-usb-nova-t-usb2-02\.fw' drivers/media/dvb/dvb-usb/nova-t-usb2.c
 
+    accept 'static struct dvb_usb_device_properties umt_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/umt-010.c
     blobname 'dvb-usb-umt-010-02\.fw' drivers/media/dvb/dvb-usb/umt-010.c
 
+    accept 'static struct dvb_usb_device_properties ttusb2_properties\(_s2400\)\? = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/ttusb2.c
     blobname 'dvb-usb-\(pctv-400e\|tt-s2400\)-01\.fw' drivers/media/dvb/dvb-usb/ttusb2.c
 
+    accept 'static struct dvb_usb_device_properties cxusb_bluebird_\(lgh064f\|dee1601\|lgz201\|dtt7579\|nano2_needsfirmware\)_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/cxusb.c
     blobname 'dvb-usb-bluebird-0[12]\.fw' drivers/media/dvb/dvb-usb/cxusb.c
 
+    accept 'static struct dvb_usb_device_properties \(dtt200u\|wt220u\(_\(fc\|zl0353\|miglia\)\)\?\)_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/dtt200u.c
     blobname 'dvb-usb-\(dtt200u-01\|wt220u-\(02\|fc03\|\(zl0353\|miglia\)-01\)\)\.fw' drivers/media/dvb/dvb-usb/dtt200u.c
 
+    accept 'static struct dvb_usb_device_properties vp7045_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/vp7045.c
     blobname 'dvb-usb-vp7045-01\.fw' drivers/media/dvb/dvb-usb/vp7045.c
 
+    accept 'static struct dvb_usb_device_properties \(dibusb\(1_1\(_an2235\)\?\|2_0b\)\|artec_t1_usb2\)_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/dibusb-mb.c
     blobname 'dvb-usb-\(dibusb-\(5\.0\.0\.11\|an2235-01\|6\.0\.0\.8\)\|adstech-usb2-02\)\.fw' drivers/media/dvb/dvb-usb/dibusb-mb.c
 
+    accept 'static struct dvb_usb_device_properties a800_properties = {[\n]\(	\.\(caps\|usb_ctrl\) = [^",]*,[\n]*\)*	\.firmware = ' drivers/media/dvb/dvb-usb/a800.c
     blobname 'dvb-usb-avertv-a800-02\.fw' drivers/media/dvb/dvb-usb/a800.c
 
+    accept 'static struct dvb_usb_device_properties af9005_properties = {[\n]\(	\.\(caps\|usb_ctrl\) = [^",]*,[\n]*\)*	\.firmware = ' drivers/media/dvb/dvb-usb/af9005.c
     blobname 'af9005\.fw' drivers/media/dvb/dvb-usb/af9005.c
 
+    accept '		.download_firmware = af9015_download_firmware,[\n]		\.firmware = ' drivers/media/dvb/dvb-usb/af9015.c
     blobname 'dvb-usb-af9015\.fw' drivers/media/dvb/dvb-usb/af9015.c
 
+    accept 'static struct dvb_usb_device_properties dibusb_mc_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/dibusb-mc.c
     blobname 'dvb-usb-dibusb-6\.0\.0\.8\.fw' drivers/media/dvb/dvb-usb/dibusb-mc.c
 
+    accept 'static struct dvb_usb_device_properties \(megasky\|digivox_mini_ii\|tvwalkertwin\|dposh\)_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/m920x.c
     blobname 'dvb-usb-\(\(megasky\|digivox\)-02\|tvwalkert\|dposh-01\)\.fw' drivers/media/dvb/dvb-usb/m920x.c
 
+    accept 'static struct dvb_usb_device_properties vp702x_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/vp702x.c
     blobname 'dvb-usb-vp702x-02\.fw' drivers/media/dvb/dvb-usb/vp702x.c
 
+    accept 'static struct dvb_usb_device_properties digitv_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/digitv.c
     blobname 'dvb-usb-digitv-02\.fw' drivers/media/dvb/dvb-usb/digitv.c
 
     blob 'Driver: \(korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|tu_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\) --* \([^\n]\|[\n]*[^\n\-]\)*\([\n][\n]--*[\n][\n]Driver: \(korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|tu_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\) --* \([^\n]\|[\n]*[^\n\-]\)*\)*' firmware/WHENCE
