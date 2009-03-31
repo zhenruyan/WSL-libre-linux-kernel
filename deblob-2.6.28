@@ -728,6 +728,7 @@ reject_firmware drivers/media/dvb/siano/smscoreapi.c
 reject_firmware drivers/media/dvb/siano/smsusb.c
 clean_blob drivers/media/dvb/siano/smscoreapi.c
 clean_blob drivers/media/dvb/siano/smsusb.c
+clean_blob drivers/media/dvb/siano/sms-cards.c
 clean_kconfig drivers/media/dvb/siano/Kconfig 'DVB_SIANO_SMS1XXX'
 clean_mk CONFIG_DVB_SIANO_SMS1XXX drivers/media/dvb/siano/Makefile
 
