@@ -111,9 +111,9 @@ clean_blob () {
 dummy_blob () {
 	#$1 = filename
 	if test -f $1; then
-	    fatal $1 exists, something is wrong
+	    die $1 exists, something is wrong
 	elif test ! -f firmware/Makefile; then
-	    fatal firmware/Makefile does not exist, something is wrong
+	    die firmware/Makefile does not exist, something is wrong
 	fi
 
 	clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
@@ -123,9 +123,9 @@ dummy_blob () {
 clean_fw () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
-		fatal $1 does not exist, something is wrong
+		die $1 does not exist, something is wrong
 	elif test -f $2; then
-		fatal $2 exists, something is wrong
+		die $2 exists, something is wrong
 	fi
 	clean_blob $1 -s 4
 	dummy_blob $2
@@ -134,9 +134,9 @@ clean_fw () {
 drop_fw_file () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
-		fatal $1 does not exist, something is wrong
+		die $1 does not exist, something is wrong
 	elif test -f $2; then
-		fatal $2 exists, something is wrong
+		die $2 exists, something is wrong
 	fi
 	clean_file $1
 	dummy_blob $2
