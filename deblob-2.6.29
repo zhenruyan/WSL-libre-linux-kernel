@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.29 extra=
+kver=2.6.29 extra=++
 
 fatal () {
   echo "$@"
@@ -609,9 +609,10 @@ clean_mk CONFIG_DVB_USB_VP7045 drivers/media/dvb/dvb-usb/Makefile
 # dvb/frontends
 
 announce DVB_AF9013 - "Afatech AF9013 demodulator"
-undefault_firmware 'AF9013' drivers/media/dvb/frontends/af9013.c
+undefault_firmware 'AF9013' \
+  drivers/media/dvb/frontends/af9013.c \
+  drivers/media/dvb/frontends/af9013_priv.h
 reject_firmware drivers/media/dvb/frontends/af9013.c
-clean_blob drivers/media/dvb/frontends/af9013_priv.h
 clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_AF9013'
 clean_mk CONFIG_DVB_AF9013 drivers/media/dvb/frontends/Makefile
 
