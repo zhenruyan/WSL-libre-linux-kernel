@@ -1,7 +1,7 @@
 #!/bin/sh
 
-#    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2008, 2009 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008 Jeff Moe
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,27 +44,42 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.27 extra=++
+kver=2.6.27 extra=1
+
+fatal () {
+  echo "$@"
+  exit 1
+}
 
 case $1 in
---force) die () { echo ERROR: "$@": ignored >&2; }; shift;;
-*) die () { echo "$@" >&2; exit 1; };;
+--force) die () { echo ERROR: "$@": ignored >&2; }; forced=:; shift;;
+*) die () { fatal "$@"; }; forced=false;;
 esac
 
-check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
+check=`echo "$0" | sed 's,[^/]*$,,;s,^$,.,;s,/*$,,'`/deblob-check
 if [ ! -f $check ] ; then
-  echo optional deblob-check missing, will remove entire files >&2
+  if $forced; then
+    die deblob-check script missing, will remove entire files
+  else
+    die deblob-check script missing
+  fi
   have_check=false
 else
   have_check=:
 fi
+
+announce () {
+	echo
+	echo "$@"
+}
 
 clean_file () {
 	#$1 = filename
 	if test ! -f $1; then
 		die $1 does not exist, something is wrong
 	fi
-	rm -v $1
+	rm $1
+	echo $1: removed
 }
 
 check_changed () {
@@ -83,10 +98,10 @@ clean_blob () {
 		die $1 does not exist, something is wrong
 	    fi
 	    name=$1
-	    echo Removing blobs from $name
 	    set fnord "$@" -d
 	    shift 2
 	    $check "$@" -i linux-$kver $name > $name.deblob
+	    echo $name: removed blobs
 	    check_changed $name
 	else
 	    clean_file $1
@@ -96,36 +111,53 @@ clean_blob () {
 dummy_blob () {
 	#$1 = filename
 	if test -f $1; then
-	    echo $1 exists, something is wrong >&2
-	    exit 1
+	    fatal $1 exists, something is wrong
 	elif test ! -f firmware/Makefile; then
-	    echo firmware/Makefile does not exist, something is wrong >&2
-	    exit 1
+	    fatal firmware/Makefile does not exist, something is wrong
 	fi
 
-	sed -i "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
-	  firmware/Makefile
+	clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
+	  firmware/Makefile "dropped $1"
 }
 
 clean_fw () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
-		echo $1 does not exist, something is wrong >&2
-		exit 1
+		fatal $1 does not exist, something is wrong
 	elif test -f $2; then
-		echo $2 exists, something is wrong >&2
-		exit 1
+		fatal $2 exists, something is wrong
 	fi
 	clean_blob $1 -s 4
 	dummy_blob $2
 }
 
+drop_fw_file () {
+	#$1 = firmware text input, $2 = firmware output
+	if test ! -f $1; then
+		fatal $1 does not exist, something is wrong
+	elif test -f $2; then
+		fatal $2 exists, something is wrong
+	fi
+	clean_file $1
+	dummy_blob $2
+}
+
 clean_kconfig () {
         #$1 = filename $2 = things to remove
-        echo Marking config $2 as depending on NONFREE in $1
+	case $1 in
+	-f)
+		shift
+		;;
+	*)
+		if $have_check; then
+			return
+		fi
+		;;
+	esac
 	sed "/^config \\($2\\)\$/{p;i\
 	depends on NONFREE
 d;}" $1 > $1.deblob
+	echo $1: marked config $2 as depending on NONFREE
 	check_changed $1
 }
 
@@ -133,6 +165,7 @@ clean_mk () {
 	#$1 = config $2 = Makefile name
 	# We don't clean up Makefiles any more --lxoliva
 	# sed -i "/\\($1\\)/d" $2
+	# echo $2: removed $1 support
 	# check_changed $2
 	if sed -n "/\\($1\\)/p" $2 | grep . > /dev/null; then
 	    :
@@ -141,7 +174,41 @@ clean_mk () {
 	fi
 }
 
+clean_sed () {
+	#$1 = sed-script $2 = file $3 = comment
+	sed -e "$1" "$2" > "$2".deblob
+	echo $2: ${3-applied sed script $1}
+	check_changed "$2"
+}
 
+reject_firmware () {
+	#$1 = file
+	clean_sed '
+s,request\(_ihex\)\?_firmware\(_nowait\)\?,reject_firmware\2,g
+' "$1" 'disabled non-Free firmware-loading machinery'
+}
+
+undefine_macro () {
+  #$1 - macro name
+  #$2 - substitution
+  #$3 - message
+  #rest - file names
+  macro=$1 repl=$2 msg=$3; shift 3
+  for f in "$@"; do
+    clean_sed "
+  s,^#define $macro .*\$,/*(DEBLOBBED)*/,;
+  s,$macro,$repl,g;
+" "$f" "$msg"
+  done
+}
+
+undefault_firmware () {
+  #$1 - pattern such that $1_DEFAULT_FIRMWARE is #defined to non-Free firmware
+  #$@ other than $1 - file names
+  macro="$1"_DEFAULT_FIRMWARE; shift
+  undefine_macro "$macro" "\"/*(DEBLOBBED)*/\"" \
+    "disabled non-Free firmware" "$@"
+}
 
 # First, check that files that contain firmwares and their
 # corresponding sources are present.
@@ -177,7 +244,7 @@ for f in \
     firmware/keyspan_pda/keyspan_pda.S \
   firmware/keyspan_pda/xircom_pgs.HEX \
     firmware/keyspan_pda/xircom_pgs.S \
-  sound/pci/cs46xx/imgs/cwcbinhack.h \
+  sound/pci/cs46xx/imgs/cwcdma.h \
     sound/pci/cs46xx/imgs/cwcdma.asp \
 ; do
   if test ! $f; then
@@ -186,542 +253,1511 @@ for f in \
 done
 
 # Identify the tarball.
-sed -i "s,^EXTRAVERSION.*,&-libre$extra," Makefile
+clean_sed "
+s,^EXTRAVERSION.*,&-libre$extra,
+" Makefile 'added -libre to EXTRAVERSION'
 
-#######################
-# Removed ATM Drivers #
-#######################
+# Add reject_firmware and maybe_reject_firmware
+clean_sed '
+$i\
+#ifndef _LINUX_LIBRE_FIRMWARE_H\
+#define _LINUX_LIBRE_FIRMWARE_H\
+\
+#include <linux/device.h>\
+\
+#define NONFREE_FIRMWARE "/*(DEBLOBBED)*/"\
+\
+static inline int\
+report_missing_free_firmware(const char *name, const char *what)\
+{\
+	printk(KERN_ERR "%s: Missing Free %s\\n", name,\
+	       what ? what : "firmware");\
+	return -EINVAL;\
+}\
+static inline int\
+reject_firmware(const struct firmware **fw,\
+		const char *name, struct device *device)\
+{\
+	const struct firmware *xfw = NULL;\
+	int retval;\
+	report_missing_free_firmware(dev_name(device), NULL);\
+	retval = request_firmware(&xfw, NONFREE_FIRMWARE, device);\
+	if (!retval)\
+		release_firmware(xfw);\
+	return -EINVAL;\
+}\
+static inline int\
+maybe_reject_firmware(const struct firmware **fw,\
+		      const char *name, struct device *device)\
+{\
+	if (strstr (name, NONFREE_FIRMWARE))\
+		return reject_firmware(fw, name, device);\
+	else\
+		return request_firmware(fw, name, device);\
+}\
+static inline void\
+discard_rejected_firmware(const struct firmware *fw, void *context)\
+{\
+	release_firmware(fw);\
+}\
+static inline int\
+reject_firmware_nowait(struct module *module, int uevent,\
+		       const char *name, struct device *device,\
+		       void *context,\
+		       void (*cont)(const struct firmware *fw,\
+				    void *context))\
+{\
+	int retval;\
+	report_missing_free_firmware(dev_name(device), NULL);\
+	retval = request_firmware_nowait(module, uevent, NONFREE_FIRMWARE,\
+					 device, NULL,\
+					 discard_rejected_firmware);\
+	if (retval)\
+		return retval;\
+	return -EINVAL;\
+}\
+static inline int\
+maybe_reject_firmware_nowait(struct module *module, int uevent,\
+			     const char *name, struct device *device,\
+			     void *context,\
+			     void (*cont)(const struct firmware *fw,\
+					  void *context))\
+{\
+	if (strstr (name, NONFREE_FIRMWARE))\
+		return reject_firmware_nowait(module, uevent, name,\
+					      device, context, cont);\
+	else\
+		return request_firmware_nowait(module, uevent, name,\
+					       device, context, cont);\
+}\
+\
+#endif /* _LINUX_LIBRE_FIRMWARE_H */\
+' include/linux/firmware.h 'added non-Free firmware notification support'
 
-# ATM_AMBASSADOR -  Madge Ambassador (Collage PCI 155 Server)
+########
+# Arch #
+########
+
+# x86
+
+announce MICROCODE - "Intel IA32 CPU microcode support"
+reject_firmware arch/x86/kernel/microcode.c
+clean_blob arch/x86/kernel/microcode.c
+clean_kconfig arch/x86/Kconfig 'MICROCODE'
+clean_mk CONFIG_MICROCODE arch/x86/kernel/Makefile
+
+# arm
+
+announce IXP4XX_NPE - "IXP4xx Network Processor Engine support"
+reject_firmware arch/arm/mach-ixp4xx/ixp4xx_npe.c
+clean_blob Documentation/arm/IXP4xx
+
+announce ARCH_NETX - "Hilscher NetX based"
+clean_sed '
+s,\([" ]\)request_firmware(,\1reject_firmware(,
+' arch/arm/mach-netx/xc.c 'disabled non-Free firmware-loading machinery'
+clean_blob arch/arm/mach-netx/xc.c
+clean_kconfig arch/arm/Kconfig 'ARCH_NETX'
+clean_mk CONFIG_ARCH_NETX arch/arm/Makefile
+
+
+#######
+# ATM #
+#######
+
+announce ATM_AMBASSADOR - "Madge Ambassador, Collage PCI 155 Server"
+reject_firmware drivers/atm/ambassador.c
+clean_blob drivers/atm/ambassador.c
 clean_fw firmware/atmsar11.HEX firmware/atmsar11.fw
 clean_kconfig drivers/atm/Kconfig 'ATM_AMBASSADOR'
 clean_mk CONFIG_ATM_AMBASSADOR drivers/atm/Makefile
 
-# ATM_FORE200E_PCA
-# ATM_FORE200E_SBA - SBA-200E
-clean_kconfig drivers/atm/Kconfig 'ATM_FORE.*'
+announce ATM_FORE200E - "FORE Systems 200E-series"
+reject_firmware drivers/atm/fore200e.c
+clean_blob drivers/atm/fore200e.c
+clean_blob Documentation/networking/fore200e.txt
+clean_kconfig drivers/atm/Kconfig 'ATM_FORE200E'
 clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 
 
-########################
-# Removed char Drivers #
-########################
+########
+# char #
+########
 
-# COMPUTONE - Computone IntelliPort Plus serial
-clean_file firmware/intelliport2.bin.ihex
-dummy_blob firmware/intelliport2.bin
+announce COMPUTONE - "Computone IntelliPort Plus serial"
+drop_fw_file firmware/intelliport2.bin.ihex firmware/intelliport2.bin
+reject_firmware drivers/char/ip2/ip2main.c
+clean_blob drivers/char/ip2/ip2main.c
 clean_kconfig drivers/char/Kconfig 'COMPUTONE'
 clean_mk CONFIG_COMPUTONE drivers/char/Makefile
 
+announce CYCLADES - "Cyclades async mux support"
+reject_firmware drivers/char/cyclades.c
+clean_blob drivers/char/cyclades.c
+clean_kconfig drivers/char/Kconfig 'CYCLADES'
+clean_mk CONFIG_CYCLADES drivers/char/Makefile
+
+announce ISI - "Multi-Tech multiport card support"
+reject_firmware drivers/char/isicom.c
+clean_blob drivers/char/isicom.c
+clean_kconfig drivers/char/Kconfig 'ISI'
+clean_mk CONFIG_ISI drivers/char/Makefile
+
+announce MOXA_INTELLIO - "Moxa Intellio support"
+reject_firmware drivers/char/moxa.c
+clean_blob drivers/char/moxa.c
+clean_kconfig drivers/char/Kconfig 'MOXA_INTELLIO'
+clean_mk CONFIG_MOXA_INTELLIO drivers/char/Makefile
+
 # gpu drm
 
-# DRM_MGA - Matrox g200/g400
+announce DRM_MGA - "Matrox g200/g400"
 clean_blob drivers/gpu/drm/mga/mga_ucode.h
+clean_blob drivers/gpu/drm/mga/mga_warp.c
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_MGA'
 clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
-# DRM_R128 - ATI Rage 128
+announce DRM_R128 - "ATI Rage 128"
+clean_sed '
+/^static int r128_do_init_cce([^;]*$/,/^}$/{
+  /^	r128_cce_load_microcode(dev_priv);$/{
+    i\
+	DRM_ERROR("Missing Free microcode!\\n");\
+	dev->dev_private = (void *)dev_priv;\
+	r128_do_cleanup_cce(dev);\
+	return -EINVAL;
+  }
+}' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/r128/r128_cce.c
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
-# DRM_RADEON - ATI Radeon
+announce DRM_RADEON - "ATI Radeon"
+clean_sed '
+/^static int radeon_do_init_cp([^;]*$/,/^}$/{
+  /^	radeon_cp_load_microcode(dev_priv);$/{
+    i\
+	DRM_ERROR("Missing Free microcode!\\n");\
+	radeon_do_cleanup_cp(dev);\
+	return -EINVAL;
+  }
+}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on init'
+clean_sed '
+/^static int radeon_do_resume_cp([^;]*$/,/^}$/{
+  /^	radeon_cp_load_microcode(dev_priv);$/{
+    i\
+	DRM_ERROR("Missing Free microcode!\\n");\
+	return -EINVAL;
+  }
+}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on resume'
+clean_blob drivers/gpu/drm/radeon/radeon_cp.c
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
 clean_kconfig drivers/gpu/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
 
 
-#########################
-# Removed Media Drivers #
-#########################
+#########
+# Media #
+#########
 
+# media/tuner
 
-# dvb/dvb-usb
-clean_blob drivers/media/dvb/dvb-usb/af9005-script.h
+announce MEDIA_TUNER_XC2028 - "XCeive xc2028/xc3028 tuners"
+undefault_firmware 'XC\(2028\|3028L\)' \
+  drivers/media/common/tuners/tuner-xc2028.h \
+  drivers/media/video/saa7134/saa7134-cards.c \
+  drivers/media/video/ivtv/ivtv-driver.c \
+  drivers/media/video/cx18/cx18-driver.c \
+  drivers/media/video/cx88/cx88-cards.c \
+  drivers/media/video/em28xx/em28xx-cards.c \
+  drivers/media/dvb/dvb-usb/dib0700_devices.c
+reject_firmware drivers/media/common/tuners/tuner-xc2028.c
+clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC2028'
+clean_mk CONFIG_MEDIA_TUNER_XC2028 drivers/media/common/tuners/Makefile
+
+announce MEDIA_TUNER_XC5000 - "Xceive XC5000 silicon tuner"
+undefine_macro 'XC5000_DEFAULT_FIRMWARE_SIZE' 0 \
+  'removed non-Free firmware size' drivers/media/common/tuners/xc5000.c
+undefault_firmware 'XC5000' drivers/media/common/tuners/xc5000.c
+reject_firmware drivers/media/common/tuners/xc5000.c
+clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC5000'
+clean_mk CONFIG_MEDIA_TUNER_XC5000 drivers/media/common/tuners/Makefile
+
+announce DVB_USB - "Support for various USB DVB devices"
+reject_firmware drivers/media/dvb/dvb-usb/dvb-usb-firmware.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB'
+clean_mk CONFIG_DVB_USB drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_AF9005 - "Afatech AF9005 DVB-T USB1.1"
+clean_file drivers/media/dvb/dvb-usb/af9005-script.h
+clean_sed '
+s,^	deb_info("load init script\\n");$,	{\n		err("Missing Free init script\\n");\n		return scriptlen = ret = -EINVAL;\n		,;
+' drivers/media/dvb/dvb-usb/af9005-fe.c 'report missing Free init script'
+clean_blob drivers/media/dvb/dvb-usb/af9005-fe.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
 clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
 
+announce DVB_B2C2_FLEXCOP - "Technisat/B2C2 FlexCopII(b) and FlexCopIII adapters"
+reject_firmware drivers/media/dvb/b2c2/flexcop-fe-tuner.c
+
+announce DVB_BT8XX - "BT8xx based PCI cards"
+reject_firmware drivers/media/dvb/bt8xx/dvb-bt8xx.c
+
+announce DVB_USB_A800 - "AVerMedia AverTV DVB-T USB 2.0 (A800)"
+clean_blob drivers/media/dvb/dvb-usb/a800.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_A800'
+clean_mk CONFIG_DVB_USB_A800 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_AF9005 - "Afatech AF9005 DVB-T USB1.1 support"
+clean_blob drivers/media/dvb/dvb-usb/af9005.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
+clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_CXUSB - "Conexant USB2.0 hybrid reference design support"
+clean_blob drivers/media/dvb/dvb-usb/cxusb.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_CXUSB'
+clean_mk CONFIG_DVB_USB_CXUSB drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DIB0700 - "DiBcom DiB0700 USB DVB devices"
+clean_blob drivers/media/dvb/dvb-usb/dib0700_devices.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIB0700'
+clean_mk CONFIG_DVB_USB_DIB0700 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DIBUSB_MB - "DiBcom USB DVB-T devices (based on the DiB3000M-B)"
+clean_blob drivers/media/dvb/dvb-usb/dibusb-mb.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIBUSB_MB'
+clean_mk CONFIG_DVB_USB_DIBUSB_MB drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DIBUSB_MC - "DiBcom USB DVB-T devices (based on the DiB3000M-C/P)"
+clean_blob drivers/media/dvb/dvb-usb/dibusb-mc.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIBUSB_MC'
+clean_mk CONFIG_DVB_USB_DIBUSB_MC drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DIGITV - "Nebula Electronics uDigiTV DVB-T USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/digitv.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIGITV'
+clean_mk CONFIG_DVB_USB_DIGITV drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DTT200U - "WideView WT-200U and WT-220U (pen) DVB-T USB2.0 support (Yakumo/Hama/Typhoon/Yuan)"
+clean_blob drivers/media/dvb/dvb-usb/dtt200u.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DTT200U'
+clean_mk CONFIG_DVB_USB_DTT200U drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_DW2102 - "DvbWorld DVB-S/S2 USB2.0 support"
+reject_firmware drivers/media/dvb/dvb-usb/dw2102.c
+clean_blob drivers/media/dvb/dvb-usb/dw2102.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DW2102'
+clean_mk CONFIG_DVB_USB_DW2102 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_GP8PSK - "GENPIX 8PSK->USB module support"
+reject_firmware drivers/media/dvb/dvb-usb/gp8psk.c
+clean_blob drivers/media/dvb/dvb-usb/gp8psk.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_GP8PSK'
+clean_mk CONFIG_DVB_USB_GP8PSK drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_M920X - "Uli m920x DVB-T USB2.0 support"
+reject_firmware drivers/media/dvb/dvb-usb/m920x.c
+clean_blob drivers/media/dvb/dvb-usb/m920x.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_M920X'
+clean_mk CONFIG_DVB_USB_M920X drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_NOVA_T_USB2 - "Hauppauge WinTV-NOVA-T usb2 DVB-T USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/nova-t-usb2.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_NOVA_T_USB2'
+clean_mk CONFIG_DVB_USB_NOVA_T_USB2 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_OPERA1 - "Opera1 DVB-S USB2.0 receiver"
+reject_firmware drivers/media/dvb/dvb-usb/opera1.c
+clean_blob drivers/media/dvb/dvb-usb/opera1.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_OPERA1'
+clean_mk CONFIG_DVB_USB_OPERA1 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_TTUSB2 - "Pinnacle 400e DVB-S USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/ttusb2.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_TTUSB2'
+clean_mk CONFIG_DVB_USB_TTUSB2 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_UMT_010 - "HanfTek UMT-010 DVB-T USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/umt-010.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_UMT_010'
+clean_mk CONFIG_DVB_USB_UMT_010 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_VP702X - "TwinhanDTV StarBox and clones DVB-S USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/vp702x.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_VP702X'
+clean_mk CONFIG_DVB_USB_VP702X drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_VP7045 - "TwinhanDTV Alpha/MagicBoxII, DNTV tinyUSB2, Beetle USB2.0 support"
+clean_blob drivers/media/dvb/dvb-usb/vp7045.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_VP7045'
+clean_mk CONFIG_DVB_USB_VP7045 drivers/media/dvb/dvb-usb/Makefile
+
 # dvb/frontends
 
-# DVB_TDA10021 - Philips TDA10021 based
-clean_blob drivers/media/dvb/frontends/tda10021.c
-clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_TDA10021'
-clean_mk CONFIG_DVB_TDA10021 drivers/media/dvb/frontends/Makefile
+announce DVB_BCM3510 - "Broadcom BCM3510"
+undefault_firmware 'BCM3510' drivers/media/dvb/frontends/bcm3510.c
+reject_firmware drivers/media/dvb/frontends/bcm3510.c
+reject_firmware drivers/media/dvb/frontends/bcm3510.h
+clean_sed '
+/You.ll need a firmware/,/dvb-fe-bcm/d;
+' drivers/media/dvb/frontends/bcm3510.c \
+  "removed non-Free firmware notes"
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_BCM3510'
+clean_mk CONFIG_DVB_BCM3510 drivers/media/dvb/frontends/Makefile
 
-# DVB_TDA8083 - Philips TDA8083 based
-clean_blob drivers/media/dvb/frontends/tda8083.c
-clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_TDA8083'
-clean_mk CONFIG_DVB_TDA8083 drivers/media/dvb/frontends/Makefile
+announce DVB_NXT200X - "NxtWave Communications NXT2002/NXT2004 based"
+undefault_firmware 'NXT200[24]' drivers/media/dvb/frontends/nxt200x.c
+reject_firmware drivers/media/dvb/frontends/nxt200x.c
+clean_blob drivers/media/dvb/frontends/nxt200x.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_NXT200X'
+clean_mk CONFIG_DVB_NXT200X drivers/media/dvb/frontends/Makefile
 
-# DVB_VES1820 - VLSI VES1820 based
-clean_blob drivers/media/dvb/frontends/ves1820.c
-clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_VES1820'
-clean_mk CONFIG_DVB_VES1820 drivers/media/dvb/frontends/Makefile
+announce DVB_OR51132 - "Oren OR51132 based"
+reject_firmware drivers/media/dvb/frontends/or51132.c
+clean_blob drivers/media/dvb/frontends/or51132.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_OR51132'
+clean_mk CONFIG_DVB_OR51132 drivers/media/dvb/frontends/Makefile
 
-# DVB_VES1X93 - VLSI VES1893 or VES1993 based
-clean_blob drivers/media/dvb/frontends/ves1x93.c
-clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_VES1X93'
-clean_mk CONFIG_DVB_VES1X93 drivers/media/dvb/frontends/Makefile
+announce DVB_OR51211 - "Oren OR51211 based"
+undefault_firmware 'OR51211' drivers/media/dvb/frontends/or51211.c
+reject_firmware drivers/media/dvb/frontends/or51211.c
+reject_firmware drivers/media/dvb/frontends/or51211.h
+clean_blob drivers/media/dvb/frontends/or51211.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_OR51211'
+clean_mk CONFIG_DVB_OR51211 drivers/media/dvb/frontends/Makefile
 
-# dvb/ttpci
+announce DVB_SP8870 - "Spase sp8870"
+undefault_firmware 'SP8870' drivers/media/dvb/frontends/sp8870.c
+reject_firmware drivers/media/dvb/frontends/sp8870.c
+reject_firmware drivers/media/dvb/frontends/sp8870.h
+clean_blob drivers/media/dvb/frontends/sp8870.c
+clean_kconfig drivers/media/dvb/frontends 'DVB_SP8870'
+clean_mk CONFIG_DVB_SP8870 drivers/media/dvb/frontends/Makefile
 
-# DVB_AV7110 - AV7110 cards
+announce DVB_SP887X - "Spase sp887x based"
+undefault_firmware 'SP887X' drivers/media/dvb/frontends/sp887x.c
+reject_firmware drivers/media/dvb/frontends/sp887x.c
+reject_firmware drivers/media/dvb/frontends/sp887x.h
+clean_blob drivers/media/dvb/frontends/sp887x.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_SP887X'
+clean_mk CONFIG_DVB_SP887X drivers/media/dvb/frontends/Makefile
+
+announce DVB_TDA10048 - "Philips TDA10048HN based"
+undefine_macro 'TDA10048_DEFAULT_FIRMWARE_SIZE' 0 \
+  'removed non-Free firmware size' drivers/media/dvb/frontends/tda10048.c
+undefault_firmware 'TDA10048' drivers/media/dvb/frontends/tda10048.c
+reject_firmware drivers/media/dvb/frontends/tda10048.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_TDA10048'
+clean_mk CONFIG_DVB_TDA10048 drivers/media/dvb/frontends/Makefile
+
+announce DVB_TDA1004X - "Philips TDA10045H/TDA10046H"
+undefault_firmware 'TDA1004[56]' drivers/media/dvb/frontends/tda1004x.c
+reject_firmware drivers/media/dvb/frontends/tda1004x.c
+reject_firmware drivers/media/dvb/frontends/tda1004x.h
+clean_blob drivers/media/dvb/frontends/tda1004x.c
+clean_kconfig drivers/media/dvb/frontends 'DVB_TDA1004X'
+clean_mk CONFIG_DVB_TDA1004X drivers/media/dvb/frontends/Makefile
+
+# dvb
+
+announce DVB_AV7110 - "AV7110 cards"
+# The bootcode is actually Free Software under GPLv2, but since it's
+# being distributed without source code, we're taking it out for now.
+clean_sed '
+s,^	\/\* boot \*\/$,	printk(KERN_ERR "dvb-ttpci: av7110_bootarm(): Missing Free bootcode\\n");\n	return -EINVAL;\n\n&,
+' drivers/media/dvb/ttpci/av7110_hw.c 'report missing Free bootcode'
+clean_sed '
+s,mwdebi(.*bootcode.*$,/* & */,
+' drivers/media/dvb/ttpci/av7110_hw.c 'adjust bootcode loader'
 clean_blob drivers/media/dvb/ttpci/av7110_hw.c
+reject_firmware drivers/media/dvb/ttpci/av7110.c
 clean_blob drivers/media/dvb/ttpci/av7110.c
+clean_sed '
+/^config DVB_AV7110_FIRMWARE_FILE$/, /^config / {
+  /^	default.*dvb-ttpci-01/ s,".*","/*(DEBLOBBED)*/",;
+}' drivers/media/dvb/ttpci/Kconfig 'removed default firmware'
+clean_kconfig -f drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110_FIRMWARE'
 clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110'
 clean_mk CONFIG_DVB_AV7110 drivers/media/dvb/ttpci/Makefile
 
-# DVB_BUDGET_AV - Budget cards with analog video inputs
-clean_blob drivers/media/dvb/ttpci/budget-av.c
-clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET_AV'
-clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET_PATCH'
-clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET'
-clean_mk CONFIG_DVB_BUDGET_AV drivers/media/dvb/ttpci/Makefile
-clean_mk CONFIG_DVB_BUDGET_PATCH drivers/media/dvb/ttpci/Makefile
-clean_mk CONFIG_DVB_BUDGET drivers/media/dvb/ttpci/Makefile
+announce DVB_BUDGET_AV - "Budget cards with analog video inputs"
+reject_firmware drivers/media/dvb/ttpci/budget-av.c
 
-# DVB_BUDGET_CI - Budget cards with onboard CI connector
-clean_blob drivers/media/dvb/ttpci/budget-ci.c
-clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET_CI'
-clean_mk CONFIG_DVB_BUDGET_CI drivers/media/dvb/ttpci/Makefile
+announce DVB_BUDGET_CI - "Budget cards with onboard CI connector"
+reject_firmware drivers/media/dvb/ttpci/budget-ci.c
 
-# dvb/ttusb-budget
+announce DVB_DRX397XD - "Micronas DRX3975D/DRX3977D based"
+reject_firmware drivers/media/dvb/frontends/drx397xD.c
+clean_blob drivers/media/dvb/frontends/drx397xD_fw.h
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_DRX397XD'
+clean_mk CONFIG_DVB_DRX397XD drivers/media/dvb/frontends/Makefile
 
-# DVB_TTUSB_BUDGET - Technotrend/Hauppauge Nova-USB devices
-clean_file firmware/ttusb-budget/dspbootcode.bin.ihex
-dummy_blob firmware/ttusb-budget/dspbootcode.bin
+announce DVB_PLUTO2 - "Pluto2 cards"
+reject_firmware drivers/media/dvb/pluto2/pluto2.c
+
+announce DVB_SIANO_SMS1XXX - "Siano SMS1XXX USB dongle support"
+reject_firmware drivers/media/dvb/siano/smscoreapi.c
+reject_firmware drivers/media/dvb/siano/smsusb.c
+clean_blob drivers/media/dvb/siano/smscoreapi.c
+clean_blob drivers/media/dvb/siano/smsusb.c
+clean_blob drivers/media/dvb/siano/sms-cards.c
+clean_kconfig drivers/media/dvb/siano/Kconfig 'DVB_SIANO_SMS1XXX'
+clean_mk CONFIG_DVB_SIANO_SMS1XXX drivers/media/dvb/siano/Makefile
+
+announce DVB_TTUSB_BUDGET - "Technotrend/Hauppauge Nova-USB devices"
+drop_fw_file firmware/ttusb-budget/dspbootcode.bin.ihex firmware/ttusb-budget/dspbootcode.bin
+reject_firmware drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_kconfig drivers/media/dvb/ttusb-budget/Kconfig 'DVB_TTUSB_BUDGET'
 clean_mk CONFIG_DVB_TTUSB_BUDGET drivers/media/dvb/ttusb-budget/Makefile
 
+announce DVB_TTUSB_DEC - "Technotrend/Hauppauge USB DEC devices"
+reject_firmware drivers/media/dvb/ttusb-dec/ttusb_dec.c
+clean_blob drivers/media/dvb/ttusb-dec/ttusb_dec.c
+clean_kconfig drivers/media/dvb/ttusb-dec/Kconfig 'DVB_TTUSB_DEC'
+clean_mk CONFIG_DVB_TTUSB_DEC drivers/media/dvb/ttusb-dec/Makefile
+
 # video
 
-# USB_PWC - USB Philips Cameras
-clean_blob drivers/media/video/pwc/pwc-kiara.c
-clean_blob drivers/media/video/pwc/pwc-timon.c
-clean_kconfig drivers/media/video/pwc/Kconfig 'USB_PWC'
-clean_mk CONFIG_USB_PWC drivers/media/video/Makefile
+announce VIDEO_BT848 - "BT848 Video For Linux"
+reject_firmware drivers/media/video/bt8xx/bttv-cards.c
+clean_kconfig drivers/media/video/bt8xx/Kconfig 'VIDEO_BT848'
+clean_mk CONFIG_VIDEO_BT848 drivers/media/video/bt8xx/Makefile
 
-# VIDEO_CPIA - CPiA Video For Linux
+announce VIDEO_CPIA2 - "CPiA2 Video For Linux"
 clean_fw firmware/cpia2/stv0672_vp4.bin.ihex firmware/cpia2/stv0672_vp4.bin
-clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA'
-clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_PP'
-clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_USB'
+reject_firmware drivers/media/video/cpia2/cpia2_core.c
+clean_blob drivers/media/video/cpia2/cpia2_core.c
 clean_kconfig drivers/media/video/cpia2/Kconfig 'VIDEO_CPIA2'
-clean_mk CONFIG_VIDEO_CPIA drivers/media/video/Makefile
-clean_mk CONFIG_VIDEO_CPIA_PP drivers/media/video/Makefile
-clean_mk CONFIG_VIDEO_CPIA_USB drivers/media/video/Makefile
-clean_mk CONFIG_VIDEO_CPIA2 drivers/media/video/Makefile
+clean_mk CONFIG_VIDEO_CPIA2 drivers/media/video/cpia2/Makefile
 
-# USB_DABUSB - DABUSB driver
+announce VIDEO_CX18 - "Conexant cx23418 MPEG encoder support"
+reject_firmware drivers/media/video/cx18/cx18-av-firmware.c
+reject_firmware drivers/media/video/cx18/cx18-firmware.c
+clean_blob drivers/media/video/cx18/cx18-av-firmware.c
+clean_blob drivers/media/video/cx18/cx18-firmware.c
+clean_kconfig drivers/media/video/cx18/Kconfig 'VIDEO_CX18'
+clean_mk CONFIG_VIDEO_CX18 drivers/media/video/cx18/Makefile
+
+announce VIDEO_CX23885 - "Conexant cx23885 (2388x successor) support"
+reject_firmware drivers/media/video/cx23885/cx23885-417.c
+clean_blob drivers/media/video/cx23885/cx23885-417.c
+clean_blob drivers/media/video/cx23885/cx23885-dvb.c
+clean_kconfig drivers/media/video/cx23885/Kconfig 'VIDEO_CX23885'
+clean_mk CONFIG_VIDEO_CX23885 drivers/media/video/cx23885/Makefile
+
+announce VIDEO_CX25840 - "Conexant CX2584x audio/video decoders"
+reject_firmware drivers/media/video/cx25840/cx25840-firmware.c
+clean_blob drivers/media/video/cx25840/cx25840-firmware.c
+clean_kconfig drivers/media/video/cx25840/Kconfig 'VIDEO_CX25840'
+clean_mk CONFIG_VIDEO_CX25840 drivers/media/video/cx25840/Makefile
+
+announce VIDEO_CX88_BLACKBIRD - "Blackbird MPEG encoder support (cx2388x + cx23416)"
+reject_firmware drivers/media/video/cx88/cx88-blackbird.c
+clean_kconfig drivers/media/video/cx88/Kconfig 'VIDEO_CX88_BLACKBIRD'
+clean_mk CONFIG_VIDEO_CX88_BLACKBIRD drivers/media/video/cx88/Makefile
+
+announce VIDEO_CX88_DVB - "DVB/ATSC Support for cx2388x based TV cards"
+clean_blob drivers/media/video/cx88/cx88-dvb.c
+clean_kconfig drivers/media/video/cx88/Kconfig 'VIDEO_CX88_DVB'
+clean_mk CONFIG_VIDEO_CX88_DVB drivers/media/video/cx88/Makefile
+
+announce VIDEO_IVTV - "Conexant cx23416/cx23415 MPEG encoder/decoder support"
+reject_firmware drivers/media/video/ivtv/ivtv-firmware.c
+clean_blob drivers/media/video/ivtv/ivtv-firmware.c
+clean_kconfig drivers/media/video/ivtv/Kconfig 'VIDEO_IVTV'
+clean_mk CONFIG_VIDEO_IVTV drivers/media/video/ivtv/Makefile
+
+announce VIDEO_PVRUSB2 - "Hauppauge WinTV-PVR USB2 support"
+reject_firmware drivers/media/video/pvrusb2/pvrusb2-hdw.c
+clean_blob drivers/media/video/pvrusb2/pvrusb2-devattr.c
+clean_kconfig drivers/media/video/pvrusb2/Kconfig 'VIDEO_PVRUSB2'
+clean_mk CONFIG_VIDEO_PVRUSB2 drivers/media/video/pvrusb2/Makefile
+
+announce "VIDEO_CX23885, VIDEO_CX88_BLACKBIRD, VIDEO_IVTV, VIDEO_PVRUSB2" - "See above"
+clean_blob include/media/cx2341x.h
+
+announce VIDEO_SAA7134_DVB - "DVB/ATSC Support for saa7134 based TV cards"
+reject_firmware drivers/media/video/saa7134/saa7134-dvb.c
+clean_kconfig drivers/media/video/saa7134/Kconfig 'VIDEO_SAA7134_DVB'
+clean_mk CONFIG_VIDEO_SAA7134_DVB drivers/media/video/saa7134/Makefile
+
+announce USB_DABUSB - "DABUSB driver"
 clean_fw firmware/dabusb/bitstream.bin.ihex firmware/dabusb/bitstream.bin
 clean_fw firmware/dabusb/firmware.HEX firmware/dabusb/firmware.fw
+reject_firmware drivers/media/video/dabusb.c
+clean_blob drivers/media/video/dabusb.c
 clean_kconfig drivers/media/Kconfig 'USB_DABUSB'
 clean_mk CONFIG_USB_DABUSB drivers/media/video/Makefile
 
-# video/usbvideo
+announce USB_S2255 - "USB Sensoray 2255 video capture device"
+reject_firmware drivers/media/video/s2255drv.c
+clean_blob drivers/media/video/s2255drv.c
+clean_kconfig drivers/media/video/Kconfig 'USB_S2255'
+clean_mk CONFIG_USB_S2255 drivers/media/video/Makefile
 
-# USB_IBMCAM - USB IBM (Xirlink) C-it Camera support
-clean_blob drivers/media/video/usbvideo/ibmcam.c
-clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_IBMCAM'
-clean_mk CONFIG_USB_IBMCAM drivers/media/video/usbvideo/Makefile
-
-# USB_VICAM - USB 3com HomeConnect (aka vicam)
-clean_file firmware/vicam/firmware.H16
-dummy_blob firmware/vicam/firmware.fw
+announce USB_VICAM - "USB 3com HomeConnect, AKA vicam"
+drop_fw_file firmware/vicam/firmware.H16 firmware/vicam/firmware.fw
+reject_firmware drivers/media/video/usbvideo/vicam.c
+clean_blob drivers/media/video/usbvideo/vicam.c
 clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_VICAM'
 clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 
 
-#######################
-# Removed net Drivers #
-#######################
+#######
+# net #
+#######
 
-# ACENIC - Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit
+announce ACENIC - "Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit"
 clean_blob drivers/net/acenic_firmware.h
+clean_sed '
+s,	\(ace_load_firmware[^;]*\),	if ((ecode = \1)) goto init_error,
+' drivers/net/acenic.c 'check for error in firmware loading'
+clean_sed '
+/^static int __devinit ace_load_firmware([^;]*$/,/^}$/{
+  /^}$/i\
+}\
+	printk(KERN_ERR "%s: Missing Free firwmare\\n", ap->name);\
+	return -EINVAL;
+}' drivers/net/acenic.c 'report missing Free firmware'
+clean_blob drivers/net/acenic.c
 clean_kconfig drivers/net/Kconfig 'ACENIC'
 clean_mk CONFIG_ACENIC drivers/net/Makefile
 
-# ADAPTEC_STARFIRE - Adaptec Starfire/DuraLAN support
-
+announce ADAPTEC_STARFIRE - "Adaptec Starfire/DuraLAN support"
 # This file requires prior acceptance of the GPL before you can even
 # run the code in it.  It's not clear whether this is a further
 # requirement that would make the distribution incompatible with the
 # GPL, but since nothing remains after we remove the blob, it's
 # irrelevant whether the explicit acceptance would be a problem.
-clean_blob drivers/net/starfire_firmware.h
+clean_file drivers/net/starfire_firmware.h
+clean_file drivers/net/starfire_firmware.pl
+clean_sed '
+/Load Rx\/Tx firmware/i\
+	printk (KERN_ERR "%s: Missing Free firmware\\n", dev->name);\
+	return -EINVAL;
+' drivers/net/starfire.c 'report missing Free firmware'
+clean_blob drivers/net/starfire.c
 clean_kconfig drivers/net/Kconfig 'ADAPTEC_STARFIRE'
 clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
 
-# BNX2 - Broadcom NetXtremeII
-clean_blob drivers/net/bnx2_fw.h
-clean_blob drivers/net/bnx2_fw2.h
+announce BNX2 - "Broadcom NetXtremeII"
+clean_file drivers/net/bnx2_fw.h
+clean_file drivers/net/bnx2_fw2.h
+clean_sed '
+/ bnx2_init_cpus(/i\
+	printk (KERN_ERR "%s: Missing Free firmware\\n", bp->dev->name);\
+	return -EINVAL;\
+#define bnx2_init_cpus(bp) (-EINVAL)
+' drivers/net/bnx2.c 'report missing Free firmware'
+clean_blob drivers/net/bnx2.c
 clean_kconfig drivers/net/Kconfig 'BNX2'
 clean_mk CONFIG_BNX2 drivers/net/Makefile
 
+announce BNX2X - "Broadcom NetXtremeII 10Gb support"
 clean_blob drivers/net/bnx2x_init_values.h
+clean_blob drivers/net/bnx2x_init.h
+clean_sed '
+/^#include "bnx2x_init\.h"/,/^$/{
+  /^$/i\
+#define bnx2x_init_block(bp, start, end) \\\
+  return (printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\\\
+	  -EINVAL)
+}' drivers/net/bnx2x_main.c 'report missing Free firmware'
 clean_kconfig drivers/net/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/Makefile
 
-# CASSINI - Sun Cassini
+announce CASSINI - "Sun Cassini"
 clean_blob drivers/net/cassini.h
+clean_sed '
+/^static void cas_saturn_firmware_load(/,/^}$/{
+  /patch = cas_saturn_patch/{
+    s,cas_saturn_patch;,NULL;,;
+    p;
+    i\
+\
+	printk(KERN_ERR "%s: Missing Free firmware\\n", cp->dev->name);\
+	return;\
+
+    d;
+  }
+}' drivers/net/cassini.c 'report missing Free firmware'
 clean_kconfig drivers/net/Kconfig 'CASSINI'
 clean_mk CONFIG_CASSINI drivers/net/Makefile
 
-# E100 - Intel(R) PRO/100+
-clean_blob drivers/net/e100.c
-if $have_check; then
-  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/e100.c
-else
-  clean_kconfig drivers/net/Kconfig 'E100'
-  clean_mk CONFIG_E100 drivers/net/Makefile
-fi
+announce CHELSIO_T3 - "Chelsio AEL 2005 support"
+reject_firmware drivers/net/cxgb3/cxgb3_main.c
+clean_blob drivers/net/cxgb3/cxgb3_main.c
+clean_kconfig drivers/net/Kconfig 'CHELSIO_T3'
+clean_mk CONFIG_CHELSIO_T3 drivers/net/cxgb3/Makefile
 
-# MYRI_SBUS - MyriCOM Gigabit Ethernet
-clean_blob drivers/net/myri_code.h
+announce E100 - "Intel PRO/100+"
+clean_sed '
+/^static void e100_setup_ucode([^;]*$/,/^}$/{
+  /^	} ucode_opts\[\] = {$/,/^	}[,;]/ {
+    s,D[^,]*_RCVBUNDLE_UCODE,/*(DEBLOBBED)*/{0},g;
+    s,D[^,]*_CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD,/*(DEBLOBBED)*/0,g;
+  }
+  /^	for ([^;]*ucode_opts[^{]*) {$/,/^	}$/ {
+    /^	}$/ i\
+	}\
+		DPRINTK(DRV, ERR, "Missing Free firmware\\n");\
+		/* ??? We should error out somehow.  */\
+		goto noloaducode;
+  }
+}
+' drivers/net/e100.c 'report missing Free firmware for some variants'
+clean_blob drivers/net/e100.c
+clean_kconfig drivers/net/Kconfig 'E100'
+clean_mk CONFIG_E100 drivers/net/Makefile
+
+announce MYRI_SBUS - "MyriCOM Gigabit Ethernet"
+clean_file drivers/net/myri_code.h
+clean_sed '
+/myri_load_lanai.*;/{
+  i\
+	printk(KERN_ERR "Missing Free firmware\\n");\
+	goto err_free_irq;
+}' drivers/net/myri_sbus.c 'report missing Free firmware'
+clean_blob drivers/net/myri_sbus.c
 clean_kconfig drivers/net/Kconfig 'MYRI_SBUS'
 clean_mk CONFIG_MYRI_SBUS drivers/net/Makefile
 
-# TEHUTI - Tehuti Networks 10G Ethernet
-clean_blob drivers/net/tehuti_fw.h -s 4
+announce MYRI10GE - "Myricom Myri-10G Ethernet support"
+reject_firmware drivers/net/myri10ge/myri10ge.c
+clean_blob drivers/net/myri10ge/myri10ge.c
+clean_kconfig drivers/net/Kconfig 'MYRI10GE'
+clean_mk CONFIG_MYRI10GE drivers/net/myri10ge/Makefile
+
+announce SPIDER_NET - "Spider Gigabit Ethernet driver"
+reject_firmware drivers/net/spider_net.c
+clean_sed 's,spider_fw\.bin,DEBLOBBED.bin,g' \
+  drivers/net/spider_net.c 'removed non-Free firmware notes'
+clean_blob drivers/net/spider_net.h
+clean_kconfig drivers/net/Kconfig 'SPIDER_NET'
+clean_mk CONFIG_SPIDER_NET drivers/net/Makefile
+
+announce TEHUTI - "Tehuti Networks 10G Ethernet"
+clean_blob drivers/net/tehuti_fw.h
+clean_sed '
+/bdx_tx_push_desc_safe.*s_firmLoad.*/{
+  i\
+		ERR("%s: Missing Free firmware\\n", priv->ndev->name);\
+		RET(-EINVAL);
+}' drivers/net/tehuti.c 'report missing Free firmware'
+clean_blob drivers/net/tehuti.c
 clean_kconfig drivers/net/Kconfig 'TEHUTI'
 clean_mk CONFIG_TEHUTI drivers/net/Makefile
 
-# TIGON3 - Broadcom Tigon3
-patch --no-backup-if-mismatch --batch -p0 <<\EOF || \
-  die failed to remove license comments from drivers/net/tg3.c \
-  # patches/linux-2.6-tg3-clean.patch
---- drivers/net/tg3.c
-+++ drivers/net/tg3.c
-@@ -5,14 +5,6 @@
-  * Copyright (C) 2001, 2002, 2003 Jeff Garzik (jgarzik@pobox.com)
-  * Copyright (C) 2004 Sun Microsystems Inc.
-  * Copyright (C) 2005-2007 Broadcom Corporation.
-- *
-- * Firmware is:
-- *	Derived from proprietary unpublished source code,
-- *	Copyright (C) 2000-2003 Broadcom Corporation.
-- *
-- *	Permission is hereby granted for the distribution of this firmware
-- *	data in hexadecimal or equivalent format, provided this copyright
-- *	notice is accompanying it.
-  */
- 
- 
-EOF
-clean_blob drivers/net/tg3.c -s 9
-if $have_check; then
-  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/tg3.c 
-else
-  clean_kconfig drivers/net/Kconfig 'TIGON3'
-  clean_mk CONFIG_TIGON3 drivers/net/Makefile
-fi
+announce TIGON3 - "Broadcom Tigon3"
+clean_sed '
+s,\&tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[0\],NULL,;
+/^static int tg3_load_firmware_cpu([^;]*$/,/^}/{
+  /^	err = 0;/{
+    i\
+	printk(KERN_ERR PFX "Missing Free firmware for %s, hoping it works anyway\\n",\
+	       tp->dev->name);
+  }
+}' drivers/net/tg3.c 'report missing Free firmware, proceed without it'
+clean_blob drivers/net/tg3.c
+clean_kconfig drivers/net/Kconfig 'TIGON3'
+clean_mk CONFIG_TIGON3 drivers/net/Makefile
 
-# TYPHOON - 3cr990 series Typhoon
+announce TYPHOON - "3cr990 series Typhoon"
 clean_blob drivers/net/typhoon-firmware.h
+clean_sed '
+/^typhoon_download_firmware([^;]*$/,/^}/{
+  /typhoon_firmware_image/{
+    i\
+	printk(KERN_ERR "%s: Missing Free firmware\\n", tp->name);\
+	err = -EINVAL;\
+	goto err_out;
+    d;
+  }
+}' drivers/net/typhoon.c 'report missing Free firmware'
 clean_kconfig drivers/net/Kconfig 'TYPHOON'
 clean_mk CONFIG_TYPHOON drivers/net/Makefile
 
 # appletalk
 
-# COPS - COPS LocalTalk PC
-# clean_blob drivers/net/appletalk/cops.c
-# clean_blob drivers/net/appletalk/cops.h
-clean_blob drivers/net/appletalk/cops_ffdrv.h
-clean_blob drivers/net/appletalk/cops_ltdrv.h
+announce COPS - "COPS LocalTalk PC"
+clean_sed '
+/sizeof(\(ff\|lt\)drv_code)/{
+  i\
+		printk(KERN_INFO "%s: Missing Free firmware.\\n", dev->name);\
+		return;
+}
+/\(ff\|lt\)drv_code/d;
+' drivers/net/appletalk/cops.c 'report missing Free firmware'
+clean_blob drivers/net/appletalk/cops.c
+clean_file drivers/net/appletalk/cops_ffdrv.h
+clean_file drivers/net/appletalk/cops_ltdrv.h
 clean_kconfig drivers/net/appletalk/Kconfig 'COPS'
 clean_mk CONFIG_COPS drivers/net/appletalk/Makefile
 
 # hamradio
 
-# YAM - YAM driver for AX.25
-clean_blob drivers/net/hamradio/yam1200.h
-clean_blob drivers/net/hamradio/yam9600.h
+announce YAM - "YAM driver for AX.25"
+clean_file drivers/net/hamradio/yam1200.h
+clean_file drivers/net/hamradio/yam9600.h
+clean_sed '
+/add_mcs(bits_\(12\|96\)00, bitrate)/{
+  i\
+		printk(KERN_ERR "yam: Missing Free firmware\\n");
+  s:add_mcs(bits_\(12\|96\)00, bitrate):NULL:
+}' drivers/net/hamradio/yam.c 'report missing Free firmware'
+clean_blob drivers/net/hamradio/yam.c
 clean_kconfig drivers/net/hamradio/Kconfig 'YAM'
 clean_mk CONFIG_YAM drivers/net/hamradio/Makefile
 
+# irda
+
+announce USB_IRDA - "IrDA USB dongles"
+reject_firmware drivers/net/irda/irda-usb.c
+clean_blob drivers/net/irda/irda-usb.c
+clean_kconfig drivers/net/irda/Kconfig 'USB_IRDA'
+clean_mk CONFIG_USB_IRDA drivers/net/irda/Makefile
+
 # pcmcia
 
-# PCMCIA_SMC91C92 - SMC 91Cxx PCMCIA
+announce PCMCIA_SMC91C92 - "SMC 91Cxx PCMCIA"
+clean_sed '
+/^\(static int \)\?osi_setup([^;]*$/,/^}$/{
+  s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1rc = -EINVAL;\n\1goto free_cfg_mem;\n&/
+}' drivers/net/pcmcia/smc91c92_cs.c 'report missing Free firmware'
+clean_sed '
+/^\(static int \)\?smc91c92_resume([^;]*$/,/^}$/{
+  s/^\(.*\)[/][*] Download.*firmware [*][/]/\1printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\n\1return -EINVAL;\n&/
+}' drivers/net/pcmcia/smc91c92_cs.c 'report another missing Free firmware'
 clean_blob drivers/net/pcmcia/ositech.h
+clean_blob drivers/net/pcmcia/smc91c92_cs.c
 clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_SMC91C92'
 clean_mk CONFIG_PCMCIA_SMC91C92 drivers/net/pcmcia/Makefile
 
+announce PCCARD - "PCCard (PCMCIA/CardBus) support"
+reject_firmware drivers/pcmcia/ds.c
+clean_kconfig drivers/pcmcia/Kconfig 'PCCARD'
+clean_mk CONFIG_PCCARD drivers/pcmcia/Makefile
+
+announce PCMCIA_3C574 - "3Com 3c574 PCMCIA support"
+clean_blob drivers/net/pcmcia/3c574_cs.c
+clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C574'
+clean_mk CONFIG_PCMCIA_3C574 drivers/net/pcmcia/Makefile
+
+announce PCMCIA_3C589 - "3Com 3c589 PCMCIA support"
+clean_blob drivers/net/pcmcia/3c589_cs.c
+clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C589'
+clean_mk CONFIG_PCMCIA_3C589 drivers/net/pcmcia/Makefile
+
+announce PCMCIA_PCNET - "NE2000 compatible PCMCIA support"
+clean_blob drivers/net/pcmcia/pcnet_cs.c
+clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_PCNET'
+clean_mk CONFIG_PCMCIA_PCNET drivers/net/pcmcia/Makefile
 
 # tokenring
 
-# 3C359 - 3Com 3C359 Token Link Velocity XL adapter
-# No need to remove these, they don't contain non-Free code.
-# clean_blob drivers/net/tokenring/3c359.c
-# clean_blob drivers/net/tokenring/3c359.h
-# This file is not under the GPL, better remove it all.
+announce 3C359 - "3Com 3C359 Token Link Velocity XL adapter"
 clean_file drivers/net/tokenring/3c359_microcode.h
+clean_sed '
+/^\(static int \)\?xl_hw_reset([^;]*$/,/^}/{
+  /start = .*mc_size/i\
+		printk(KERN_ERR "%s: Missing Free firmware\\n", dev->name);\
+		return -EINVAL;
+}' drivers/net/tokenring/3c359.c 'report missing Free firmware'
+clean_blob drivers/net/tokenring/3c359.c
 clean_kconfig drivers/net/tokenring/Kconfig '3C359'
 clean_mk CONFIG_3C359 drivers/net/tokenring/Makefile
 
-# SMCTR - SMC ISA/MCA adapter
-# No need to remove these, they don't contain non-Free code.
-# clean_blob drivers/net/tokenring/smctr.c
-# clean_blob drivers/net/tokenring/smctr.h
-# This file is not under the GPL, better remove it all.
-clean_file firmware/tr_smctr.bin.ihex
-dummy_blob firmware/tr_smctr.bin
+announce SMCTR - "SMC ISA/MCA adapter"
+drop_fw_file firmware/tr_smctr.bin.ihex firmware/tr_smctr.bin
+reject_firmware drivers/net/tokenring/smctr.c
+clean_blob drivers/net/tokenring/smctr.c
 clean_kconfig drivers/net/tokenring/Kconfig 'SMCTR'
 clean_mk CONFIG_SMCTR drivers/net/tokenring/Makefile
 
+announce TMS380TR - "Generic TMS380 Token Ring ISA/PCI adapter support"
+reject_firmware drivers/net/tokenring/tms380tr.c
+clean_blob drivers/net/tokenring/tms380tr.c
+clean_kconfig drivers/net/tokenring/Kconfig 'TMS380TR'
+clean_mk CONFIG_TMS380TR drivers/net/tokenring/Makefile
+
 # usb
 
-# USB_KAWETH - USB KLSI KL5USB101-based ethernet device support
-clean_file firmware/kaweth/new_code.bin.ihex
-dummy_blob firmware/kaweth/new_code.bin
-clean_file firmware/kaweth/new_code_fix.bin.ihex
-dummy_blob firmware/kaweth/new_code_fix.bin
-clean_file firmware/kaweth/trigger_code.bin.ihex
-dummy_blob firmware/kaweth/trigger_code.bin
-clean_file firmware/kaweth/trigger_code_fix.bin.ihex
-dummy_blob firmware/kaweth/trigger_code_fix.bin
+announce USB_KAWETH - "USB KLSI KL5USB101-based ethernet device support"
+drop_fw_file firmware/kaweth/new_code.bin.ihex firmware/kaweth/new_code.bin
+drop_fw_file firmware/kaweth/new_code_fix.bin.ihex firmware/kaweth/new_code_fix.bin
+drop_fw_file firmware/kaweth/trigger_code.bin.ihex firmware/kaweth/trigger_code.bin
+drop_fw_file firmware/kaweth/trigger_code_fix.bin.ihex firmware/kaweth/trigger_code_fix.bin
+reject_firmware drivers/net/usb/kaweth.c
+clean_blob drivers/net/usb/kaweth.c
 clean_kconfig drivers/net/usb/Kconfig 'USB_KAWETH'
 clean_mk CONFIG_USB_KAWETH drivers/net/usb/Makefile
 
 # wireless
 
+announce ATMEL "Atmel at76c50x chipset  802.11b support"
+reject_firmware drivers/net/wireless/atmel.c
+clean_blob drivers/net/wireless/atmel.c
+clean_kconfig drivers/net/wireless/Kconfig 'ATMEL'
+clean_mk CONFIG_ATMEL drivers/net/wireless/Makefile
 
-########################
-# Removed s390 Drivers #
-########################
+announce B43 - "Broadcom 43xx wireless support (mac80211 stack)"
+reject_firmware drivers/net/wireless/b43/main.c
+# Major portions of firwmare filenames not deblobbed.
+clean_blob drivers/net/wireless/b43/main.c
+clean_kconfig drivers/net/wireless/b43/Kconfig 'B43'
+clean_mk CONFIG_B43 drivers/net/wireless/b43/Makefile
 
-# QETH - Gigabit Ethernet device support
-clean_blob drivers/s390/net/qeth_core_mpc.c
-clean_kconfig drivers/s390/net/Kconfig 'QETH'
-clean_mk CONFIG_QETH drivers/s390/net/Makefile
+announce B43LEGACY - "Broadcom 43xx-legacy wireless support (mac80211 stack)"
+reject_firmware drivers/net/wireless/b43legacy/main.c
+# Major portions of firwmare filenames not deblobbed.
+clean_blob drivers/net/wireless/b43legacy/main.c
+clean_kconfig drivers/net/wireless/b43legacy/Kconfig 'B43LEGACY'
+clean_mk CONFIG_B43LEGACY drivers/net/wireless/b43legacy/Makefile
+
+announce PCMCIA_SPECTRUM - "Symbol Spectrum24 Trilogy PCMCIA card support"
+reject_firmware drivers/net/wireless/spectrum_cs.c
+clean_blob drivers/net/wireless/spectrum_cs.c
+clean_kconfig drivers/net/wireless/Kconfig 'PCMCIA_SPECTRUM'
+clean_mk CONFIG_PCMCIA_SPECTRUM drivers/net/wireless/Makefile
+
+announce IPW2100 - "Intel PRO/Wireless 2100 Network Connection"
+reject_firmware drivers/net/wireless/ipw2100.c
+clean_blob drivers/net/wireless/ipw2100.c
+clean_kconfig drivers/net/wireless/Kconfig 'IPW2100'
+clean_mk CONFIG_IPW2100 drivers/net/wireless/Makefile
+
+announce IPW2200 - "Intel PRO/Wireless 2200BG and 2915ABG Network Connection"
+reject_firmware drivers/net/wireless/ipw2200.c
+clean_blob drivers/net/wireless/ipw2200.c
+clean_kconfig drivers/net/wireless/Kconfig 'IPW2200'
+clean_mk CONFIG_IPW2200 drivers/net/wireless/Makefile
+
+announce IWL3945 - "Intel PRO/Wireless 3945ABG/BG Network Connection"
+reject_firmware drivers/net/wireless/iwlwifi/iwl3945-base.c
+clean_blob drivers/net/wireless/iwlwifi/iwl-3945.c
+clean_kconfig drivers/net/wireless/iwlwifi/Kconfig 'IWL3945'
+clean_mk CONFIG_IWL3945 drivers/net/wireless/iwlwifi/Makefile
+
+announce IWLAGN - "Intel Wireless WiFi Next Gen AGN"
+reject_firmware drivers/net/wireless/iwlwifi/iwl-agn.c
+clean_kconfig drivers/net/wireless/iwlwifi/Kconfig 'IWLAGN'
+clean_mk CONFIG_IWLAGN drivers/net/wireless/iwlwifi/Makefile
+
+announce IWL4965 - "Intel Wireless WiFi 4965AGN"
+clean_blob drivers/net/wireless/iwlwifi/iwl-4965.c
+clean_kconfig drivers/net/wireless/iwlwifi/Kconfig 'IWL4965'
+clean_mk CONFIG_IWL4965 drivers/net/wireless/iwlwifi/Makefile
+
+announce IWL5000 - "Intel Wireless WiFi 5000AGN"
+clean_blob drivers/net/wireless/iwlwifi/iwl-5000.c
+clean_kconfig drivers/net/wireless/iwlwifi/Kconfig 'IWL5000'
+clean_mk CONFIG_IWL5000 drivers/net/wireless/iwlwifi/Makefile
+
+announce LIBERTAS_CS - "Marvell Libertas 8385 CompactFlash 802.11b/g cards"
+reject_firmware drivers/net/wireless/libertas/if_cs.c
+clean_blob drivers/net/wireless/libertas/if_cs.c
+clean_kconfig drivers/net/wireless/Kconfig 'LIBERTAS_CS'
+clean_mk CONFIG_LIBERTAS_CS drivers/net/wireless/libertas/Makefile
+
+announce LIBERTAS_SDIO - "Marvell Libertas 8385 and 8686 SDIO 802.11b/g cards"
+reject_firmware drivers/net/wireless/libertas/if_sdio.c
+clean_blob drivers/net/wireless/libertas/if_sdio.c
+clean_kconfig drivers/net/wireless/Kconfig 'LIBERTAS_SDIO'
+clean_mk CONFIG_LIBERTAS_SDIO drivers/net/wireless/libertas/Makefile
+
+announce LIBERTAS_USB - "Marvell Libertas 8388 USB 802.11b/g cards"
+reject_firmware drivers/net/wireless/libertas/if_usb.c
+clean_blob drivers/net/wireless/libertas/if_usb.c
+clean_blob drivers/net/wireless/libertas/README
+clean_kconfig drivers/net/wireless/Kconfig 'LIBERTAS_USB'
+clean_mk CONFIG_LIBERTAS_USB drivers/net/wireless/libertas/Makefile
+
+announce P54_PCI - "Prism54 PCI support"
+reject_firmware drivers/net/wireless/p54/p54pci.c
+clean_blob drivers/net/wireless/p54/p54pci.c
+clean_kconfig drivers/net/wireless/p54/Kconfig 'P54_PCI'
+clean_mk CONFIG_P54_PCI drivers/net/wireless/p54/Makefile
+
+announce P54_USB - "Prism54 USB support"
+reject_firmware drivers/net/wireless/p54/p54usb.c
+clean_blob drivers/net/wireless/p54/p54usb.c
+clean_blob drivers/net/wireless/p54/p54usb.h
+clean_kconfig drivers/net/wireless/p54/Kconfig 'P54_USB'
+clean_mk CONFIG_P54_USB drivers/net/wireless/p54/Makefile
+
+announce PRISM54 - 'Intersil Prism GT/Duette/Indigo PCI/Cardbus'
+reject_firmware drivers/net/wireless/prism54/islpci_dev.c
+clean_blob drivers/net/wireless/prism54/islpci_dev.c
+clean_sed '
+/^config PRISM54$/,/^config /{
+  /If you enable this/,/^$/d;
+}' drivers/net/wireless/Kconfig 'removed firmware notes'
+clean_kconfig drivers/net/wireless/Kconfig 'PRISM54'
+clean_mk CONFIG_PRISM54 drivers/net/wireless/prism54/Makefile
+
+announce RT2X00_LIB_FIRMWARE - "Ralink driver firmware support"
+reject_firmware drivers/net/wireless/rt2x00/rt2x00firmware.c
+clean_kconfig drivers/net/wireless/rt2x00/Kconfig 'RT2X00_LIB_FIRMWARE'
+clean_mk CONFIG_RT2X00_LIB_FIRMWARE drivers/net/wireless/rt2x00/Makefile
+
+announce RT61PCI - "Ralink rt2501/rt61 (PCI/PCMCIA) support"
+clean_blob drivers/net/wireless/rt2x00/rt61pci.h
+clean_blob drivers/net/wireless/rt2x00/rt61pci.c
+clean_kconfig drivers/net/wireless/rt2x00/Kconfig 'RT61PCI'
+clean_mk CONFIG_RT61PCI drivers/net/wireless/rt2x00/Makefile
+
+announce RT73USB - "Ralink rt2501/rt73 (USB) support"
+clean_blob drivers/net/wireless/rt2x00/rt73usb.h
+clean_blob drivers/net/wireless/rt2x00/rt73usb.c
+clean_kconfig drivers/net/wireless/rt2x00/Kconfig 'RT73USB'
+clean_mk CONFIG_RT73USB drivers/net/wireless/rt2x00/Makefile
+
+announce USB_ZD1201 - "USB ZD1201 based Wireless device support"
+reject_firmware drivers/net/wireless/zd1201.c
+clean_blob drivers/net/wireless/zd1201.c
+clean_kconfig drivers/net/wireless/Kconfig 'USB_ZD1201'
+clean_mk CONFIG_USB_ZD1201 drivers/net/wireless/Makefile
+
+announce ZD1211RW - "ZyDAS ZD1211/ZD1211B USB-wireless support"
+reject_firmware drivers/net/wireless/zd1211rw/zd_usb.c
+clean_blob drivers/net/wireless/zd1211rw/zd_usb.c
+clean_kconfig drivers/net/wireless/zd1211rw/Kconfig 'ZD1211RW'
+clean_mk CONFIG_ZD1211RW drivers/net/wireless/zd1211rw/Makefile
+
+# bluetooth
+
+announce BT_HCIBCM203X - "HCI BCM203x USB driver"
+reject_firmware drivers/bluetooth/bcm203x.c
+clean_blob drivers/bluetooth/bcm203x.c
+clean_kconfig drivers/bluetooth/Kconfig 'BT_HCIBCM203X'
+clean_mk CONFIG_BT_HCIBCM203X drivers/bluetooth/Makefile
+
+announce BT_HCIBFUSB - "HCI BlueFRITZ! USB driver"
+reject_firmware drivers/bluetooth/bfusb.c
+clean_blob drivers/bluetooth/bfusb.c
+clean_kconfig drivers/bluetooth/Kconfig 'BT_HCIBFUSB'
+clean_mk CONFIG_BT_HCIBFUSB drivers/bluetooth/Makefile
+
+announce BT_HCIBT3C - "HCI BT3C (PC Card) driver"
+reject_firmware drivers/bluetooth/bt3c_cs.c
+clean_blob drivers/bluetooth/bt3c_cs.c
+clean_kconfig drivers/bluetooth/Kconfig 'BT_HCIBT3C'
+clean_mk CONFIG_BT_HCIBT3C drivers/bluetooth/Makefile
 
 
-#####################
-# Removed SH boards #
-#####################
+########
+# ISDN #
+########
 
-# SH_AP325RXA - Renesas AP-325RXA board
-clean_blob arch/sh/boards/board-ap325rxa.c
-clean_kconfig arch/sh/boards/Kconfig 'SH_AP325RXA'
-clean_mk CONFIG_SH_AP325RXA arch/sh/boards/Makefile
+announce ISDN_DIVAS - "Support Eicon DIVA Server cards"
+clean_blob drivers/isdn/hardware/eicon/cardtype.h
+clean_blob drivers/isdn/hardware/eicon/dsp_defs.h
+clean_kconfig drivers/isdn/hardware/eicon/Kconfig 'ISDN_DIVAS'
+clean_mk CONFIG_ISDN_DIVAS drivers/isdn/hardware/eicon/Makefile
 
-# SH_MIGOR - Reneasas Migo-R
-clean_blob arch/sh/boards/mach-migor/lcd_qvga.c -s 16
-clean_blob arch/sh/boards/mach-migor/setup.c
-clean_kconfig arch/sh/boards/Kconfig 'SH_MIGOR'
-clean_kconfig arch/sh/boards/mach-migor/Kconfig 'SH_MIGOR_QVGA'
-clean_mk CONFIG_SH_MIGOR_QVGA arch/sh/boards/mach-migor/Makefile
+##########
+# Serial #
+##########
+
+announce SERIAL_8250_CS - "8250/16550 PCMCIA device support"
+clean_blob drivers/serial/serial_cs.c
+clean_kconfig drivers/serial/Kconfig 'SERIAL_8250_CS'
+clean_mk CONFIG_SERIAL_8250_CS drivers/serial/Makefile
+
+announce SERIAL_ICOM - "IBM Multiport Serial Adapter"
+reject_firmware drivers/serial/icom.c
+clean_blob drivers/serial/icom.c
+clean_kconfig drivers/serial/Kconfig 'SERIAL_ICOM'
+clean_mk CONFIG_SERIAL_ICOM drivers/serial/Makefile
+
+announce SERIAL_QE - "Freescale QUICC Engine serial port support"
+reject_firmware drivers/serial/ucc_uart.c
+clean_blob drivers/serial/ucc_uart.c
+clean_kconfig drivers/serial/Kconfig 'SERIAL_QE'
+clean_mk CONFIG_SERIAL_QE drivers/serial/Makefile
 
 
-########################
-# Removed SCSI Drivers #
-########################
 
-# SCSI_QLOGICPTI - PTI Qlogic, ISP Driver
-clean_blob drivers/scsi/qlogicpti_asm.c
+########
+# SCSI #
+########
+
+announce SCSI_QLOGICPTI - "PTI Qlogic, ISP Driver"
+clean_file drivers/scsi/qlogicpti_asm.c
+clean_sed '
+/^static int __devinit qlogicpti_load_firmware([^;]*$/,/^}$/{
+  /[&]sbus_risc_code01/{
+    i\
+	printk(KERN_ERR "qlogicpti%d: Missing Free firmware\\n", qpti->qpti_id);\
+	return -EINVAL;
+  }
+  s,[&]sbus_risc_code01\[0\],NULL,
+  s,sbus_risc_code_length01,0,
+}' drivers/scsi/qlogicpti.c 'report missing Free firmware'
+clean_blob drivers/scsi/qlogicpti.c
 clean_kconfig drivers/scsi/Kconfig 'SCSI_QLOGICPTI'
 clean_mk CONFIG_SCSI_QLOGICPTI drivers/scsi/Makefile
 
-# SCSI_ADVANSYS - AdvanSys SCSI
+announce SCSI_ADVANSYS - "AdvanSys SCSI"
+clean_sed '
+/ASC_DBG.*_asc_mcode_chksum);/d;
+/^\(static ASC_CNT \)\?AscLoadMicroCode([^;]*$/,/^}$/{
+  /^}$/{
+    p;
+    i\
+#define AscLoadMicroCode(x1,x2,x3,x4) ((x1),(x2),(x3),(x4),printk(KERN_ERR "advansys: Missing Free firmware\\n"), -1)
+    d;
+  }
+}
+/^\(static int \)\?AdvLoadMicrocode([^;]*$/,/^}$/{
+  /^}$/{
+    p;
+    i\
+#define AdvLoadMicrocode(x1,x2,x3,x4,x5) ((x1),(x2),(x3),(x4),(x5),printk(KERN_ERR "advansys: Missing Free firmware\\n"), ASC_IERR_MCODE_CHKSUM)
+    d;
+  }
+}
+s/\([ 	(]\)_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_buf,/\1NULL,/;
+s/\([ 	]\)_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_size\([,)]\)/\1(unsigned short)0\5/;
+s/\([ 	]\)_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_chksum\([,)]\)/\1(ADV_DCNT)0\5/;
+' drivers/scsi/advansys.c 'report missing Free firmware'
 clean_blob drivers/scsi/advansys.c
 clean_kconfig drivers/scsi/Kconfig 'SCSI_ADVANSYS'
 clean_mk CONFIG_SCSI_ADVANSYS drivers/scsi/Makefile
 
-# SCSI_QLOGIC_1280 - Qlogic QLA 1240/1x80/1x160 SCSI
+announce SCSI_QLOGIC_1280 - "Qlogic QLA 1240/1x80/1x160 SCSI"
 clean_blob drivers/scsi/ql1280_fw.h
 clean_blob drivers/scsi/ql1040_fw.h
 clean_blob drivers/scsi/ql12160_fw.h
+clean_sed '
+s,[&]\(fw12\(160\|80e\)i\|risc\(_code\)\?\)_\(code01\[0\]\|length01\),NULL,g;
+/^qla1280_load_firmware\(_pio\)\?([^;]*$/,/^}$/{
+  /risc_code_size = [*]/{
+    i\
+	if (!risc_code_address) {\
+		printk(KERN_ERR "scsi(%li): Missing Free firmware\\n", ha->host_no);\
+		return -EINVAL;\
+	}
+  }
+}
+/^qla1280_load_firmware_dma([^;]*$/,/^}$/{
+  /risc_code_size = [*]/{
+    i\
+	if (!risc_code_address) {\
+		printk(KERN_ERR "scsi(%li): Missing Free firmware\\n", ha->host_no);\
+		err = -EINVAL;\
+		goto out;\
+	}
+  }
+}' drivers/scsi/qla1280.c 'report missing Free firmware'
 clean_kconfig drivers/scsi/Kconfig 'SCSI_QLOGIC_1280'
 clean_mk CONFIG_SCSI_QLOGIC_1280 drivers/scsi/Makefile
 
+announce SCSI_AIC94XX - "Adaptec AIC94xx SAS/SATA support"
+reject_firmware drivers/scsi/aic94xx/aic94xx_seq.c
+clean_blob drivers/scsi/aic94xx/aic94xx_seq.c
+clean_blob drivers/scsi/aic94xx/aic94xx_seq.h
+clean_kconfig drivers/scsi/aic94xx/Kconfig 'SCSI_AIC94XX'
+clean_mk CONFIG_SCSI_AIC94XX drivers/scsi/aic94xx/Makefile
 
-#######################
-# Removed USB Drivers #
-#######################
+announce SCSI_QLA_FC - "QLogic QLA2XXX Fibre Channel Support"
+reject_firmware drivers/scsi/qla2xxx/qla_gbl.h
+reject_firmware drivers/scsi/qla2xxx/qla_init.c
+reject_firmware drivers/scsi/qla2xxx/qla_os.c
+clean_sed '
+/^config SCSI_QLA_FC$/,/^config /{
+  /^	By default, firmware/i\
+	/*(DEBLOBBED)*/
+  /^	By default, firmware/,/ftp:[/][/].*firmware[/]/d
+}' drivers/scsi/qla2xxx/Kconfig 'removed firmware notes'
+clean_blob drivers/scsi/qla2xxx/qla_os.c
+clean_kconfig drivers/scsi/qla2xxx/Kconfig 'SCSI_QLA_FC'
+clean_mk CONFIG_SCSI_QLA_FC drivers/scsi/qla2xxx/Makefile
+
+
+#######
+# USB #
+#######
+
+# atm
+
+announce USB_CXACRU - "Conexant AccessRunner USB support"
+reject_firmware drivers/usb/atm/cxacru.c
+clean_blob drivers/usb/atm/cxacru.c
+clean_kconfig drivers/usb/atm/Kconfig 'USB_CXACRU'
+clean_mk CONFIG_USB_CXACRU drivers/usb/atm/Makefile
+
+announce USB_SPEEDTOUCH - "Speedtouch USB support"
+reject_firmware drivers/usb/atm/speedtch.c
+clean_blob drivers/usb/atm/speedtch.c
+clean_kconfig drivers/usb/atm/Kconfig 'USB_SPEEDTOUCH'
+clean_mk CONFIG_USB_SPEEDTOUCH drivers/usb/atm/Makefile
+
+announce USB_UEAGLEATM - "ADI 930 and eagle USB DSL modem"
+reject_firmware drivers/usb/atm/ueagle-atm.c
+clean_blob drivers/usb/atm/ueagle-atm.c
+clean_kconfig drivers/usb/atm/Kconfig 'USB_UEAGLEATM'
+clean_mk CONFIG_USB_UEAGLEATM drivers/usb/atm/Makefile
 
 # misc
 
-# USB_EMI26 - EMI 2|6 USB Audio interface
-# No need to remove this, it doesn't contain non-Free code.
-# clean_blob drivers/usb/misc/emi26.c
+announce USB_EMI26 - "EMI 2|6 USB Audio interface"
 # These files are not under the GPL, better remove them all.
-clean_file firmware/emi26/bitstream.HEX
-dummy_blob firmware/emi26/bitstream.fw
-clean_file firmware/emi26/firmware.HEX
-dummy_blob firmware/emi26/firmware.fw
-clean_file firmware/emi26/loader.HEX
-dummy_blob firmware/emi26/loader.fw
+drop_fw_file firmware/emi26/bitstream.HEX firmware/emi26/bitstream.fw
+drop_fw_file firmware/emi26/firmware.HEX firmware/emi26/firmware.fw
+drop_fw_file firmware/emi26/loader.HEX firmware/emi26/loader.fw
+reject_firmware drivers/usb/misc/emi26.c
+clean_blob drivers/usb/misc/emi26.c
 clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI26'
 clean_mk CONFIG_USB_EMI26 drivers/usb/misc/Makefile
 
-# USB_EMI62 - EMI 6|2m USB Audio interface
-# No need to remove this, it doesn't contain non-Free code.
-# clean_blob drivers/usb/misc/emi62.c
+announce USB_EMI62 - "EMI 6|2m USB Audio interface"
 # These files are probably not under the GPL, better remove them all.
-clean_file firmware/emi62/bitstream.HEX
-dummy_blob firmware/emi62/bitstream.fw
-clean_file firmware/emi62/loader.HEX
-dummy_blob firmware/emi62/loader.fw
-clean_file firmware/emi62/midi.HEX
-dummy_blob firmware/emi62/midi.fw
-clean_file firmware/emi62/spdif.HEX
-dummy_blob firmware/emi62/spdif.fw
+drop_fw_file firmware/emi62/bitstream.HEX firmware/emi62/bitstream.fw
+drop_fw_file firmware/emi62/loader.HEX firmware/emi62/loader.fw
+drop_fw_file firmware/emi62/midi.HEX firmware/emi62/midi.fw
+drop_fw_file firmware/emi62/spdif.HEX firmware/emi62/spdif.fw
+reject_firmware drivers/usb/misc/emi62.c
+clean_blob drivers/usb/misc/emi62.c
 clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI62'
 clean_mk CONFIG_USB_EMI62 drivers/usb/misc/Makefile
 
-# USB_SISUSBVGA - USB 2.0 SVGA dongle support (Net2280/SiS315)
-clean_blob drivers/usb/misc/sisusbvga/sisusb_init.h
-clean_kconfig drivers/usb/misc/sisusbvga/Kconfig 'USB_SISUSBVGA'
-clean_mk CONFIG_USB_SISUSBVGA drivers/usb/misc/sisusbvga/Makefile
+announce USB_ISIGHTFW - "iSight firmware loading support"
+reject_firmware drivers/usb/misc/isight_firmware.c
+clean_blob drivers/usb/misc/isight_firmware.c
+clean_kconfig drivers/usb/misc/Kconfig 'USB_ISIGHTFW'
+clean_mk CONFIG_USB_ISIGHTFW drivers/usb/misc/Makefile
 
 # serial
 
-# USB_SERIAL_KEYSPAN_MPR - USB Keyspan MPR Firmware
-clean_file firmware/keyspan/mpr.HEX
-dummy_blob firmware/keyspan/mpr.fw
+announce USB_SERIAL_KEYSPAN - "USB Keyspan USA-xxx Serial Driver"
+drop_fw_file firmware/keyspan/mpr.HEX firmware/keyspan/mpr.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_MPR'
-# USB_SERIAL_KEYSPAN_USA18X - USB Keyspan USA-18X Firmware
-clean_file firmware/keyspan/usa18x.HEX
-dummy_blob firmware/keyspan/usa18x.fw
+drop_fw_file firmware/keyspan/usa18x.HEX firmware/keyspan/usa18x.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA18X'
-# USB_SERIAL_KEYSPAN_USA19 - USB Keyspan USA-19 Firmware
-clean_file firmware/keyspan/usa19.HEX
-dummy_blob firmware/keyspan/usa19.fw
+drop_fw_file firmware/keyspan/usa19.HEX firmware/keyspan/usa19.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19'
-# USB_SERIAL_KEYSPAN_USA19QI - USB Keyspan USA-19QI Firmware
-clean_file firmware/keyspan/usa19qi.HEX
-dummy_blob firmware/keyspan/usa19qi.fw
+drop_fw_file firmware/keyspan/usa19qi.HEX firmware/keyspan/usa19qi.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QI'
-# USB_SERIAL_KEYSPAN_USA19QW - USB Keyspan USA-19QW Firmware
-clean_file firmware/keyspan/usa19qw.HEX
-dummy_blob firmware/keyspan/usa19qw.fw
+drop_fw_file firmware/keyspan/usa19qw.HEX firmware/keyspan/usa19qw.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QW'
-# USB_SERIAL_KEYSPAN_USA19W - USB Keyspan USA-19W Firmware
-clean_file firmware/keyspan/usa19w.HEX
-dummy_blob firmware/keyspan/usa19w.fw
+drop_fw_file firmware/keyspan/usa19w.HEX firmware/keyspan/usa19w.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19W'
-# USB_SERIAL_KEYSPAN_USA28 - USB Keyspan USA-28 Firmware
-clean_file firmware/keyspan/usa28.HEX
-dummy_blob firmware/keyspan/usa28.fw
+drop_fw_file firmware/keyspan/usa28.HEX firmware/keyspan/usa28.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28'
-# USB_SERIAL_KEYSPAN_USA28XA - USB Keyspan USA-28XA Firmware
-clean_file firmware/keyspan/usa28xa.HEX
-dummy_blob firmware/keyspan/usa28xa.fw
+drop_fw_file firmware/keyspan/usa28xa.HEX firmware/keyspan/usa28xa.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XA'
-# USB_SERIAL_KEYSPAN_USA28XB - USB Keyspan USA-28XB Firmware
-clean_file firmware/keyspan/usa28xb.HEX
-dummy_blob firmware/keyspan/usa28xb.fw
+drop_fw_file firmware/keyspan/usa28xb.HEX firmware/keyspan/usa28xb.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XB'
-# USB_SERIAL_KEYSPAN_USA28X - USB Keyspan USA-28X Firmware
-clean_file firmware/keyspan/usa28x.HEX
-dummy_blob firmware/keyspan/usa28x.fw
+drop_fw_file firmware/keyspan/usa28x.HEX firmware/keyspan/usa28x.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28X'
-# USB_SERIAL_KEYSPAN_USA49W - USB Keyspan USA-49W Firmware
-clean_file firmware/keyspan/usa49w.HEX
-dummy_blob firmware/keyspan/usa49w.fw
+drop_fw_file firmware/keyspan/usa49w.HEX firmware/keyspan/usa49w.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49W'
-# USB_SERIAL_KEYSPAN_USA49WLC - USB Keyspan USA-49WLC Firmware
-clean_file firmware/keyspan/usa49wlc.HEX
-dummy_blob firmware/keyspan/usa49wlc.fw
+drop_fw_file firmware/keyspan/usa49wlc.HEX firmware/keyspan/usa49wlc.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49WLC'
+reject_firmware drivers/usb/serial/keyspan.c
+clean_blob drivers/usb/serial/keyspan.c
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN'
 clean_mk CONFIG_USB_SERIAL_KEYSPAN drivers/usb/serial/Makefile
 
-# USB_SERIAL_EDGEPORT - USB Inside Out Edgeport Serial Driver
+announce USB_SERIAL_KEYSPAN_PDA - "USB Keyspan PDA Single Port Serial Driver"
+clean_sed '
+s,request_ihex_firmware,/*KEYSPAN_PDA*/&,
+' drivers/usb/serial/keyspan_pda.c 'accept Free firmware'
+
+announce USB_SERIAL_EDGEPORT - "USB Inside Out Edgeport Serial Driver"
 clean_fw firmware/edgeport/boot.H16 firmware/edgeport/boot.fw
+clean_fw firmware/edgeport/boot2.H16 firmware/edgeport/boot2.fw
 clean_fw firmware/edgeport/down.H16 firmware/edgeport/down.fw
 clean_fw firmware/edgeport/down2.H16 firmware/edgeport/down2.fw
+reject_firmware drivers/usb/serial/io_edgeport.c
+clean_blob drivers/usb/serial/io_edgeport.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT drivers/usb/serial/Makefile
 
-# USB_SERIAL_EDGEPORT_TI - USB Inside Out Edgeport Serial Driver (TI devices)
-clean_fw firmware/edgeport/boot2.H16 firmware/edgeport/boot2.fw
+announce USB_SERIAL_EDGEPORT_TI - "USB Inside Out Edgeport Serial Driver (TI devices)"
 clean_fw firmware/edgeport/down3.bin.ihex firmware/edgeport/down3.bin
+reject_firmware drivers/usb/serial/io_ti.c
+clean_blob drivers/usb/serial/io_ti.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT_TI'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT_TI drivers/usb/serial/Makefile
 
-# USB_SERIAL_TI - USB TI 3410/5052 Serial Driver
-clean_file firmware/ti_3410.fw.ihex
-dummy_blob firmware/ti_3410.fw
-clean_file firmware/ti_5052.fw.ihex
-dummy_blob firmware/ti_5052.fw
+announce USB_SERIAL_TI - "USB TI 3410/5052 Serial Driver"
+drop_fw_file firmware/ti_3410.fw.ihex firmware/ti_3410.fw
+drop_fw_file firmware/ti_5052.fw.ihex firmware/ti_5052.fw
+reject_firmware drivers/usb/serial/ti_usb_3410_5052.c
+clean_blob drivers/usb/serial/ti_usb_3410_5052.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_TI'
 clean_mk CONFIG_USB_SERIAL_TI drivers/usb/serial/Makefile
 
-# USB_SERIAL_WHITEHEAT - USB ConnectTech WhiteHEAT Serial Driver
+announce USB_SERIAL_WHITEHEAT - "USB ConnectTech WhiteHEAT Serial Driver"
 clean_fw firmware/whiteheat.HEX firmware/whiteheat.fw
 clean_fw firmware/whiteheat_loader.HEX firmware/whiteheat_loader.fw
 clean_fw firmware/whiteheat_loader_debug.HEX firmware/whiteheat_loader_debug.fw
+reject_firmware drivers/usb/serial/whiteheat.c
+clean_blob drivers/usb/serial/whiteheat.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_WHITEHEAT'
 clean_mk CONFIG_USB_SERIAL_WHITEHEAT drivers/usb/serial/Makefile
 
 
-#########################
-# Removed video Drivers #
-#########################
+#########
+# Sound #
+#########
 
-# FB_ASILIANT - Asiliant (Chips) 69000 display support
-clean_blob drivers/video/asiliantfb.c
-clean_kconfig drivers/video/Kconfig 'FB_ASILIANT'
-clean_mk CONFIG_FB_ASILIANT drivers/video/Makefile
-
-# FB_CT65550 - Chips 65550 display support
-clean_blob drivers/video/chipsfb.c
-clean_kconfig drivers/video/Kconfig 'FB_CT65550'
-clean_mk CONFIG_FB_CT65550 drivers/video/Makefile
-
-# USB_GSPCA - Conexant 11646
-clean_blob drivers/media/video/gspca/conex.c
-# clean_kconfig drivers/video/gspca/Kconfig 'USB_GSPCA'
-# clean_mk CONFIG_USB_GSPCA drivers/video/Makefile
-
-#########################
-# Removed Sound Drivers #
-#########################
-
-# SND_CS46XX - Cirrus Logic (Sound Fusion) CS4280/CS461x/CS462x/CS463x
-clean_blob sound/pci/cs46xx/cs46xx_image.h
-# Blobs containing comments, not recognized by deblob-check
+announce SND_CS46XX - "Cirrus Logic (Sound Fusion) CS4280/CS461x/CS462x/CS463x"
+# This appears to have been extracted from some non-Free driver
+clean_file sound/pci/cs46xx/cs46xx_image.h
+# The following blobs are definitely extracted from non-Free drivers.
 clean_file sound/pci/cs46xx/imgs/cwc4630.h
 clean_file sound/pci/cs46xx/imgs/cwcasync.h
-clean_file sound/pci/cs46xx/imgs/cwcdma.h
 clean_file sound/pci/cs46xx/imgs/cwcsnoop.h
+clean_sed '
+/^\(int \)\?snd_cs46xx_download_image([^;]*$/,/^}$/{
+  /for.*BA1_MEMORY_COUNT/i\
+#if 0
+  /^}$/{
+    i\
+#else\
+	snd_printk(KERN_ERR "cs46xx: Missing Free firmware\\n");\
+	return -EINVAL;\
+#endif
+  }
+}
+s/cs46xx_dsp_load_module(chip, [&]cwc\(4630\|async\|snoop\)_module)/(snd_printk(KERN_ERR "cs46xx: Missing Free firmware\\n"),-EINVAL)/
+' sound/pci/cs46xx/cs46xx_lib.c 'report missing Free firmware'
+clean_blob sound/pci/cs46xx/cs46xx_lib.c
 clean_kconfig sound/pci/Kconfig 'SND_CS46XX'
-# sed -i '/cs46xx\/ \\/d' sound/pci/Makefile
+clean_mk 'CONFIG_SND_CS46XX' sound/pci/cs46xx/Makefile
 
-# SND_KORG1212 - Korg 1212 IO
-clean_file firmware/korg/k1212.dsp.ihex
-dummy_blob firmware/korg/k1212.dsp
+announce SND_KORG1212 - "Korg 1212 IO"
+drop_fw_file firmware/korg/k1212.dsp.ihex firmware/korg/k1212.dsp
+reject_firmware sound/pci/korg1212/korg1212.c
+clean_blob sound/pci/korg1212/korg1212.c
+clean_kconfig sound/pci/Kconfig 'SND_KORG1212'
+clean_mk 'CONFIG_SND_KORG1212' sound/pci/korg1212/Makefile
 
-# SND_MAESTRO3 - ESS Allegro/Maestro3
-clean_file firmware/ess/maestro3_assp_kernel.fw.ihex
-dummy_blob firmware/ess/maestro3_assp_kernel.fw
-clean_file firmware/ess/maestro3_assp_minisrc.fw.ihex
-dummy_blob firmware/ess/maestro3_assp_minisrc.fw
+announce SND_MAESTRO3 - "ESS Allegro/Maestro3"
+drop_fw_file firmware/ess/maestro3_assp_kernel.fw.ihex firmware/ess/maestro3_assp_kernel.fw
+drop_fw_file firmware/ess/maestro3_assp_minisrc.fw.ihex firmware/ess/maestro3_assp_minisrc.fw
+reject_firmware sound/pci/maestro3.c
+clean_blob sound/pci/maestro3.c
+clean_kconfig sound/pci/Kconfig 'SND_MAESTRO3'
+clean_mk 'CONFIG_SND_MAESTRO3' sound/pci/Makefile
 
-# SND_YMFPCI - Yamaha YMF724/740/744/754
-clean_file firmware/yamaha/ds1_ctrl.fw.ihex
-dummy_blob firmware/yamaha/ds1_ctrl.fw
-clean_file firmware/yamaha/ds1_dsp.fw.ihex
-dummy_blob firmware/yamaha/ds1_dsp.fw
-clean_file firmware/yamaha/ds1e_ctrl.fw.ihex
-dummy_blob firmware/yamaha/ds1e_ctrl.fw
+announce SND_YMFPCI - "Yamaha YMF724/740/744/754"
+drop_fw_file firmware/yamaha/ds1_ctrl.fw.ihex firmware/yamaha/ds1_ctrl.fw
+drop_fw_file firmware/yamaha/ds1_dsp.fw.ihex firmware/yamaha/ds1_dsp.fw
+drop_fw_file firmware/yamaha/ds1e_ctrl.fw.ihex firmware/yamaha/ds1e_ctrl.fw
+reject_firmware sound/pci/ymfpci/ymfpci_main.c
+clean_blob sound/pci/ymfpci/ymfpci_main.c
+clean_kconfig sound/pci/Kconfig 'SND_YMFPCI'
+clean_mk 'CONFIG_SND_YMFPCI' sound/pci/ymfpci/Makefile
 
-# SND_SB16_CSP_FIRMWARE_IN_KERNEL - SB16 Advanced Signal Processor
-clean_file firmware/sb16/alaw_main.csp.ihex
-dummy_blob firmware/sb16/alaw_main.csp
-clean_file firmware/sb16/mulaw_main.csp.ihex
-dummy_blob firmware/sb16/mulaw_main.csp
-clean_file firmware/sb16/ima_adpcm_init.csp.ihex
-dummy_blob firmware/sb16/ima_adpcm_init.csp
-clean_file firmware/sb16/ima_adpcm_capture.csp.ihex
-dummy_blob firmware/sb16/ima_adpcm_capture.csp
-clean_file firmware/sb16/ima_adpcm_playback.csp.ihex
-dummy_blob firmware/sb16/ima_adpcm_playback.csp
+announce SND_SB16_CSP - "SB16 Advanced Signal Processor"
+drop_fw_file firmware/sb16/alaw_main.csp.ihex firmware/sb16/alaw_main.csp
+drop_fw_file firmware/sb16/mulaw_main.csp.ihex firmware/sb16/mulaw_main.csp
+drop_fw_file firmware/sb16/ima_adpcm_init.csp.ihex firmware/sb16/ima_adpcm_init.csp
+drop_fw_file firmware/sb16/ima_adpcm_capture.csp.ihex firmware/sb16/ima_adpcm_capture.csp
+drop_fw_file firmware/sb16/ima_adpcm_playback.csp.ihex firmware/sb16/ima_adpcm_playback.csp
+reject_firmware sound/isa/sb/sb16_csp.c
+clean_blob sound/isa/sb/sb16_csp.c
+clean_kconfig sound/isa/Kconfig 'SND_SB16_CSP'
+clean_mk 'CONFIG_SND_SB16_CSP' sound/isa/sb/Makefile
 
-# SND_WAVEFRONT_FIRMWARE_IN_KERNEL
-# Most of this file is not matched by deblob-check because of WAIT_IDLE.
-# Just remove it.
-clean_file sound/isa/wavefront/yss225.c
-clean_kconfig sound/isa/Kconfig 'SND_WAVEFRONT_FIRMWARE_IN_KERNEL'
+announce SND_WAVEFRONT - "Turtle Beach Maui,Tropez,Tropez+ (Wavefront)"
+clean_blob sound/isa/wavefront/yss225.c
+clean_sed '
+/firmware = &yss225_registers_firmware/i\
+	snd_printk(KERN_ERR "FX: Missing Free firmware\\n");\
+	err = -EINVAL;\
+	goto out;
+' sound/isa/wavefront/wavefront_fx.c 'report missing Free firmware'
+reject_firmware sound/isa/wavefront/wavefront_fx.c
+clean_blob sound/isa/wavefront/wavefront_fx.c
+reject_firmware sound/isa/wavefront/wavefront_synth.c
+clean_blob sound/isa/wavefront/wavefront_synth.c
+clean_kconfig sound/isa/Kconfig 'SND_WAVEFRONT'
+clean_mk 'CONFIG_SND_WAVEFRONT' sound/isa/wavefront/Makefile
+
+announce SND_VX_LIB - Digigram VX soundcards
+reject_firmware sound/drivers/vx/vx_hwdep.c
+clean_blob sound/drivers/vx/vx_hwdep.c
+clean_kconfig sound/drivers/Kconfig 'SND_VX_LIB'
+clean_mk CONFIG_SND_VX_LIB sound/drivers/vx/Makefile
+
+announce SND_DARLA20 - "(Echoaudio) Darla20"
+clean_blob sound/pci/echoaudio/darla20.c
+clean_kconfig sound/pci/Kconfig 'SND_DARLA20'
+clean_mk CONFIG_SND_DARLA20 sound/pci/echoaudio/Makefile
+
+announce SND_DARLA24 - "(Echoaudio) Darla24"
+clean_blob sound/pci/echoaudio/darla24.c
+clean_kconfig sound/pci/Kconfig 'SND_DARLA24'
+clean_mk CONFIG_SND_DARLA24 sound/pci/echoaudio/Makefile
+
+announce SND_ECHO3G - "(Echoaudio) 3G cards"
+clean_blob sound/pci/echoaudio/echo3g.c
+clean_kconfig sound/pci/Kconfig 'SND_ECHO3G'
+clean_mk CONFIG_SND_ECHO3G sound/pci/echoaudio/Makefile
+
+announce SND_GINA20 - "(Echoaudio) Gina20"
+clean_blob sound/pci/echoaudio/gina20.c
+clean_kconfig sound/pci/Kconfig 'SND_GINA20'
+clean_mk CONFIG_SND_GINA20 sound/pci/echoaudio/Makefile
+
+announce SND_GINA24 - "(Echoaudio) Gina24"
+clean_blob sound/pci/echoaudio/gina24.c
+clean_kconfig sound/pci/Kconfig 'SND_GINA24'
+clean_mk CONFIG_SND_GINA24 sound/pci/echoaudio/Makefile
+
+announce SND_INDIGO - "(Echoaudio) Indigo"
+clean_blob sound/pci/echoaudio/indigo.c
+clean_kconfig sound/pci/Kconfig 'SND_INDIGO'
+clean_mk CONFIG_SND_INDIGO sound/pci/echoaudio/Makefile
+
+announce SND_INDIGODJ - "(Echoaudio) Indigo DJ"
+clean_blob sound/pci/echoaudio/indigodj.c
+clean_kconfig sound/pci/Kconfig 'SND_INDIGODJ'
+clean_mk CONFIG_SND_INDIGODJ sound/pci/echoaudio/Makefile
+
+announce SND_INDIGOIO - "(Echoaudio) Indigo IO"
+clean_blob sound/pci/echoaudio/indigoio.c
+clean_kconfig sound/pci/Kconfig 'SND_INDIGOIO'
+clean_mk CONFIG_SND_INDIGOIO sound/pci/echoaudio/Makefile
+
+announce SND_LAYLA20 - "(Echoaudio) Layla20"
+clean_blob sound/pci/echoaudio/layla20.c
+clean_kconfig sound/pci/Kconfig 'SND_LAYLA20'
+clean_mk CONFIG_SND_LAYLA20 sound/pci/echoaudio/Makefile
+
+announce SND_LAYLA24 - "(Echoaudio) Layla24"
+clean_blob sound/pci/echoaudio/layla24.c
+clean_kconfig sound/pci/Kconfig 'SND_LAYLA24'
+clean_mk CONFIG_SND_LAYLA24 sound/pci/echoaudio/Makefile
+
+announce SND_MIA - "(Echoaudio) Mia"
+clean_blob sound/pci/echoaudio/mia.c
+clean_kconfig sound/pci/Kconfig 'SND_MIA'
+clean_mk CONFIG_SND_MIA sound/pci/echoaudio/Makefile
+
+announce SND_MONA - "(Echoaudio) Mona"
+clean_blob sound/pci/echoaudio/mona.c
+clean_kconfig sound/pci/Kconfig 'SND_MONA'
+clean_mk CONFIG_SND_MONA sound/pci/echoaudio/Makefile
+
+announce SND_'<(Echoaudio)>' - "(Echoaudio) all of the above "
+reject_firmware sound/pci/echoaudio/echoaudio.c
+clean_blob sound/pci/echoaudio/echoaudio.c
+
+announce SND_EMU10K1 - "Emu10k1 (SB Live!, Audigy, E-mu APS)"
+reject_firmware sound/pci/emu10k1/emu10k1_main.c
+clean_blob sound/pci/emu10k1/emu10k1_main.c
+clean_kconfig sound/pci/Kconfig 'SND_EMU10K1'
+clean_mk CONFIG_SND_EMU10K1 sound/pci/emu10k1/Makefile
+
+announce SND_MIXART - "Digigram miXart"
+reject_firmware sound/pci/mixart/mixart_hwdep.c
+clean_blob sound/pci/mixart/mixart_hwdep.c
+clean_kconfig sound/pci/Kconfig 'SND_MIXART'
+clean_mk CONFIG_SND_MIXART sound/pci/mixart/Makefile
+
+announce SND_PCXHR - "Digigram PCXHR"
+reject_firmware sound/pci/pcxhr/pcxhr_hwdep.c
+clean_blob sound/pci/pcxhr/pcxhr_hwdep.c
+clean_kconfig sound/pci/Kconfig 'SND_PCXHR'
+clean_mk CONFIG_SND_PCXHR sound/pci/pcxhr/Makefile
+
+announce SND_RIPTIDE - "Conexant Riptide"
+reject_firmware sound/pci/riptide/riptide.c
+clean_blob sound/pci/riptide/riptide.c
+clean_kconfig sound/pci/Kconfig 'SND_RIPTIDE'
+clean_mk CONFIG_SND_RIPTIDE sound/pci/riptide/Makefile
+
+announce SND_HDSP - "RME Hammerfall DSP Audio"
+reject_firmware sound/pci/rme9652/hdsp.c
+clean_blob sound/pci/rme9652/hdsp.c
+clean_kconfig sound/pci/Kconfig 'SND_HDSP'
+clean_mk CONFIG_SND_HDSP sound/pci/rme9652/Makefile
+
+announce SND_AICA - "Dreamcast Yamaha AICA sound"
+reject_firmware sound/sh/aica.c
+clean_blob sound/sh/aica.c
+clean_kconfig sound/sh/Kconfig 'SND_AICA'
+clean_mk CONFIG_SND_AICA sound/sh/Makefile
+
+announce SOUND_MSNDCLAS - "Support for Turtle Beach MultiSound Classic, Tahiti, Monterey"
+clean_blob sound/oss/msnd_classic.h
+clean_kconfig sound/oss/Kconfig 'SOUND_MSNDCLAS'
+clean_sed '
+/^config MSNDCLAS_INIT_FILE$/, /^config / {
+  /^	default.*msndinit\.bin/ s,".*","/*(DEBLOBBED)*/",;
+}
+/^config MSNDCLAS_PERM_FILE$/, /^config / {
+  /^	default.*msndperm\.bin/ s,".*","/*(DEBLOBBED)*/",;
+}' sound/oss/Kconfig 'removed default firmware'
+clean_mk CONFIG_SOUND_MSNDCLAS sound/oss/Makefile
+
+announce SOUND_MSNDPIN - "Support for Turtle Beach MultiSound Pinnacle"
+clean_blob sound/oss/msnd_pinnacle.h
+clean_kconfig sound/oss/Kconfig 'SOUND_MSNDPIN'
+clean_sed '
+/^config MSNDPIN_INIT_FILE$/, /^config / {
+  /^	default.*pndspini\.bin/ s,".*","/*(DEBLOBBED)*/",;
+}
+/^config MSNDPIN_PERM_FILE$/, /^config / {
+  /^	default.*pndsperm\.bin/ s,".*","/*(DEBLOBBED)*/",;
+}' sound/oss/Kconfig 'removed default firmware'
+clean_mk CONFIG_SOUND_MSNDPIN sound/oss/Makefile
+
+announce SOUND_SSCAPE - "Ensoniq SoundScape support"
+clean_blob sound/oss/sscape.c
+clean_kconfig sound/oss/Kconfig 'SOUND_SSCAPE'
+clean_mk CONFIG_SOUND_SSCAPE sound/oss/Makefile
+
+announce SOUND_TRIX - "MediaTrix AudioTrix Pro support"
+clean_blob sound/oss/trix.c
+clean_kconfig sound/oss/Kconfig 'SOUND_TRIX'
+clean_sed '
+/^config TRIX_BOOT_FILE$/, /^config / {
+  /^	default.*trxpro\.hex/ s,".*","/*(DEBLOBBED)*/",;
+}' sound/oss/Kconfig 'removed default firmware'
+clean_mk CONFIG_SOUND_TRIX sound/oss/Makefile
+
+announce SOUND_TRIX - "See above,"
+announce SOUND_PAS - "ProAudioSpectrum 16 support,"
+announce SOUND_SB - "100% Sound Blaster compatibles (SB16/32/64, ESS, Jazz16) support"
+clean_blob sound/oss/sb_common.c
+clean_kconfig sound/oss/Kconfig 'SOUND_PAS'
+clean_kconfig sound/oss/Kconfig 'SOUND_SB'
+clean_mk CONFIG_SOUND_PAS sound/oss/Makefile
+clean_mk CONFIG_SOUND_SB sound/oss/Makefile
+
+announce SOUND_PSS - "PSS (AD1848, ADSP-2115, ESC614) support"
+clean_sed 's,^\( [*] .*synth"\)\.$,\1/*.,' sound/oss/pss.c 'avoid nested comments'
+clean_blob sound/oss/pss.c
+clean_kconfig sound/oss/Kconfig 'SOUND_PSS'
+clean_sed '
+/^config PSS_BOOT_FILE$/, /^config / {
+  /^	default.*dsp001\.ld/ s,".*","/*(DEBLOBBED)*/",;
+}' sound/oss/Kconfig 'removed default firmware'
+clean_mk CONFIG_SOUND_PSS sound/oss/Makefile
+
+#################
+# Documentation #
+#################
+
+announce Documentation - "non-Free firmware scripts and documentation"
+clean_blob Documentation/dvb/avermedia.txt
+clean_blob Documentation/dvb/opera-firmware.txt
+clean_blob Documentation/dvb/ttusb-dec.txt
+clean_blob Documentation/sound/alsa/ALSA-Configuration.txt
+clean_blob Documentation/sound/oss/MultiSound
+clean_blob Documentation/sound/oss/PSS
+clean_blob Documentation/sound/oss/PSS-updates
+clean_file Documentation/dvb/get_dvb_firmware
+clean_file Documentation/video4linux/extract_xc3028.pl
+clean_sed s,usb8388,whatever,g drivers/base/Kconfig 'removed blob name'
+clean_blob firmware/WHENCE
 
 exit 0
