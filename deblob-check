@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-03-31
+# deblob-check version 2009-04-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -610,7 +610,7 @@ set_except () {
   blobna 'request_firmware_nowait'
   blobna 'request_firmware'
   blobna 'request_ihex_firmware'
-  blobna 'MODULE_FIRMWARE[ 	\n]*([^\n;]*)[ 	\n]*;\([ 	\n]*MODULE_FIRMWARE[ 	\n]*([^\n;]*)[ 	\n]*;\)*'
+  blobna 'MODULE_FIRMWARE[ 	]*([^\n;]*)[ 	]*;\([ 	\n]*MODULE_FIRMWARE[ 	]*([^\n;]*)[ 	]*;\)*'
   blobna 'DEFAULT_FIRMWARE'
   blobna '\(\.\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
@@ -918,6 +918,13 @@ set_except () {
     # Hunting down non-Free firmware-loading code and instructions.
     # Firmware names are to be caught anywhere.
 
+    # 2.6.27 but not later
+
+    blob 'cas_saturn_patch_t cas_saturn_patch\[\] = {[^;]*};' drivers/net/cassini.h
+    accept '	  firmware files -- the same names which appear in MODULE_FIRMWARE()' drivers/base/Kconfig
+
+    # 2.6.28 or earlier
+
     blobname 'atmsar11\.fw' drivers/atm/ambassador.c
 
     blob '\(#ifdef __\(LITTLE\|BIG\)_ENDIAN[\n]\)\?#define FW_EXT "\(_ecd\)\?\.bin2\?"\([\n]#else[\n]#define FW_EXT "\(_ecd\)\?\.bin2\?"\)*\([\n]#endif\)\?' drivers/atm/fore200e.c
@@ -1035,7 +1042,7 @@ set_except () {
 
 
     blobname '\(agere\|prism\)_\(sta\|ap\)_fw\.bin' 'drivers/net/wireless/\(orinico/\)\?orinoco\.c'
-    blobna 'symbol_sp24t_\(prim\|sec\)_fw' 'drivers/net/wireless/\(orinico/\)\?orinoco\.c'
+    blobname 'symbol_sp24t_\(prim\|sec\)_fw' 'drivers/net/wireless/\(\(orinico/\)\?orinoco\.c\|spectrum_cs\.c\)'
 
     blob 'unsigned short sbus_risc_code01\[\] __devinitdata = {[^}]*};' drivers/scsi/qlogicpti_asm.c
     blob '#include "qlogicpti_asm\.c"' drivers/scsi/qlogicpti.c
@@ -1103,7 +1110,7 @@ set_except () {
 
     blobname 'amd-ucode[/]microcode_amd\.bin' arch/x86/kernel/microcode_amd.c
 
-    blobname 'intel-ucode[/]\([0-9a-f][0-9a-f]\|%02x\)-\([0-9a-f][0-9a-f]\|%02x\)-\([0-9a-f][0-9a-f]\|%02x\)' arch/x86/kernel/microcode_intel.c
+    blobname 'intel-ucode[/]\([0-9a-f][0-9a-f]\|%02x\)-\([0-9a-f][0-9a-f]\|%02x\)-\([0-9a-f][0-9a-f]\|%02x\)' 'arch/x86/kernel/microcode\(_intel\)\?\.c'
 
     blobname 'BCM2033-\(MD\.hex\|FW\.bin\)' drivers/bluetooth/bcm203x.c
 
@@ -1376,7 +1383,7 @@ set_except () {
     blobname 'drx397xD\.\(A2\|B1\)\.fw' drivers/media/dvb/frontends/drx397xD_fw.h
 
     accept '#define DIB0700_DEFAULT_DEVICE_PROPERTIES \\[\n]\(	\.\(caps\|usb_ctrl\) *= [^\n",]*, \\[\n]\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/dib0700_devices.c
-    blobname 'dvb-usb-dib0700-1\.20\.fw' drivers/media/dvb/dvb-usb/dib0700_devices.c
+    blobname 'dvb-usb-dib0700-1\.[12]0\.fw' drivers/media/dvb/dvb-usb/dib0700_devices.c
 
     accept 'static struct dvb_usb_device_properties nova_t_properties = {[\n]\(	\.\(caps\|usb_ctrl\) *= [^",]*,[\n]*\)*	\.firmware *= ' drivers/media/dvb/dvb-usb/nova-t-usb2.c
     blobname 'dvb-usb-nova-t-usb2-02\.fw' drivers/media/dvb/dvb-usb/nova-t-usb2.c
