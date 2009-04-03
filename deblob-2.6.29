@@ -1341,7 +1341,7 @@ clean_mk CONFIG_RT2870 drivers/staging/rt2870/Makefile
 
 # wimax
 
-annunce WIMAX_I2400M - "Intel Wireless WiMAX Connection 2400"
+announce WIMAX_I2400M - "Intel Wireless WiMAX Connection 2400"
 reject_firmware drivers/net/wimax/i2400m/fw.c
 clean_blob drivers/net/wimax/i2400m/sdio.c
 clean_blob drivers/net/wimax/i2400m/usb.c
