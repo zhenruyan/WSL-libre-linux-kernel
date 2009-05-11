@@ -93,50 +93,37 @@ else
   exit 1
 fi
 
-if test -f linux-$kver-$libre.tar.bz2; then
-  echo linux-$kver-$libre.tar.bz2 already exists >&2
-  exit 1
-fi
+for f in \
+  linux-$kver-$libre.tar.bz2 \
+  linux-$kver-$libre.tar.bz2.asc \
+  linux-$kver-$libre.tar.bz2.sign \
+  linux-$kver-$libre.tar.lz \
+  linux-$kver-$libre.tar.lz.asc \
+  linux-$kver-$libre.tar.lz.sign \
+  linux-$kver.tar \
+  linux-$kver-$libre.tar \
+  linux-$kver-$libre.patch \
+  linux-$kver-$libre.log \
+  linux-$kver-$libre.xdelta \
+  linux-$kver-$libre.xdelta.asc \
+  linux-$kver-$libre.xdelta.sign \
+; do
+  if test -f $f; then
+    echo $f already exists >&2
+    exit 1
+  fi
+done
 
-if test -f linux-$kver.tar; then
-  echo linux-$kver.tar already exists >&2
-  exit 1
-fi
-
-if test -f linux-$kver-$libre.tar; then
-  echo linux-$kver-$libre.tar already exists >&2
-  exit 1
-fi
-
-if test -f linux-$kver-$libre.patch; then
-  echo linux-$kver-$libre.patch already exists >&2
-  exit 1
-fi
-
-if test -f linux-$kver-$libre.log; then
-  echo linux-$kver-$libre.log already exists >&2
-  exit 1
-fi
-
-if test -f linux-$kver-$libre.xdelta; then
-  echo linux-$kver-$libre.xdelta already exists >&2
-  exit 1
-fi
-
-if test -d linux-$kver; then
-  echo linux-$kver already exists >&2
-  exit 1
-fi
-
-if test -d linux-$kver-$libre; then
-  echo linux-$kver-$libre already exists >&2
-  exit 1
-fi
-
-if test -d orig-linux-$kver; then
-  echo orig-linux-$kver already exists >&2
-  exit 1
-fi
+for d in \
+  linux-$kver \
+  linux-$kver-$libre \
+  orig-linux-$kver \
+; do
+  if test -d $d; then
+    echo $d already exists >&2
+    exit 1
+  fi
+done
 
 if test -f $dir/deblob-$kver; then
   if cmp $dir/deblob-$kver $deblob; then
@@ -225,21 +212,27 @@ xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta
 
 echo Compressing linux-$kver-$libre.tar and linux-$kver-$libre.xdelta
 rm -f linux-$kver.tar
+lzip -k9 linux-$kver-$libre.tar
 bzip2 -9 linux-$kver-$libre.tar
 if test -f linux-$kver-$libre.xdelta; then
+  lzip -k9 linux-$kver-$libre.xdelta
   bzip2 -9 linux-$kver-$libre.xdelta
 fi
 
 trap "status=$?; (exit $status); exit" 0 1 2 15
 
 echo Done except for signing, feel free to interrupt
-gpg -a --detach-sign linux-$kver-$libre.tar.bz2
-mv linux-$kver-$libre.tar.bz2.asc linux-$kver-$libre.tar.bz2.sign
-
-if test -f linux-$kver-$libre.xdelta.bz2; then
-  gpg -a --detach-sign linux-$kver-$libre.xdelta.bz2
-  mv linux-$kver-$libre.xdelta.bz2.asc linux-$kver-$libre.xdelta.bz2.sign
-fi
+for f in \
+  linux-$kver-$libre.tar.bz2 \
+  linux-$kver-$libre.tar.lz \
+  linux-$kver-$libre.xdelta.bz2 \
+  linux-$kver-$libre.xdelta.lz \
+; do
+  if test -f $f; then
+    gpg -a --detach-sign $f
+    mv $f.asc $f.sign
+  fi
+done
 
 echo All set, please review linux-$kver-$libre.patch
 
