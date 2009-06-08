@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.29 extra=++
+kver=2.6.29 extra=1
 
 fatal () {
   echo "$@"
@@ -420,7 +420,7 @@ clean_mk CONFIG_MOXA_INTELLIO drivers/char/Makefile
 announce DRM_MGA - "Matrox g200/g400"
 clean_blob drivers/gpu/drm/mga/mga_ucode.h
 clean_blob drivers/gpu/drm/mga/mga_warp.c
-clean_kconfig drivers/gpu/drm/Kconfig 'DRM_MGA'
+clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_MGA'
 clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
 announce DRM_R128 - "ATI Rage 128"
@@ -435,7 +435,7 @@ clean_sed '
   }
 }' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/r128/r128_cce.c
-clean_kconfig drivers/gpu/drm/Kconfig 'DRM_R128'
+clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 announce DRM_RADEON - "ATI Radeon"
@@ -458,7 +458,7 @@ clean_sed '
 }' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on resume'
 clean_blob drivers/gpu/drm/radeon/radeon_cp.c
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
-clean_kconfig drivers/gpu/drm/Kconfig 'DRM_RADEON'
+clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
 
 
@@ -919,6 +919,10 @@ drop_fw_file firmware/e100/d101m_ucode.bin.ihex firmware/e100/d101m_ucode.bin
 drop_fw_file firmware/e100/d101s_ucode.bin.ihex firmware/e100/d101s_ucode.bin
 drop_fw_file firmware/e100/d102e_ucode.bin.ihex firmware/e100/d102e_ucode.bin
 reject_firmware drivers/net/e100.c
+clean_sed '
+/^static const struct firmware \*e100_\(reject\|request\)_firmware(/,/^}$/{
+  s:^\(.*\)return ERR_PTR(err);$:\1DPRINTK(PROBE,ERR, "Proceeding without firmware\\n");\n\1return NULL;:
+}' drivers/net/e100.c 'proceed without firmware'
 clean_blob drivers/net/e100.c
 clean_kconfig drivers/net/Kconfig 'E100'
 clean_mk CONFIG_E100 drivers/net/Makefile
