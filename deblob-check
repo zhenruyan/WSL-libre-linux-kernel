@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-06-08
+# deblob-check version 2009-06-08.1
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1482,6 +1482,8 @@ set_except () {
     blobname 'tigon[/]tg3\(_tso5\?\)\?\.bin' drivers/net/tg3.c
     blobname '\(ti_usb-v\(%04x\|[0-9a-f]*\)-p\(%04x\|[0-9a-f]*\)\|mts_\(cdma\|gsm\|edge\)\)\.\(bin\|fw\)' drivers/usb/serial/ti_usb_3410_5052.c
     blobname 'iw\?2400m-fw-\(sdio\|usb\)-\(\(["][ ]I2400M_FW_VERSION[ ]["]\|[0-9]*\)\.sbcf\|[^". \n]*\)' 'drivers/net/wimax/i2400m/\(sdio\|usb\)\.c'
+    blob '3\.[ ]Installing[ ]the[ ]firmware[^\n]*\([\n][\n]*   [^\n]*\)*[\n]*[$][^\n]*i2400m-fw[^\n]*\([\n][\n]*   [^\n]*\)*' Documentation/wimax/README.i2400m
+    blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*\([\n][\n]*\(   \|i2400m_usb\)[^\n]*\)*' Documentation/wimax/README.i2400m
     accept '[	][	]ranges[ ]=[ ]<'"$blobpat*"'>[;]' arch/powerpc/boot/dts/mpc8572ds.dts
     accept '\(div_table_\(clz\|inv\|ix\)\|zero_l\):\([\n][	]\.\(byte[	]-\?[0-9]*\|long[	]0x[0-9A-F]*\)\)*' arch/sh/lib/udivsi3_i4i.S
     defsnc 'const[ ]u32[ ]crypto_[fi][tl]_tab\[4\]\[256\][ ]=' crypto/aes_generic.c
@@ -1569,7 +1571,7 @@ set_except () {
     # too lax?
     defsnc 'static[ ]yyconst[ ]\(flex_int\(16\|32\)_t\|\(\(short[ ]\)\?int\)\)[ ]yy_[^[]*\[[][0-9]*\][ ]='
     defsnc 'static[ ]const[ ]\(yytype_u\?int\(8\|16\)\|\(unsigned[ ]\)\?\(short\([ ]int\)\?\|char\)\)[ ]yy[^[]*\[\][ ]='
-    initnc '\([	]\)\?static[ ]\(const[ ]\)\?\(unsigned[ ]\(short\|char\)\|struct[ ]SiS_[^ ]*\)[ ]SiS[^[]*\(\[[][ ][*0-9]*\]\)\+[ ]*='
+    initnc '\([	]\)\?static[ ]\(const[ ]\)\?\(unsigned[ ]\(short\|char\)\|struct[ ]SiS_[^ ]*\)[ ]SiS[^[]*\(\[[][ *0-9]*\]\)\+[ ]*='
 
     initnc 'static[ ]const[ ]a3d_Hrtf_t[ ]A3dHrirZeros[ ]=[ ][{]'
     initnc 'static[ ]const[ ]a3d_Hrtf_t[ ]A3dHrirImpulse[ ]=[ ][{]'
