@@ -382,6 +382,8 @@ announce ATM_FORE200E - "FORE Systems 200E-series"
 reject_firmware drivers/atm/fore200e.c
 clean_blob drivers/atm/fore200e.c
 clean_blob Documentation/networking/fore200e.txt
+clean_blob drivers/atm/.gitignore
+clean_blob Documentation/dontdiff
 clean_kconfig drivers/atm/Kconfig 'ATM_FORE200E'
 clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 
