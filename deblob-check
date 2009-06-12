@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-06-12
+# deblob-check version 2009-06-12.1
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1998,7 +1998,8 @@ set_except () {
     blobname 'cis[/]LA-PCM\.cis' drivers/net/pcmcia/pcnet_cs.c
     blobname 'ositech[/]Xilinx7OD\.bin' drivers/net/pcmcia/smc91c92_cs.c
     blobname 'tehuti[/]\(firmware\|bdx\)\.bin' drivers/net/tehuti.c
-    accept '[	][	][	]["]b43-open%s[/]%s\.fw["]' drivers/net/wireless/b43/main.c
+    accept '[ 	]*["]b43-open%s[/]%s\.fw["]' drivers/net/wireless/b43/main.c
+    blobname 'nx\(romimg\|3fw\(ct\|mn\)\)\.bin' drivers/net/netxen/netxen_nic_hw.c
     ;;
 
   */patch*2.6.28-rc*)
