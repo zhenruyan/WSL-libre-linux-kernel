@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-06-11
+# deblob-check version 2009-06-12
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1014,7 +1014,7 @@ set_except () {
     blob '[/][*]\([^/]*\|[^*/][/]*\)*Load[ ]Rx[/]Tx[ ]firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n][	]for[ ][(][^)]*FIRMWARE_[RT]X_SIZE[^)]*[)][\n][	][	]writel[^;]*firmware_[rt]x[^;]*[;]\)\+' drivers/net/starfire.c
 
     blob 'static[ ]\(u8\|const[ ]u32\|struct[ ]fw_info\)[ ]bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)*[ ]=[ ][{][^}]*[}][;]\([\n][\n]*static[ ]\(u8\|const[ ]u32\|struct[ ]fw_info\)[ ]bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)*[ ]=[ ][{][^}]*[}][;]\)*' 'drivers/net/bnx2_fw2\?.h'
-    blob '#include[ ]["]bnx2_fw2\?\.h["]\([\n][\n]*#include[ ]["]bnx2_fw2\?\.h["]\)*' drivers/net/bnx2.c
+    blob '#include[ ]["]bnx2_fw\.h["][\n][\n]*#include[ ]["]bnx2_fw2\.h["]' drivers/net/bnx2.c
     blob 'static[ ]void[\n]load_rv2p_fw[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/net/bnx2.c
     blob 'static[ ]int[\n]bnx2_init_cpus[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/net/bnx2.c
 
@@ -1454,7 +1454,7 @@ set_except () {
     accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]digitv_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/digitv.c
     blobname 'dvb-usb-digitv-02\.fw' drivers/media/dvb/dvb-usb/digitv.c
 
-    blob 'Driver:[ ]\(acenic\|ADAPTEC_STARFIRE\|cxgb3\|e100\|tigon3\|korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|t[iu]_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\)[ ]--*[ ]\([^\n]\|[\n]*[^\n\-]\)*\([\n][\n]--*[\n][\n]Driver:[ ]\(acenic\|ADAPTEC_STARFIRE\|cxgb3\|e100\|tigon3\|korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|t[iu]_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\)[ ]--*[ ]\([^\n]\|[\n]*[^\n\-]\)*\)*' firmware/WHENCE
+    blob 'Driver:[ ]\(acenic\|ADAPTEC_STARFIRE\|cxgb3\|e100\|tigon3\|korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|t[iu]_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\|ambassador\|SCSI_\(ADVANSYS\|QLOGIC\(_1280\|PTI\)\)\|TEHUTI\|TYPHOON\|YAM\|3C359\|PCMCIA_\(PCNET\|SMC91C92\)\|MYRI_SBUS\|BNX2\|wavefront\)[ ]--*[ ]\([^\n]\|[\n]*[^\n\-]\)*\([\n][\n]--*[\n][\n]Driver:[ ]\(acenic\|ADAPTEC_STARFIRE\|cxgb3\|e100\|tigon3\|korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|t[iu]_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\|ambassador\|SCSI_\(ADVANSYS\|QLOGIC\(_1280\|PTI\)\)\|TEHUTI\|TYPHOON\|YAM\|3C359\|PCMCIA_\(PCNET\|SMC91C92\)\|MYRI_SBUS\|BNX2\|wavefront\)[ ]--*[ ]\([^\n]\|[\n]*[^\n\-]\)*\)*' firmware/WHENCE
 
     blobname 'sms1xxx-\(stellar\|nova-[ab]\|hcw-55xxx\)-dvbt-0[12]\.fw' drivers/media/dvb/siano/sms-cards.c
 
@@ -1481,7 +1481,7 @@ set_except () {
     blobname 'e100[/]d10\(1[ms]\|2e\)_ucode\.bin' drivers/net/e100.c
     blobname 'tigon[/]tg3\(_tso5\?\)\?\.bin' drivers/net/tg3.c
     blobname '\(ti_usb-v\(%04x\|[0-9a-f]*\)-p\(%04x\|[0-9a-f]*\)\|mts_\(cdma\|gsm\|edge\)\)\.\(bin\|fw\)' drivers/usb/serial/ti_usb_3410_5052.c
-    blobname 'iw\?2400m-fw-\(sdio\|usb\)-\(\(["][ ]I2400M_FW_VERSION[ ]["]\|[0-9]*\)\.sbcf\|[^". \n]*\)' 'drivers/net/wimax/i2400m/\(sdio\|usb\)\.c'
+    blobname 'iw\?2400m-fw-\(sdio\|usb\)-\(\(["][ ]I2400M_FW_VERSION[ ]["]\|[0-9.]*\)\.sbcf\|[^". \n]*\)' 'drivers/net/wimax/i2400m/\(sdio\|usb\)\.c'
     blob '3\.[ ]Installing[ ]the[ ]firmware[^\n]*\([\n][\n]*   [^\n]*\)*[\n]*[$][^\n]*i2400m-fw[^\n]*\([\n][\n]*   [^\n]*\)*' Documentation/wimax/README.i2400m
     blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*\([\n][\n]*\(   \|i2400m_usb\)[^\n]*\)*' Documentation/wimax/README.i2400m
     accept '[	][	]ranges[ ]=[ ]<'"$blobpat*"'>[;]' arch/powerpc/boot/dts/mpc8572ds.dts
@@ -1998,6 +1998,7 @@ set_except () {
     blobname 'cis[/]LA-PCM\.cis' drivers/net/pcmcia/pcnet_cs.c
     blobname 'ositech[/]Xilinx7OD\.bin' drivers/net/pcmcia/smc91c92_cs.c
     blobname 'tehuti[/]\(firmware\|bdx\)\.bin' drivers/net/tehuti.c
+    accept '[	][	][	]["]b43-open%s[/]%s\.fw["]' drivers/net/wireless/b43/main.c
     ;;
 
   */patch*2.6.28-rc*)
