@@ -126,7 +126,7 @@ for d in \
     echo $d already exists >&2
     exit 1
   fi
-  cleanup="$cleanup $f"
+  cleanup="$cleanup $d"
 done
 
 if test -f $dir/deblob-$kver; then
