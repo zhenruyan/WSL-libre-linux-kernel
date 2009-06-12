@@ -995,7 +995,7 @@ reject_firmware drivers/staging/sxg/sxg.c
 clean_sed '
 /^static int sxg_phy_init(/,/^}$/{
   /for (p = PhyUcode/i\
-		printk("%s: missing Free firmware\n");\
+		printk("%s: missing Free firmware\\n");\
 		return (STATUS_FAILURE);\
 #define PhyUcode NULL		
 }' drivers/staging/sxg/sxg.c
@@ -1150,7 +1150,7 @@ clean_sed '
 /^static int b43_upload_microcode(/,/^}$/{
   /	if (dev->fw\.opensource) {$/i\
 	if (!dev->fw.opensource) {\
-		b43err(dev->wl, "Rejected non-Free firmware\n");\
+		b43err(dev->wl, "Rejected non-Free firmware\\n");\
 		err = -EOPNOTSUPP;\
 		goto error;\
 	}
@@ -1393,7 +1393,7 @@ clean_blob drivers/staging/rt3070/rt_ate.c
 clean_sed '
 /^INT[	]set_eFuseLoadFromBin_Proc(/,/^}$/{
   /src = kmalloc/i\
-	printk("%s: missing Free firmware\n", __func__);\
+	printk("%s: missing Free firmware\\n", __func__);\
 	return FALSE;	
 }' drivers/staging/rt3070/common/eeprom.c 'report missing Free firmware'
 clean_blob drivers/staging/rt3070/common/eeprom.c
