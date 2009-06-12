@@ -93,6 +93,8 @@ else
   exit 1
 fi
 
+cleanup=
+
 for f in \
   linux-$kver-$libre.tar.bz2 \
   linux-$kver-$libre.tar.bz2.asc \
@@ -112,6 +114,7 @@ for f in \
     echo $f already exists >&2
     exit 1
   fi
+  cleanup="$cleanup $f"
 done
 
 for d in \
@@ -123,6 +126,7 @@ for d in \
     echo $d already exists >&2
     exit 1
   fi
+  cleanup="$cleanup $f"
 done
 
 if test -f $dir/deblob-$kver; then
@@ -149,7 +153,7 @@ else
   fi
 fi
 
-trap "status=$?; echo cleaning up...; rm -rf orig-linux-$kver linux-$kver linux-$kver-$libre linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.tar.bz2 linux-$kver-$libre.patch linux-$kver-$libre.xdelta; (exit $status); exit" 0 1 2 15
+trap "status=$?; echo cleaning up...; rm -rf $cleanup; (exit $status); exit" 0 1 2 15
 
 set -e
 
