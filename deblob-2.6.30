@@ -995,7 +995,7 @@ reject_firmware drivers/staging/sxg/sxg.c
 clean_sed '
 /^static int sxg_phy_init(/,/^}$/{
   /for (p = PhyUcode/i\
-		printk("%s: missing Free firmware\\n");\
+		printk("%s: missing Free firmware\\n", __func__);\
 		return (STATUS_FAILURE);\
 #define PhyUcode NULL		
 }' drivers/staging/sxg/sxg.c
