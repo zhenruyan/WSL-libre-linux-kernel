@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.29 extra=1
+kver=2.6.29 extra=1++
 
 fatal () {
   echo "$@"
@@ -969,6 +969,13 @@ clean_mk CONFIG_SPIDER_NET drivers/net/Makefile
 announce SXG - "Alacritech SLIC Technology Non-Accelerated 10Gbe cards"
 clean_blob drivers/staging/sxg/saharadbgdownload.h
 clean_blob drivers/staging/sxg/sxgphycode.h
+clean_sed '
+/^static int sxg_phy_init(/,/^}$/{
+  /for (p = PhyUcode/i\
+		printk("%s: missing Free firmware\n");\
+		return (STATUS_FAILURE);\
+#define PhyUcode NULL		
+}' drivers/staging/sxg/sxg.c
 clean_kconfig drivers/staging/sxg/Kconfig 'SXG'
 clean_mk CONFIG_SXG drivers/staging/sxg/Makefile
 
