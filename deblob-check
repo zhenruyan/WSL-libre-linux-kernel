@@ -2003,7 +2003,7 @@ set_except () {
     ;;
 
   */patch*2.6.30*)
-    initnc '} bclk_divs\[\] =' sound/soc/codecs/wm8903.c
+    initnc '}[ ]bclk_divs\[\][ ]=[ ][{]' sound/soc/codecs/wm8903.c
     ;;
 
   */patch*2.6.28-rc*)
