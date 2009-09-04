@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-08-14
+# deblob-check version 2009-09-04
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2277,7 +2277,7 @@ set_except () {
 
     # initnc 'static[ ]uint32_t[ ]nv\(4[013467ace]\|49_4b\|8[46]\)_ctx_\(voodoo\|prog\)\[\][ ]=' 'drivers/char/drm/nv40_graph.c|.*'
     ;;
-  */linux-2.6*-lirc.patch)
+  */linux-2.6*-lirc.patch | */lirc-*.patch)
     defsnc 'const[ ]unsigned[ ]char[ ]map_table\[\][ ]=' drivers/input/lirc/lirc_ttusbir.c
     blobname 'haup-ir-blaster\.bin' drivers/input/lirc/lirc_zilog.c
     ;;
