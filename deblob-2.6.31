@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.31 extra=--
+kver=2.6.31 extra=
 
 fatal () {
   echo "$@"
@@ -918,6 +918,13 @@ announce BNX2X - "Broadcom NetXtremeII 10Gb support"
 drop_fw_file firmware/bnx2x-e1-4.8.53.0.fw.ihex firmware/bnx2x-e1-4.8.53.0.fw
 drop_fw_file firmware/bnx2x-e1h-4.8.53.0.fw.ihex firmware/bnx2x-e1h-4.8.53.0.fw
 reject_firmware drivers/net/bnx2x_main.c
+clean_sed '
+/^#include "bnx2x_init\.h"/,/^$/{
+  /^$/i\
+#define bnx2x_init_block(bp, start, end) \\\
+  return (printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\\\
+	  -EINVAL)
+}' drivers/net/bnx2x_main.c 'report missing Free firmware'
 clean_blob drivers/net/bnx2x_main.c
 clean_blob drivers/net/bnx2x_hsi.h
 clean_blob drivers/net/bnx2x_init_ops.h
@@ -1004,7 +1011,7 @@ clean_sed '
 		printk("%s: missing Free firmware\\n", __func__);\
 		return (STATUS_FAILURE);\
 #define PhyUcode NULL		
-}' drivers/staging/sxg/sxg.c
+}' drivers/staging/sxg/sxg.c 'report missing Free firmware'
 clean_blob drivers/staging/sxg/sxg.c
 clean_kconfig drivers/staging/sxg/Kconfig 'SXG'
 clean_mk CONFIG_SXG drivers/staging/sxg/Makefile
@@ -1385,7 +1392,6 @@ announce RTL8192SU - "RealTek RTL8192SU Wireless LAN NIC driver"
 reject_firmware drivers/staging/rtl8192su/r819xU_firmware.c
 reject_firmware drivers/staging/rtl8192su/r8192S_firmware.c
 clean_blob drivers/staging/rtl8192su/r8192SU_HWImg.c
-clean_blob drivers/staging/rtl8192su/r8192SU_HWImg.h
 clean_blob drivers/staging/rtl8192su/r8192S_FwImgDTM.h
 clean_blob drivers/staging/rtl8192su/r8192S_firmware.c
 clean_blob drivers/staging/rtl8192su/r819xU_firmware_img.c

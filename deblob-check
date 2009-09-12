@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-09-11
+# deblob-check version 2009-09-12
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1208,8 +1208,8 @@ set_except () {
     blobname '%s%[du]%s["],[ ]name_pre,[ ]index,[ ]["]\.ucode' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\).c'
 
     blobname 'libertas_cs\(_helper\)\?\.fw' drivers/net/wireless/libertas/if_cs.c
-    blob 'sd\(8385\|8686\)_helper\.bin["],[\n][	][	]\.firmware[ ]=[ ]["]sd\(8385\|8686\)\.bin' drivers/net/wireless/libertas/if_sdio.c
-    blobname 'sd\(8385\|8686\)\(_helper\)\?\.bin' drivers/net/wireless/libertas/if_sdio.c
+    blob 'sd\(8385\|868[68]\)_helper\.bin["],[\n][	][	]\.firmware[ ]=[ ]["]sd\(8385\|868[68]\)\.bin' drivers/net/wireless/libertas/if_sdio.c
+    blobname 'sd\(8385\|868[68]\)\(_helper\)\?\.bin' drivers/net/wireless/libertas/if_sdio.c
     accept '[	]*card->firmware[ ]=[ ]\(if_sdio\|lbs_fw\)' drivers/net/wireless/libertas/if_sdio.c
     blobname 'usb8388\(-5\.126\.0\.p5\)\?\.bin' drivers/net/wireless/libertas/if_usb.c
     blob '[/][*]\([^/]\|[^*/][/]*\)*usb8388\(-5\.126\.0\.p5\)\?\.bin\([^/]\|[^*/][/]*\)*[*][/]' drivers/net/wireless/libertas/if_usb.c
@@ -1314,6 +1314,7 @@ set_except () {
     blobna 'You[ ]need[ ]to[ ]install[\n]*riptide\.hex[\n]\.[\n]' Documentation/sound/alsa/ALSA-Configuration.txt
     blobname 'riptide\.hex' sound/pci/riptide/riptide.c
     defsnc 'static[ ]union[ ]firmware_version[ ]firmware_versions\[\][ ]=' sound/pci/riptide/riptide.c
+    blob 'chip->firmware[ ]=[ ]firmware;' sound/pci/riptide/riptide.c
 
     blobname '\(multi\|digi\)face_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
 
@@ -1358,8 +1359,8 @@ set_except () {
     accept '[	 ]*["]request_firmware[ ]\(fatal[ ]error\|unable[ ]to[ ]locate\|:[ ]Failed[ ]to[ ]find\)' drivers/media/video/pvrusb2/pvrusb2-hdw.c
     accept '[ ][*][ ]NOTE[ ]:[ ]the[ ]pointer[ ]to[ ]the[ ]firmware[ ]data[ ]given[ ]by[ ]request_firmware[(][)]' drivers/media/video/pvrusb2-hdw.c
 
-    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]dw210[24]_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/dw2102.c
-    blobname 'dvb-usb-dw210[124]\.fw' drivers/media/dvb/dvb-usb/dw2102.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]dw\(210[24]\|3101\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/dw2102.c
+    blobname 'dvb-usb-dw\(210[124]\|3101\)\.fw' drivers/media/dvb/dvb-usb/dw2102.c
 
     accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]gp8psk_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/gp8psk.c
     blobname 'dvb-usb-gp8psk-0[12]\.fw' drivers/media/dvb/dvb-usb/gp8psk.c
@@ -1454,7 +1455,7 @@ set_except () {
     accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]digitv_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/digitv.c
     blobname 'dvb-usb-digitv-02\.fw' drivers/media/dvb/dvb-usb/digitv.c
 
-    blob 'Driver:[ ]\(acenic\|ADAPTEC_STARFIRE\|cxgb3\|e100\|tigon3\|korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|t[iu]_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\|ambassador\|SCSI_\(ADVANSYS\|QLOGIC\(_1280\|PTI\)\)\|TEHUTI\|TYPHOON\|YAM\|3C359\|PCMCIA_\(PCNET\|SMC91C92\)\|MYRI_SBUS\|BNX2\|wavefront\)[ ]--*[ ]\([^\n]\|[\n]*[^\n\-]\)*\([\n][\n]--*[\n][\n]Driver:[ ]\(acenic\|ADAPTEC_STARFIRE\|cxgb3\|e100\|tigon3\|korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|t[iu]_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\|ambassador\|SCSI_\(ADVANSYS\|QLOGIC\(_1280\|PTI\)\)\|TEHUTI\|TYPHOON\|YAM\|3C359\|PCMCIA_\(PCNET\|SMC91C92\)\|MYRI_SBUS\|BNX2\|wavefront\)[ ]--*[ ]\([^\n]\|[\n]*[^\n\-]\)*\)*' firmware/WHENCE
+    blob 'Driver:[ ]\(acenic\|ADAPTEC_STARFIRE\|cxgb3\|e100\|tigon3\|korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|t[iu]_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\|ambassador\|SCSI_\(ADVANSYS\|QLOGIC\(_1280\|PTI\)\)\|TEHUTI\|TYPHOON\|YAM\|3C359\|PCMCIA_\(PCNET\|SMC91C92\|3C5\(89\|74\)\)\|MYRI_SBUS\|BNX2\|bnx2x\|wavefront\)\([ ]--*\|:\)[ ]\([^\n]\|[\n]*[^\n\-]\)*\([\n][\n]--*[\n][\n]\?Driver:[ ]\(acenic\|ADAPTEC_STARFIRE\|cxgb3\|e100\|tigon3\|korg1212\|maestro3\|ymfpci\|smctr\|kaweth\|ttusb-budget\|keyspan\|emi26\|emi62\|t[iu]_usb_3410_5052\|whiteheat\|ip2\|CPiA2\|DABUSB\|USB_VICAM\|USB_SERIAL_EDGEPORT\(_TI\)\?\|SND_SB16_CSP\|CASSINI\|ambassador\|SCSI_\(ADVANSYS\|QLOGIC\(_1280\|PTI\)\)\|TEHUTI\|TYPHOON\|YAM\|3C359\|PCMCIA_\(PCNET\|SMC91C92\|3C5\(89\|74\)\)\|MYRI_SBUS\|BNX2\|bnx2x\|wavefront\)\([ ]--*\|:\)[ ]\([^\n]\|[\n]*[^\n\-]\)*\)*' firmware/WHENCE
 
     blobname 'sms1xxx-\(stellar\|nova-[ab]\|hcw-55xxx\)-dvbt-0[12]\.fw' drivers/media/dvb/siano/sms-cards.c
 
@@ -2010,7 +2011,7 @@ set_except () {
     defsnc 'struct[ ]scrubrate[ ]scrubrates\[\][ ]=' drivers/edac/amd64_edac.c
     defsnc 'static[ ]const[ ]unsigned[ ]r\([35]\|s6\)00_reg_safe_bm\[[0-9]*\][ ]=' 'drivers/gpu/drm/radeon/r\(300\|v515\|s600\)\.c'
     defsnc 'static[ ]struct[ ]keyboard_layout_map_t[ ]keyboard_layout_maps\[\][ ]=' drivers/media/dvb/siano/smsir.c
-    blobname 'dvb-cx18-mpc718-mt532\.fw' drivers/media/video/cx18/cx18-dvb.c
+    blobname 'dvb-cx18-mpc718-mt352\.fw' drivers/media/video/cx18/cx18-dvb.c
     defsnc '[	]const[ ]unsigned[ ]char[ ]\(y\|uv\)QuanTable51[18]\[\][ ]=' 'drivers/media/video/\(ov511\|gspca/ov519\)\.c'
     defsnc 'static[ ]const[ ]u8[ ]bridge_start_ov965x_\(vga\|cif\)\[\]\[2\][ ]=' drivers/media/video/gspca/ov534.c
     defsnc 'static[ ]const[ ]int[ ]hsv_\(red\|green\|blue\)_[xy]\[\][ ]=' drivers/media/video/gspca/sn9c20x.c
@@ -2019,8 +2020,9 @@ set_except () {
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]onenand_oob_128[ ]=' drivers/mtd/onenand/onenand_base.c
     blobname 'bnx2x-e1h\?-\([0-9.%d]*\.fw\)\?' drivers/net/bnx2x_main.c
     blob '#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\([\n]#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\)*' drivers/net/bnx2x_hsi.h
-    blobna 'sprintf[(]fw_file_name[ ][+][ ]offset,[ ]"%d\.%d\.%d\.%d\.fw"\(,[\n][	]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)*);' drivers/net/bnx2x_main.c
-    blob 'static[ ]int[ ]__devinit[ ]bnx2x_check_firmware(struct[ ]bnx2x[ ][*]bp)[\n][{]\([^}]*\|[^\n][}]*\)[\n][}]' drivers/net/bnx2x_main.c
+    blob 'static[ ]int[ ]__devinit[ ]bnx2x_check_firmware[(]struct[ ]bnx2x[ ][*]bp[)][\n][{]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/net/bnx2x_main.c
+    blobna 'if[ ][(][(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\([ ][|][|][\n][ 	]*[(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\)*[)][ ]{[^{}]*}' drivers/net/bnx2x_main.c
+    blobna 'sprintf[(]fw_file_name[ ][+][ ]offset,[ ]["]%d[.]%d[.]%d[.]%d[.]fw["]\(,[\n][ 	]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)*[)];' drivers/net/bnx2x_main.c
     blob 'rc[ ]=[ ]bnx2x_check_firmware(bp);' drivers/net/bnx2x_main.c
     defsnc 'crb_128M_2M_map\[64\][ ]__cacheline_aligned_in_smp[ ]='  drivers/net/netxen/netxen_nic_hw.c
     defsnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals\(_3070\)\?\[\][ ]=' drivers/net/wireless/rt2x00/rt2800usb.c
@@ -2038,8 +2040,8 @@ set_except () {
     blob 'u8[ ]rtl8190_fw\(boot\|main\|data\)_array\[\][ ]=[ ]{[^}]*};' drivers/staging/rtl8192su/r8192xU_firmware_img.c
     defsnc 'u32 Rtl8192Usb\(PHY_REG\(_1T2R\)\?\|\(Radio[ABCD]\|MACPHY\|AGCTAB\)_\)Array\(_PG\)\?\[\][ ]=' drivers/staging/rtl8192su/rtl819xU_firmware_img.c
     defsnc 'BYTE[ ]\(sbox\|dot[23]\)_table\[256\][ ]=' drivers/staging/vt6655/aes_ccmp.c
-    defsnc 'BYTE[ ]byVT3253\(InitTab\|B0\(_AGC4\)\?\)_\(RFMD\|AIROHA2230\|UW2451\|AGC\)\[CB_VT3253\(B0\(_AGC4\)\?\)\?_INIT_FOR_\(RFMD\(2959\)\?\|AIROHA2230\|UW2451\|AGC\)\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
-    defsnc 'SCountryTable[ ]ChannelRuleTable\[CCODE_MAX[+]1\][ ]=' drivers/staging/vt6655/card.c
+    defsnc 'BYTE[ ]byVT3253\(InitTab\|B0\(_AGC4\?\)\?\)_\(RFMD\(2959\)\?\|AIROHA2230\|UW2451\|AGC\)\[CB_VT3253\(B0\(_AGC4\?\)\?\)\?\(\(_INIT\)\?_FOR_\(RFMD\(2959\)\?\|AIROHA2230\|UW2451\|AGC\)\)\?\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
+    defsnc 'SCountryTable[ ]ChannelRuleTab\[CCODE_MAX[+]1\][ ]=' drivers/staging/vt6655/card.c
     defsnc 'static[ ]const[ ]long[ ]frequency_list\[\][ ]=' drivers/staging/vt6655/iwctl.c
     accept '#define[ ]CONFIG_PATH[ ]*"[/]etc[/]vntconfiguration[.]dat"' drivers/staging/vt6655/device_cfg.h
     defsnc 'static[ ]const[ ]DWORD[ ]s_adwCrc32Table\[256\][ ]=' drivers/staging/vt6655/tcrc.c
@@ -2047,6 +2049,7 @@ set_except () {
     blobname 'prism2_ru\.hex' drivers/staging/wlan-ng/prism2fw.c
     defsnc 'static[ ]const[ ]u16[ ]wm8960_reg\[WM8960_CACHEREGNUM\][ ]=' sound/soc/codecs/wm8960.c
     # end of new in 2.6.31
+    accept '[ 	]*ramdisk[ ]=[ ]["][/]boot[/][^ ]*initrd[^ ]*\.img["]' Documentation/ia64/xen.txt
     ;;
 
   */patch*2.6.30*)
@@ -2676,11 +2679,11 @@ i\\
   b print_blobs_output_false_positive
 }
 h
-s/^\\([^\\n]*\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
+s/\\(\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 p
 g
-s/^\\([^\\n]*\\($bloblong[^\\n]*\\)\\+\\)//
+s/\\(\\($bloblong[^\\n]*\\)\\+\\)//
 : print_blobs_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
@@ -2740,13 +2743,13 @@ i\\
   b print_marked_blobs_output_false_positive
 }
 h
-s/^\\([^\\n]*\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
+s/\\(\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
 s/$bloblong/\/*(DEBLOBBED)*\//g
 p
 g
-s/^\\([^\\n]*\\($bloblong[^\\n]*\\)\\+\\)//
+s/\\(\\($bloblong[^\\n]*\\)\\+\\)//
 : print_marked_blobs_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
@@ -2998,13 +3001,13 @@ $v:list_blobs
   b list_blobs_delete_to_eol
 }
 h
-s/^\\([^\\n]*\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
+s/\\(\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
 s/$bloblong/\/*(DEBLOBBED)*\//g
 p
 g
-s/^\\([^\\n]*\\($bloblong[^\\n]*\\)\\+\\)//
+s/\\(\\($bloblong[^\\n]*\\)\\+\\)//
 : list_blobs_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
