@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-09-12
+# deblob-check version 2009-09-20
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1983,7 +1983,7 @@ set_except () {
     blobname '3826\.arm' 'drivers/\(net/wireless/p54/p54spi\|staging/stlc45xx/stlc45xx\)\.c'
     defsnc 'static[ ]unsigned[ ]char[ ]p54spi_eeprom\[\][ ]=' drivers/net/wireless/p54/p54spi_eeprom.h
     blobname '\(comedi[/]\)\?jr3pci\.idm' drivers/staging/comedi/drivers/jr3_pci.c
-    blobname 'usbdux\(fast\)\?_firmware\.hex' 'drivers/staging/comedi/drivers/usbdux\(fast\)\?\.c'
+    blobname 'usbdux\(fast\)\?_firmware\.bin' 'drivers/staging/comedi/drivers/usbdux\(fast\)\?\.c'
     blobname 'RT30xxEEPROM\.bin' drivers/staging/rt3070/common/eeprom.c
     blob '#include[ 	]*["]\.\.[/]firmware.h["]' drivers/staging/rt3070/common/rtmp_init.c
     defsnc 'static[ ]const[ ]u8[ ]default_cal_\(channels\|rssi\)\[\][ ]=' drivers/staging/stlc45xx/stlc45xx.c
