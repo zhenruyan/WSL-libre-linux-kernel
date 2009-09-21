@@ -485,6 +485,15 @@ clean_sed '
 clean_blob drivers/gpu/drm/radeon/radeon_cp.c
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
 clean_sed '
+/^static void r100_cp_load_microcode(struct radeon_device \*rdev)/i\
+#define r100_cp_load_microcode(rdev) \\\
+  do { \\\
+    DRM_ERROR("Missing Free microcode!\\n"); \\\
+    return -EINVAL; \\\
+  } while (0)
+' drivers/gpu/drm/radeon/r100.c 'report missing Free microcode'
+clean_blob drivers/gpu/drm/radeon/r100.c
+clean_sed '
 /^static void r600_cp_load_microcode(drm_radeon_private_t \*dev_priv)/i\
 #define r600_cp_load_microcode(dev_priv) \\\
   do { \\\
