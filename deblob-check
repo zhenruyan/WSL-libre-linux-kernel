@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-09-20
+# deblob-check version 2009-09-21
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -962,18 +962,16 @@ set_except () {
     blobname 'intelliport2\.bin' drivers/char/ip2/ip2main.c
 
     blob 'static[ ]unsigned[ ]char[ ]warp_g[24]00_t2\?gzs\?a\?f\?\[\][ ]=[ ][{][^{};]*[}][;]\([\n][\n]*static[ ]unsigned[ ]char[ ]warp_g[24]00_t2\?gzs\?a\?f\?\[\][ ]=[ ][{][^{};]*[}][;]\)*' drivers/gpu/drm/mga/mga_ucode.h
-    blob '#define[ ]\(MGA_WARP_CODE_ALIGN\|WARP_UCODE_\(SIZE\|INSTALL\)\)\([^\n]*\\[ 	]*[\n]\)*[^\n]*' drivers/gpu/drm/mga/mga_warp.c
-    blob 'static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]' drivers/gpu/drm/mga/mga_warp.c
-    blob 'static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}][\n]' drivers/gpu/drm/mga/mga_warp.c
+    blob '\(#define[ ]\(MGA_WARP_CODE_ALIGN\|WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\)\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]\)\([\n][\n]*\(#define[ ]\(MGA_WARP_CODE_ALIGN\|WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\)\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]\)\)*' drivers/gpu/drm/mga/mga_warp.c
     blobna '\(case[ ]MGA_CARD_TYPE_G[^:]*:[ 	\n]*\)\+return[ ][^;]*mga_warp[^;]*microcode[^;]*[;]\([ 	\n]*\(case[ ]MGA_CARD_TYPE_G[^:]*:[ 	\n]*\)\+return[ ][^;]*mga_warp[^;]*microcode[^;]*[;][ 	]*\)*' drivers/gpu/drm/mga/mga_warp.c
 
-    blob 'static[ ]u32[ ]r128_cce_microcode\[\][ ]=[ ][{][^{};]*[}][;]' drivers/gpu/drm/r128/r128_cce.c
-    blob 'static[ ]void[ ]r128_cce_load_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}][\n]' drivers/gpu/drm/r128/r128_cce.c
-    blob '[	]r128_cce_load_microcode[(][^;]*[)][;]' drivers/gpu/drm/r128/r128_cce.c
+    blob 'static[ ]u32[ ]r128_cce_microcode\[\][ ]=[ ][{][^;]*[}][;]' drivers/gpu/drm/r128/r128_cce.c
+    blob 'static[ ]void[ ]r128_cce_load_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/gpu/drm/r128/r128_cce.c
+    # blobna 'R128_WRITE[(]R128_PM4_MICROCODE_DATA[HL],[\n	 ]*r128_cce_microcode\[i[ ][*][ ]2\([ ][+][ ]1\)\?\][)]\([;][\n 	]*R128_WRITE[(]R128_PM4_MICROCODE_DATA[HL],[\n	 ]*r128_cce_microcode\[i[ ][*][ ]2\([ ][+][ ]1\)\?\][)]\)*' drivers/gpu/drm/r128/r128_cce.c
 
-    blob 'static[ ]const[ ]u32[ ]R[SV0-9]*[05]_\(cp_microcode\[\]\[[23]\]\|pfp_microcode\[\]\)[ ]=[ ][{][^{};]*[}][;]\([\n][\n]*static[ ]const[ ]u32[ ]R[SV0-9]*[05]_\(cp_microcode\[\]\[[23]\]\|pfp_microcode\[\]\)[ ]=[ ][{][^{};]*[}][;]\)*' 'drivers/gpu/drm/radeon/\(radeon\|r600\)_microcode\.h'
-    blob '\([/][*][ ]Load[ ]the[ ]microcode\([^/]\|[^*/][/]*\)*[*][/][\n]\)\?static[ ]void[ ]radeon_cp_load_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}][\n]' drivers/gpu/drm/radeon/radeon_cp.c
-    blobna 'radeon_cp_load_microcode[(][^;]*[)][;]' drivers/gpu/drm/radeon/radeon_cp.c
+    blob 'static[ ]const[ ]u32[ ]R[SV0-9]*[05]_\(c\|pf\)p_microcode\[\]\(\[[23]\]\)\?[ ]=[ ][{][^;]*[}][;]\([\n][\n]*static[ ]const[ ]u32[ ]R[SV0-9]*[05]_\(c\|pf\)p_microcode\[\]\(\[[23]\]\)\?[ ]=[ ][{][^;]*[}][;]\)*' 'drivers/gpu/drm/radeon/\(radeon\|r600\)_microcode\.h'
+    blob 'static[ ]void[ ]r\(adeon\|[67]00\)_cp_load_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/gpu/drm/radeon/radeon_cp.c
+    # blobna 'RADEON_WRITE[(]R\(ADEON\|600\)_CP_\(ME_RAM\|PFP_UCODE\)_DATA[HL]\?,[\n	 ]*R[SV0-9]*[05]_\(c\|pf\)p_microcode\[i\]\(\[[012]\]\)\?[)]\([;][\n 	]*RADEON_WRITE[(]R\(ADEON\|600\)_CP_\(ME_RAM\|PFP_UCODE\)_DATA[HL]\?,[\n	 ]*R[SV0-9]*[05]_\(c\|pf\)p_microcode\[i\]\(\[[012]\]\)\?[)]\)*' 'drivers/gpu/drm/radeon/\(radeon\|r600\)_cp\.c'
 
     blob 'sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]cx\(23\(1xx\|855\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\)[ ]*[{]\([^}]*\|[^\n][}]*\)[\n][}]\([\n][\n]*sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]cx\(23\(1xx\|855\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\)[ ]*[{]\([^}]*\|[^\n][}]*\)[\n][}]\)*' Documentation/dvb/get_dvb_firmware
     blobna 'Please[ ]use[^\n]*firmware[^\n]*sp887x[^\n]*\([\n][^\n]\+\)\+' Documentation/dvb/avermedia.txt
@@ -1944,8 +1942,6 @@ set_except () {
     defsnc 'const[ ]char[ ]_[zs]b_findmap\[\][ ]=' arch/s390/kernel/bitmap.c
     initnc '[	][{][ ]CnINT2MSKR0,[ ]CnINT2MSKCR0[ ],[ ]32,' arch/sh/kernel/cpu/sh4a/setup-sh7786.c
     blobname 'solos-\(FPGA\|Firmware\)\.bin' drivers/atm/solos-pci.c
-    blob '\([/][*][ ]load[ ]r[67]00[ ]microcode\([^/]\|[^*/][/]*\)*[*][/][\n]\)\?static[ ]void[ ]r[67]00_cp_load_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}][\n]' drivers/gpu/drm/radeon/r600_cp.c
-    blobna 'r[67]00_cp_load_microcode[(][^;]*[)][;]' drivers/gpu/drm/radeon/r600_cp.c
     defsnc 'static[ ]u16[ ]__initdata[ ]i2c_clk_div\[50\]\[2\][ ]=' drivers/i2c/busses/i2c-imx.c
     defsnc 'static[ ]const[ ]struct[ ]mpc_i2c_divider[ ]mpc_i2c_dividers_\(52xx\|8xxx\)\[\][ ]=' drivers/i2c/busses/i2c-mpc.c
     accept '[	]const[ ]char[ ]\*fw_name[ ]=[ ]["]av7110[/]bootcode\.bin["][;]' drivers/media/dvb/ttpci/av7110_hw.c
@@ -2050,6 +2046,14 @@ set_except () {
     defsnc 'static[ ]const[ ]u16[ ]wm8960_reg\[WM8960_CACHEREGNUM\][ ]=' sound/soc/codecs/wm8960.c
     # end of new in 2.6.31
     accept '[ 	]*ramdisk[ ]=[ ]["][/]boot[/][^ ]*initrd[^ ]*\.img["]' Documentation/ia64/xen.txt
+
+    # in drm-*.patch, post-2.6.31
+    blobname 'matrox[/]g[24]00_warp\.fw' drivers/gpu/drm/mga/mga_warp.c
+    blobname 'r128[/]r128_cce\.bin' drivers/gpu/drm/r128/r128_cce.c
+    blobname 'radeon[/]R\([123]0\|[45]2\|S6[09]\)0_cp\.bin' drivers/gpu/drm/radeon/r100.c
+    blobname 'radeon[/]\(R\(60\|V6[1237]\|S7[1378]\)[05]\|%s\)_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
+    defsnc 'const[ ]u32[ ]r[67]xx_default_state\[\] =' drivers/gpu/drm/radeon/r600_blit_shaders.c
+    defsnc 'struct nv17_tv_norm_params nv17_tv_norms\[NUM_TV_NORMS] =' drivers/gpu/drm/nouveau/nv17_tv_modes.c
     ;;
 
   */patch*2.6.30*)
@@ -2206,10 +2210,6 @@ set_except () {
     defsnc '#if[ ]0[\n][	][{]0x30,[ ]0x0154,[ ]0x0008[}],' drivers/media/video/gspca/sunplus.c
     ;;
 
-  */drm-modesetting-radeon.patch)
-    defsnc 'static[ ]int[ ]atom_dst_to_src\[8\]\[4\][ ]=' drivers/gpu/drm/radeon/atom.c
-    ;;
-
   */linux*alsa*.patch)
     defsnc 'static[ ]u8[ ]tas3004_treble_table\[\][ ]=' sound/aoa/codecs/tas-basstreble.h
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]wm_vol\[256\][ ]=' sound/pci/ice1712/phase.c
@@ -2297,6 +2297,14 @@ set_except () {
     initnc 'const[ ]u\(8\|16\|32\)[ ]b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\][ ]='
     ;;
   */*drm*.patch)
+    defsnc 'const[ ]u32[ ]r[67]xx_default_state\[\] =' drivers/gpu/drm/radeon/r600_blit_shaders.c
+    defsnc 'struct nv17_tv_norm_params nv17_tv_norms\[NUM_TV_NORMS] =' drivers/gpu/drm/nouveau/nv17_tv_modes.c
+    defsnc 'static[ ]int[ ]atom_dst_to_src\[8\]\[4\][ ]=' drivers/gpu/drm/radeon/atom.c
+    blobname 'matrox[/]g[24]00_warp\.fw' drivers/gpu/drm/mga/mga_warp.c
+    blobname 'r128[/]r128_cce\.bin' drivers/gpu/drm/r128/r128_cce.c
+    blobname 'radeon[/]R\([123]0\|[45]2\|S6[09]\)0_cp\.bin' drivers/gpu/drm/radeon/r100.c
+    blobname 'radeon[/]\(R\(60\|V6[1237]\|S7[1378]\)[05]\|%s\)_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
+
     # linux-2.6-drm-i915-modeset.patch, nouveau-drm*.patch,
     # drm-fedora9-rollup.patch
     initnc 'static[ ]const[ ]u32[ ]filter_table\[\][ ]=' drivers/char/drm/intel_tv.c
@@ -2308,7 +2316,7 @@ set_except () {
     # these are bits of code, obtained through mmio interactions.
     # This means these blobs are not source code, AND original authors
     # of the blobs have power to stop others from modifying them.
-    # Non-Free software, for sure.
+    # Non-Free Software, for sure.
 
     # initnc 'static[ ]uint32_t[ ]nv\(4[013467ace]\|49_4b\|8[46]\)_ctx_\(voodoo\|prog\)\[\][ ]=' 'drivers/char/drm/nv40_graph.c|.*'
     ;;
