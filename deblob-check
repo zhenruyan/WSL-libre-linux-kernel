@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-09-21
+# deblob-check version 2009-09-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2308,8 +2308,8 @@ set_except () {
     # linux-2.6-drm-i915-modeset.patch, nouveau-drm*.patch,
     # drm-fedora9-rollup.patch
     initnc 'static[ ]const[ ]u32[ ]filter_table\[\][ ]=' drivers/char/drm/intel_tv.c
-    defsnc '\(static[ ]uint32_t\|[}]\)[ ]nv04_graph_ctx_regs[ ]\[\][ ]=' drivers/char/drm/nv04_graph.c
-    defsnc 'static[ ]int[ ]nv10_graph_ctx_regs[ ]\[\][ ]=' drivers/char/drm/nv10_graph.c
+    defsnc '\(static[ ]uint32_t\|[}]\)[ ]nv04_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv04_graph.c
+    defsnc 'static[ ]int[ ]nv1[07]_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv10_graph.c
 
     # Although the developers of the drivers are not trying to stop
     # anyone from modifying it or understanding it, they acknowledge
