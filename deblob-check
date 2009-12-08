@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-12-07
+# deblob-check version 2009-12-08
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2691,7 +2691,7 @@ $v:narrowed to match
   i\\
 ::: $file :::
   # s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-  s/$bloblong/\/*(DEBLOBBED)*\//
+  s/$bloblong/\/*(DEBLOBBED)*\//g
   p
 }
 g
@@ -2822,7 +2822,7 @@ h
 s/\\(\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 # s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-s/$bloblong/\/*(DEBLOBBED)*\//
+s/$bloblong/\/*(DEBLOBBED)*\//g
 p
 g
 s/\\(\\($bloblong[^\\n]*\\)\\+\\)//
@@ -2952,7 +2952,7 @@ h
 s/^\\($lblobctx[^\\n]*\\($bloblong[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 # s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-s/$bloblong/\/*(DEBLOBBED)*\//
+s/$bloblong/\/*(DEBLOBBED)*\//g
 p
 g
 s/^\\($lblobctx[^\\n]*\\($bloblong[^\\n]*\\)*\\)//
@@ -3019,7 +3019,7 @@ s/^\\($falsepos[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to match
 /$bloblong/{
   # s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-  s/$bloblong/\/*(DEBLOBBED)*\//
+  s/$bloblong/\/*(DEBLOBBED)*\//g
 }
 p
 g
@@ -3080,7 +3080,7 @@ h
 s/\\(\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 # s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-s/$bloblong/\/*(DEBLOBBED)*\//
+s/$bloblong/\/*(DEBLOBBED)*\//g
 p
 g
 s/\\(\\($bloblong[^\\n]*\\)\\+\\)//
@@ -3113,7 +3113,7 @@ h
 s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$bloblong[^\\n]*\\)\\($bloblong[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 # s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-s/$bloblong/\/*(DEBLOBBED)*\//
+s/$bloblong/\/*(DEBLOBBED)*\//g
 p
 g
 s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$bloblong[^\\n]*\\)\\($bloblong[^\\n]*\\)*\\)//
