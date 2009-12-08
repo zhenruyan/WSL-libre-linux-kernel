@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-12-08
+# deblob-check version 2009-12-08.1
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2086,6 +2086,7 @@ set_except () {
     defsnc '[}][ ]csc_table\[\][ ]=' drivers/video/msm/mdp_csc_table.h
     defsnc '\(static[ ]\)\?struct[ ]mdp_table_entry[ ]mdp_\(\(upscale\|gaussian_blur\)_table\|downscale_[xy]_table_PT[2468]TO\(PT[468]\|1\)\)\[\][ ]=' drivers/video/msm/mdp_scale_tables.c
     blobname 'sd8688\(_helper\)\?\.bin' drivers/bluetooth/btmrvl_sdio.c
+    blob 'sd8688_helper\.bin["],[\n][	]\.firmware[	]=[ ]["]sd8688\.bin' drivers/bluetooth/btmrvl_sdio.c
     accept '[	][	]card->firmware[ ]=[ ]data->firmware[;]'  drivers/bluetooth/btmrvl_sdio.c
     accept '[	]isar->firmware[ ]=[ ][&]load_firmware[;]' drivers/isdn/hardware/mISDN/mISDNisar.c
     blobname 'isdn[/]ISAR\.BIN' drivers/isdn/hardware/mISDN/speedfax.c
