@@ -80,7 +80,9 @@ else
 fi
 
 filetest () {
-  [ -f $1 ]
+  if [ ! -f $1 ]; then
+    die $1 does not exist, something is wrong && return 1
+  fi
 }
 
 announce () {
@@ -186,7 +188,8 @@ clean_mk () {
 clean_sed () {
   #$1 = sed-script $2 = file $3 = comment
   filetest $2 || return
-  sed -e "$1" "$2" > "$2".deblob
+  sed -e "$1" "$2" > "$2".deblob || {
+    die $2: failed: ${3-applied sed script $1} && return 1; }
   check_changed $2 && echo $2: ${3-applied sed script $1} 
 }
 
@@ -431,37 +434,29 @@ clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
 announce DRM_R128 - "ATI Rage 128"
 clean_sed '
-/^static int r128_do_init_cce([^;]*$/,/^}$/{
-  /^	r128_cce_load_microcode(dev_priv);$/{
-    i\
-	DRM_ERROR("Missing Free microcode!\\n");\
-	dev->dev_private = (void *)dev_priv;\
-	r128_do_cleanup_cce(dev);\
-	return -EINVAL;
-  }
-}' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
+/^static void r128_cce_load_microcode(drm_r128_private_t \* dev_priv)/i\
+#define r128_cce_load_microcode(dev_priv) \\\
+  do { \\\
+    DRM_ERROR("Missing Free microcode!\\n"); \\\
+    dev->dev_private = (void *)dev_priv; \\\
+    r128_do_cleanup_cce(dev); \\\
+    return -EINVAL; \\\
+  } while (0)
+' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/r128/r128_cce.c
 clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 announce DRM_RADEON - "ATI Radeon"
 clean_sed '
-/^static int radeon_do_init_cp([^;]*$/,/^}$/{
-  /^	radeon_cp_load_microcode(dev_priv);$/{
-    i\
-	DRM_ERROR("Missing Free microcode!\\n");\
-	radeon_do_cleanup_cp(dev);\
-	return -EINVAL;
-  }
-}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on init'
-clean_sed '
-/^static int radeon_do_resume_cp([^;]*$/,/^}$/{
-  /^	radeon_cp_load_microcode(dev_priv);$/{
-    i\
-	DRM_ERROR("Missing Free microcode!\\n");\
-	return -EINVAL;
-  }
-}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on resume'
+/^static void radeon_cp_load_microcode(drm_radeon_private_t \* dev_priv)/i\
+#define radeon_cp_load_microcode(dev_priv) \\\
+  do { \\\
+    DRM_ERROR("Missing Free microcode!\\n"); \\\
+    radeon_do_cleanup_cp(dev); \\\
+    return -EINVAL; \\\
+  } while (0)
+' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/radeon/radeon_cp.c
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
 clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_RADEON'
@@ -876,6 +871,7 @@ clean_sed '
   return (printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\\\
 	  -EINVAL)
 }' drivers/net/bnx2x_main.c 'report missing Free firmware'
+clean_blob drivers/net/bnx2x_hsi.h
 clean_kconfig drivers/net/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/Makefile
 
