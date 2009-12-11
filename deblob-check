@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-12-08.1
+# deblob-check version 2009-12-10
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2122,6 +2122,10 @@ set_except () {
     defsnc 'static[ ]struct[ ]validx[ ]tbl_\(commm\?on\|init_\(at_startup\|post_alt\)\|sensor_settings_common_[ab]\|big_[abc]\|640\|800\)\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi2020\|mi1320\|ov9655\|ov2640\).c'
     defsnc 'static[ ]u8[ ][*]tbl_\(640\|800\)\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi1320\|ov9655\).c'
     accept '[<][<]\([/]Subtype[/]Type1\)\?[/]BaseFont[^ ]*[/]FontDescriptor[ ][0-9][0-9]*[ ]0[ ]R\([/]Type[/]Font\)\?[\n]\?[/]FirstChar[ ][0-9][0-9]*[/]LastChar[ ][0-9][0-9]*[/]Widths\[[\n][0-9 \n]*\]' 'Documentation/DocBook/v4l/.*\.pdf'
+    ;;
+
+  */patch*2.6.27*)
+    accept '[	]request_firmware[(][)][ ]will[ ]hit[ ]an[ ]OOPS' drivers/media/dvb/frontends/dib7000p.c
     ;;
 
   */patch*2.6.30*)
