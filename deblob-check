@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-12-10
+# deblob-check version 2009-12-15
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2124,7 +2124,7 @@ set_except () {
     accept '[<][<]\([/]Subtype[/]Type1\)\?[/]BaseFont[^ ]*[/]FontDescriptor[ ][0-9][0-9]*[ ]0[ ]R\([/]Type[/]Font\)\?[\n]\?[/]FirstChar[ ][0-9][0-9]*[/]LastChar[ ][0-9][0-9]*[/]Widths\[[\n][0-9 \n]*\]' 'Documentation/DocBook/v4l/.*\.pdf'
     ;;
 
-  */patch*2.6.27*)
+  */patch*2.6.27*|*/patch*2.6.31.*)
     accept '[	]request_firmware[(][)][ ]will[ ]hit[ ]an[ ]OOPS' drivers/media/dvb/frontends/dib7000p.c
     ;;
 
