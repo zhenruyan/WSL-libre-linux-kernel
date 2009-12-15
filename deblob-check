@@ -2124,6 +2124,25 @@ set_except () {
     accept '[<][<]\([/]Subtype[/]Type1\)\?[/]BaseFont[^ ]*[/]FontDescriptor[ ][0-9][0-9]*[ ]0[ ]R\([/]Type[/]Font\)\?[\n]\?[/]FirstChar[ ][0-9][0-9]*[/]LastChar[ ][0-9][0-9]*[/]Widths\[[\n][0-9 \n]*\]' 'Documentation/DocBook/v4l/.*\.pdf'
     ;;
 
+  */freedo.patch)
+    accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
+    ;;
+
+  */*-loongson.patch)
+    defsnc 'static[ ]const[ ]u16[ ]Sbox\[256\][ ]=' drivers/net/wireless/rtl8187b/ieee80211/ieee80211_crypt_tkip.c
+    defsnc 'u16[ ]rtl8225bcd_rxgain\[\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225.c
+    defsnc 'u8[ ]rtl8225_tx_power_cck\(_ch14\)\?\[\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225.c
+    defsnc 'u8[ ]rtl8225_agc\[\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225.c
+    defsnc 'static[ ]u32[ ]MAC_REG_TABLE\[\]\[3\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225z2.c
+    defsnc 'static[ ]u8[ ][ ]*ZEBRA_AGC\[\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225z2.c
+    defsnc 'static[ ]u32[ ]ZEBRA_RF_RX_GAIN_TABLE\[\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225z2.c
+    defsnc 'u8[ ]ZEBRA2_CCK_OFDM_GAIN_SETTING\[\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225z2.c
+    defsnc 'u16[ ]rtl8225z2_rxgain\[\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225z2.c
+    defsnc 'u8[ ]rtl8225z2_tx_power_cck\(_ch14\)\?\[\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225z2.c
+    defsnc 'static[ ]struct[ ]vesa_mode_table[ ]vesa_mode\[\][ ]=' drivers/staging/sm7xx/smtcfb.c
+    defsnc 'struct[ ]ModeInit[ ]VGAMode\[\][ ]=' drivers/staging/sm7xx/smtcfb.h
+    ;;
+
   */patch*2.6.27*|*/patch*2.6.31.*)
     accept '[	]request_firmware[(][)][ ]will[ ]hit[ ]an[ ]OOPS' drivers/media/dvb/frontends/dib7000p.c
     ;;
