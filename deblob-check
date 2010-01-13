@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2009-12-15
+# deblob-check version 2010-01-13
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2124,7 +2124,7 @@ set_except () {
     accept '[<][<]\([/]Subtype[/]Type1\)\?[/]BaseFont[^ ]*[/]FontDescriptor[ ][0-9][0-9]*[ ]0[ ]R\([/]Type[/]Font\)\?[\n]\?[/]FirstChar[ ][0-9][0-9]*[/]LastChar[ ][0-9][0-9]*[/]Widths\[[\n][0-9 \n]*\]' 'Documentation/DocBook/v4l/.*\.pdf'
     ;;
 
-  */freedo.patch)
+  */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
     ;;
 
@@ -2402,6 +2402,9 @@ set_except () {
     defsnc '\(static[ ]uint32_t\|[}]\)[ ]nv04_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv04_graph.c
     defsnc 'static[ ]int[ ]nv1[07]_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv10_graph.c
     defsnc '[	][}][ ]common_modes\[17\][ ]=' drivers/gpu/drm/radeon/radeon_connectors.c
+
+    # drm-upgrayedd.patch
+    defsnc 'static[ ]const[ ]u16[ ]\(y\|uv\)_static_hcoeffs\[N_HORIZ_\(Y\|UV\)_TAPS[ ][*][ ]N_PHASES\][ ]=' drivers/gpu/drm/i915/intel_overlay.c
 
     # Although the developers of the drivers are not trying to stop
     # anyone from modifying it or understanding it, they acknowledge
