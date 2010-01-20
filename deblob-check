@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-01-19
+# deblob-check version 2010-01-20
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -695,7 +695,7 @@ set_except () {
     defsnc 'static[ ]unsigned[ ]char[ ]testdata\[TESTDATA_LEN\][ ]=' fs/jffs2/comprtest.c
 
     # added in 2.6.25
-    accept "%canned_values[ ]=[ ][(][\\n][	]\\([0-9]\\+[ ]=>[ ]\\[[ 	\\n]\\+\\(\\([0-9]\\+\\|'0x[0-9a-f]\\+'\\),[ 	\\n]*\\)*\\]\\(,[ ]\\|[\\n]\\)\\)*[)][;]"
+    accept "%canned_values[ ]=[ ][(][\\n][	]\\([0-9]\\+[ ]=>[ ]\\[[ 	\\n]\\+\\(\\([0-9]\\+\\|\\'0x[0-9a-f]\\+\\'\\),[ 	\\n]*\\)*\\]\\(,[ ]\\|[\\n]\\)\\)*[)][;]"
 
     # from 2.6.25-rc* patches
     initnc '[	]int[ ]bcomm_irq\[3[*]16\][ ]='
@@ -923,7 +923,7 @@ set_except () {
     blobna '[\n][	]scriptlen[ ]=[ ]sizeof[(]script[)][^;]*[;][\n][	]for[^{]*scriptlen[^{]*[{][^}]*[^\n	}]' drivers/media/dvb/dvb-usb/af9005-fe.c
 
     accept 'struct[ ]\(sp8870\|tda1004x\)_config[\n][{][^}]*[(][*]request_firmware[)][^}]*[\n][}][;]' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.h'
-    blob '[/][*]\([^/]*\|[^*/][/]\)*get_dvb_firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]\(#define[ ]\(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|["][^"]*["]\)[ ]\([^\n]*\|[\\][\n]\)*\|[/][*][(]DEBLOBBED[)][*][/]\)\)*' 'drivers/media/dvb/frontends/\(nxt200x\|or51211\|sp887[0x]\|tda1004[8x]\)\.c'
+    blob '[/][*]\([^/]*\|[^*/][/]*\)*get_dvb_firmware\([^/]*\|[^*/][/]*\)*[*][/]\([\n]\(#define[ ]\(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|["][^"]*["]\)[ ]\([^\n]\|[\\][\n]\)*\|[/][*][(]DEBLOBBED[)][*][/]\)\)*' 'drivers/media/dvb/frontends/\(nxt200x\|or51211\|sp887[0x]\|tda1004[8x]\)\.c'
     blobname 'dvb-fe-sp8870\.fw' drivers/media/dvb/frontends/sp8870.c
     blobname 'dvb-fe-tda1004[56]\.fw' drivers/media/dvb/frontends/tda1004x.c
 
@@ -1289,7 +1289,7 @@ set_except () {
     blob 'to[ ]allow[ ]the[ ]user[ ]\([^/"]\|[^*"][/]*\)*fir[em]ware[ ]file\([^/"]\|[^*"][/]*\)*["][^"]*["]' sound/oss/pss.c
     blobname '\([/]etc[/]sound[/]\)\?pss_synth' sound/oss/pss.c
     accept '[	][$][(]obj[)][/]bin2hex[ ]pss_synth' sound/oss/Makefile
-    accept '[	][ ]*echo[ ]'"'"'static[ ]\(unsigned[ ]char[ ][*][ ]*\|int[ ]\)pss_synth\(Len\)\?[ ]=[ ]\(NULL\|0\)[;]' sound/oss/Makefile
+    accept '[	][ ]*echo[ ][\'"'"']static[ ]\(unsigned[ ]char[ ][*][ ]*\|int[ ]\)pss_synth\(Len\)\?[ ]=[ ]\(NULL\|0\)[;]' sound/oss/Makefile
     
     accept '[	]\.request_firmware[ ]=[ ]NULL,' drivers/media/dvb/dvb-usb/m920x.c
 
@@ -3104,53 +3104,6 @@ check () {
 
   input=$1
 
-  # This block is the result of an incomplete experiment to use flex
-  # to search for blobs.
-  if false; then
-    : > deblob-check-flex
-    eol='$'
-
-    for f in addx badx initnc defsnc initc defsc accept ocomment oprepline \
-	blobna blobname blob; do
-      eval "$f () { echo \"$f \$1\" >> deblob-check-flex; }"
-    done
-
-    badx "$blobfseq"
-    set_except "$input"
-
-    check_for_flex='
-h
-s,^\([^ ]*\) ,,
-s,^^,,
-s,[$]$,,
-s,\([^\\]\|^\)\(\(\\\\\)*\)\(\[^\?[]]\?[^]]\+\]\([*]\|\\[+?]\)\?\(\\\\\)*\)\+,\1\2,g
-/\([^\\]\|^\)\(\\\\\)*\([{(|)}?+^$"; 	]\)/{
-  g
-  i\
-(?BAD input line);
-  q 1
-}
-g
-s,\\\([{(|)}?+]\),\1,g
-s,\([^ ]*\) \(\^\?\)\(.*\)\(\$\?\),\2(?s:\3)\4 { /*\1*/; },g
-'     
-
-    { echo %%;
-      sed "$check_for_flex" deblob-check-flex || echo failed >&2
-      echo '\n|. { /*otherwise*/; }'
-    } > deblob-check-flex.l
-
-    rm -f deblob-check-flex
-    
-    exit
-  fi
-
-  falsepos_name=`mktemp -t deblob-check-falsepos-XXXXXX`
-  tempfiles="$falsepos_name"
-
-  falseneg_name=`mktemp -t deblob-check-falseneg-XXXXXX`
-  tempfiles="$tempfiles $falseneg_name"
-
   # Add $1 to falsepos.  Its usage makes it implicitly anchored to the
   # beginning of the line.  $2, if present, will some day narrow the
   # falsepos matches to files that match it.
@@ -3228,7 +3181,119 @@ s,\([^ ]*\) \(\^\?\)\(.*\)\(\$\?\),\2(?s:\3)\4 { /*\1*/; },g
     badx "$1" $2
   }
 
+  falsepos_name=`mktemp -t deblob-check-falsepos-XXXXXX`
+  tempfiles="$falsepos_name"
+
+  falseneg_name=`mktemp -t deblob-check-falseneg-XXXXXX`
+  tempfiles="$tempfiles $falseneg_name"
+
   set_except "$input"
+
+  # This block is the result of an incomplete experiment to use flex
+  # to search for blobs.
+  if ${DEBLOB_CHECK_GEN_FLEX-false}; then
+    : > deblob-check-flex
+    eol='$'
+
+    for f in addx badx \
+     `: initnc defsnc initc defsc accept ocomment oprepline \
+	blobna blobname blob` \
+    ; do
+      eval "$f () { echo \"$f \$1\" >> deblob-check-flex; }"
+    done
+
+    badx "$blobfseq"
+    set_except "$input"
+
+    check_for_flex='
+h
+s,^\([^ ]*\) ,,
+s,^^,,
+s,[$]$,,
+s,\([^\\]\|^\)\(\(\\\\\)*\)\(\[^\?[]]\?[^]]\+\]\([*]\|\\[+?]\)\?\(\\\\\)*\)\+,\1\2,g
+/\([^\\]\|^\)\(\\\\\)*\([{(|)}?+^$"'"'"'; 	]\)/{
+  g
+  i\
+(?BAD input line);
+  q 1
+}
+g
+s,\\\([{(|)}?+]\),\1,g
+s,\([^ ]*\) \(\^\?\)\(.*\)\(\$\?\),\2(?s:\3)\4 { /*\1*/; },g
+'     
+
+    { echo %%;
+      sed "$check_for_flex" deblob-check-flex || echo failed >&2
+      echo '\n|. { /*otherwise*/; }'
+    } > deblob-check-flex.l
+
+    rm -f deblob-check-flex
+    
+    exit
+  fi
+
+  # This block is the result of an incomplete experiment to use flex
+  # to search for blobs.
+  if ${DEBLOB_CHECK_GEN_PYTHON-false}; then
+    : > deblob-check-python
+    eol='$'
+
+    for f in addx badx \
+     `: initnc defsnc initc defsc accept ocomment oprepline \
+	blobna blobname blob` \
+    ; do
+      eval "$f () { echo \"$f \$1\" >> deblob-check-python; }"
+    done
+
+    badx "$blobfseq"
+    set_except "$input"
+
+    check_for_python='
+h
+s,^\([^ ]*\) ,,
+s,^^,,
+s,[$]$,,
+s,\([^\\]\|^\)\(\(\\\\\)*\)\(\[^\?[]]\?[^]]\+\]\([*]\|\\[+?]\)\?\(\\\\\)*\)\+,\1\2,g
+/\([^\\]\|^\)\(\\\\\)*\([{(|)}?+^$"'"'"'; 	]\)/{
+  g
+  i\
+(?BAD input line);
+  q 1
+}
+g
+s,\\(,\\(?:,g
+s,\\\([{(|)}?+]\),\1,g
+# s,\([^ ]*\) \(.*\),re.compile (r'"'\\2'"'),g
+s,\([^ ]*\) \(.*\),rxs["\1"] += r'"'|\\2'"',g
+'     
+
+    { cat <<EOF
+#! /usr/bin/python
+
+import re
+
+rxs = { 'addx':'', 'badx':'' }
+
+EOF
+      sed "$check_for_python" deblob-check-python || echo failed >&2
+      cat <<EOF
+
+rx = ''
+for x in rxs:
+    rxs[x] = '(?P<%s>%s)' % (x, rxs[x][1:])
+    rx += '|' + rxs[x]
+    rxs[x] = re.compile(rxs[x], re.M | re.S)
+
+rx = rx[1:]
+
+rxc = re.compile(rx, re.M | re.S)
+EOF
+    } > deblob-check-python.py
+
+    rm -f deblob-check-python
+    
+    exit
+  fi
 
   set_sed_cmd "$input"
 
