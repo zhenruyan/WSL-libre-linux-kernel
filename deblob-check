@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-01-13
+# deblob-check version 2010-01-19
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -565,65 +565,6 @@ fi
 # false positives.  Takes the input filename in $1.
 
 set_except () {
-  # Look for a multi-line definition starting with a line that matches
-  # $1 (implicitly anchored to the beginning of the line), and ending
-  # at the first ';'.  $2 may optionally name the files in which this
-  # match is to be disregarded as a potential blob.
-  initnc () {
-    addx "$1[^;]*[;]\\?" $2
-  }
-
-  # Same as initnc, but require the terminating semicolon.
-  defsnc () {
-    addx "$1[^;]*[;]" $2
-  }
-
-  # Look for a multi-line definition starting with a line that matches
-  # $1 (implicitly anchored to the beginning of the line), and ending
-  # at the first ';' that's not within comments.
-  initc () {
-    addx "$1\\([^;]*\\|$comment\\)*[;]\\?" $2
-  }
-
-  # Same as initc, but require the terminating semicolon.
-  defsc () {
-    addx "$1\\([^;]*\\|$comment\\)*[;]" $2
-  }
-
-  # Accept as a non-blob an expression $1 that would have otherwise
-  # triggered blob detection.  The expression must end in a way that
-  # would trigger the blob detection machinery.
-  accept () {
-    addx "$1" $2
-  }
-
-  # Match up to the end a comment started in $1.
-  ocomment () {
-    addx "$1[/]*\\([^/]\\|[^*/][/]*\\)*[*][/]" $2
-  }
-
-  # Match $1 followed by backslash-terminated lines and a last
-  # non-backslash-terminated line.
-  oprepline () {
-    addx "$1\\([^\\n]*\\\\[\\n]\\)*[^\\n\\\\]*$eol" $2
-  }
-
-  # Match $1 in $2 as a blob.  Not anchored.
-  blobna () {
-    badx "$1" $2
-  }
-
-  # Match $1 as a blob anywhere.  $2 is just for documentation purposes.
-  blobname () {
-    badx "$1"
-  }
-
-  # Match $1 in $2 as a blob.  The expectation is a match in the
-  # beginning of line, but we don't do anchoring of blob patterns ATM.
-  blob () {
-    badx "$1" $2
-  }
-
   blobna 'request_firmware_nowait'
   blobna 'request_firmware'
   blobna 'request_ihex_firmware'
@@ -1310,7 +1251,7 @@ set_except () {
     blobna 'You[ ]need[ ]to[ ]install[\n]*riptide\.hex[\n]\.[\n]' Documentation/sound/alsa/ALSA-Configuration.txt
     blobname 'riptide\.hex' sound/pci/riptide/riptide.c
     defsnc 'static[ ]union[ ]firmware_version[ ]firmware_versions\[\][ ]=' sound/pci/riptide/riptide.c
-    blob 'chip->firmware[ ]=[ ]firmware;' sound/pci/riptide/riptide.c
+    blob 'chip->firmware[ ]=[ ]firmware[;]' sound/pci/riptide/riptide.c
 
     blobname '\(multi\|digi\)face_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
 
@@ -1479,8 +1420,8 @@ set_except () {
     blobname 'tigon[/]tg3\(_tso5\?\)\?\.bin' drivers/net/tg3.c
     blobname '\(ti_usb-v\(%04x\|[0-9a-f]*\)-p\(%04x\|[0-9a-f]*\)\|mts_\(cdma\|gsm\|edge\)\)\.\(bin\|fw\)' drivers/usb/serial/ti_usb_3410_5052.c
     blobname 'iw\?2400m-fw-\(sdio\|usb\)-\(\(["][ ]I2400M_FW_VERSION[ ]["]\|[0-9.]*\)\.sbcf\|[^". \n]*\)' 'drivers/net/wimax/i2400m/\(sdio\|usb\)\.c'
-    blob '3\.[ ]Installing[ ]the[ ]firmware[^\n]*\([\n][\n]*   [^\n]*\)*[\n]*[$][^\n]*i2400m-fw[^\n]*\([\n][\n]*   [^\n]*\)*' Documentation/wimax/README.i2400m
-    blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*\([\n][\n]*\(   \|i2400m_usb\)[^\n]*\)*' Documentation/wimax/README.i2400m
+    blob '3\.[ ]Installing[ ]the[ ]firmware[^\n]*\([\n][\n]*[ ][ ][ ][^\n]*\)*[\n]*[$][^\n]*i2400m-fw[^\n]*\([\n][\n]*[ ][ ][ ][^\n]*\)*' Documentation/wimax/README.i2400m
+    blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*\([\n][\n]*\([ ][ ][ ]\|i2400m_usb\)[^\n]*\)*' Documentation/wimax/README.i2400m
     accept '[	][	]ranges[ ]=[ ]<'"$blobpat*"'>[;]' 'arch/powerpc/boot/dts/\(mpc8572ds\|p2020ds\)\.dts'
     accept '\(div_table_\(clz\|inv\|ix\)\|zero_l\):\([\n][	]\.\(byte[	]-\?[0-9]*\|long[	]0x[0-9A-F]*\)\)*' arch/sh/lib/udivsi3_i4i.S
     defsnc 'const[ ]u32[ ]crypto_[fi][tl]_tab\[4\]\[256\][ ]=' crypto/aes_generic.c
@@ -1534,7 +1475,7 @@ set_except () {
     defsnc '[ ][ ][ ][ ]u_int32_t[ ]ralinkrate\[256\][ ]=' 'drivers/staging/rt\(28[67]0\|3070\)/rt_linux\.c'
     defsnc 'unsigned[ ]char[ ]\(QUALITY\|STRENGTH\)_MAP\[\][ ]=' drivers/staging/rtl8187se/r8180_core.c
     defsnc 'u\(8\|16\|32\)[ ]rtl8225\(\(a\|bcd\?\)_rxgain\|agc\|tx_\(gain_cck\|power\)_ofdm\|tx_power_cck\(_ch14\)\?\)\[\]=' drivers/staging/rtl8187se/r8180_rtl8225.c
-    defsnc '\(static[ ]const[ ]\)\?u\(8\|16\|32\)[ ]\(rtl8225\(z2\)\?_\(threshold\|gain_\(a\|bg\)\|chan\|rxgain\|agc\|tx_\(gain_cck\|power\)_ofdm\|tx_power_cck\(_ch14\)\?\)\|ZEBRA2_CCK_OFDM_GAIN_SETTING\)\[\] \?=' drivers/staging/rtl8187se/r8180_rtl8225z2.c
+    defsnc '\(static[ ]const[ ]\)\?u\(8\|16\|32\)[ ]\(rtl8225\(z2\)\?_\(threshold\|gain_\(a\|bg\)\|chan\|rxgain\|agc\|tx_\(gain_cck\|power\)_ofdm\|tx_power_cck\(_ch14\)\?\)\|ZEBRA2_CCK_OFDM_GAIN_SETTING\)\[\][ ]\?=' drivers/staging/rtl8187se/r8180_rtl8225z2.c
     defsnc 'static[ ]short[ ]rtl8255_agc\[\]=' drivers/staging/rtl8187se/r8180_rtl8255.c
     defsnc '[ ]\?static[ ]u\(8\|32\)[ ]\(MAC_REG_TABLE\[\]\[2\]\|[ ]*ZEBRA_\(AGC\|RF_RX_GAIN_TABLE\)\[\]\|OFDM_CONFIG\[\]\)=' drivers/staging/rtl8187se/r8185b_init.c
     accept '[	]-[ ]move[ ]firmware[ ]loading[ ]to[ ]request_firmware[(][)]' drivers/staging/slicoss/README
@@ -1947,7 +1888,7 @@ set_except () {
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]nand_oob_128[ ]=' drivers/mtd/nand/nand_base.c
     blobname 'bnx2[/]bnx2-\(mips\|rv2p\)-[-0-9a-z.]*\.fw' drivers/net/bnx2.c
     accept 'static[ ]void[\n]load_rv2p_fw[(][^{)]*const[ ]struct[ ]bnx2_mips_fw_file_entry' drivers/net/bnx2.c
-    accept 'static[ ]int[\n]bnx2_init_cpus[(][^{]*[)][\n][{][\n][	]const[ ]struct bnx2_mips_fw_file'
+    accept 'static[ ]int[\n]bnx2_init_cpus[(][^{]*[)][\n][{][\n][	]const[ ]struct[ ]bnx2_mips_fw_file'
     blobname 'yam[/]\(12\|96\)00\.bin' drivers/net/hamradio/yam.c
     blobname 'myricom[/]lanai\.bin' drivers/net/myri_sbus.c
     blobname '3com[/]3C359\.bin' drivers/net/tokenring/3c359.c
@@ -1958,7 +1899,7 @@ set_except () {
     accept 'static[ ]int[ ]ar9170_usb_request_firmware[(]' drivers/net/wireless/ar9170/usb.c
     accept '[	]err[ ]=[ ]request_firmware[(][^\n]*["]ar9170\(-[12]\)\?\.fw["],' drivers/net/wireless/ar9170/usb.c
     accept '[	]err[ ]=[ ]ar9170_usb_request_firmware[(]' drivers/net/wireless/ar9170/usb.c
-    accept 'MODULE_FIRMWARE[(]["]ar9170\(-[12]\)\?\.fw["][)];' drivers/net/wireless/ar9170/usb.c
+    accept 'MODULE_FIRMWARE[(]["]ar9170\(-[12]\)\?\.fw["][)][;]' drivers/net/wireless/ar9170/usb.c
     blobname 'slicoss[/]\(oasis\|gb\)\(rcvucode\|download\)\.sys' drivers/staging/slicoss/slicoss.c
     blobname 'sxg[/]sahara\(dbg\)\?downloadB\.sys' drivers/staging/sxg/sxg.c
     blobname 'qlogic[/]isp1000\.bin' drivers/scsi/qlogicpti.c
@@ -1981,9 +1922,9 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]default_cal_\(channels\|rssi\)\[\][ ]=' drivers/staging/stlc45xx/stlc45xx.c
     accept '[	][	]stlc45xx_error[(]["]request_firmware[(][)][ ]failed' drivers/staging/stlc45xx/stlc45xx.c
     blob 'static[ ]struct[ ]phy_ucode[	]PhyUcode\[\][ ]=[^;]*[;]' drivers/staging/sxg/sxgphycode-1.2.h
-    blob '#include[ ]"sxgphycode\(-1\.2\)\?\.h"' drivers/staging/sxg/sxg.c
-    accept 'device[ ]drivers[ ]which[ ]predate[ ]the[ ]common[ ]use[ ]of[ ]request_firmware()' firmware/README.AddingFirmware
-    accept 'As[ ]we[ ]update[ ]those[ ]drivers[ ]to[ ]use[ ]request_firmware()' firmware/README.AddingFirmware
+    blob '#include[ ]["]sxgphycode\(-1\.2\)\?\.h["]' drivers/staging/sxg/sxg.c
+    accept 'device[ ]drivers[ ]which[ ]predate[ ]the[ ]common[ ]use[ ]of[ ]request_firmware[(][)]' firmware/README.AddingFirmware
+    accept 'As[ ]we[ ]update[ ]those[ ]drivers[ ]to[ ]use[ ]request_firmware[(][)]' firmware/README.AddingFirmware
     blob 'This[ ]directory[ ]is[ ]_NOT_[ ]for[ ]adding[ ]arbitrary[ ]new[ ]firmware[ ]images.*git[ ]pull[ ]request[ ]to:[\n][^\n]*infradead\.org>' firmware/README.AddingFirmware
     blobna 'linux-firmware\.git' firmware/README.AddingFirmware
     blobname '\(ea[/]\)\?\(loader\|indigo_djx\)_dsp\.fw' sound/pci/echoaudio/indigodjx.c
@@ -1996,7 +1937,7 @@ set_except () {
 
     # New in 2.6.31
     accept '[ ][*][ ]page[ ]tables[ ]as[ ]follows:[\n][ ][*][\n][ ][*][ ][ ][ ]3[ ]3[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[\n][ ][*][ ][ ][ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0' arch/arm/include/asm/pgtable.h
-    defsnc '\([	]static const u8 snum_init\[\][ ]=[ ][{]\|static[ ]void[ ]qe_snums_init[(]void[)]\)[\n][	][	]0x04, 0x05,' arch/powerpc/sysdev/qe_lib/qe.c
+    defsnc '\([	]static[ ]const[ ]u8[ ]snum_init\[\][ ]=[ ][{]\|static[ ]void[ ]qe_snums_init[(]void[)]\)[\n][	][	]0x04,[ ]0x05,' arch/powerpc/sysdev/qe_lib/qe.c
     accept '[.]LgoS4:[\n][	][.]word[	][.]LmtoS4-\.LgoS4\([\n][	]\.\(long\|word\|byte\)[	][01]\(,0\)*\)*' arch/s390/kernel/sclp.S
     defsnc 'static[ ]int[ ]sh_clk_div6_divisors\[64\][ ]=' arch/sh/kernel/cpu/clock-cpg.c
     accept '[ ][*][ ]*1[ ]1\([ ]0\)*[ ]1\([ ]0\)*' arch/x86/lguest/boot.c
@@ -2007,41 +1948,41 @@ set_except () {
     defsnc '[	]const[ ]unsigned[ ]char[ ]\(y\|uv\)QuanTable51[18]\[\][ ]=' 'drivers/media/video/\(ov511\|gspca/ov519\)\.c'
     defsnc 'static[ ]const[ ]u8[ ]bridge_start_ov965x_\(vga\|cif\)\[\]\[2\][ ]=' drivers/media/video/gspca/ov534.c
     defsnc 'static[ ]const[ ]\(int\|s16\)[ ]hsv_\(red\|green\|blue\)_[xy]\[\][ ]=' drivers/media/video/gspca/sn9c20x.c
-    defsnc 'static[ ]\(u16\|struct i2c_reg_u16\)[ ]\(bridge\|mt9\(v\(11[12]\|011\)\|m001\)\)_init\[\]\(\[2\]\)\?[ ]=' drivers/media/video/gspca/sn9c20x.c
-    defsnc 'static[ ]\(u8\|struct i2c_reg_u8\)[ ]\(soi968\|ov\(76[67]0\|965[05]\)\|hv7131r\)_init\[\]\(\[2\]\)\?[ ]=' drivers/media/video/gspca/sn9c20x.c
+    defsnc 'static[ ]\(u16\|struct[ ]i2c_reg_u16\)[ ]\(bridge\|mt9\(v\(11[12]\|011\)\|m001\)\)_init\[\]\(\[2\]\)\?[ ]=' drivers/media/video/gspca/sn9c20x.c
+    defsnc 'static[ ]\(u8\|struct[ ]i2c_reg_u8\)[ ]\(soi968\|ov\(76[67]0\|965[05]\)\|hv7131r\)_init\[\]\(\[2\]\)\?[ ]=' drivers/media/video/gspca/sn9c20x.c
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]onenand_oob_128[ ]=' drivers/mtd/onenand/onenand_base.c
     blobname 'bnx2x-e1h\?-\([0-9.%d]*\.fw\)\?' drivers/net/bnx2x_main.c
     blob '#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\([\n]#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\)*' drivers/net/bnx2x_hsi.h
     blob 'static[ ]int[ ]__devinit[ ]bnx2x_check_firmware[(]struct[ ]bnx2x[ ][*]bp[)][\n][{]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/net/bnx2x_main.c
-    blobna 'if[ ][(][(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\([ ][|][|][\n][ 	]*[(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\)*[)][ ]{[^{}]*}' drivers/net/bnx2x_main.c
-    blobna 'sprintf[(]fw_file_name[ ][+][ ]offset,[ ]["]%d[.]%d[.]%d[.]%d[.]fw["]\(,[\n][ 	]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)*[)];' drivers/net/bnx2x_main.c
-    blob 'rc[ ]=[ ]bnx2x_check_firmware(bp);' drivers/net/bnx2x_main.c
+    blobna 'if[ ][(][(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\([ ][|][|][\n][ 	]*[(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\)*[)][ ][{][^{}]*[}]' drivers/net/bnx2x_main.c
+    blobna 'sprintf[(]fw_file_name[ ][+][ ]offset,[ ]["]%d[.]%d[.]%d[.]%d[.]fw["]\(,[\n][ 	]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)*[)][;]' drivers/net/bnx2x_main.c
+    blob 'rc[ ]=[ ]bnx2x_check_firmware[(]bp[)][;]' drivers/net/bnx2x_main.c
     defsnc 'crb_128M_2M_map\[64\][ ]__cacheline_aligned_in_smp[ ]='  drivers/net/netxen/netxen_nic_hw.c
     defsnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals\(_3070\)\?\[\][ ]=' drivers/net/wireless/rt2x00/rt2800usb.c
     blobname 'wl1251-\(fw\|nvs\)\.bin' drivers/net/wireless/wl12xx/wl1251.h
     blobname 'iwmc3200wifi-\([ul]mac\|calib\)-sdio\.bin' drivers/net/wireless/iwmc3200wifi/sdio.c
-    defsnc 'u16[ ]MCS_DATA_RATE\[2\]\[2\]\[77\] =' drivers/staging/rtl8192su/ieee80211/rtl819x_HTProc.c
+    defsnc 'u16[ ]MCS_DATA_RATE\[2\]\[2\]\[77\][ ]=' drivers/staging/rtl8192su/ieee80211/rtl819x_HTProc.c
     blob 'u8[ ]Rtl8192SUFw\(Img\|Main\|Data\)Array\[\(Img\|Main\|Data\)ArrayLength\][ ]=[ ][{]'"$sepx$blobpat*$sepx"'[}][;]\([\n][\n]*u8[ ]Rtl8192SUFw\(Img\|Main\|Data\)Array\[\(Img\|Main\|Data\)ArrayLength\][ ]=[ ][{]'"$sepx$blobpat*$sepx"'[}][;]\)*' drivers/staging/rtl8192su/r8192SU_HWImg.c
     blobname 'RTL8192SU[/]\(rtl8192sfw\.bin\|\(boot\|main\|data\)\.img\)' drivers/staging/rtl8192su/r8192S_firmware.c
-    blobna 'case[ ]FW_SOURCE_HEADER_FILE:[\n]#if[ ]1[\n]#define[^#]*[\n]#endif[\n][	][	][	]break;' drivers/staging/rtl8192su/r8192S_firmware.c
+    blobna 'case[ ]FW_SOURCE_HEADER_FILE:[\n]#if[ ]1[\n]#define[^#]*[\n]#endif[\n][	][	][	]break[;]' drivers/staging/rtl8192su/r8192S_firmware.c
     defsnc 'u32[ ]Rtl8192SU\(PHY_\(REG\|ChangeTo\)_[12]T[12]R\|Radio[AB]_\(\(\(to\)\?[12]T\|GM\)_\)\?\|MAC\(PHY\|_[12]T\)_\|AGCTAB_\)Array\(_PG\)\?\[\(PHY_\(REG\|ChangeTo\)_[12]T[12]R\|Radio[AB]_\(\(\(to\)\?[12]T\|GM\)_\)\?\|MAC\(PHY\|_[12]T\)_\|AGCTAB_\)Array\(_PG\)\?Length][ ]=' drivers/staging/rtl8192su/rtl92SU_HWImg.c
-    blob 'u8[ ]Rtl8192PciEFw\(Boot\|Main\|Data\)ArrayDTM\[\(Boot\|Main\|Data\)ArrayLengthDTM\][ ]=[ ]{[^}]*};' drivers/staging/rtl8192su/r8192S_FwImgDTM.h
+    blob 'u8[ ]Rtl8192PciEFw\(Boot\|Main\|Data\)ArrayDTM\[\(Boot\|Main\|Data\)ArrayLengthDTM\][ ]=[ ][{][^}]*[}][;]' drivers/staging/rtl8192su/r8192S_FwImgDTM.h
     defsnc '\(static[ ]\)\?u32[ ]Rtl8192PciE\(PHY_REG\(_1T2R\)\?\|\(Radio[ABCD]\|MACPHY\|AGCTAB\)_\)Array\(_PG\)\?\(DTM\)\?\[\(\(PHY_REG\(_1T2R\)\?\|\(Radio[ABCD]\|MACPHY\|AGCTAB\)_\)Array\(_PG\)\?Length\(DTM\)\?\)\?\][ ]=' drivers/staging/rtl8192su/rtl8192S_FwImgDTM.h
     blob '\([&]\|sizeof[(]\)rtl8190_fw\(boot\|main\|data\)_array\(\[0\]\|[)]\)\(,[ 	\n]*\([&]\|sizeof[(]\)rtl8190_fw\(boot\|main\|data\)_array\(\[0\]\|[)]\)\)*' 'drivers/staging/rtl8192su/r819\(2S\|xU\)_firmware\.c'
     blobname 'RTL8192U[/]\(boot\|main\|data\)\.img' 'drivers/staging/rtl8192su/r819xU_firmware\.c'
-    blob 'u8[ ]rtl8190_fw\(boot\|main\|data\)_array\[\][ ]=[ ]{[^}]*};' drivers/staging/rtl8192su/r8192xU_firmware_img.c
-    defsnc 'u32 Rtl8192Usb\(PHY_REG\(_1T2R\)\?\|\(Radio[ABCD]\|MACPHY\|AGCTAB\)_\)Array\(_PG\)\?\[\][ ]=' drivers/staging/rtl8192su/rtl819xU_firmware_img.c
+    blob 'u8[ ]rtl8190_fw\(boot\|main\|data\)_array\[\][ ]=[ ][{][^}]*[}][;]' drivers/staging/rtl8192su/r8192xU_firmware_img.c
+    defsnc 'u32[ ]Rtl8192Usb\(PHY_REG\(_1T2R\)\?\|\(Radio[ABCD]\|MACPHY\|AGCTAB\)_\)Array\(_PG\)\?\[\][ ]=' drivers/staging/rtl8192su/rtl819xU_firmware_img.c
     defsnc 'BYTE[ ]\(sbox\|dot[23]\)_table\[256\][ ]=' drivers/staging/vt6655/aes_ccmp.c
     defsnc 'BYTE[ ]byVT3253\(InitTab\|B0\(_AGC4\?\)\?\)_\(RFMD\(2959\)\?\|AIROHA2230\|UW2451\|AGC\)\[CB_VT3253\(B0\(_AGC4\?\)\?\)\?\(\(_INIT\)\?_FOR_\(RFMD\(2959\)\?\|AIROHA2230\|UW2451\|AGC\)\)\?\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
     defsnc 'SCountryTable[ ]ChannelRuleTab\[CCODE_MAX[+]1\][ ]=' drivers/staging/vt6655/card.c
     defsnc 'static[ ]const[ ]long[ ]frequency_list\[\][ ]=' drivers/staging/vt6655/iwctl.c
-    accept '#define[ ]CONFIG_PATH[ ]*"[/]etc[/]vntconfiguration[.]dat"' drivers/staging/vt6655/device_cfg.h
+    accept '#define[ ]CONFIG_PATH[ ]*["][/]etc[/]vntconfiguration[.]dat["]' drivers/staging/vt6655/device_cfg.h
     defsnc 'static[ ]const[ ]DWORD[ ]s_adwCrc32Table\[256\][ ]=' drivers/staging/vt6655/tcrc.c
     defsnc 'const[ ]BYTE[ ]TKIP_Sbox_\(Lower\|Upper\)\[256\][ ]=' drivers/staging/vt6655/tkip.c
     blobname 'prism2_ru\.\(hex\|fw\)' drivers/staging/wlan-ng/prism2fw.c
     defsnc 'static[ ]const[ ]u16[ ]wm8960_reg\[WM8960_CACHEREGNUM\][ ]=' sound/soc/codecs/wm8960.c
     blob '#include[ ]["]me4\(00\|61\)0_firmware\.h["]\([\n][\n]*#include[ ]["]me4\(00\|61\)0_firmware\.h["]\)*' drivers/staging/me4000/me4000.c
-    blob 'firm[ ]=[ ][^;]*xilinx_firm[^;]*;' drivers/staging/me4000/me4000.c
+    blob 'firm[ ]=[ ][^;]*xilinx_firm[^;]*[;]' drivers/staging/me4000/me4000.c
     # end of new in 2.6.31
     accept '[ 	]*ramdisk[ ]=[ ]["][/]boot[/][^ ]*initrd[^ ]*\.img["]' Documentation/ia64/xen.txt
 
@@ -2050,8 +1991,8 @@ set_except () {
     blobname 'r128[/]r128_cce\.bin' drivers/gpu/drm/r128/r128_cce.c
     blobname 'radeon[/]R\([123]0\|[45]2\|S6[09]\)0_cp\.bin' drivers/gpu/drm/radeon/r100.c
     blobname 'radeon[/]\(R\(60\|V6[1237]\|S7[1378]\)[05]\|%s\)_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
-    defsnc 'const[ ]u32[ ]r[67]xx_default_state\[\] =' drivers/gpu/drm/radeon/r600_blit_shaders.c
-    defsnc 'struct nv17_tv_norm_params nv17_tv_norms\[NUM_TV_NORMS] =' drivers/gpu/drm/nouveau/nv17_tv_modes.c
+    defsnc 'const[ ]u32[ ]r[67]xx_default_state\[\][ ]=' drivers/gpu/drm/radeon/r600_blit_shaders.c
+    defsnc 'struct[ ]nv17_tv_norm_params[ ]nv17_tv_norms\[NUM_TV_NORMS][ ]=' drivers/gpu/drm/nouveau/nv17_tv_modes.c
 
     # New in or modified for 2.6.32
     blobname '\(cxgb3[/]\)\?ael20\(05_\(opt\|twx\)\|20_twx\)_edc\.bin' drivers/net/cxgb3/cxgb3_main.c
@@ -2061,11 +2002,11 @@ set_except () {
     defsnc '[	][}][ ]common_modes\[17\][ ]=' drivers/gpu/drm/radeon/radeon_connectors.c
     defsnc '[	][	]*\(static[ ]\)\?struct[ ]phy_reg[ ]phy_reg_init\(_0\)\?\[\][ ]=' drivers/net/r8169.c
     accept '[	][	]*struct[ ]phy_reg[ ]phy_reg_init_1\[\][ ]=[ ][{][^;]*0x8300[^;]*[}][;]' drivers/net/r8169.c
-    blob 'static[ ]void[ ]rtl8168d_[12]_hw_phy_config(void[ ]__iomem[ ][*]ioaddr)[\n]{[\n]\([^}]*\|[^\n}][}]*\)*[\n][}]' drivers/net/r8169.c
+    blob 'static[ ]void[ ]rtl8168d_[12]_hw_phy_config[(]void[ ]__iomem[ ][*]ioaddr[)][\n][{][\n]\([^}]*\|[^\n}][}]*\)*[\n][}]' drivers/net/r8169.c
     blobna 'rtl8168d_[12]_hw_phy_config[(]ioaddr[)][;]' drivers/net/r8169.c
-    blobna 'static[ ]struct[ ]phy_reg_init_[12]\[\][ ]=[ ]{[\n 	{}0-9a-fx]*0x06,[ ]0xf8f9[\n 	{}0-9a-fx]*};' drivers/net/r8169.c
+    blobna 'static[ ]struct[ ]phy_reg_init_[12]\[\][ ]=[ ][{][\n 	{}0-9a-fx]*0x06,[ ]0xf8f9[\n 	{}0-9a-fx]*[}][;]' drivers/net/r8169.c
     # This loads firmware to be flashed from filename provided through ethtool.
-    accept 'int[ ]be_load_fw([^\n;{]*)[ \n][{]\([^}]*\|[^\n}][}]*\)*ETHTOOL_FLASH_MAX_FILENAME\([^}]*\|[^\n}][}]*\)*be_cmd_get_fw_ver\([^}]*\|[^\n}][}]*\)*request_firmware\([^}]*\|[^\n}][}]*\)*[\n][}]' drivers/net/benet/be_main.c
+    accept 'int[ ]be_load_fw[(][^\n;{]*[)][ \n][{]\([^}]*\|[^\n}][}]*\)*ETHTOOL_FLASH_MAX_FILENAME\([^}]*\|[^\n}][}]*\)*be_cmd_get_fw_ver\([^}]*\|[^\n}][}]*\)*request_firmware\([^}]*\|[^\n}][}]*\)*[\n][}]' drivers/net/benet/be_main.c
     defsnc '[	]u8[ ]init_hash_seed\[\][ ]=' drivers/net/qlge/qlge_main.c
     defsnc 'static[ ]const[ ]u_int32_t[ ]ar9287\(Common\|Modes\(_\([tr]x_gain\)\)\?\)_9287_1_[01]\[\]\[[236]\][ ]=' drivers/net/wireless/ath9k/initvals.h
     defsnc 'static[ ]const[ ]u_int32_t[ ]ar9271\(Common\|Modes\)_9271_1_0\[\]\[[26]\][ ]=' drivers/net/wireless/ath9k/initvals.h
@@ -2093,9 +2034,9 @@ set_except () {
     blobname '\(cache\|resident\)\.image\.bin' drivers/staging/sep/sep_driver.c
     blobname 'RTL8192E[/]\(boot\|main\|data\)\.img' drivers/staging/rtl8192e/r819xE_firmware.c
     defsnc '\(static[ ]\)\?u32[ ]Rtl8190PciE\?\(AGCTAB_\|PHY_REG\(_1T2R\)\?\|Radio[ABCD]_\)Array\[\(AGCTAB_\|PHY_REG\(_1T2R\)\?\|Radio[ABCD]_\)ArrayLength\][ ]=' drivers/staging/rtl8192e/r819xE_phy.c
-    accept '[ ][*][ ]File: main_usb\.c\([\n][ ][*]\([^\n/]*\|[^*\n/][/]*\)*\)*[\n][ ][*][/]\([\n][\n]*#\(undef [^\n]*\|include "[^\n]*"\)\)*[\n][\n]*#include "firmware\.h"' drivers/staging/vt6656/main_usb.c
+    accept '[ ][*][ ]File:[ ]main_usb\.c\([\n][ ][*]\([^\n/]*\|[^*\n/][/]*\)*\)*[\n][ ][*][/]\([\n][\n]*#\(undef[ ][^\n]*\|include[ ]["][^\n]*["]\)\)*[\n][\n]*#include[ ]["]firmware\.h["]' drivers/staging/vt6656/main_usb.c
     blob 'const[ ]BYTE[ ]abyFirmware\[\][ ]=[ ][{][^;]*[}][;]' drivers/staging/vt6656/firmware.c
-    defsnc '}[ ][ ][ ]ChannelRuleTab\[\][ ]=' drivers/staging/vt6656/channel.c
+    defsnc '[}][ ][ ][ ]ChannelRuleTab\[\][ ]=' drivers/staging/vt6656/channel.c
     defsnc '\(static[ ]\)\?struct[ ]register_address_value_pair[\n]\(preview_snapshot_mode\|noise_reduction\)_reg_settings_array\[\][ ]=' drivers/staging/dream/camera/mt9d112_reg.c
     blobname '\([/]tmp[/]\)\?RT30xxEEPROM\.bin' 'drivers/staging/rt3090/\(common/ee_efuse\.c\|rtmp_def\.h\)'
     defsnc 'static[ ]UINT8[ ]WPS_DH_\([PRX]\|RRModP\)_VALUE\[1\(9[23]\|84\)\][ ]=' drivers/staging/rt3090/common/crypt_biginteger.c
@@ -2109,7 +2050,7 @@ set_except () {
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]hwecc4_2048[ ]__initconst[ ]=' drivers/mtd/nand/davinci_nand.c
     defsnc 'static[ ]const[ ]u16[ ]wm8974_reg\[WM8974_CACHEREGNUM\][ ]=' sound/soc/codecs/wm8974.c
     defsnc 'static[ ]const[ ]u16[ ]ak4642_reg\[AK4642_CACHEREGNUM\][ ]=' sound/soc/codecs/ak4642.c
-    accept 'int[ ]snd_hda_load_patch([^\n;{]*)[ \n]{\([^}]*\|[^\n}][}]*\)*hda_codec\([^}]*\|[^\n}][}]*\)*request_firmware\([^}]*\|[^\n}][}]*\)*[\n][}]' sound/pci/hda/hda_hwdep.c
+    accept 'int[ ]snd_hda_load_patch[(][^\n;{]*[)][ \n][{]\([^}]*\|[^\n}][}]*\)*hda_codec\([^}]*\|[^\n}][}]*\)*request_firmware\([^}]*\|[^\n}][}]*\)*[\n][}]' sound/pci/hda/hda_hwdep.c
     accept '[ ][ ][ ]Bit[ 0-7]*' Documentation/input/sentelic.txt
     accept 'The[ ]hd-audio[ ]driver[ ]reads[ ]the[ ]file[ ]via[ ]request_firmware[(][)]\.' Documentation/sound/alsa/HD-Audio.txt
     blob 'SD8688[ ]firmware:[\n]*\([/]lib[/]firmware[^\n]*[\n]*\)*The[ ]images[^:]*:[\n]*[^\n]*[/]linux-firmware[^\n]*' Documentation/btmrvl.txt
@@ -2117,7 +2058,7 @@ set_except () {
     defsnc 'static[ ]int[ ]zoom2_batt_table\[\][ ]=' arch/arm/mach-omap2/board-zoom2.c
     defsnc 'static[ ]struct[ ]ad714x_platf\(or\|ro\)m_data[ ]ad714[27]_platf\(or\|ro\)m_data[ ]=' arch/blackfin/mach-bf537/boards/stamp.c
     blob 'static[ ]const[ ]u8[ ]lgs8g75_initdat\[\][ ]=[ ][{][^;]*[}][;]' drivers/media/dvb/frontends/lgs8gxx.c
-    blob 'static[ ]int[ ]lgs8g75_init_data([^\n;{]*)[ \n]{\([^}]*\|[^\n}][}]*\)*lgs8g75_initdat\([^}]*\|[^\n}][}]*\)*[\n][}]' drivers/media/dvb/frontends/lgs8gxx.c
+    blob 'static[ ]int[ ]lgs8g75_init_data[(][^\n;{]*[)][ \n][{]\([^}]*\|[^\n}][}]*\)*lgs8g75_initdat\([^}]*\|[^\n}][}]*\)*[\n][}]' drivers/media/dvb/frontends/lgs8gxx.c
     defsc 'static[ ]struct[ ]idxdata[ ]tbl_common_[a-e]\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi2020\|mi1320\|ov9655\|ov2640\)\.c'
     defsnc 'static[ ]struct[ ]validx[ ]tbl_\(commm\?on\|init_\(at_startup\|post_alt\)\|sensor_settings_common_[ab]\|big_[abc]\|640\|800\)\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi2020\|mi1320\|ov9655\|ov2640\).c'
     defsnc 'static[ ]u8[ ][*]tbl_\(640\|800\)\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi1320\|ov9655\).c'
@@ -3166,23 +3107,20 @@ check () {
   # This block is the result of an incomplete experiment to use flex
   # to search for blobs.
   if false; then
-    : > deblob-check-falsepos > deblob-check-falseneg
+    : > deblob-check-flex
     eol='$'
-    addx () {
-      if test -n "$1"; then
-        echo "$1" >> deblob-check-falsepos
-      fi
-    }
-    badx () {
-      if test -n "$1"; then
-        echo "$1" >> deblob-check-falseneg
-      fi
-    }
+
+    for f in addx badx initnc defsnc initc defsc accept ocomment oprepline \
+	blobna blobname blob; do
+      eval "$f () { echo \"$f \$1\" >> deblob-check-flex; }"
+    done
+
     badx "$blobfseq"
     set_except "$input"
 
     check_for_flex='
 h
+s,^\([^ ]*\) ,,
 s,^^,,
 s,[$]$,,
 s,\([^\\]\|^\)\(\(\\\\\)*\)\(\[^\?[]]\?[^]]\+\]\([*]\|\\[+?]\)\?\(\\\\\)*\)\+,\1\2,g
@@ -3194,19 +3132,15 @@ s,\([^\\]\|^\)\(\(\\\\\)*\)\(\[^\?[]]\?[^]]\+\]\([*]\|\\[+?]\)\?\(\\\\\)*\)\+,\1
 }
 g
 s,\\\([{(|)}?+]\),\1,g
-s,\(\^\?\)\(.*\)\(\$\?\),\1(?s:\2)\3 |,g
-$s,|$,{,
+s,\([^ ]*\) \(\^\?\)\(.*\)\(\$\?\),\2(?s:\3)\4 { /*\1*/; },g
 '     
 
     { echo %%;
-      sed "s,^,^,;$check_for_flex" deblob-check-falsepos || echo failed >&2
-      echo '/*FALSEPOS*/; }'
-      sed "$check_for_flex" deblob-check-falseneg || echo failed >&2
-      echo '/*FALSENEG*/; }'
-      echo '\n|. { /*OTHERWISE*/; }'
+      sed "$check_for_flex" deblob-check-flex || echo failed >&2
+      echo '\n|. { /*otherwise*/; }'
     } > deblob-check-flex.l
 
-    rm -f deblob-check-falsepos deblob-check-falseneg
+    rm -f deblob-check-flex
     
     exit
   fi
@@ -3233,6 +3167,65 @@ $s,|$,{,
     if test -n "$1"; then
       $echo_n "\\|$1" >> $falseneg_name
     fi
+  }
+
+  # Look for a multi-line definition starting with a line that matches
+  # $1 (implicitly anchored to the beginning of the line), and ending
+  # at the first ';'.  $2 may optionally name the files in which this
+  # match is to be disregarded as a potential blob.
+  initnc () {
+    addx "$1[^;]*[;]\\?" $2
+  }
+
+  # Same as initnc, but require the terminating semicolon.
+  defsnc () {
+    addx "$1[^;]*[;]" $2
+  }
+
+  # Look for a multi-line definition starting with a line that matches
+  # $1 (implicitly anchored to the beginning of the line), and ending
+  # at the first ';' that's not within comments.
+  initc () {
+    addx "$1\\([^;]*\\|$comment\\)*[;]\\?" $2
+  }
+
+  # Same as initc, but require the terminating semicolon.
+  defsc () {
+    addx "$1\\([^;]*\\|$comment\\)*[;]" $2
+  }
+
+  # Accept as a non-blob an expression $1 that would have otherwise
+  # triggered blob detection.  The expression must end in a way that
+  # would trigger the blob detection machinery.
+  accept () {
+    addx "$1" $2
+  }
+
+  # Match up to the end a comment started in $1.
+  ocomment () {
+    addx "$1[/]*\\([^/]\\|[^*/][/]*\\)*[*][/]" $2
+  }
+
+  # Match $1 followed by backslash-terminated lines and a last
+  # non-backslash-terminated line.
+  oprepline () {
+    addx "$1\\([^\\n]*\\\\[\\n]\\)*[^\\n\\\\]*$eol" $2
+  }
+
+  # Match $1 in $2 as a blob.  Not anchored.
+  blobna () {
+    badx "$1" $2
+  }
+
+  # Match $1 as a blob anywhere.  $2 is just for documentation purposes.
+  blobname () {
+    badx "$1"
+  }
+
+  # Match $1 in $2 as a blob.  The expectation is a match in the
+  # beginning of line, but we don't do anchoring of blob patterns ATM.
+  blob () {
+    badx "$1" $2
   }
 
   set_except "$input"
