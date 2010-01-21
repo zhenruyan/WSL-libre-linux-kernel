@@ -3475,7 +3475,7 @@ check () {
 
   set_except "$input"
 
-  # check that all regular expressions match our requirements
+  # Check that all regular expressions match our requirements.
   sed -n '
 s,^\(-\^\?\|[+]\^\),,
 h
