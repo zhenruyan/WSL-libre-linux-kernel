@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-01-20
+# deblob-check version 2010-01-21
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -335,6 +335,33 @@ test_mode=false
 
 name=deblob-check
 
+set_flex_cmd () {
+  set_flex_main
+}
+
+set_sed_cmd () {
+  set_sed_main "
+i\\
+$file\\
+/*(DEBLOB-\\
+ERROR)*/
+q 1"
+}
+
+set_cmd=set_sed_cmd
+
+case $1 in
+--use-sed)
+  shift;
+  set_cmd=set_sed_cmd
+  ;;
+
+--gen-flex)
+  shift;
+  set_cmd=set_flex_cmd
+  ;;
+esac
+
 case $1 in
 --version | -V)
   sed -e '/^# '$name' version /,/^# Written by/ { s/^# //; p; }; d' < $0
@@ -360,35 +387,35 @@ case $1 in
 --mark-false-positives | -p)
   shift;
   set_sed_cmd () {
-    set_sedmain "b list_both" "p" "b list_matches"
+    set_sed_main "b list_both" "p" "b list_matches"
   }
   ;;
 
 --print-marked-false-positives | -f)
   shift;
   set_sed_cmd () {
-    set_sedmain "b print_marked_matches" "" "b print_marked_matches"
+    set_sed_main "b print_marked_matches" "" "b print_marked_matches"
   }
   ;;
 
 --print-false-positives | -F)
   shift;
   set_sed_cmd () {
-    set_sedmain "b print_matches" "" "b print_matches"
+    set_sed_main "b print_matches" "" "b print_matches"
   }
   ;;
 
 --deblob | --mark-blobs | -d)
   shift;
   set_sed_cmd () {
-    set_sedmain "b list_blobs" "p" "p"
+    set_sed_main "b list_blobs" "p" "p"
   }
   ;;
 
 --cat | -D)
   shift;
   set_sed_cmd () {
-    set_sedmain \
+    set_sed_main \
       "# sedcat: Actual blob detected, but there may be false positives." \
       "# sedcat: No blob whatsoever found." \
       "# sedcat: False positives found." \
@@ -401,21 +428,21 @@ d
 --print-marked-blobs | -b)
   shift;
   set_sed_cmd () {
-    set_sedmain "b print_marked_blobs"
+    set_sed_main "b print_marked_blobs"
   }
   ;;
 
 --print-blobs | -B)
   shift;
   set_sed_cmd () {
-    set_sedmain "b print_blobs"
+    set_sed_main "b print_blobs"
   }
   ;;
 
 --print-marked-blobs-with-context | -c)
   shift;
   set_sed_cmd () {
-    set_sedmain "b print_marked_cblobs"
+    set_sed_main "b print_marked_cblobs"
   }
   ;;
 
@@ -429,7 +456,7 @@ d
 --list-false-positives | -P)
   shift;
   set_sed_cmd () {
-    set_sedmain "" "" "
+    set_sed_main "" "" "
 i\\
 $file\\
 /*(DEBLOB-\\
@@ -441,7 +468,7 @@ q 1"
 --list-all-matches | -x)
   shift;
   set_sed_cmd () {
-    set_sedmain "
+    set_sed_main "
 i\\
 $file\\
 /*(DEBLOB-\\
@@ -458,13 +485,13 @@ q 1"
 --print-all-matches | -X)
   shift;
   set_sed_cmd () {
-    set_sedmain "b print_both" "" "b print_matches"
+    set_sed_main "b print_both" "" "b print_matches"
   }
   ;;
 
 *)
   case $1 in
-  -l | --list-blobs) shift;;
+  --list-blobs | -l) shift;;
   esac
   case $1 in
   -- | --implied-prefix | --prefix | -i) ;;
@@ -476,15 +503,6 @@ q 1"
     fi
     ;;
   esac
-      
-  set_sed_cmd () {
-    set_sedmain "
-i\\
-$file\\
-/*(DEBLOB-\\
-ERROR)*/
-q 1"
-  }
   ;;
 
 esac
@@ -598,18 +616,18 @@ set_except () {
 
     # checked:
 
-    accept '[	][$]3[ ]=[ ][{][{]pge[ ]=[ ][{][{]ste[ ]=[ ][{]\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\)[ ]=\|<repeats[ ][0-9]\+[ ]times>\)[{},\n 	]*\)*<repeats[ ]11[ ]times>[}]'"$eol"
+    accept '[	][$]3[ ]=[ ][{][{]pge[ ]=[ ][{][{]ste[ ]=[ ][{]\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\)[ ]=\|<repeats[ ][0-9]\+[ ]times>\)[{},\n 	]*\)*<repeats[ ]11[ ]times>[}]$'
     accept '__clz_tab:[\n][	]\.byte[	]0\(,[0-5]\)\+'"$sepx$blobpat*" arch/sparc/lib/divdi3.S
     accept 'PITBL:[\n][ ][ ]\.long[ ][ ]0xC0040000,0xC90FDAA2,'"$blobpat*" arch/sparc/lib/divdi3.S
     accept '\(0x[0F][0F],\)\+\\[\n]\(\(0x[0F][0F],\)\+\\[\n]\)*\(0x[0F][0F],\)\+0x00' arch/m68k/mac/mac_penguin.S
-    accept '\.lowcase:[\n][	]\.byte[ ]0x00\(,0x0[1-7]\)\+'"$sepx$blobpat*$eol" arch/s390/kernel/head.S
-    accept '_zb_findmap:[\n][ ][ ][ ][ ][ ][ ][ ][ ][ ]\.byte[ ][ ]0\(,[123],0\)\+,4'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
-    accept '_sb_findmap:[\n][ ][ ][ ][ ][ ][ ][ ][ ][ ]\.byte[ ][ ]8\(,0,[123]\)\+,0'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
+    accept '\.lowcase:[\n][	]\.byte[ ]0x00\(,0x0[1-7]\)\+'"$sepx$blobpat*"'$' arch/s390/kernel/head.S
+    accept '_zb_findmap:[\n][ ][ ][ ][ ][ ][ ][ ][ ][ ]\.byte[ ][ ]0\(,[123],0\)\+,4'"$sepx$blobpat*"'$' arch/s390/kernel/bitmap.S
+    accept '_sb_findmap:[\n][ ][ ][ ][ ][ ][ ][ ][ ][ ]\.byte[ ][ ]8\(,0,[123]\)\+,0'"$sepx$blobpat*"'$' arch/s390/kernel/bitmap.S
     accept '[	]\.section[ ]__ex_table,["]a["]'"$sepx$blobpat*" arch/powerpc/lib/copyuser_64.S
     accept '[	]memcpy[(]src,[ ]["]\\x01\\x00\\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00["].*PROGxxxx' arch/powerpc/platforms/iseries/mf.c
     initnc 'static[ ]const[ ]unsigned[ ]int[ ]cpu_745x\[2\]\[16\][ ]=' arch/ppc/platforms/ev64260.c
     initnc 'const[ ]unsigned[ ]char[ ]__flsm1_tab\[256\][ ]=' arch/alpha/lib/fls.c
-    accept '#define[ ]_MAP_0_32_ASCII_SEG7_NON_PRINTABLE[	]\\[\n][	]\(0,\)\+'"$eol" 'drivers/input/misc/map_to_7segment\.h\|include/linux/map_to_7segment\.h'
+    accept '#define[ ]_MAP_0_32_ASCII_SEG7_NON_PRINTABLE[	]\\[\n][	]\(0,\)\+$' 'drivers/input/misc/map_to_7segment\.h\|include/linux/map_to_7segment\.h'
     initc '[	]static[ ]int[ ][ ][ ][ ][ ][ ]init_values_b\[\][ ]=' sound/oss/ad1848.c
     initnc 'static[ ]unsigned[ ]char[ ]atkbd_set2_keycode\[512\][ ]=' drivers/input/keyboard/atkbd.c
     accept 'desc_config1:[\n][	]\.byte[ ]0x09,[ ]0x02'"$sepx$blobpat*" 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
@@ -627,7 +645,7 @@ set_except () {
     accept '0x041e[ ][ ][ ][ ][ ]0x4017[\n]'"$blobpat*" Documentation/video4linux/zc0301.txt
     accept '[ ][ ][(]gdb[)][ ]x[/]100x[ ][$]25[\n][ ][ ]0x507d2434:[ ][ ][ ][ ][ ]0x507d2434[ ][ ][ ][ ][ ][ ]0x00000000[ ][ ][ ][ ][ ][ ]0x08048000[ ][ ][ ][ ][ ][ ]0x080a4f8c'"$sepx$blobpat*" Documentation/uml/UserModeLinux-HOWTO.txt
     accept '[ ][ ][ ][ ][ ][ ]1[ ][ ]0[ ][ ]0[ ][ ]0[ ][ ]0x308'"$sepx$blobpat*" Documentation/isdn/README.inc
-    accept 'domain<N>[ ]<cpumask>[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]10[ ]11[ ]12[ ]13[ ]14[ ]15[ ]16[ ]17[ ]18[ ]19[ ]20[ ]21[ ]22[ ]23[ ]24[ ]25[ ]26[ ]27[ ]28[ ]29[ ]30[ ]31[ ]32[ ]33[ ]34[ ]35[ ]36'"$eol" Documentation/sched-stats.txt
+    accept 'domain<N>[ ]<cpumask>[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]10[ ]11[ ]12[ ]13[ ]14[ ]15[ ]16[ ]17[ ]18[ ]19[ ]20[ ]21[ ]22[ ]23[ ]24[ ]25[ ]26[ ]27[ ]28[ ]29[ ]30[ ]31[ ]32[ ]33[ ]34[ ]35[ ]36$' Documentation/sched-stats.txt
     accept '[ *	]*0[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]1[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]2[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]3[\n][ *	]*0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1' 'net/\(netfilter\|ipv4\)/ipvs/ip_vs_sync.c|net/sctp/sm_make_chunk.c|include/linux/scpt.h'
     accept '[ ][*][ ][ ]1[ ]1[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]1[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0' arch/x86/lguest/boot.c
     ocomment '[	][/][*][ ]Configure[ ]the[ ]PCI[ ]bus[ ]bursts[ ]and[ ]FIFO[ ]thresholds.' drivers/net/fealnx.c
@@ -669,7 +687,7 @@ set_except () {
     defsnc 'const[ ]unsigned[ ]char[ ]INIT_2\[127\][ ]=' drivers/video/omap/lcd_sx1.c
 
     # removed in 2.6.24
-    accept "[ ]Psize[ ][ ][ ][ ]Ipps[ ][ ][ ][ ][ ][ ][ ]Tput[ ][ ][ ][ ][ ]Rxint[ ][ ][ ][ ][ ]Txint[ ][ ][ ][ ]Done[ ][ ][ ][ ][ ]Ndone[\\n][ ]---------------------------------------------------------------\\([\\n][ 0-9]\\+\\)\\+$eol"
+    accept "[ ]Psize[ ][ ][ ][ ]Ipps[ ][ ][ ][ ][ ][ ][ ]Tput[ ][ ][ ][ ][ ]Rxint[ ][ ][ ][ ][ ]Txint[ ][ ][ ][ ]Done[ ][ ][ ][ ][ ]Ndone[\\n][ ]---------------------------------------------------------------\\([\\n][ 0-9]\\+\\)\\+"'$'
     initnc 'static[ ]u_short[ ]ataplain_map\[NR_KEYS\][ ]__initdata[ ]='
     initnc '[	]static[ ]const[ ]unsigned[ ]char[ ]invert5\[\][ ]='
     initnc 'static[ ]unsigned[ ]char[ ]alpa2target\[\][ ]='
@@ -2147,7 +2165,7 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]speedtab[ ]\[3\]\[12\][ ]=' 'drivers/ide/umc8672\.c\|drivers/ide/legacy/umc8672\.c'
     initnc 'static[ ]const[ ]__u8[ ]\(effects\|gamma\)_table\[\(MAX_[A-Z]*\|[A-Z]*_MAX\)\]\[[0-9]*\][ ]=' drivers/media/video/gspca/t631.c
     defsnc 'static[ ]const[ ]s8[ ]\(b43\(legacy\)\?\|bcm43xx\)_tssi2dbm_[bg]_table\[\][ ]=' net/wireless/b43/phy.c
-    accept '#define[ ]_MAP_0_32_ASCII_SEG7_NON_PRINTABLE[	]\\[\n][	]\(0,\)\+'"$eol" 'drivers/input/misc/map_to_7segment\.h\|include/linux/map_to_7segment\.h'
+    accept '#define[ ]_MAP_0_32_ASCII_SEG7_NON_PRINTABLE[	]\\[\n][	]\(0,\)\+$' 'drivers/input/misc/map_to_7segment\.h\|include/linux/map_to_7segment\.h'
     accept '[ *	]*0[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]1[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]2[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]3[\n][ *	]*0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1' 'net/\(netfilter\|ipv4\)/ipvs/ip_vs_sync.c|net/sctp/sm_make_chunk.c|include/linux/scpt.h'
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]wm_vol\[256\][ ]=' sound/pci/ice1712/phase.c
     defsnc 'static[ ]const[ ]char[ ]zr360[56]0_dht\[0x1a4\][ ]=' 'drivers/media/video/zr36060\.c\|drivers/media/video/zoran/zr36060\.c'
@@ -2288,7 +2306,7 @@ set_except () {
     ;;
   */patch*2.6.25-rc*)
     initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]uchar[ ]sbox\[8\]\[4\]\[16\][ ]=[ ][{][*][/][;]'
-    accept '[	][$]3[ ]=[ ][{][{]pge[ ]=[ ][{][{]ste[ ]=[ ][{]\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\)[ ]=\|<repeats[ ][0-9]\+[ ]times>\)[{},\n 	]*\)*<repeats[ ]11 times>[}]'"$eol"
+    accept '[	][$]3[ ]=[ ][{][{]pge[ ]=[ ][{][{]ste[ ]=[ ][{]\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\)[ ]=\|<repeats[ ][0-9]\+[ ]times>\)[{},\n 	]*\)*<repeats[ ]11 times>[}]$'
     initnc 'static[ ]yyconst[ ]flex_int\(16\|32\)_t[ ]yy_[^[]*\[[0-9]*\][ ]='
     initnc 'static[ ]const[ ]yytype_u\?int\(8\|16\)[ ]yy[^[]*\[\][ ]='
     initnc '[	]int[ ]bcomm_irq\[3[*]16\][ ]='
@@ -2319,13 +2337,13 @@ set_except () {
     initnc 'static[ ]const[ ]u8[ ]rtl8225_tx_power_cck\[\][ ]='
     initnc 'static[ ]const[ ]u8[ ]rtl8225_tx_power_cck_ch14\[\][ ]='
     initnc 'static[ ]const[ ]u16[ ]rtl8225z2_rxgain\[\][ ]='
-    accept '[ ][ ][ ][ ][ ]\([ ]49,\)*[\n]\([ 0-9,]*[\n]\)*[ ][ ][ ][ ][ ]\( 49,\)*'"$eol"
+    accept '[ ][ ][ ][ ][ ]\([ ]49,\)*[\n]\([ 0-9,]*[\n]\)*[ ][ ][ ][ ][ ]\( 49,\)*$'
     initnc 'static[ ]const[ ]unsigned[ ]char[ ]wm_vol\[256\][ ]='
-    accept 'domain<N>[ ]<cpumask>[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]10[ ]11[ ]12[ ]13[ ]14[ ]15[ ]16[ ]17[ ]18[ ]19[ ]20[ ]21[ ]22[ ]23[ ]24[ ]25[ ]26[ ]27[ ]28[ ]29[ ]30[ ]31[ ]32[ ]33[ ]34[ ]35 36'"$eol"
+    accept 'domain<N>[ ]<cpumask>[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]10[ ]11[ ]12[ ]13[ ]14[ ]15[ ]16[ ]17[ ]18[ ]19[ ]20[ ]21[ ]22[ ]23[ ]24[ ]25[ ]26[ ]27[ ]28[ ]29[ ]30[ ]31[ ]32[ ]33[ ]34[ ]35 36$'
     # drivers/net/e1000e/phy.c
     initnc 'static[ ]const[ ]u16[ ]e1000_igp_2_cable_length_table\[\][ ]='
-    accept '[	]24[ ]=>[ ]\[[\n]\([^\n]*[\n]\)*[	]\]\(,[ ][0-9]\+[ ]=> \[\)\?'"$eol"
-    accept '[	][	]'"'"'0x[^\n]*[\n]\([^\n]*[\n]\)*[	]\]\(,[ ][0-9]\+[ ]=> \[\)\?'"$eol"
+    accept '[	]24[ ]=>[ ]\[[\n]\([^\n]*[\n]\)*[	]\]\(,[ ][0-9]\+[ ]=> \[\)\?$'
+    accept '[	][	]'"'"'0x[^\n]*[\n]\([^\n]*[\n]\)*[	]\]\(,[ ][0-9]\+[ ]=> \[\)\?$'
     initnc 'const[ ]u\(8\|16\|32\)[ ]b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\][ ]='
     ;;
   */*drm*.patch)
@@ -2475,12 +2493,12 @@ blobfseq="$blobseq$blobcont*"
 
 # Regular expression that matches the beginning of the pattern or a
 # line break.  It must be \(\)ed, such that it can be named in
-# replacement patterns without being named.
+# replacement patterns.
 bol="\\(^\\|[\\n]\\)"
 
 # Regular expression that matches the end of the pattern or a line
 # break.  It must be \(\)ed, such that it can be named in replacement
-# patterns without being named.
+# patterns.
 eol="\\([\\n]\\|\$\\)"
 
 # Regular expression that matches a C-style comment.
@@ -2513,9 +2531,11 @@ asmblob="[a-zA-Z_.][^\\n:;#/ 	]*[ ]*:\\([^:{}]*\\|$asmcomment\\)*$blobseq\\([^:]
 
 # $4 is the action for every complete input pattern.
 
-set_sedmain () {
-  falsepos=`sed 's,^\\\|,,;s,^.,\\\\(&,;s,.$,&\\\\),' < "$falsepos_name"`
-  orfalseneg=`cat < "$falseneg_name"`
+set_sed_main () {
+  falsepos=`sed -n 's,^[+]\^*,,p' < "$regex_name" |
+    sed -n "s,[$]$,$eol,; "'1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
+  orfalseneg=`sed -n 's,^[-],,p' < "$regex_name" |
+    sed -n "s,[$]$,$eol,; "'1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
 
   case $orfalseneg in
   "")
@@ -2535,7 +2555,7 @@ set_sedmain () {
   # Regular expression that matches the context for a long blob match.
   lblobctx="\\($initblob\\|$defineblob\\|$asmblob\\|$sblobctx\\)"
 
-  if test -s "$falsepos_name"; then
+  if test "X$falsepos" != X; then
     check_false_positives="$v:???falsepos
 /$bol$falsepos/!b blob
 $v:+++falsepos
@@ -2554,7 +2574,7 @@ g
     check_false_positives=
   fi
 
-  sedmain="
+  $echo "
 /^$/N
 /^[\\n]\\?;[/][*]\\(end .*\\)\\?[*][/];$/{
   $4
@@ -3092,7 +3112,42 @@ s/^[^\\n]*//
 s/^[\\n]//
 b list_both
 
-"
+" > "$scriptname"
+
+  scriptcmd='$sed -n -f "$scriptname"'
+
+  sedunbreak='
+: restart
+/[/][*](DEBLOB-$/ {
+  N
+  /[/][*](DEBLOB-[\n]ERROR)[*][/]/{q 1;}
+  s,[/][*](DEBLOB-[\n]BED)[*][/],,
+  b restart
+}
+p
+'
+  scriptcmd2='$sed -n -e "$sedunbreak"'
+}
+
+set_flex_main () {
+  adjust_rx_for_flex='
+s,\\\([{(|)}?+]\),\1,g
+s,^\([-+]\)\(\^\?\)\(.*\)\(\$\?\)$,\2(?s:\3)\4\1,g
+s,[+]$, { falsepos (); },
+s,[-]$, { blob (); },
+'     
+
+  echo '%%' > "$scriptname"
+  echo "-$blobfseq" | sed "$adjust_rx_for_flex" >> "$scriptname"
+  sed "$adjust_rx_for_flex" < "$regex_name" >> "$scriptname"
+  echo '\n|. { unmatched (); }
+%%
+int falsepos () {}
+int blob () {}
+int unmatched () {}
+' >> "$scriptname"
+
+  scriptcmd=false
 }
 
 # Process an input file named in $1 and run it through the blob
@@ -3108,18 +3163,14 @@ check () {
   # beginning of the line.  $2, if present, will some day narrow the
   # falsepos matches to files that match it.
   addx () {
-    if test -n "$1"; then
-      $echo_n "\\|$1" >> $falsepos_name
-    fi
+    $echo "+^$1" >> $regex_name
   }
 
   # Add $1 to falseneg.  Unlike addx, it is NOT implicitly anchored to
   # the beginning of the line.  $2, if present, will some day narrow
   # the falseneg matches to files that match it.
   badx () {
-    if test -n "$1"; then
-      $echo_n "\\|$1" >> $falseneg_name
-    fi
+    $echo "-$1" >> $regex_name
   }
 
   # Look for a multi-line definition starting with a line that matches
@@ -3162,7 +3213,7 @@ check () {
   # Match $1 followed by backslash-terminated lines and a last
   # non-backslash-terminated line.
   oprepline () {
-    addx "$1\\([^\\n]*\\\\[\\n]\\)*[^\\n\\\\]*$eol" $2
+    addx "$1\\([^\\n]*\\\\[\\n]\\)*[^\\n\\\\]*$" $2
   }
 
   # Match $1 in $2 as a blob.  Not anchored.
@@ -3181,124 +3232,39 @@ check () {
     badx "$1" $2
   }
 
-  falsepos_name=`mktemp -t deblob-check-falsepos-XXXXXX`
-  tempfiles="$falsepos_name"
-
-  falseneg_name=`mktemp -t deblob-check-falseneg-XXXXXX`
-  tempfiles="$tempfiles $falseneg_name"
+  regex_name=`mktemp -t deblob-check-regex-XXXXXX`
+  tempfiles="$regex_name"
 
   set_except "$input"
 
-  # This block is the result of an incomplete experiment to use flex
-  # to search for blobs.
-  if ${DEBLOB_CHECK_GEN_FLEX-false}; then
-    : > deblob-check-flex
-    eol='$'
-
-    for f in addx badx \
-     `: initnc defsnc initc defsc accept ocomment oprepline \
-	blobna blobname blob` \
-    ; do
-      eval "$f () { echo \"$f \$1\" >> deblob-check-flex; }"
-    done
-
-    badx "$blobfseq"
-    set_except "$input"
-
-    check_for_flex='
+  # Check that all regular expressions match our requirements.
+  sed -n '
+s,^\(-\^\?\|[+]\^\),,
 h
-s,^\([^ ]*\) ,,
-s,^^,,
 s,[$]$,,
 s,\([^\\]\|^\)\(\(\\\\\)*\)\(\[^\?[]]\?[^]]\+\]\([*]\|\\[+?]\)\?\(\\\\\)*\)\+,\1\2,g
-/\([^\\]\|^\)\(\\\\\)*\([{(|)}?+^$"'"'"'; 	]\)/{
+/\([^\\]\|^\)\(\\\\\)*\([{(|)}?+^$"'"'"'; 	]\)\|^$/{
   g
   i\
-(?BAD input line);
+BAD regular expression:
+  p
   q 1
-}
-g
-s,\\\([{(|)}?+]\),\1,g
-s,\([^ ]*\) \(\^\?\)\(.*\)\(\$\?\),\2(?s:\3)\4 { /*\1*/; },g
-'     
+}' $regex_name >&2 || exit 1
 
-    { echo %%;
-      sed "$check_for_flex" deblob-check-flex || echo failed >&2
-      echo '\n|. { /*otherwise*/; }'
-    } > deblob-check-flex.l
+  scriptname=`mktemp -t deblob-check-script-XXXXXX`
+  tempfiles="$tempfiles $scriptname"
 
-    rm -f deblob-check-flex
-    
-    exit
-  fi
+  scriptcmd=false
+  scriptcmd2=
 
-  # This block is the result of an incomplete experiment to use flex
-  # to search for blobs.
-  if ${DEBLOB_CHECK_GEN_PYTHON-false}; then
-    : > deblob-check-python
-    eol='$'
+  $set_cmd "$input"
 
-    for f in addx badx \
-     `: initnc defsnc initc defsc accept ocomment oprepline \
-	blobna blobname blob` \
-    ; do
-      eval "$f () { echo \"$f \$1\" >> deblob-check-python; }"
-    done
-
-    badx "$blobfseq"
-    set_except "$input"
-
-    check_for_python='
-h
-s,^\([^ ]*\) ,,
-s,^^,,
-s,[$]$,,
-s,\([^\\]\|^\)\(\(\\\\\)*\)\(\[^\?[]]\?[^]]\+\]\([*]\|\\[+?]\)\?\(\\\\\)*\)\+,\1\2,g
-/\([^\\]\|^\)\(\\\\\)*\([{(|)}?+^$"'"'"'; 	]\)/{
-  g
-  i\
-(?BAD input line);
-  q 1
-}
-g
-s,\\(,\\(?:,g
-s,\\\([{(|)}?+]\),\1,g
-# s,\([^ ]*\) \(.*\),re.compile (r'"'\\2'"'),g
-s,\([^ ]*\) \(.*\),rxs["\1"] += r'"'|\\2'"',g
-'     
-
-    { cat <<EOF
-#! /usr/bin/python
-
-import re
-
-rxs = { 'addx':'', 'badx':'' }
-
-EOF
-      sed "$check_for_python" deblob-check-python || echo failed >&2
-      cat <<EOF
-
-rx = ''
-for x in rxs:
-    rxs[x] = '(?P<%s>%s)' % (x, rxs[x][1:])
-    rx += '|' + rxs[x]
-    rxs[x] = re.compile(rxs[x], re.M | re.S)
-
-rx = rx[1:]
-
-rxc = re.compile(rx, re.M | re.S)
-EOF
-    } > deblob-check-python.py
-
-    rm -f deblob-check-python
-    
-    exit
-  fi
-
-  set_sed_cmd "$input"
-
-  rm -f $tempfiles
-  tempfiles=
+  for f in $tempfiles; do
+    case $f in "$scriptname") ;;
+    *) rm -f "$f" ;;
+    esac
+  done
+  tempfiles="$scriptname"
 
   # Choose the input source...
   case $input in
@@ -3335,7 +3301,7 @@ EOF
 	i\\
 ;/**/;\\
 ;/*end patchlet */;\\
-;/*begin patchlet */
+;/*begin patchlet */;
 	s/^/;\\/*/
 	s/\$/*\\/;/
       }
@@ -3357,29 +3323,11 @@ EOF
   esac
 
   # Then run through the selected action.
-  if test "$rm" != "rm -f" || \
-     test ! `$echo "$sedmain" | wc -c` -lt 1024; then
-    scriptname=`mktemp -t deblob-check-sedmain-XXXXXX`
-    tempfiles="$tempfiles $scriptname"
-    $echo "$sedmain" > $scriptname
-    cmd="$sed -n -f \"$scriptname\""
-  else
-    cmd='$sed -n -e "$sedmain"'
-  fi
-  set "$@" "$cmd"
+  set "$@" "$scriptcmd"
 
-  sedunbreak='
-: restart
-/[/][*](DEBLOB-$/ {
-  N
-  /[/][*](DEBLOB-[\n]ERROR)[*][/]/{q 1;}
-  s,[/][*](DEBLOB-[\n]BED)[*][/],,
-  b restart
-}
-p
-'
-  cmd='$sed -n -e "$sedunbreak"'
-  set "$@" "$cmd"
+  case $scriptcmd2 in "" | cat) ;;
+  *) set "$@" "$scriptcmd2"
+  esac
 
   # test $# = 1 || set "$@" "cat"
 
