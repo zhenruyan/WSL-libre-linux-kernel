@@ -3339,6 +3339,7 @@ for line in sys.stdin:
             what = match.lastgroup
 
             if what == 'cblob':
+		if verbose: print 'match is a blob context'
 		pend = match.end()
                 p = match.start() + 1
                 match = rxc.search (s, p)
@@ -3348,8 +3349,10 @@ for line in sys.stdin:
             assert blob_p or what == 'falsepos'
 
             if blob_p:
+		if verbose: print 'match is a blob'
                 blobs += 1
             else:
+		if verbose: print 'match is a false positive'
                 falses += 1
             
             assert match.end(what) == match.end()
@@ -3517,23 +3520,28 @@ BEGIN {
 	firstmatchstart = RSTART + p - 1;
 	for (;;) {
 	    matchstart = RSTART + p - 1;
-	    matchlen = RLENGTH;
+	    matchlen = RLENGTH + 1;
 	    if (verbose)
 		print "found match", matchstart, matchlen;
+	    if (verbose > 1)
+		print substr (s, matchstart, matchlen);
 	    if (match (substr (s, matchstart, matchlen), /^($falsepos)$/) == 1) {
+		if (verbose) print "match is a false positive";
 		blob_p = 0;
 		falses++;
 	    } else if (match (substr (s, matchstart, matchlen), /^($cblob)$/) == 1) {
+		if (verbose) print "match is a blob context";
 		pend = p + matchlen;
 		p = matchstart + 1;
 		if (verbose) print "search after cblob starting at", p;
-		match (substr (s, p, matchlen), /^($falsepos)|^($cblob)|[^\n]*($blob)/);
+		match (substr (s, p, matchlen - 1), /^($falsepos)|^($cblob)|[^\n]*($blob)/);
 		continue;
 	    } else {
-		# Match again, to skip 
+		if (verbose) print "match is a blob";
+		# Match again, to skip the leading non-blob characters.
 		match (substr (s, matchstart), /$blob/);
 		matchstart = RSTART + matchstart - 1;
-		matchlen = RLENGTH;
+		matchlen = RLENGTH + 1;
 		blob_p = 1;
 		blobs++;
 	    }
