@@ -2535,7 +2535,7 @@ set_sed_main () {
   falsepos=`sed -n 's,^[+]\^*,,p' < "$regex_name" |
     sed -n "s,[$]$,$eol,; "'1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
   orfalseneg=`sed -n 's,^[-],,p' < "$regex_name" |
-    sed -n "s,[$]$,$eol,; "'1h; 1!H; ${g;s,\(^\|[\n]\),\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
+    sed -n "s,[$]$,$eol,; "'1h; 1!H; ${g;s,\(^\|[\n]\),\\\\|,g;p;}'`
 
   case $orfalseneg in
   "")
