@@ -2418,7 +2418,7 @@ set_except () {
     initnc 'static[ ]const[ ]u16[ ]rtl8225z2_rxgain\[\][ ]='
     accept '[ ][ ][ ][ ][ ]\([ ]49,\)*[\n]\([ 0-9,]*[\n]\)*[ ][ ][ ][ ][ ]\( 49,\)*$'
     initnc 'static[ ]const[ ]unsigned[ ]char[ ]wm_vol\[256\][ ]='
-    accept 'domain<N>[ ]<cpumask>[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]10[ ]11[ ]12[ ]13[ ]14[ ]15[ ]16[ ]17[ ]18[ ]19[ ]20[ ]21[ ]22[ ]23[ ]24[ ]25[ ]26[ ]27[ ]28[ ]29[ ]30[ ]31[ ]32[ ]33[ ]34[ ]35 36$'
+    accept 'domain<N>[ ]<cpumask>[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]10[ ]11[ ]12[ ]13[ ]14[ ]15[ ]16[ ]17[ ]18[ ]19[ ]20[ ]21[ ]22[ ]23[ ]24[ ]25[ ]26[ ]27[ ]28[ ]29[ ]30[ ]31[ ]32[ ]33[ ]34[ ]35[ ]36$'
     # drivers/net/e1000e/phy.c
     initnc 'static[ ]const[ ]u16[ ]e1000_igp_2_cable_length_table\[\][ ]='
     accept '[	]24[ ]=>[ ]\[[\n]\([^\n]*[\n]\)*[	]\]\(,[ ][0-9]\+[ ]=> \[\)\?$'
@@ -2608,9 +2608,11 @@ asmblob="[a-zA-Z_.][^\\n:;#/ 	]*[ ]*:\\([^:{}]*\\|$asmcomment\\)*$blobseq\\([^:]
 
 set_sed_main () {
   falsepos=`sed -n 's,^[+]\^*,,p' < "$regex_name" |
-    sed -n "s,[$]$,$eol,; "'1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
+    sed -n -e 's,[$]$,\\\\([\\\\n]\\\\|$\\\\),' \
+	-e '1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
   blobs=`sed -n 's,^[-],,p' < "$regex_name" |
-    sed -n "s,[$]$,$eol,; "'1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
+    sed -n -e 's,[$]$,\\\\([\\\\n]\\\\|$\\\\),' \
+	-e '1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
 
   # Regular expression that matches one or more blobs without
   # intervening line breaks.
@@ -2639,6 +2641,8 @@ g
   fi
 
   $echo "
+#! /bin/sed -f
+
 /^$/N
 /^[\\n]\\?;[/][*]\\(end .*\\)\\?[*][/];$/{
   $4
@@ -3423,6 +3427,7 @@ EOF
 
 set_awk_main () {
   adjust_rx='
+s,[$]$,([\\n]|$),;
 s,\[^\],[^\\],g;
 s,\\\([{(|)}?+]\),\1,g;
 '
@@ -3514,13 +3519,20 @@ BEGIN {
     s = substr (s, 1, length (s) - 1)
 
     pp = p = pend = 1;
+    if (verbose > 1) print "searching starting at", substr (s, p, 10)
     while (match (substr (s, p),
-		  /^($falsepos)|^($cblob)|[^\n]*($blob)/)) {
+		  /(^|[\n])($falsepos)|(^|[\n])($cblob)|[^\n]*($blob)/)) {
 	blobs = falses = 0;
 	firstmatchstart = RSTART + p - 1;
+	if (substr (s, firstmatchstart, 1) == "\n")
+	    firstmatchstart++;
 	for (;;) {
 	    matchstart = RSTART + p - 1;
-	    matchlen = RLENGTH + 1;
+	    matchlen = RLENGTH;
+	    if (substr (s, matchstart, 1) == "\n") {
+		matchstart++;
+		matchlen--;
+	    }
 	    if (verbose)
 		print "found match", matchstart, matchlen;
 	    if (verbose > 1)
@@ -3541,7 +3553,7 @@ BEGIN {
 		# Match again, to skip the leading non-blob characters.
 		match (substr (s, matchstart), /$blob/);
 		matchstart = RSTART + matchstart - 1;
-		matchlen = RLENGTH + 1;
+		matchlen = RLENGTH;
 		blob_p = 1;
 		blobs++;
 	    }
