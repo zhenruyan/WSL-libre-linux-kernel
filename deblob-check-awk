@@ -369,6 +369,8 @@ if (${AWK-awk} --re-interval --version) > /dev/null 2>&1; then
 # processing lines containing /* such as this:
 # Documentation/sysctl/*, swap/mm readaround
 # Try it: deblob-check --use-python linux-2.6.32/CREDITS
+# It hits even with our tiny testsuite:
+# AWK=false PYTHON=python deblob-check -t
 elif (${PYTHON-false} --version) > /dev/null 2>&1; then
   set_main_cmd=set_python_main
 # Sed takes GBs of RAM to compile all the huge regexps in the sed
