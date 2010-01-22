@@ -1917,7 +1917,7 @@ set_except () {
     accept 'static[ ]int[ ]ar9170_usb_request_firmware[(]' drivers/net/wireless/ar9170/usb.c
     accept '[	]err[ ]=[ ]request_firmware[(][^\n]*["]ar9170\(-[12]\)\?\.fw["],' drivers/net/wireless/ar9170/usb.c
     accept '[	]err[ ]=[ ]ar9170_usb_request_firmware[(]' drivers/net/wireless/ar9170/usb.c
-    accept 'MODULE_FIRMWARE[(]["]ar9170\(-[12]\)\?\.fw["][)][;]' drivers/net/wireless/ar9170/usb.c
+    accept 'MODULE_FIRMWARE[(]["]ar9170\(-[12]\)\?\.fw["][)][;]\([\n]MODULE_FIRMWARE[(]["]ar9170\(-[12]\)\?\.fw["][)][;]\)*' drivers/net/wireless/ar9170/usb.c
     blobname 'slicoss[/]\(oasis\|gb\)\(rcvucode\|download\)\.sys' drivers/staging/slicoss/slicoss.c
     blobname 'sxg[/]sahara\(dbg\)\?downloadB\.sys' drivers/staging/sxg/sxg.c
     blobname 'qlogic[/]isp1000\.bin' drivers/scsi/qlogicpti.c
