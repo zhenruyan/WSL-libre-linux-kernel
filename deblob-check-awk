@@ -1061,7 +1061,7 @@ set_except () {
     blobna 'for[ ][(][^\n]*ARRAY_SIZE[(]\(sr\|twinax\)_edc[)][^\n]*[)][\n][^;]*mdio_write[^;]*[;]' drivers/net/cxgb3/ael1002.c
     blobname '\(cxgb3[/]\)\?t3\(fw\|\(%c\|.\)_p\(rotocol_\)\?sram\)-\(%d\|[0-9]*\)\.\(%d\|[0-9]*\)\.\(%d\|[0-9]*\)\.bin' drivers/net/cxgb3/cxgb3_main.c
 
-    blob '\([/][*][*]*[*][/][\n]*\)*\([/][*]\([*]*[^*/][^*/]*[/]*\)*[*]*Micro[ ]code\([*]*[^*/][^*/]*[/]*\)*[*]*8086:\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\([\n]*[/][*]\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)*\|#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)\([\n]*[/][*]\([^/]*\|[^*/][/]*\|[*][/][\n]*[/][*]\)*Micro[ ]code\([*]*[^*/][^*/]*[/]*\)*[*]*8086:\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\([\n]*[/][*]\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)*\|[\n][\n]*#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)*' drivers/net/e100.c
+    blob '\([/][*][*]*[*][/][\n]*\)*\([/][*]\([*]*[^*/][^*/]*[/]*\)*[*]*Micro[ ]code\([*]*[^*/][^*/]*[/]*\)*[*]*8086:\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\([\n]*[/][*]\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)*\|#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)\([\n]*[/][*]\([*]*[^*/][^*/]*[/]*\|[*]*[*][/][\n]*[/][*]\)*[*]*Micro[ ]code\([*]*[^*/][^*/]*[/]*\)*[*]*8086:\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\([\n]*[/][*]\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)*\|[\n][\n]*#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)*' drivers/net/e100.c
     blobna '\([/][*]\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/][\n]*[	][	]\)\(ucode\[opts->\(timer\|bundle\|min_size\)_dword\][ ].=[ ][^;]*[;][\n][\n]*[	][	]\)*[^}]*UCODE_SIZE[^}]*cb_ucode[^}]*return[;][\n][	][}]' drivers/net/e100.c
 
     blob 'static[ ]unsigned[ ]char[ ]__devinitdata[ ]lanai4_\(code\|data\)\[[0-9]*\][ ]=[ ][{][^;]*[}][;]' drivers/net/myri_code.h
@@ -2575,7 +2575,7 @@ bol="\\(^\\|[\\n]\\)"
 eol="\\([\\n]\\|\$\\)"
 
 # Regular expression that matches a C-style comment.
-comment="\\([/][*]\\([^/]*\\|[^*/][/]*\\)*[*][/]\\|[/][/][^\\n]*[\\n]\\)"
+comment="\\([/][*]\\([*]*[^*/][^*/]*[/]*\\)*[*]*[*][/]\\|[/][/][^\\n]*[\\n]\\)"
 
 # Regular expression that matches comments typically used in assembly.
 asmcomment="\\($comment\\|[;#][^\\n]*[\\n]\\)"
@@ -3326,7 +3326,7 @@ for line in sys.stdin:
     if s[-1] == '\n':
         s = s[:-1]
 
-    pp = p = 0
+    pp = p = pend = 0
     match = rxc.search (s, p)
     while match != None:
         firstmatch = match
@@ -3337,6 +3337,7 @@ for line in sys.stdin:
             what = match.lastgroup
 
             if what == 'cblob':
+		pend = match.end()
                 p = match.start() + 1
                 match = rxc.search (s, p)
                 continue
@@ -3361,6 +3362,9 @@ for line in sys.stdin:
         if print_nomatch:
             sys.stdout.write (s[pp:firstmatch.start()])
         pp = firstmatch.start()
+
+	if (p < pend):
+	    p = pend
 
         p = s.find ('\n', p)
         if p == -1:
@@ -3504,12 +3508,12 @@ BEGIN {
 
     s = substr (s, 1, length (s) - 1)
 
-    pp = p = 1;
+    pp = p = pend = 1;
     while (match (substr (s, p),
 		  /^($falsepos)|^($cblob)|[^\n]*($blob)/)) {
 	blobs = falses = 0;
 	firstmatchstart = RSTART + p - 1;
-	do {
+	for (;;) {
 	    matchstart = RSTART + p - 1;
 	    matchlen = RLENGTH;
 	    if (verbose)
@@ -3518,7 +3522,10 @@ BEGIN {
 		blob_p = 0;
 		falses++;
 	    } else if (match (substr (s, matchstart, matchlen), /^($cblob)$/) == 1) {
+		pend = p + matchlen;
 		p = matchstart + 1;
+		if (verbose) print "search after cblob starting at", p;
+		match (substr (s, p, matchlen), /^($falsepos)|^($cblob)|[^\n]*($blob)/);
 		continue;
 	    } else {
 		# Match again, to skip 
@@ -3536,17 +3543,26 @@ BEGIN {
 		p = matchstart + length (replacement);
 	    } else
 		p = matchstart + matchlen;
-	} while (match (substr (s, p), /^($falsepos)|^($cblob)|[^\n]*($blob)/) == 1);
+	    if (!match (substr (s, p),
+			/^($falsepos)|^($cblob)|[^\n]*($blob)/) \\
+		|| (RSTART != 1 && p + RSTART >= pend))
+		break;
+	}
 
 	if (print_nomatch)
 	    printf "%s", substr (s, pp, firstmatchstart - pp);
 	pp = firstmatchstart;
+
+	if (p < pend)
+	    p = pend;
 
 	i = index (substr (s, p), "\n");
 	if (i)
 	    p += i;
 	else
 	    p = length (s);
+
+	if (verbose) print "match set range:", pp, p
 
 	if ((print_blob && blobs) || (print_falsepos && falses)) {
 	    if (!print_nomatch)
