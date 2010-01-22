@@ -338,10 +338,6 @@ test_mode=false
 
 name=deblob-check
 
-set_flex_cmd () {
-  set_flex_main
-}
-
 set_eqscript_main () {
   $set_main_cmd "$@"
 }
@@ -359,13 +355,22 @@ ERROR)*/
 q 1"
 }
 
+set_flex_cmd () {
+  set_flex_main
+}
+
+set_save_script_input_cmd () {
+  set_save_script_input_main
+}
+
 set_cmd=set_eqscript_cmd
 # GNU awk works fine, but it requires --re-interval to accept regexp
 # ranges, which we rely on to match blobs.  We could expand the blob
 # on our own, but, yuck.
-if (${AWK-awk} --re-interval --version) > /dev/null 2>&1; then
+if (${AWK-gawk} --re-interval --version) > /dev/null 2>&1; then
   set_main_cmd=set_awk_main
 # Don't choose python by default, it exhibits exponential behavior
+# (see http://swtch.com/~rsc/regexp/regexp1.html for details)
 # processing lines containing /* such as this:
 # Documentation/sysctl/*, swap/mm readaround
 # Try it: deblob-check --use-python linux-2.6.32/CREDITS
@@ -375,6 +380,7 @@ elif (${PYTHON-false} --version) > /dev/null 2>&1; then
   set_main_cmd=set_python_main
 # Sed takes GBs of RAM to compile all the huge regexps in the sed
 # script we generate with all known false positives and blobs in Linux.
+# However, it is somewhat faster than GNU awk for long runs.
 # Try it: deblob-check --use-sed -i linux-2.6.32 /dev/null
 else
   set_cmd=set_sed_cmd
@@ -395,12 +401,17 @@ case $1 in
 
 --use-sed)
   shift;
-  set_cmd=set_sed_cmd
+  set_cmd=set_sed_cmd;
   ;;
 
 --gen-flex)
   shift;
-  set_cmd=set_flex_cmd
+  set_cmd=set_flex_cmd;
+  ;;
+
+--save-script-input)
+  shift;
+  set_cmd=set_save_script_input_cmd;
   ;;
 esac
 
@@ -2640,8 +2651,7 @@ g
     check_false_positives=
   fi
 
-  $echo "
-#! /bin/sed -f
+  $echo "#! /bin/sed -nf
 
 /^$/N
 /^[\\n]\\?;[/][*]\\(end .*\\)\\?[*][/];$/{
@@ -3457,8 +3467,14 @@ s,\\\([{(|)}?+]\),\1,g;
   *) cblob='$.^';;
   esac
 
+  if ${DONT_USE_GAWK_EXTENSIONS-false}; then
+    xrs="# " nrs= eor='$0' eormatch='' eornl= eornlsz=0
+  else
+    xrs= nrs="# " eor="RT" eormatch='RT ~ ' eornl='[\n]' eornlsz=1
+  fi
+
   cat >> "$scriptname" <<EOF
-#! /bin/awk --re-interval -f
+#! /bin/gawk --re-interval -f
 
 BEGIN {
     # Should we replace blobs and false positives with replacement?
@@ -3487,9 +3503,19 @@ BEGIN {
 
     # Which of the defaults above should we override?
     $@ = 1;
+
+    # requires GNU awk RS extension:
+$xrs    RS = "[;][/][*](begin|end) [^\n]*[*][/][;][\n]";
 }
-/^[;][/][*]begin .*[*][/][;]$/ {
-    filenames[nfilenames] = substr(\$0, 10, length (\$0) - 12);
+# requires GNU awk RS extension:
+$xrs { s = s \$0; }
+# does not require GNU awk RS extension:
+$nrs !/^[;][/][*].*[*][/][;]$/ {
+$nrs     s = s \$0 "\n";
+$nrs     next;
+$nrs }
+$eormatch /^[;][/][*]begin .*[*][/][;]$eornl$/ {
+    filenames[nfilenames] = substr($eor, 10, length ($eor) - 12 - $eornlsz);
     if (verbose) print "entering " nfilenames ": " filenames[nfilenames];
     nextnfilenames = nfilenames + 1;
     if (s == "") {
@@ -3497,23 +3523,15 @@ BEGIN {
 	next;
     }
 }
-/^[;][/][*]end .*[*][/][;]$/ {
+$eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
     nextnfilenames = nfilenames - 1;
     if (verbose)
 	print "got to the end of " nextnfilenames ": " filenames[nextnfilenames];
 }
-/^[;][/][*][*][/][;]$/ {
-    s = s "\n";
-    next;
-}
-!/^[;][/][*].*[*][/][;]$/ {
-    s = s \$0 "\n";
-    next;
-}
 {
     if (verbose) {
 	print "looking for matches";
-	for (i = nfilenames; --i;)
+	for (i = nfilenames; --i >= 0;)
 	    print filenames[i] " within";
         print filenames[0]
     }
@@ -3602,7 +3620,7 @@ BEGIN {
 	}
 
 	if ((list_blob && blobs) || (list_falsepos && falses)) {
-	    for (i = nfilenames; --i;)
+	    for (i = nfilenames; --i >= 0;)
 		print filenames[i] " within";
 	    print filenames[0];
 	    exit (1);
@@ -3621,7 +3639,32 @@ BEGIN {
 }
 EOF
 
-  scriptcmd="${AWK-awk} --re-interval -f "'"$scriptname"'
+  scriptcmd="${AWK-gawk} --re-interval -f "'"$scriptname"'
+}
+
+set_flex_main () {
+  adjust_rx='
+s,\\\([{(|)}?+]\),\1,g
+s,^\([-+]\)\(\^\?\)\(.*\)\(\$\?\)$,\2(?s:\3)\4\1,g
+s,[+]$, { falsepos (); },
+s,[-]$, { blob (); },
+'     
+
+  echo '%%' > "$scriptname"
+  sed "$adjust_rx" < "$regex_name" >> "$scriptname"
+  echo '\n|. { unmatched (); }
+%%
+int falsepos () {}
+int blob () {}
+int unmatched () {}
+' >> "$scriptname"
+
+  scriptcmd=false
+}
+
+set_save_script_input_main () {
+  savename=`mktemp -t deblob-check-input-XXXXXX`
+  scriptcmd="{ echo saving input in $savename && cat > $savename && echo done; }"
 }
 
 # Process an input file named in $1 and run it through the blob
