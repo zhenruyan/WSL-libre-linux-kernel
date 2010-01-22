@@ -3283,7 +3283,9 @@ s,^\\(.*\\)\$,blob = r'(?P<blob>\\1)',;\
 if no_falsepos or falsepos is None:
     falsepos = r'(?!)'
 
-rx = '^%s|[^\n]*%s' % (falsepos, blob)
+# Use non-greedy operator to skip partial line before blob, to avoid
+# skipping blobs when more than one appears in the same line.
+rx = '^%s|[^\n]*?%s' % (falsepos, blob)
 
 if with_context:
     rx += '|^' + cblob
@@ -3521,7 +3523,7 @@ BEGIN {
     pp = p = pend = 1;
     if (verbose > 1) print "searching starting at", substr (s, p, 10)
     while (match (substr (s, p),
-		  /(^|[\n])($falsepos)|(^|[\n])($cblob)|[^\n]*($blob)/)) {
+		  /(^|[\n])($falsepos)|(^|[\n])($cblob)|$blob/)) {
 	blobs = falses = 0;
 	firstmatchstart = RSTART + p - 1;
 	if (substr (s, firstmatchstart, 1) == "\n")
@@ -3550,10 +3552,6 @@ BEGIN {
 		continue;
 	    } else {
 		if (verbose) print "match is a blob";
-		# Match again, to skip the leading non-blob characters.
-		match (substr (s, matchstart), /$blob/);
-		matchstart = RSTART + matchstart - 1;
-		matchlen = RLENGTH;
 		blob_p = 1;
 		blobs++;
 	    }
@@ -3565,14 +3563,23 @@ BEGIN {
 		p = matchstart + length (replacement);
 	    } else
 		p = matchstart + matchlen;
+	    i = index (substr (s, p), "\n");
+	    if (!i)
+		i = length (s)
+	    p--;
 	    if (!match (substr (s, p),
-			/^($falsepos)|^($cblob)|[^\n]*($blob)/) \\
-		|| (RSTART != 1 && p + RSTART >= pend))
+			/[\n]($falsepos)|[\n]($cblob)|$blob/) \\
+		|| (RSTART > i && p + RSTART >= pend))
 		break;
 	}
 
 	if (print_nomatch)
 	    printf "%s", substr (s, pp, firstmatchstart - pp);
+        else if (print_blob || print_falsepos) {
+	    lastline = substr (s, pp, firstmatchstart - pp);
+	    sub (/.*[\n]/, "", lastline);
+	    firstmatchstart -= length (lastline);
+        }
 	pp = firstmatchstart;
 
 	if (p < pend)
