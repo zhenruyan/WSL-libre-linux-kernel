@@ -2576,8 +2576,7 @@ g
     check_false_positives=
   fi
 
-  $echo "
-#! /bin/sed -f
+  $echo "#! /bin/sed -nf
 
 /^$/N
 /^[\\n]\\?;[/][*]\\(end .*\\)\\?[*][/];$/{
