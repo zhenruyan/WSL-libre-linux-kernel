@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-01-22
+# deblob-check version 2010-01-23
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -280,15 +280,18 @@ case $1 in
 p
 i\\
 "
+    vp="2"
     ;;
   *)
     v="P;i\\
 "
+    vp="1"
     ;;
   esac
   ;;
 *) 
   v="# "
+  vp="0"
   ;;
 esac
 
@@ -335,8 +338,12 @@ test_mode=false
 
 name=deblob-check
 
-set_flex_cmd () {
-  set_flex_main
+set_eqscript_main () {
+  $set_main_cmd "$@"
+}
+
+set_eqscript_cmd () {
+  set_eqscript_main "list_blob"
 }
 
 set_sed_cmd () {
@@ -348,17 +355,63 @@ ERROR)*/
 q 1"
 }
 
-set_cmd=set_sed_cmd
+set_flex_cmd () {
+  set_flex_main
+}
+
+set_save_script_input_cmd () {
+  set_save_script_input_main
+}
+
+set_cmd=set_eqscript_cmd
+# GNU awk works fine, but it requires --re-interval to accept regexp
+# ranges, which we rely on to match blobs.  We could expand the blob
+# on our own, but, yuck.
+if (${AWK-gawk} --re-interval --version) > /dev/null 2>&1; then
+  set_main_cmd=set_awk_main
+# Don't choose python by default, it exhibits exponential behavior
+# (see http://swtch.com/~rsc/regexp/regexp1.html for details)
+# processing lines containing /* such as this:
+# Documentation/sysctl/*, swap/mm readaround
+# Try it: deblob-check --use-python linux-2.6.32/CREDITS
+# It hits even with our tiny testsuite:
+# AWK=false PYTHON=python deblob-check -t
+elif (${PYTHON-false} --version) > /dev/null 2>&1; then
+  set_main_cmd=set_python_main
+# Sed takes GBs of RAM to compile all the huge regexps in the sed
+# script we generate with all known false positives and blobs in Linux.
+# However, it is somewhat faster than GNU awk for long runs.
+# Try it: deblob-check --use-sed -i linux-2.6.32 /dev/null
+else
+  set_cmd=set_sed_cmd
+fi
 
 case $1 in
+--use-python)
+  shift;
+  set_cmd=set_eqscript_cmd;
+  set_main_cmd=set_python_main;
+  ;;
+
+--use-awk)
+  shift;
+  set_cmd=set_eqscript_cmd;
+  set_main_cmd=set_awk_main;
+  ;;
+
 --use-sed)
   shift;
-  set_cmd=set_sed_cmd
+  set_cmd=set_sed_cmd;
   ;;
 
 --gen-flex)
   shift;
-  set_cmd=set_flex_cmd
+  set_cmd=set_flex_cmd;
+  ;;
+
+--save-script-input)
+  shift;
+  set_cmd=set_save_script_input_cmd;
   ;;
 esac
 
@@ -389,12 +442,18 @@ case $1 in
   set_sed_cmd () {
     set_sed_main "b list_both" "p" "b list_matches"
   }
+  set_eqscript_cmd () {
+    set_eqscript_main "replace_blob = print_blob = without_falsepos"
+  }
   ;;
 
 --print-marked-false-positives | -f)
   shift;
   set_sed_cmd () {
     set_sed_main "b print_marked_matches" "" "b print_marked_matches"
+  }
+  set_eqscript_cmd () {
+    set_eqscript_main "replace_falsepos = print_falsepos"
   }
   ;;
 
@@ -403,12 +462,18 @@ case $1 in
   set_sed_cmd () {
     set_sed_main "b print_matches" "" "b print_matches"
   }
+  set_eqscript_cmd () {
+    set_eqscript_main "print_falsepos"
+  }
   ;;
 
 --deblob | --mark-blobs | -d)
   shift;
   set_sed_cmd () {
     set_sed_main "b list_blobs" "p" "p"
+  }
+  set_eqscript_cmd () {
+    set_eqscript_main "replace_blob = print_blob = print_falsepos = print_nomatch"
   }
   ;;
 
@@ -423,12 +488,18 @@ case $1 in
 d
 # sedcat: Just print stuff, remove this line to run the actual script."
   }
+  set_eqscript_cmd () {
+    set_eqscript_main "print_blob = print_falsepos = print_nomatch"
+  }
   ;;
 
 --print-marked-blobs | -b)
   shift;
   set_sed_cmd () {
     set_sed_main "b print_marked_blobs"
+  }
+  set_eqscript_cmd () {
+    set_eqscript_main "replace_blob = print_blob"
   }
   ;;
 
@@ -437,6 +508,9 @@ d
   set_sed_cmd () {
     set_sed_main "b print_blobs"
   }
+  set_eqscript_cmd () {
+    set_eqscript_main "print_blob"
+  }
   ;;
 
 --print-marked-blobs-with-context | -c)
@@ -444,12 +518,18 @@ d
   set_sed_cmd () {
     set_sed_main "b print_marked_cblobs"
   }
+  set_eqscript_cmd () {
+    set_eqscript_main "with_context = replace_blob = print_blob"
+  }
   ;;
 
 --print-blobs-with-context | -C)
   shift;
   set_sed_cmd () {
     set_sed_main "b print_cblobs"
+  }
+  set_eqscript_cmd () {
+    set_eqscript_main "with_context = print_blob"
   }
   ;;
 
@@ -462,6 +542,9 @@ $file\\
 /*(DEBLOB-\\
 ERROR)*/
 q 1"
+  }
+  set_eqscript_cmd () {
+    set_eqscript_main "list_falsepos"
   }
   ;;
 
@@ -480,12 +563,18 @@ $file\\
 ERROR)*/
 q 1"
   }
+  set_eqscript_cmd () {
+    set_eqscript_main "list_blob = list_falsepos"
+  }
   ;;
 
 --print-all-matches | -X)
   shift;
   set_sed_cmd () {
     set_sed_main "b print_both" "" "b print_matches"
+  }
+  set_eqscript_cmd () {
+    set_eqscript_main "print_blob = print_falsepos"
   }
   ;;
 
@@ -583,6 +672,7 @@ fi
 # false positives.  Takes the input filename in $1.
 
 set_except () {
+  blob "$blobseq"
   blobna 'request_firmware_nowait'
   blobna 'request_firmware'
   blobna 'request_ihex_firmware'
@@ -2483,13 +2573,9 @@ blobcont="\\($sepx$constx\\)"
 # \(\)s.
 blobpat="$constx$blobcont"
 
-# Regular expression that matches a blob with the exact number of
+# Regular expression that matches a blob with at least the number of
 # constants specified as sensitivity.
-blobseq="$blobpat\\{$sens\\}"
-
-# Regular expression that matches a blob with the exact specified
-# length, or longer.
-blobfseq="$blobseq$blobcont*"
+blobseq="$blobpat\\{$sens,\\}"
 
 # Regular expression that matches the beginning of the pattern or a
 # line break.  It must be \(\)ed, such that it can be named in
@@ -2535,24 +2621,13 @@ set_sed_main () {
   falsepos=`sed -n 's,^[+]\^*,,p' < "$regex_name" |
     sed -n -e 's,[$]$,\\\\([\\\\n]\\\\|$\\\\),' \
 	-e '1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
-  orfalseneg=`sed -n 's,^[-],,p' < "$regex_name" |
+  blobs=`sed -n 's,^[-],,p' < "$regex_name" |
     sed -n -e 's,[$]$,\\\\([\\\\n]\\\\|$\\\\),' \
-	-e '1h; 1!H; ${g;s,\(^\|[\n]\),\\\\|,g;p;}'`
-
-  case $orfalseneg in
-  "")
-      blobfast=$blobseq
-      bloblong=$blobfseq
-      ;;
-  *)
-      blobfast="\\($blobseq$orfalseneg\\)"
-      bloblong="\\($blobfseq$orfalseneg\\)"
-      ;;
-  esac
+	-e '1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
 
   # Regular expression that matches one or more blobs without
   # intervening line breaks.
-  sblobctx="\\(\\([^\\n]\\|[/][*](DEBLOB-\\nBED)[*][/]\\)*$bloblong\\)\\+"
+  sblobctx="\\(\\([^\\n]\\|[/][*](DEBLOB-\\nBED)[*][/]\\)*$blobs\\)\\+"
 
   # Regular expression that matches the context for a long blob match.
   lblobctx="\\($initblob\\|$defineblob\\|$asmblob\\|$sblobctx\\)"
@@ -2564,15 +2639,15 @@ $v:+++falsepos
 h
 s/$bol$falsepos/\\1;\/**\/;/g
 # See if, after removing all matches, we end up without any blobs.
-$v:???blobfast
-/$blobfast/!{
+$v:???blobs
+/$blobs/!{
   g
   b falsepos
 }
 g
 "
   else
-    falsepos="$^"
+    falsepos="$.^"
     check_false_positives=
   fi
 
@@ -2609,8 +2684,8 @@ $4
 $v:read all
 s/^\\(;[/][*]begin [^\\n]*[\\n]\\)*//
 s/\\($bol[\n]\?;[/][*]\\(end [^\\n]*\\)\\?[*][/];\\)*$//
-$v:???!blobfast
-/$blobfast/!b clean
+$v:???!blobs
+/$blobs/!b clean
 $check_false_positives
 # Fall through.
 : blob
@@ -2645,7 +2720,7 @@ $v:print_matches
 h
 s/^\\($falsepos[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to match
-/$bloblong/ {
+/$blobs/ {
   i\\
 ::: $file :::
   p
@@ -2678,11 +2753,11 @@ $v:print_marked_matches
 h
 s/^\\($falsepos[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to match
-/$bloblong/{
+/$blobs/{
   i\\
 ::: $file :::
-  # s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-  s/$bloblong/\/*(DEBLOBBED)*\//g
+  # s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
+  s/$blobs/\/*(DEBLOBBED)*\//g
   p
 }
 g
@@ -2699,7 +2774,7 @@ $v:print_blobs
 /^$falsepos/ {
   $v:delete false positive
   # This is tricky.  We don't want to print the false positive.
-  /^$falsepos[^\\n]*$blobfast/ {
+  /^$falsepos[^\\n]*$blobs/ {
     $v:delete false positive immediately followed by blob
     s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//
     h
@@ -2721,10 +2796,10 @@ $v:print_blobs
     b print_blobs_delete_to_eol
   }
 }
-/^\([^\\n]\|[/][*](DEBLOB-\\nBED)[*][/]\)*$blobfast/! {
+/^\([^\\n]\|[/][*](DEBLOB-\\nBED)[*][/]\)*$blobs/! {
   $v:delete non-blob header
   h
-  s/[\\n]\\($falsepos\\|[^\\n]*$blobfast\\).*//
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobs\\).*//
   $v:matched non-blob header
   : print_blobs_nomatch_loop
   /[\\n]/ {
@@ -2746,11 +2821,11 @@ i\\
   b print_blobs_output_false_positive
 }
 h
-s/\\(\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
+s/\\(\\($blobs[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 p
 g
-s/\\(\\($bloblong[^\\n]*\\)\\+\\)//
+s/\\(\\($blobs[^\\n]*\\)\\+\\)//
 : print_blobs_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
@@ -2763,7 +2838,7 @@ $v:print_marked_blobs
 /^$falsepos/ {
   $v:delete false positive
   # This is tricky.  We don't want to print the false positive.
-  /^$falsepos[^\\n]*$blobfast/ {
+  /^$falsepos[^\\n]*$blobs/ {
     $v:delete false positive immediately followed by blob
     s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//
     h
@@ -2785,10 +2860,10 @@ $v:print_marked_blobs
     b print_marked_blobs_delete_to_eol
   }
 }
-/^\([^\\n]\|[/][*](DEBLOB-\\nBED)[*][/]\)*$blobfast/! {
+/^\([^\\n]\|[/][*](DEBLOB-\\nBED)[*][/]\)*$blobs/! {
   $v:delete non-blob header
   h
-  s/[\\n]\\($falsepos\\|[^\\n]*$blobfast\\).*//
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobs\\).*//
   $v:matched non-blob header
   : print_marked_blobs_nomatch_loop
   /[\\n]/ {
@@ -2810,13 +2885,13 @@ i\\
   b print_marked_blobs_output_false_positive
 }
 h
-s/\\(\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
+s/\\(\\($blobs[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
-# s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-s/$bloblong/\/*(DEBLOBBED)*\//g
+# s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
+s/$blobs/\/*(DEBLOBBED)*\//g
 p
 g
-s/\\(\\($bloblong[^\\n]*\\)\\+\\)//
+s/\\(\\($blobs[^\\n]*\\)\\+\\)//
 : print_marked_blobs_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
@@ -2829,7 +2904,7 @@ $v:print_cblobs
 /^$falsepos/ {
   $v:delete false positive
   # This is tricky.  We don't want to print the false positive.
-  /^$falsepos[^\\n]*$blobfast/ {
+  /^$falsepos[^\\n]*$blobs/ {
     $v:delete false positive immediately followed by blob
     s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//
     h
@@ -2876,11 +2951,11 @@ i\\
   b print_cblobs_output_false_positive
 }
 h
-s/^\\($lblobctx[^\\n]*\\($bloblong[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
+s/^\\($lblobctx[^\\n]*\\($blobs[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 p
 g
-s/^\\($lblobctx[^\\n]*\\($bloblong[^\\n]*\\)*\\)//
+s/^\\($lblobctx[^\\n]*\\($blobs[^\\n]*\\)*\\)//
 : print_cblobs_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
@@ -2893,7 +2968,7 @@ $v:print_marked_cblobs
 /^$falsepos/ {
   $v:delete false positive
   # This is tricky.  We don't want to print the false positive.
-  /^$falsepos[^\\n]*$blobfast/ {
+  /^$falsepos[^\\n]*$blobs/ {
     $v:delete false positive immediately followed by blob
     s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//
     h
@@ -2940,13 +3015,13 @@ i\\
   b print_marked_cblobs_output_false_positive
 }
 h
-s/^\\($lblobctx[^\\n]*\\($bloblong[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
+s/^\\($lblobctx[^\\n]*\\($blobs[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
-# s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-s/$bloblong/\/*(DEBLOBBED)*\//g
+# s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
+s/$blobs/\/*(DEBLOBBED)*\//g
 p
 g
-s/^\\($lblobctx[^\\n]*\\($bloblong[^\\n]*\\)*\\)//
+s/^\\($lblobctx[^\\n]*\\($blobs[^\\n]*\\)*\\)//
 : print_marked_cblobs_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
@@ -2956,10 +3031,10 @@ b print_marked_cblobs
 
 : print_both
 $v:print_both
-/^\\($falsepos\\|[^\\n]*$blobfast\\)/! {
+/^\\($falsepos\\|[^\\n]*$blobs\\)/! {
   $v:delete non-blob header
   h
-  s/[\\n]\\($falsepos\\|[^\\n]*$blobfast\\).*//
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobs\\).*//
   $v:matched non-blob header
   : print_both_nomatch_loop
   /[\\n]/ {
@@ -2975,11 +3050,11 @@ $v:print_both
 h
 i\\
 ::: $file :::
-s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$bloblong[^\\n]*\\)\\($bloblong[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
+s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobs[^\\n]*\\)\\($blobs[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 p
 g
-s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$bloblong[^\\n]*\\)\\($bloblong[^\\n]*\\)*\\)//
+s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobs[^\\n]*\\)\\($blobs[^\\n]*\\)*\\)//
 : print_both_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
@@ -3008,9 +3083,9 @@ $v:list_matches
 h
 s/^\\($falsepos[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to match
-/$bloblong/{
-  # s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-  s/$bloblong/\/*(DEBLOBBED)*\//g
+/$blobs/{
+  # s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
+  s/$blobs/\/*(DEBLOBBED)*\//g
 }
 p
 g
@@ -3027,7 +3102,7 @@ $v:list_blobs
 /^$falsepos/ {
   $v:print false positive
   # This is tricky.  We don't want to deblob the false positive.
-  /^$falsepos[^\\n]*$blobfast/ {
+  /^$falsepos[^\\n]*$blobs/ {
     $v:print false positive immediately followed by blob
     s/^\\($falsepos\\)/\\1\/*(DEBLOB-\\nBED)*\//
     h
@@ -3051,10 +3126,10 @@ $v:list_blobs
   s/^\\($falsepos[^\\n]*\\)//
   b list_blobs_delete_to_eol
 }
-/^[^\\n]*$blobfast/! {
+/^[^\\n]*$blobs/! {
   $v:print non-blob header
   h
-  s/[\\n]\\($falsepos\\|[^\\n]*$blobfast\\).*//
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobs\\).*//
   p
   : list_blobs_nomatch_loop
   /[\\n]/ {
@@ -3068,13 +3143,13 @@ $v:list_blobs
   b list_blobs_delete_to_eol
 }
 h
-s/\\(\\($bloblong[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
+s/\\(\\($blobs[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
-# s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-s/$bloblong/\/*(DEBLOBBED)*\//g
+# s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
+s/$blobs/\/*(DEBLOBBED)*\//g
 p
 g
-s/\\(\\($bloblong[^\\n]*\\)\\+\\)//
+s/\\(\\($blobs[^\\n]*\\)\\+\\)//
 : list_blobs_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
@@ -3084,10 +3159,10 @@ b list_blobs
 
 : list_both
 $v:list_both
-/^\\($falsepos\\|[^\\n]*$blobfast\\)/! {
+/^\\($falsepos\\|[^\\n]*$blobs\\)/! {
   $v:print non-blob header
   h
-  s/[\\n]\\($falsepos\\|[^\\n]*$blobfast\\).*//
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobs\\).*//
   p
   : list_both_nomatch_loop
   /[\\n]/ {
@@ -3101,13 +3176,13 @@ $v:list_both
   b list_both_delete_to_eol
 }
 h
-s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$bloblong[^\\n]*\\)\\($bloblong[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
+s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobs[^\\n]*\\)\\($blobs[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
-# s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
-s/$bloblong/\/*(DEBLOBBED)*\//g
+# s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
+s/$blobs/\/*(DEBLOBBED)*\//g
 p
 g
-s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$bloblong[^\\n]*\\)\\($bloblong[^\\n]*\\)*\\)//
+s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobs[^\\n]*\\)\\($blobs[^\\n]*\\)*\\)//
 : list_both_delete_to_eol
 $v:delete to eol
 s/^[^\\n]*//
@@ -3141,7 +3216,6 @@ s,[-]$, { blob (); },
 '     
 
   echo '%%' > "$scriptname"
-  echo "-$blobfseq" | sed "$adjust_rx" >> "$scriptname"
   sed "$adjust_rx" < "$regex_name" >> "$scriptname"
   echo '\n|. { unmatched (); }
 %%
@@ -3151,6 +3225,447 @@ int unmatched () {}
 ' >> "$scriptname"
 
   scriptcmd=false
+}
+
+set_python_main () {
+  adjust_rx='
+s,\\(,\\(?:,g;
+s,\\\([{(|)}?+]\),\1,g;
+'
+
+  cat >> "$scriptname" <<EOF
+#! /usr/bin/python
+
+import sys
+import re
+
+# Should we replace blobs and false positives with replacement?
+replace_blob = 0
+replace_falsepos = 0
+replacement = '/*(DEBLOBBED)*/'
+
+# Should we print lines containing blobs, false positives, and neither?
+print_blob = 0
+with_context = 0
+print_falsepos = 0
+print_nomatch = 0
+
+# Should we print name_to_list and exit if we find blobs or false positives?
+list_blob = 0
+list_falsepos = 0
+name_to_list = '$input'
+
+# Should we forget everything we know about false positives?
+falsepos = None
+no_falsepos = 0
+
+verbose = $vp
+
+# Which of the defaults above should we override?
+$@ = 1
+
+EOF
+
+  if test "X$DEBLOB_CHECK_PYTHON_REGEX" = Xdebug; then
+    sed -e "$adjust_rx" \
+	-e 's,\([^-+]*\)\(.*\),re.compile (r'"'\\2'"'),g' \
+	< "$regex_name" >> "$scriptname"
+  fi
+
+  sed -n 's,^[+],,p' < "$regex_name" |
+    sed -n -e "$adjust_rx" -e 's,\^,,' \
+	-e '1h; 1!H; $ { g; s,[\n],|,g; '"\
+s,^\\(.*\\)\$,falsepos = r'(?P<falsepos>\\1)',;\
+"' p;}' >> "$scriptname"
+
+  sed -n 's,^[-],,p' < "$regex_name" |
+    sed -n -e "$adjust_rx" \
+	-e '1h; 1!H; $ { g; s,[\n],|,g; '"\
+s,^\\(.*\\)\$,blob = r'(?P<blob>\\1)',;\
+"' p;}' >> "$scriptname"
+
+  echo "\\($initblob\\|$defineblob\\|$asmblob\\)" | 
+    sed -e "$adjust_rx" \
+        -e "s,^\\(.*\\)\$,cblob = r'(?P<cblob>\\1)'," >> "$scriptname"
+
+  cat >> "$scriptname" <<\EOF
+
+if no_falsepos or falsepos is None:
+    falsepos = r'(?!)'
+
+# Use non-greedy operator to skip partial line before blob, to avoid
+# skipping blobs when more than one appears in the same line.
+rx = '^%s|[^\n]*?%s' % (falsepos, blob)
+
+if with_context:
+    rx += '|^' + cblob
+
+rxc = re.compile(rx, re.M | re.S)
+
+filenames = None
+
+s = ''
+
+for line in sys.stdin:
+    # Read into s all lines between begin and end.  An empty line, without
+    # even the '\n', flags the end of the input.
+    if line[:3] == ';/*' and line[-4:] == '*/;\n':
+        if line[3:9] == 'begin ':
+            nextfilenames = (line[9:-4], filenames)
+            if s == '':
+                filenames = nextfilenames
+                del nextfilenames
+                continue
+        elif line[3:7] == 'end ':
+            assert line[7:-4] == filenames[0]
+            nextfilenames = filenames[1]
+        else:
+            assert filenames != None
+            s += line
+            continue
+    else:
+	assert filenames != None
+        s += line
+        continue
+        
+    if verbose:
+            print 'looking for matches'
+            sfilenames = filenames
+            while filenames != None:
+            	if filenames[0] == name_to_list:
+                    print name_to_list
+                    assert filenames[1] == None
+                else:
+                    print filenames[0] + ' within'
+                    assert filenames[1] != None
+                filenames = filenames[1]
+            filenames = sfilenames
+
+    if s[-1] == '\n':
+        s = s[:-1]
+
+    pp = p = pend = 0
+    match = rxc.search (s, p)
+    while match != None:
+        firstmatch = match
+        blobs = falses = 0
+        while match != None:
+            if verbose:
+                print 'found match'
+            what = match.lastgroup
+
+            if what == 'cblob':
+		if verbose: print 'match is a blob context'
+		pend = match.end()
+                p = match.start() + 1
+                match = rxc.search (s, p)
+                continue
+
+            blob_p = what == 'blob'
+            assert blob_p or what == 'falsepos'
+
+            if blob_p:
+		if verbose: print 'match is a blob'
+                blobs += 1
+            else:
+		if verbose: print 'match is a false positive'
+                falses += 1
+            
+            assert match.end(what) == match.end()
+            if blob_p and replace_blob or not blob_p and replace_falsepos:
+                s = s[:match.start(what)] + replacement + s[match.end():]
+                p = match.start(what) + len(replacement)
+            else:
+                p = match.end()
+
+            match = rxc.match (s, p)
+        
+        if print_nomatch:
+            sys.stdout.write (s[pp:firstmatch.start()])
+        pp = firstmatch.start()
+
+	if (p < pend):
+	    p = pend
+
+        p = s.find ('\n', p)
+        if p == -1:
+            p = len(s)
+        p += 1
+
+        if print_blob and blobs or print_falsepos and falses:
+            if not print_nomatch:
+                sfilenames = filenames
+                while filenames != None:
+                    print '::: ' + filenames[0] + ' :::'
+                    if filenames[0] == name_to_list:
+                        assert filenames[1] == None
+                    else:
+                        assert filenames[1] != None
+                    filenames = filenames[1]
+                filenames = sfilenames
+            sys.stdout.write (s[pp:p])
+            pp = p
+
+        if list_blob and blobs or list_falsepos and falses:
+            while filenames != None:
+            	if filenames[0] == name_to_list:
+                    print name_to_list
+                    assert filenames[1] == None
+                else:
+                    print filenames[0] + ' within'
+                    assert filenames[1] != None
+                filenames = filenames[1]
+            exit (1)
+
+        match = rxc.search (s, p)
+
+    if print_nomatch:
+        sys.stdout.write(s[pp:])
+
+    if verbose:
+        print 'no further matches'
+
+    s = ''
+    filenames = nextfilenames
+    del nextfilenames
+
+assert filenames == None
+
+exit (0)
+EOF
+
+  scriptcmd="${PYTHON-python} "'"$scriptname"'
+}
+
+set_awk_main () {
+  adjust_rx='
+s,[$]$,([\\n]|$),;
+s,\[^\],[^\\],g;
+s,\\\([{(|)}?+]\),\1,g;
+'
+
+  case " = $@ = " in
+  *" = no_falsepos = "*) falsepos='$.^';;
+  *) falsepos=`
+    sed -n 's,^[+],,p' < "$regex_name" |
+    sed -n -e "$adjust_rx" -e 's,\^,,' \
+	-e '1h; 1!H; $ { g; s,[\n],|,g; p;}'
+    `
+     case $falsepos in "") falsepos='$.^';; esac;;
+  esac
+
+  blob=`
+    sed -n 's,^[-],,p' < "$regex_name" |
+    sed -n -e "$adjust_rx" \
+	-e '1h; 1!H; $ { g; s,[\n],|,g; p;}'`
+
+  case " = $@ = " in
+  *" = with_context = "*) cblob=`
+    $echo "\\($initblob\\|$defineblob\\|$asmblob\\)" | 
+    sed -e "$adjust_rx"
+   `;;
+  *) cblob='$.^';;
+  esac
+
+  xrs= nrs="# " eor="RT" eormatch='RT ~ ' eornl='[\n]' eornlsz=1
+  # Uncomment the line below to disable the use of a regular
+  # expression for the awk Record Separator, a GNU awk extension.
+  # Using this extension appears to save a lot of memory for long
+  # deblob-check runs.
+  # xrs="# " nrs= eor='$0' eormatch='' eornl= eornlsz=0
+
+  cat >> "$scriptname" <<EOF
+#! /bin/gawk --re-interval -f
+
+BEGIN {
+    # Should we replace blobs and false positives with replacement?
+    replace_blob = 0;
+    replace_falsepos = 0;
+    replacement = "/*(DEBLOBBED)*/";
+
+    # Should we print lines containing blobs, false positives, and neither?
+    print_blob = 0;
+    with_context = 0;
+    print_falsepos = 0;
+    print_nomatch = 0;
+
+    # Should we print name_to_list and exit if we find blobs or false positives?
+    list_blob = 0;
+    list_falsepos = 0;
+    name_to_list = "$input";
+
+    # Should we forget everything we know about false positives?
+    no_falsepos = 0;
+
+    verbose = $vp;
+
+    nfilenames = 0;
+    s = "";
+
+    # Which of the defaults above should we override?
+    $@ = 1;
+
+    # requires GNU awk RS extension:
+$xrs    RS = "[;][/][*](begin|end) [^\n]*[*][/][;][\n]";
+}
+# requires GNU awk RS extension:
+$xrs { s = s \$0; }
+# does not require GNU awk RS extension:
+$nrs !/^[;][/][*].*[*][/][;]$/ {
+$nrs     s = s \$0 "\n";
+$nrs     next;
+$nrs }
+$eormatch /^[;][/][*]begin .*[*][/][;]$eornl$/ {
+    filenames[nfilenames] = substr($eor, 10, length ($eor) - 12 - $eornlsz);
+    if (verbose) print "entering " nfilenames ": " filenames[nfilenames];
+    nextnfilenames = nfilenames + 1;
+    if (s == "") {
+	nfilenames = nextnfilenames;
+	next;
+    }
+}
+$eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
+    nextnfilenames = nfilenames - 1;
+    if (verbose)
+	print "got to the end of " nextnfilenames ": " filenames[nextnfilenames];
+}
+{
+    if (verbose) {
+	print "looking for matches";
+	for (i = nfilenames; --i >= 0;)
+	    print filenames[i] " within";
+        print filenames[0]
+    }
+
+    s = substr (s, 1, length (s) - 1)
+
+    pp = p = pend = 1;
+    if (verbose > 1) print "searching starting at", substr (s, p, 10)
+    while (match (substr (s, p),
+		  /(^|[\n])($falsepos)|(^|[\n])($cblob)|$blob/)) {
+	blobs = falses = 0;
+	firstmatchstart = RSTART + p - 1;
+	if (substr (s, firstmatchstart, 1) == "\n")
+	    firstmatchstart++;
+	for (;;) {
+	    matchstart = RSTART + p - 1;
+	    matchlen = RLENGTH;
+	    if (substr (s, matchstart, 1) == "\n") {
+		matchstart++;
+		matchlen--;
+	    }
+	    if (verbose)
+		print "found match", matchstart, matchlen;
+	    if (verbose > 1)
+		print substr (s, matchstart, matchlen);
+	    if (match (substr (s, matchstart, matchlen), /^($falsepos)$/) == 1) {
+		if (verbose) print "match is a false positive";
+		blob_p = 0;
+		falses++;
+	    } else if (match (substr (s, matchstart, matchlen), /^($cblob)$/) == 1) {
+		if (verbose) print "match is a blob context";
+		pend = p + matchlen;
+		p = matchstart + 1;
+		if (verbose) print "search after cblob starting at", p;
+		match (substr (s, p, matchlen - 1), /^($falsepos)|^($cblob)|[^\n]*($blob)/);
+		continue;
+	    } else {
+		if (verbose) print "match is a blob";
+		blob_p = 1;
+		blobs++;
+	    }
+
+	    if (blob_p ? replace_blob : replace_falsepos) {
+		s = substr (s, 1, matchstart - 1)	\\
+		    replacement				\\
+		    substr (s, matchstart + matchlen);
+		p = matchstart + length (replacement);
+	    } else
+		p = matchstart + matchlen;
+	    i = index (substr (s, p), "\n");
+	    if (!i)
+		i = length (s)
+	    p--;
+	    if (!match (substr (s, p),
+			/[\n]($falsepos)|[\n]($cblob)|$blob/) \\
+		|| (RSTART > i && p + RSTART >= pend))
+		break;
+	}
+
+	if (print_nomatch)
+	    printf "%s", substr (s, pp, firstmatchstart - pp);
+        else if (print_blob || print_falsepos) {
+	    lastline = substr (s, pp, firstmatchstart - pp);
+	    sub (/.*[\n]/, "", lastline);
+	    firstmatchstart -= length (lastline);
+        }
+	pp = firstmatchstart;
+
+	if (p < pend)
+	    p = pend;
+
+	i = index (substr (s, p), "\n");
+	if (i)
+	    p += i;
+	else
+	    p = length (s);
+
+	if (verbose) print "match set range:", pp, p
+
+	if ((print_blob && blobs) || (print_falsepos && falses)) {
+	    if (!print_nomatch)
+		for (i = nfilenames; i--;)
+		    print "::: " filenames[i] " :::";
+	    printf "%s", substr (s, pp, p - pp);
+	    pp = p;
+	}
+
+	if ((list_blob && blobs) || (list_falsepos && falses)) {
+	    for (i = nfilenames; --i >= 0;)
+		print filenames[i] " within";
+	    print filenames[0];
+	    exit (1);
+	}
+    }
+
+    if (print_nomatch)
+	printf "%s", substr (s, pp)
+
+    if (verbose)
+	print "no further matches";
+
+    s = "";
+    nfilenames = nextnfilenames;
+    next;
+}
+EOF
+
+  scriptcmd="${AWK-gawk} --re-interval -f "'"$scriptname"'
+}
+
+set_flex_main () {
+  adjust_rx='
+s,\\\([{(|)}?+]\),\1,g
+s,^\([-+]\)\(\^\?\)\(.*\)\(\$\?\)$,\2(?s:\3)\4\1,g
+s,[+]$, { falsepos (); },
+s,[-]$, { blob (); },
+'     
+
+  echo '%%' > "$scriptname"
+  sed "$adjust_rx" < "$regex_name" >> "$scriptname"
+  echo '\n|. { unmatched (); }
+%%
+int falsepos () {}
+int blob () {}
+int unmatched () {}
+' >> "$scriptname"
+
+  scriptcmd=false
+}
+
+set_save_script_input_main () {
+  savename=`mktemp -t deblob-check-input-XXXXXX`
+  scriptcmd="{ echo saving input in $savename && cat > $savename && echo done; }"
 }
 
 # Process an input file named in $1 and run it through the blob
@@ -3290,7 +3805,7 @@ BAD regular expression:
   # Extract or otherwise munge...
   case /$input in
   *.tar*)
-    cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo; echo \";/*end \$TAR_FILENAME*/;\"'"
+    cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo; echo \";/*end \$TAR_FILENAME*/;\"'"
     ;;
   *.patch | *.patch.*z* | */patch-* | *.diff | *.diff.*z*)
     if $reverse_patch; then
@@ -3302,7 +3817,7 @@ BAD regular expression:
       /^[$r]/d
       /^\\(@@\\|$s$s$s\\) / {
 	i\\
-;/**/;\\
+
 ;/*end patchlet */;\\
 ;/*begin patchlet */;
 	s/^/;\\/*/
