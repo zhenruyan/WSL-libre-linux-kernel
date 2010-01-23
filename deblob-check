@@ -25,7 +25,8 @@
 # USA
 
 
-# usage: deblob-check [-S] [-vv] [-s S] [-lDdBbCcXxPpFftVh?H] \
+# usage: deblob-check [-S] [-v] [-v] [-s S] [--reverse-patch] \
+#        [--use-...|--gen-flex] [-lDdBbCcXxPpFftVh?H] \
 #        *.tar* patch-* [-i prefix/] *.patch *.diff...
 
 # Look for and report too-long undocumented sequences of numbers
@@ -35,12 +36,33 @@
 # The order of command line flags is significant.  Flags given out of
 # the order above won't be handled correctly, sorry.
 
-# -s --sensitivity: must be followed by a blank and a number.
-#		Specifies the number of consecutive integral or
+# -s --sensitivity: Specifies the number of consecutive integral or
 #		character constants that trigger the blob detector.
+#	        Must be followed by a blank and a number.
 
 #    --reverse-patch: Test the removed parts of a patch, rather than
 #		the added ones.
+
+#    --use-awk: Choose the internal GNU awk script for the bulk of the
+#		work.  This is the default option, if GNU awk is found.
+#		The awk interpreter is named gawk, unless AWK is set.
+
+#    --use-sed: Choose the internal GNU sed script for the bulk of the
+#		work.  This is the default option, if GNU awk is not
+#		found.
+
+#    --use-python: Choose the internal python script.  This is not
+#		recommended, because the regular expressions we use
+#		invoke exponential behavior in the python engine.
+
+#    --save-script-input: Save the input that would have been fed to
+#		any of the engines above.
+
+#    --gen-flex: Generate a flex input file with all known blob and
+#		false positive patterns.  It would have been a fast
+#		regular expression processor if only the flex program
+#		completed in reasonable time.
+
 
 # The default sensitivity is 32 constants.
 
