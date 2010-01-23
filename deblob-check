@@ -2219,7 +2219,7 @@ set_except () {
     ;;
 
   */patch*2.6.30*)
-    initnc '}[ ]bclk_divs\[\][ ]=[ ][{]' sound/soc/codecs/wm8903.c
+    initnc '[}][ ]bclk_divs\[\][ ]=[ ][{]' sound/soc/codecs/wm8903.c
     ;;
 
   */patch*2.6.28-rc*)
@@ -2418,7 +2418,7 @@ set_except () {
     ;;
   */patch*2.6.25-rc*)
     initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]uchar[ ]sbox\[8\]\[4\]\[16\][ ]=[ ][{][*][/][;]'
-    accept '[	][$]3[ ]=[ ][{][{]pge[ ]=[ ][{][{]ste[ ]=[ ][{]\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\)[ ]=\|<repeats[ ][0-9]\+[ ]times>\)[{},\n 	]*\)*<repeats[ ]11 times>[}]$'
+    accept '[	][$]3[ ]=[ ][{][{]pge[ ]=[ ][{][{]ste[ ]=[ ][{]\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\)[ ]=\|<repeats[ ][0-9]\+[ ]times>\)[{},\n 	]*\)*<repeats[ ]11[ ]times>[}]$'
     initnc 'static[ ]yyconst[ ]flex_int\(16\|32\)_t[ ]yy_[^[]*\[[0-9]*\][ ]='
     initnc 'static[ ]const[ ]yytype_u\?int\(8\|16\)[ ]yy[^[]*\[\][ ]='
     initnc '[	]int[ ]bcomm_irq\[3[*]16\][ ]='
@@ -2449,18 +2449,18 @@ set_except () {
     initnc 'static[ ]const[ ]u8[ ]rtl8225_tx_power_cck\[\][ ]='
     initnc 'static[ ]const[ ]u8[ ]rtl8225_tx_power_cck_ch14\[\][ ]='
     initnc 'static[ ]const[ ]u16[ ]rtl8225z2_rxgain\[\][ ]='
-    accept '[ ][ ][ ][ ][ ]\([ ]49,\)*[\n]\([ 0-9,]*[\n]\)*[ ][ ][ ][ ][ ]\( 49,\)*$'
+    accept '[ ][ ][ ][ ][ ]\([ ]49,\)*[\n]\([ 0-9,]*[\n]\)*[ ][ ][ ][ ][ ]\([ ]49,\)*$'
     initnc 'static[ ]const[ ]unsigned[ ]char[ ]wm_vol\[256\][ ]='
     accept 'domain<N>[ ]<cpumask>[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]10[ ]11[ ]12[ ]13[ ]14[ ]15[ ]16[ ]17[ ]18[ ]19[ ]20[ ]21[ ]22[ ]23[ ]24[ ]25[ ]26[ ]27[ ]28[ ]29[ ]30[ ]31[ ]32[ ]33[ ]34[ ]35[ ]36$'
     # drivers/net/e1000e/phy.c
     initnc 'static[ ]const[ ]u16[ ]e1000_igp_2_cable_length_table\[\][ ]='
-    accept '[	]24[ ]=>[ ]\[[\n]\([^\n]*[\n]\)*[	]\]\(,[ ][0-9]\+[ ]=> \[\)\?$'
-    accept '[	][	]'"'"'0x[^\n]*[\n]\([^\n]*[\n]\)*[	]\]\(,[ ][0-9]\+[ ]=> \[\)\?$'
+    accept '[	]24[ ]=>[ ]\[[\n]\([^\n]*[\n]\)*[	]\]\(,[ ][0-9]\+[ ]=>[ ]\[\)\?$'
+    accept '[	][	]'"[']"'0x[^\n]*[\n]\([^\n]*[\n]\)*[	]\]\([,][ ][0-9]\+[ ]=>[ ]\[\)\?$'
     initnc 'const[ ]u\(8\|16\|32\)[ ]b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\][ ]='
     ;;
   */*drm*.patch)
-    defsnc 'const[ ]u32[ ]r[67]xx_default_state\[\] =' drivers/gpu/drm/radeon/r600_blit_shaders.c
-    defsnc 'struct nv17_tv_norm_params nv17_tv_norms\[NUM_TV_NORMS] =' drivers/gpu/drm/nouveau/nv17_tv_modes.c
+    defsnc 'const[ ]u32[ ]r[67]xx_default_state\[\][ ]=' drivers/gpu/drm/radeon/r600_blit_shaders.c
+    defsnc 'struct[ ]nv17_tv_norm_params[ ]nv17_tv_norms\[NUM_TV_NORMS\][ ]=' drivers/gpu/drm/nouveau/nv17_tv_modes.c
     defsnc 'static[ ]int[ ]atom_dst_to_src\[8\]\[4\][ ]=' drivers/gpu/drm/radeon/atom.c
     blobname 'matrox[/]g[24]00_warp\.fw' drivers/gpu/drm/mga/mga_warp.c
     blobname 'r128[/]r128_cce\.bin' drivers/gpu/drm/r128/r128_cce.c
@@ -2544,11 +2544,11 @@ set_except () {
     initnc 'static[ ]const[ ]struct[ ]ath5k_ini_rf[ ]rfregs_5112\[\][ ]='
     initnc 'static[ ]const[ ]struct[ ]ath5k_ini_rf[ ]rfregs_5112a\[\][ ]='
     initnc 'static[ ]const[ ]struct[ ]ath5k_ini_rf[ ]rfregs_5413\[\][ ]='
-    oprepline '#define[ ]AR5K_RATES_11A '
-    oprepline '#define[ ]AR5K_RATES_11B '
-    oprepline '#define[ ]AR5K_RATES_11G '
-    oprepline '#define[ ]AR5K_RATES_TURBO '
-    oprepline '#define[ ]AR5K_RATES_XR '
+    oprepline '#define[ ]AR5K_RATES_11A[ ]'
+    oprepline '#define[ ]AR5K_RATES_11B[ ]'
+    oprepline '#define[ ]AR5K_RATES_11G[ ]'
+    oprepline '#define[ ]AR5K_RATES_TURBO[ ]'
+    oprepline '#define[ ]AR5K_RATES_XR[ ]'
     initnc 'static[ ]const[ ]struct[ ]ath5k_ini[ ]ar5212_ini\[\][ ]='
     initnc 'static[ ]const[ ]struct[ ]ath5k_ini_mode[ ]rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\][ ]=' drivers/net/wireless/ath5k/initvals.c # ?
     initnc '[	][	][}][ ]blinkrates\[\][ ]='
@@ -2559,8 +2559,8 @@ set_except () {
     initnc 'static[ ]const[ ]u8[ ]rtl8225z2_tx_power_cck_ch14\[\][ ]=' drivers/net/wireless/rtl8187_rtl8225.c
 
     # git logs
-    accept '[ ][ ][ ]sudo[ ]modprobe[ ]ath5k[ ]debug=0x00000400[\n][ 	]*[\n]\([ 	]*Band[^\n]*[\n]\([ 	]*\(\(channels\|rates\):\|[- 	0-9a-f]*\|\[\.\.\.[ ]etc[ ]\]\)[\n]\)\+\)\+[ ][ ][ ][ ][ ][ ][ ]540[ ]000c[ ]0000 0000'
-    oprepline '[	][{][ ]1,[ ]MODULATION_XR,[ ]3000,[ ]1,[ ]150,[ ]3 [}],'
+    accept '[ ][ ][ ]sudo[ ]modprobe[ ]ath5k[ ]debug=0x00000400[\n][ 	]*[\n]\([ 	]*Band[^\n]*[\n]\([ 	]*\(\(channels\|rates\):\|[- 	0-9a-f]*\|\[\.\.\.[ ]etc[ ]\]\)[\n]\)\+\)\+[ ][ ][ ][ ][ ][ ][ ]540[ ]000c[ ]0000[ ]0000'
+    oprepline '[	][{][ ]1,[ ]MODULATION_XR,[ ]3000,[ ]1,[ ]150,[ ]3[ ][}],'
 
     # Fedora 8ish kernel-xen builds
     initnc 'const[ ]u16[ ]crc_itu_t_table\[256\][ ]='
@@ -2573,8 +2573,7 @@ set_except () {
     ;;
 
   */linux-2.6-netdev-e1000e*.patch)
-    # drivers/net/e1000e/phy.c
-    initnc 'static[ ]const[ ]u16[ ]e1000_igp_2_cable_length_table\[\][ ]='
+    initnc 'static[ ]const[ ]u16[ ]e1000_igp_2_cable_length_table\[\][ ]=' drivers/net/e1000e/phy.c
     ;;
   esac
 }  
@@ -3839,7 +3838,7 @@ BAD regular expression:
       /^[$r]/d
       /^\\(@@\\|$s$s$s\\) / {
 	i\\
-
+\\
 ;/*end patchlet */;\\
 ;/*begin patchlet */;
 	s/^/;\\/*/
