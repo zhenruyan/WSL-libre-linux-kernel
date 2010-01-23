@@ -3309,8 +3309,7 @@ s = ''
 for line in sys.stdin:
     # Read into s all lines between begin and end.  An empty line, without
     # even the '\n', flags the end of the input.
-    if line[:3] == ';/*':
-        assert line[-4:] == '*/;\n'
+    if line[:3] == ';/*' and line[-4:] == '*/;\n':
         if line[3:9] == 'begin ':
             nextfilenames = (line[9:-4], filenames)
             if s == '':
@@ -3320,8 +3319,9 @@ for line in sys.stdin:
         elif line[3:7] == 'end ':
             assert line[7:-4] == filenames[0]
             nextfilenames = filenames[1]
-        elif len(line) == 7:
-            s += '\n'
+        else:
+            assert filenames != None
+            s += line
             continue
     else:
 	assert filenames != None
@@ -3467,11 +3467,12 @@ s,\\\([{(|)}?+]\),\1,g;
   *) cblob='$.^';;
   esac
 
-  if ${DONT_USE_GAWK_EXTENSIONS-false}; then
-    xrs="# " nrs= eor='$0' eormatch='' eornl= eornlsz=0
-  else
-    xrs= nrs="# " eor="RT" eormatch='RT ~ ' eornl='[\n]' eornlsz=1
-  fi
+  xrs= nrs="# " eor="RT" eormatch='RT ~ ' eornl='[\n]' eornlsz=1
+  # Uncomment the line below to disable the use of a regular
+  # expression for the awk Record Separator, a GNU awk extension.
+  # Using this extension appears to save a lot of memory for long
+  # deblob-check runs.
+  # xrs="# " nrs= eor='$0' eormatch='' eornl= eornlsz=0
 
   cat >> "$scriptname" <<EOF
 #! /bin/gawk --re-interval -f
@@ -3804,7 +3805,7 @@ BAD regular expression:
   # Extract or otherwise munge...
   case /$input in
   *.tar*)
-    cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo; echo \";/*end \$TAR_FILENAME*/;\"'"
+    cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo; echo \";/*end \$TAR_FILENAME*/;\"'"
     ;;
   *.patch | *.patch.*z* | */patch-* | *.diff | *.diff.*z*)
     if $reverse_patch; then
@@ -3816,7 +3817,7 @@ BAD regular expression:
       /^[$r]/d
       /^\\(@@\\|$s$s$s\\) / {
 	i\\
-;/**/;\\
+
 ;/*end patchlet */;\\
 ;/*begin patchlet */;
 	s/^/;\\/*/
