@@ -161,7 +161,7 @@ echo Uncompressing linux-$kver.tar.bz2 into linux-$kver.tar
 rm -rf linux-$kver linux-$kver.tar
 bunzip2 < linux-$kver.tar.bz2 > linux-$kver.tar
 
-echo Extracing linux-$kver.tar into linux-$kver
+echo Extracting linux-$kver.tar into linux-$kver
 tar -xf linux-$kver.tar
 rm -rf linux-$kver-$libre linux-$kver-$libre.tar
 
