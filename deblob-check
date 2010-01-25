@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-01-23
+# deblob-check version 2010-01-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -54,6 +54,10 @@
 #    --use-python: Choose the internal python script.  This is not
 #		recommended, because the regular expressions we use
 #		invoke exponential behavior in the python engine.
+
+#    --use-perl: Choose the internal perl script.  This is not
+#		recommended, because our regular expressions exceed
+#		some limits hard-coded into perl.
 
 #    --save-script-input: Save the input that would have been fed to
 #		any of the engines above.
@@ -249,21 +253,6 @@ case ${LANG+set} in set) LANG=C; export LANG;; esac
 
 rm="rm -f"
 
-sed=`echo $0 | sed 's,\(/\?\)[^/]*$,\1deblob-psed,'`
-if test -f "$sed"; then
-  :
-elif test -f deblob-psed; then
-  sed=deblob-psed
-else
-  sed=false
-fi
-
-if $sed -e 'q' < /dev/null > /dev/null; then
-  :
-else
-  sed=sed
-fi
-
 for echo in 'echo' 'printf %s\n'; do
   case `$echo '\nx'` in 
   '\nx') break;;
@@ -391,14 +380,13 @@ set_cmd=set_eqscript_cmd
 # on our own, but, yuck.
 if (${AWK-gawk} --re-interval --version) > /dev/null 2>&1; then
   set_main_cmd=set_awk_main
+# Don't choose perl by default, we exceed some internal limits.
+elif (${PERL-perl} --version) > /dev/null 2>&1; then
+  set_main_cmd=set_perl_main
 # Don't choose python by default, it exhibits exponential behavior
 # (see http://swtch.com/~rsc/regexp/regexp1.html for details)
-# processing lines containing /* such as this:
-# Documentation/sysctl/*, swap/mm readaround
-# Try it: deblob-check --use-python linux-2.6.32/CREDITS
-# It hits even with our tiny testsuite:
-# AWK=false PYTHON=python deblob-check -t
-elif (${PYTHON-false} --version) > /dev/null 2>&1; then
+# processing some of our regular expressions.
+elif (${PYTHON-python} --version) > /dev/null 2>&1; then
   set_main_cmd=set_python_main
 # Sed takes GBs of RAM to compile all the huge regexps in the sed
 # script we generate with all known false positives and blobs in Linux.
@@ -415,6 +403,12 @@ case $1 in
   set_main_cmd=set_python_main;
   ;;
 
+--use-perl)
+  shift;
+  set_cmd=set_eqscript_cmd;
+  set_main_cmd=set_perl_main;
+  ;;
+	
 --use-awk)
   shift;
   set_cmd=set_eqscript_cmd;
@@ -439,19 +433,19 @@ esac
 
 case $1 in
 --version | -V)
-  sed -e '/^# '$name' version /,/^# Written by/ { s/^# //; p; }; d' < $0
+  ${SED-sed} -e '/^# '$name' version /,/^# Written by/ { s/^# //; p; }; d' < $0
   exit 0
   ;;
 
 -\? | -h)
-  sed -n -e '/^# usage:/,/# -h/ { /^# -/,/^$/{s/^# \(-.*\):.*/\1/p; d; }; s/^\(# \?\)\?//p; }' < $0 &&
+  ${SED-sed} -n -e '/^# usage:/,/# -h/ { /^# -/,/^$/{s/^# \(-.*\):.*/\1/p; d; }; s/^\(# \?\)\?//p; }' < $0 &&
   echo
   echo "run \`$name --help | more' for full usage"
   exit 0
   ;;
 
 --help | -H)
-  sed -n -e '/^# '$name' version /,/^[^#]/ s/^\(# \?\)\?//p' < $0
+  ${SED-sed} -n -e '/^# '$name' version /,/^[^#]/ s/^\(# \?\)\?//p' < $0
   exit 0
   ;;
 
@@ -700,9 +694,9 @@ set_except () {
   blobna 'request_ihex_firmware'
   blobna 'MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\([ 	\n]*MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\)*'
   blobna 'DEFAULT_FIRMWARE'
-  blobna '\(\.\|->\)firmware[ 	\n]*=[^=]'
+  blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '\.\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|cis\|dat\|elf\|xlx\|rfb\|ucode\|img\)["]'
+  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|cis\|dat\|elf\|xlx\|rfb\|ucode\|img\)["]'
 
   case $prefix$1 in
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
@@ -956,16 +950,16 @@ set_except () {
     accept '[	]-[ ]move[ ]firmware[ ]loading[ ]to[ ]request_firmware[(][)]' drivers/staging/slicoss/README
     accept 'config[ ]FIRMWARE_IN_KERNEL.*let[ ]firmware[ ]be[ ]loaded[ ]from[ ]userspace\.' drivers/base/Kconfig
     accept '[	 ]*and[ ]request_firmware[(][)][ ]in[ ]the[ ]source' drivers/base/Kconfig
-    accept 'static[ ]int[\n]_request_firmware[(]const[ ]struct[ ]firmware[ ][*][*]firmware_p,[ ]const[ ]char[ ][*]name,[^{]*[\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}][\n]' drivers/base/firmware_class.c
-    accept 'static[ ]int[\n]request_firmware_work_func[(]void[ ][*]arg[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*ret[ ]=[ ]_request_firmware[(]\([^}]\|[^\n}][}]*\)*[\n][}][\n]' drivers/base/firmware_class.c
-    accept '[/][*][*][\n][ ][*][ ]request_firmware:[ ]-[ ]send[ ]firmware[ ][^{]*[\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}][\n]' drivers/base/firmware_class.c
-    accept '[/][*][*][\n][ ][*][ ]request_firmware_nowait:[ ]asynchronous[ ]version[^{]*[\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}][\n]' drivers/base/firmware_class.c
+    accept 'static[ ]int[\n]_request_firmware[(]const[ ]struct[ ]firmware[ ][*][*]firmware_p,[ ]const[ ]char[ ][*]name,[^{]*[\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept 'static[ ]int[\n]request_firmware_work_func[(]void[ ][*]arg[)][\n][{][\n]\([\n]*[^\n}][}]*\)*ret[ ]=[ ]_request_firmware[(]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept '[/][*][*][\n][ ][*][ ]request_firmware:[ ]-[ ]send[ ]firmware[ ][^{]*[\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept '[/][*][*][\n][ ][*][ ]request_firmware_nowait:[ ]asynchronous[ ]version[^{]*[\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept 'EXPORT_SYMBOL[(]request_firmware\(_nowait\)\?[)][;]' drivers/base/firmware_class.c
     accept 'int[ ]request_firmware\(_nowait\)\?[(][^;]*[)][;]' include/linux/firmware.h
     accept 'static[ ]inline[ ]int[ ]request_firmware\(_nowait\)\?[(][^{]*[)][\n][{][\n][	]return[ ]-EINVAL[;][\n][}]' include/linux/firmware.h
-    accept 'static[ ]inline[ ]int[\n]\(maybe_\)\?reject_firmware\(_nowait\)\?[(][^{;]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]' include/linux/firmware.h
+    accept 'static[ ]inline[ ]int[\n]\(maybe_\)\?reject_firmware\(_nowait\)\?[(][^{;]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' include/linux/firmware.h
 
-    accept 'static[ ]inline[ ]int[ ]request_ihex_firmware\?[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}][\n]' include/linux/ihex.h
+    accept 'static[ ]inline[ ]int[ ]request_ihex_firmware\?[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' include/linux/ihex.h
     ocomment '[/][*][ ]Optional[ ]firmware\([^\n]*[\n][ ][*]\)*[^\n]*[ ]MODULE_FIRMWARE[(][)]'
     oprepline '#define[ ]MODULE_FIRMWARE[(]_firmware[)]' include/linux/module.h
     accept '[ ][*][ ]Sample[ ]code[ ]on[ ]how[ ]to[ ]use[ ]request_firmware[(][)][ ]from[ ]drivers\.' samples/firmware_class/firmware_sample_driver.c
@@ -1010,7 +1004,7 @@ set_except () {
     blob '\(#\(ifdef[ ]AMB_NEW_MICROCODE\|else\|endif\)[\n]#\(define\|include\)[ ]UCODE2\?[(][^\n]*[\n]\)\+\([\n]*static[ ]\(u32\|region\)[ ]__devinitdata[ ]ucode_\(start\|\(regions\|data\)\[\]\)[ ]=[^;]*[;]\)*' drivers/atm/ambassador.c
 
     blobname '\(pca\|sba\)200e\(_ecd\)\?\.\(data\|bin[12]\?\)' 'drivers/atm/\(Makefile\|fore200e\(_mkfirm\)\?\.c\)'
-    blobna '[/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*PCA-200E[ ]firmware[ ][*][/]' drivers/atm/fore200e_mkfirm.c
+    blobna '[/][*][/]*\([*]*[^*/][/]*\)*[*]*PCA-200E[ ]firmware[ ][*][/]' drivers/atm/fore200e_mkfirm.c
     blobna '_fore200e_\(pca\|sba\)_fw_\(data\|size\)' drivers/atm/fore200e.c
     blob '#ifdef[ ]CONFIG_ATM_FORE200E_\(PCA\|SBA\)\([\n]extern[ ]const[ ]unsigned[ ]\(char\|int\)[ ]*_fore200e_\(pca\|sba\)_fw_\(data\[\]\|size\)[;]\)\+[\n]#endif\([\n]\+#ifdef[ ]CONFIG_ATM_FORE200E_\(PCA\|SBA\)\([\n]extern[ ]const[ ]unsigned[ ]\(char\|int\)[ ]*_fore200e_\(pca\|sba\)_fw_\(data\[\]\|size\)[;]\)\+[\n]#endif\)*' drivers/atm/fore200e.c
 
@@ -1031,15 +1025,15 @@ set_except () {
     blobname 'intelliport2\.bin' drivers/char/ip2/ip2main.c
 
     blob 'static[ ]unsigned[ ]char[ ]warp_g[24]00_t2\?gzs\?a\?f\?\[\][ ]=[ ][{][^{};]*[}][;]\([\n][\n]*static[ ]unsigned[ ]char[ ]warp_g[24]00_t2\?gzs\?a\?f\?\[\][ ]=[ ][{][^{};]*[}][;]\)*' drivers/gpu/drm/mga/mga_ucode.h
-    blob '\(#define[ ]WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]\)\([\n][\n]*\(#define[ ]WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]\)\)*' drivers/gpu/drm/mga/mga_warp.c
+    blob '\(#define[ ]WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]\)\([\n][\n]*\(#define[ ]WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]\)\)*' drivers/gpu/drm/mga/mga_warp.c
     blobna '\(case[ ]MGA_CARD_TYPE_G[^:]*:[ 	\n]*\)\+return[ ][^;]*mga_warp[^;]*microcode[^;]*[;]\([ 	\n]*\(case[ ]MGA_CARD_TYPE_G[^:]*:[ 	\n]*\)\+return[ ][^;]*mga_warp[^;]*microcode[^;]*[;][ 	]*\)*' drivers/gpu/drm/mga/mga_warp.c
 
     blob 'static[ ]u32[ ]r128_cce_microcode\[\][ ]=[ ][{][^;]*[}][;]' drivers/gpu/drm/r128/r128_cce.c
-    blob 'static[ ]void[ ]r128_cce_load_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/gpu/drm/r128/r128_cce.c
+    blob 'static[ ]void[ ]r128_cce_load_microcode[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/gpu/drm/r128/r128_cce.c
     # blobna 'R128_WRITE[(]R128_PM4_MICROCODE_DATA[HL],[\n	 ]*r128_cce_microcode\[i[ ][*][ ]2\([ ][+][ ]1\)\?\][)]\([;][\n 	]*R128_WRITE[(]R128_PM4_MICROCODE_DATA[HL],[\n	 ]*r128_cce_microcode\[i[ ][*][ ]2\([ ][+][ ]1\)\?\][)]\)*' drivers/gpu/drm/r128/r128_cce.c
 
     blob 'static[ ]const[ ]u32[ ]R[SV0-9]*[05]_\(c\|pf\)p_microcode\[\]\(\[[23]\]\)\?[ ]=[ ][{][^;]*[}][;]\([\n][\n]*static[ ]const[ ]u32[ ]R[SV0-9]*[05]_\(c\|pf\)p_microcode\[\]\(\[[23]\]\)\?[ ]=[ ][{][^;]*[}][;]\)*' 'drivers/gpu/drm/radeon/\(radeon\|r600\)_microcode\.h'
-    blob 'static[ ]void[ ]r\(adeon\|[167]00\)_cp_load_microcode[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*cp_microcode\([^}]\|[^\n}][}]*\)*[\n][}]' 'drivers/gpu/drm/radeon/r\(\(adeon\|600\)_cp\|100\)\.c'
+    blob 'static[ ]void[ ]r\(adeon\|[167]00\)_cp_load_microcode[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*cp_microcode\([\n]*[^\n}][}]*\)*[\n]\+[}]' 'drivers/gpu/drm/radeon/r\(\(adeon\|600\)_cp\|100\)\.c'
     # blobna 'RADEON_WRITE[(]R\(ADEON\|600\)_CP_\(ME_RAM\|PFP_UCODE\)_DATA[HL]\?,[\n	 ]*R[SV0-9]*[05]_\(c\|pf\)p_microcode\[i\]\(\[[012]\]\)\?[)]\([;][\n 	]*RADEON_WRITE[(]R\(ADEON\|600\)_CP_\(ME_RAM\|PFP_UCODE\)_DATA[HL]\?,[\n	 ]*R[SV0-9]*[05]_\(c\|pf\)p_microcode\[i\]\(\[[012]\]\)\?[)]\)*' 'drivers/gpu/drm/radeon/\(radeon\|r600\)_cp\.c'
 
     blob 'sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]cx\(23\(1xx\|855\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\)[ ]*[{]\([^}]*\|[^\n}][}]*\)[\n][}]\([\n][\n]*sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]cx\(23\(1xx\|855\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\)[ ]*[{]\([^}]*\|[^\n}][}]*\)[\n][}]\)*' Documentation/dvb/get_dvb_firmware
@@ -1053,7 +1047,7 @@ set_except () {
     blobna '[\n][	]scriptlen[ ]=[ ]sizeof[(]script[)][^;]*[;][\n][	]for[^{]*scriptlen[^{]*[{][^}]*[^\n	}]' drivers/media/dvb/dvb-usb/af9005-fe.c
 
     accept 'struct[ ]\(sp8870\|tda1004x\)_config[\n][{][^}]*[(][*]request_firmware[)][^}]*[\n][}][;]' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.h'
-    blob '[/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*get_dvb_firmware[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\([\n]\(#define[ ]\(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|["][^"]*["]\)[ ]\([^\n]\|[\\][\n]\)*\|[/][*][(]DEBLOBBED[)][*][/]\)\)*' 'drivers/media/dvb/frontends/\(nxt200x\|or51211\|sp887[0x]\|tda1004[8x]\)\.c'
+    blob '[/][*][/]*\([*]*[^*/][/]*\)*[*]*get_dvb_firmware[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\([\n]\(#define[ ]\(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|["][^"]*["]\)[ ]\([^\n]\|[\\][\n]\)*\|[/][*][(]DEBLOBBED[)][*][/]\)\)*' 'drivers/media/dvb/frontends/\(nxt200x\|or51211\|sp887[0x]\|tda1004[8x]\)\.c'
     blobname 'dvb-fe-sp8870\.fw' drivers/media/dvb/frontends/sp8870.c
     blobname 'dvb-fe-tda1004[56]\.fw' drivers/media/dvb/frontends/tda1004x.c
 
@@ -1074,21 +1068,21 @@ set_except () {
 
     blob 'static[ ]u32[ ]tigon2\?Fw\(Text\|Rodata\|Data\)\[[(]MAX_\(TEXT\|RODATA\|DATA\)_LEN[/]4[)][ ][+][ ]1\][ ]__devinitdata[ ]=[ ][{][^}]*[}][;]\([\n]static[ ]u32[ ]tigon2\?Fw\(Text\|Rodata\|Data\)\[[(]MAX_\(TEXT\|RODATA\|DATA\)_LEN[/]4[)][ ][+][ ]1\][ ]__devinitdata[ ]=[ ][{][^}]*[}][;]\)*' drivers/net/acenic_firwmare.h
     blob '#define[ ]tigon2\?Fw[^ ]*\(Addr\|Len\)[ ]0x[^\n]*\([\n]#define[ ]tigon2\?Fw[^ ]*\(Addr\|Len\)[ ]0x[^\n]*\)\+' drivers/net/acenic_firmware.h
-    blob '\([/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*Do[ ]not[ ]try[ ]to[ ]clear[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/][\n][	]\)\?ace_clear[^;]*[;][\n]\([^}]*[{][^}]*ace_copy[^}]*tigon2\?Fw[^}]*[}]\)*[\n]\+[	]return[ ]0[;][\n][}]' drivers/net/acenic.c
+    blob '\([/][*][/]*\([*]*[^*/][/]*\)*[*]*Do[ ]not[ ]try[ ]to[ ]clear[/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n][	]\)\?ace_clear[^;]*[;][\n]\([^}]*[{][^}]*ace_copy[^}]*tigon2\?Fw[^}]*[}]\)*[\n]\+[	]return[ ]0[;][\n][}]' drivers/net/acenic.c
     blob 'if[ ][(]\(ACE_IS_TIGON_I[(]ap[)]\|ap->version[ ]==[ ]2\)[)][\n][	][	]writel[(]tigon2\?FwStartAddr,[ ][&]regs->Pc[)][;]\([\n][	]if[ ][(]\(ACE_IS_TIGON_I[(]ap[)]\|ap->version[ ]==[ ]2\)[)][\n][	][	]writel[(]tigon2\?FwStartAddr,[ ][&]regs->Pc[)][;]\)*' drivers/net/acenic.c
 
     blob '#include[ ]["]starfire_firmware\.h["]' drivers/net/starfire.c
-    blob '[/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*Load[ ]Rx[/]Tx[ ]firmware[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\([\n][	]for[ ][(][^)]*FIRMWARE_[RT]X_SIZE[^)]*[)][\n][	][	]writel[^;]*firmware_[rt]x[^;]*[;]\)\+' drivers/net/starfire.c
+    blob '[/][*][/]*\([*]*[^*/][/]*\)*[*]*Load[ ]Rx[/]Tx[ ]firmware[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\([\n][	]for[ ][(][^)]*FIRMWARE_[RT]X_SIZE[^)]*[)][\n][	][	]writel[^;]*firmware_[rt]x[^;]*[;]\)\+' drivers/net/starfire.c
 
     blob 'static[ ]\(u8\|const[ ]u32\|struct[ ]fw_info\)[ ]bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)*[ ]=[ ][{][^}]*[}][;]\([\n][\n]*static[ ]\(u8\|const[ ]u32\|struct[ ]fw_info\)[ ]bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)*[ ]=[ ][{][^}]*[}][;]\)*' 'drivers/net/bnx2_fw2\?.h'
     blob '#include[ ]["]bnx2_fw\.h["][\n][\n]*#include[ ]["]bnx2_fw2\.h["]' drivers/net/bnx2.c
-    blob 'static[ ]void[\n]load_rv2p_fw[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/net/bnx2.c
-    blob 'static[ ]int[\n]bnx2_init_cpus[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/net/bnx2.c
+    blob 'static[ ]void[\n]load_rv2p_fw[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/bnx2.c
+    blob 'static[ ]int[\n]bnx2_init_cpus[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/bnx2.c
 
     # init_data_e1h? might actually be just data, but it doesn't
     # really matter.
     blob 'static[ ]const[ ]u32[ ]\(init\?\|[tucx]sem_\(int_table\|pram\)\)_data_e1h\?\[\][ ]=[ ][{][^}]*[}][;]\([\n][\n]*static[ ]const[ ]u32[ ]\(init\?\|[tucx]sem_\(int_table\|pram\)\)_data_e1h\?\[\][ ]=[ ][{][^}]*[}][;]\)*' drivers/net/bnx2x_init_values.h
-    blob 'static[ ]\(void[ ]\|const[ ]u32[ ][*]\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]\([\n][\n]*static[ ]\(void[ ]\|const[ ]u32[ ][*]\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)[(][^{]*[)][\n][{][\n]\([^}]\|[^\n}][}]*\)*[\n][}]\)*' 'drivers/net/bnx2x_init\(_ops\)\?\.h'
+    blob 'static[ ]\(void[ ]\|const[ ]u32[ ][*]\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]\([\n][\n]*static[ ]\(void[ ]\|const[ ]u32[ ][*]\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]\)*' 'drivers/net/bnx2x_init\(_ops\)\?\.h'
 
     blobname 'sun[/]cassini\.bin' drivers/net/cassini.c
 
@@ -1096,12 +1090,12 @@ set_except () {
     blobna 'for[ ][(][^\n]*ARRAY_SIZE[(]\(sr\|twinax\)_edc[)][^\n]*[)][\n][^;]*mdio_write[^;]*[;]' drivers/net/cxgb3/ael1002.c
     blobname '\(cxgb3[/]\)\?t3\(fw\|\(%c\|.\)_p\(rotocol_\)\?sram\)-\(%d\|[0-9]*\)\.\(%d\|[0-9]*\)\.\(%d\|[0-9]*\)\.bin' drivers/net/cxgb3/cxgb3_main.c
 
-    blob '\([/][*][*]*[*][/][\n]*\)*\([/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*Micro[ ]code[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*8086:[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\([\n]*[/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)*\|#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)\([\n]*[/][*][/]*\([*]*[^*/][^*/]*[/]*\|[*]*[*][/][\n]*[/][*]\)*[*]*Micro[ ]code[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*8086:[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\([\n]*[/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)*\|[\n][\n]*#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)*' drivers/net/e100.c
-    blobna '\([/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/][\n]*[	][	]\)\(ucode\[opts->\(timer\|bundle\|min_size\)_dword\][ ].=[ ][^;]*[;][\n][\n]*[	][	]\)*[^}]*UCODE_SIZE[^}]*cb_ucode[^}]*return[;][\n][	][}]' drivers/net/e100.c
+    blob '\([/][*][*]*[*][/][\n]*\)*\([/][*][/]*\([*]*[^*/][/]*\)*[*]*Micro[ ]code[/]*\([*]*[^*/][/]*\)*[*]*8086:[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\([\n]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)*\|#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)\([\n]*[/][*][/]*\([*]*[^*/][^*/]*[/]*\|[*]*[*][/][\n]*[/][*]\)*[*]*Micro[ ]code[/]*\([*]*[^*/][/]*\)*[*]*8086:[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\([\n]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)*\|[\n][\n]*#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)*' drivers/net/e100.c
+    blobna '\([/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n]*[	][	]\)\(ucode\[opts->\(timer\|bundle\|min_size\)_dword\][ ].=[ ][^;]*[;][\n][\n]*[	][	]\)*[^}]*UCODE_SIZE[^}]*cb_ucode[^}]*return[;][\n][	][}]' drivers/net/e100.c
 
     blob 'static[ ]unsigned[ ]char[ ]__devinitdata[ ]lanai4_\(code\|data\)\[[0-9]*\][ ]=[ ][{][^;]*[}][;]' drivers/net/myri_code.h
     blob '#include[ ]["]myri_code\.h["]' drivers/net/myri_sbus.c
-    blobna '\([/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/][\n	 ]*\)\?for[ ][(][^\n]*sizeof[(]lanai4_\(code\|data\)[^\n]*[)][\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_code_off[^;]*[;]\([\n	 ]*\([/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/][\n	 ]*\)\?for[ ][(][^\n]*sizeof[(]lanai4_\(code\|data\)[^\n]*[)][\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_\(code\|data\)_off[^;]*[;]\)*' drivers/net/myri_sbus.c
+    blobna '\([/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n	 ]*\)\?for[ ][(][^\n]*sizeof[(]lanai4_\(code\|data\)[^\n]*[)][\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_code_off[^;]*[;]\([\n	 ]*\([/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n	 ]*\)\?for[ ][(][^\n]*sizeof[(]lanai4_\(code\|data\)[^\n]*[)][\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_\(code\|data\)_off[^;]*[;]\)*' drivers/net/myri_sbus.c
 
     blob 'static[ ]u32[ ]s_firmLoad\[\][ ]=[ ][{][^;]*[}][;]' drivers/net/tehuti_fw.h
     blob 'bdx_tx_push_desc_safe[^;]*s_firmLoad[^;]*[;]' drivers/net/tehuti.c
@@ -1109,14 +1103,14 @@ set_except () {
 
     blob '[ ][*][ ]Firmware[ ]is:[\n][ ][*][	]Derived[ ]from[ ]proprietary[^/]*notice[ ]is[ ]accompanying[ ]it\.[\n][ ][*][/]' drivers/net/tg3.c
     blob 'Derived[ ]from[ ]proprietary[ ]unpublished[ ]source[ ]code' drivers/net/tg3.c
-    blob '\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\([\n][\n]*\(static[ ]const[ ]u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\|#if[ ]0\([ ][/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)\?[\n]\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;][\n]#endif\)\)*' drivers/net/tg3.c
+    blob '\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\([\n][\n]*\(static[ ]const[ ]u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\|#if[ ]0\([ ][/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?[\n]\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;][\n]#endif\)\)*' drivers/net/tg3.c
 
     blob 'static[ ]const[ ]u8[ ]typhoon_firmware_image\[\][ ]=[ ][{][^}]*[}][;]' drivers/net/typhoon-firmware.h
 
     blobna 'licensed[^\n]*strictly[ ]for[ ]use[^\n]*[\n]*[^\n]*COPS[ ]LocalTalk' 'drivers/net/appletalk/cops_\(ff\|lt\)drv\.h'
     blob 'static[ ]const[ ]unsigned[ ]char[ ]ffdrv_code\[\][ ]=[ ][{][^}]*[}][;]' drivers/net/appletalk/cops_ffdrv.h
     blob 'static[ ]const[ ]unsgined[ ]char[ ]ltdrv_code\[\][ ]=[ ][{][^}]*[}][;]' drivers/net/appletalk/cops_ltdrv.h
-    blob '#include[ ]["]cops_\(lt\|ff\)drv\.h["][ 	]*\([/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*Firmware[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)\?\([\n][\n]*#include[ ]["]cops_\(lt\|ff\)drv\.h["][ 	]*\([/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*Firmware[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)\?\)*' drivers/net/appletalk/cops.c
+    blob '#include[ ]["]cops_\(lt\|ff\)drv\.h["][ 	]*\([/][*][/]*\([*]*[^*/][/]*\)*[*]*Firmware[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?\([\n][\n]*#include[ ]["]cops_\(lt\|ff\)drv\.h["][ 	]*\([/][*][/]*\([*]*[^*/][/]*\)*[*]*Firmware[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?\)*' drivers/net/appletalk/cops.c
 
     blob 'static[ ]unsigned[ ]char[ ]bits_1200\[\][ ]*=[ ][{][^}]*[}][;]' drivers/net/hamradio/yam1200.h
     blob 'static[ ]unsigned[ ]char[ ]bits_9600\[\][ ]*=[ ][{][^}]*[}][;]' drivers/net/hamradio/yam9600.h
@@ -1128,7 +1122,7 @@ set_except () {
 
     blob 'static[ ]const[ ]u8[ ]microcode\[\][ ]=[ ][{][^}]*[}][ ]*[;]' drivers/net/tokenring/3c359_microcode.h
     blob '#include[ ]["]3c359_microcode\.h["]' drivers/net/tokenring/3c359.c
-    blobna 'start[ ]=[ ][(]0xFFFF[ ]-[ ][(]mc_size[)][^;]*[;][\n 	]*[/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/][\n 	]*printk[(]KERN_INFO[ ]["]3C359:[ ]Uploading[ ]Microcode:[ ]["][)][;][\n 	]*for[ ][(][^{]*\(mc_size[^{]*[)][ ][{][^}]*writeb[(]microcode\[\|[)][ ][{][^}]*writeb[(]microcode\[mc_size\)[^}]*[}]\([\n][ 	]*printk[^\n]*[;][\n 	]*for[ ][(][^{]*\(mc_size[^{]*[)][ ][{][^}]*writeb[(]microcode\[\|[)][ ][{][^}]*writeb[(]microcode\[mc_size\)[^}]*[}]\)*' drivers/net/tokenring/3c359.c
+    blobna 'start[ ]=[ ][(]0xFFFF[ ]-[ ][(]mc_size[)][^;]*[;][\n 	]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n 	]*printk[(]KERN_INFO[ ]["]3C359:[ ]Uploading[ ]Microcode:[ ]["][)][;][\n 	]*for[ ][(][^{]*\(mc_size[^{]*[)][ ][{][^}]*writeb[(]microcode\[\|[)][ ][{][^}]*writeb[(]microcode\[mc_size\)[^}]*[}]\([\n][ 	]*printk[^\n]*[;][\n 	]*for[ ][(][^{]*\(mc_size[^{]*[)][ ][{][^}]*writeb[(]microcode\[\|[)][ ][{][^}]*writeb[(]microcode\[mc_size\)[^}]*[}]\)*' drivers/net/tokenring/3c359.c
 
     blobname 'tr_smctr\.bin' drivers/net/tokenring/smctr.c
 
@@ -1141,7 +1135,7 @@ set_except () {
     blob 'unsigned[ ]short[ ]sbus_risc_code01\[\][ ]__devinitdata[ ]=[ ][{][^}]*[}][;]' drivers/scsi/qlogicpti_asm.c
     blob '#include[ ]["]qlogicpti_asm\.c["]' drivers/scsi/qlogicpti.c
 
-    blob '\([/][*][ ]Microcode[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/][\n]*\)\?static[ ]\(u\(nsigned[ ]\)\?char\|unsigned[ ]short\|ADV_DCNT\)[ ]_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\][ ]=[ ][{][^}]*[}]\|size[ ]=[ ]sizeof[^;]*\|chksum[ ]=[ ]0x[^;]*\)[;]\([ 	]*[/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)\?\([\n][\n]*\([/][*][ ]Microcode[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/][\n]*\)\?static[ ]\(u\(nsigned[ ]\)\?char\|unsigned[ ]short\|ADV_DCNT\)[ ]_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\][ ]=[ ][{][^}]*[}]\|size[ ]=[ ]sizeof[^;]*\|chksum[ ]=[ ]0x[^;]*\)[;]\([ 	]*[/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]\)\?\)*' drivers/scsi/advansys.c
+    blob '\([/][*][ ]Microcode[/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n]*\)\?static[ ]\(u\(nsigned[ ]\)\?char\|unsigned[ ]short\|ADV_DCNT\)[ ]_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\][ ]=[ ][{][^}]*[}]\|size[ ]=[ ]sizeof[^;]*\|chksum[ ]=[ ]0x[^;]*\)[;]\([ 	]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?\([\n][\n]*\([/][*][ ]Microcode[/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n]*\)\?static[ ]\(u\(nsigned[ ]\)\?char\|unsigned[ ]short\|ADV_DCNT\)[ ]_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\][ ]=[ ][{][^}]*[}]\|size[ ]=[ ]sizeof[^;]*\|chksum[ ]=[ ]0x[^;]*\)[;]\([ 	]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?\)*' drivers/scsi/advansys.c
 
     blob '\(#ifdef[ ]UNIQUE_FW_NAME[\n]\)\?static[ ]unsigned[ ]short[ ]\(risc\|fw12\(80e\|160\)i\)_code01\[\][ ]=[ ][{]\([\n]#else[\n]static[ ]unsigned[ ]short[ ]risc_code01\[\][ ]=[ ][{][\n]#endif[\n]\)\?[^}]*[}][;]\([\n][\n]*\(#ifdef[ ]UNIQUE_FW_NAME[\n]\)\?static[ ]unsigned[ ]short[ ]\(risc_code\|fw12\(80e\|160\)i\)_length01[ ]=[ ][^;]*[;]\([\n]#else[\n]static[ ]unsigned[ ]short[ ]risc_code_length01[ ]=[ ][^;]*[;][\n]#endif\)\?\)\?' 'drivers/scsi/ql1\(04\|2\(8\|16\)\)0_fw\.h'
 
@@ -1152,7 +1146,7 @@ set_except () {
     blobname 'keyspan[/]\(mpr\|usa\(18x\|19\(q[iw]\|w\)\?\|28\(x\(a\|b\)\?\)\?\|49w\(lc\)\?\)\)\.fw' drivers/usb/serial/keyspan.c
 
     accept '[	][	]fw_name[ ]=[ ]["]keyspan_pda[/]\(keyspan_pda\|xircom_pgs\)\.fw["][;]' drivers/usb/serial/keyspan_pda.c
-    blobna 'fw_name[ ]=[ ]\([^}]\|[^\n}][}]*\)*\([/][*]KEYSPAN_PDA[*][/]\)\?request_ihex_firmware' drivers/usb/serial/keyspan_pda.c
+    blobna 'fw_name[ ]=[ ]\([\n]*[^\n}][}]*\)*\([/][*]KEYSPAN_PDA[*][/]\)\?request_ihex_firmware' drivers/usb/serial/keyspan_pda.c
     accept '[	]if[ ][(][/][*]KEYSPAN_PDA[*][/]request_ihex_firmware' drivers/usb/serial/keyspan_pda.c
 
     blobname 'edgeport[/]\(boot\|down\)2\?\.fw' drivers/usb/serial/io_edgeport.c
@@ -1215,8 +1209,8 @@ set_except () {
     blobname 'cyzfirm\.bin' drivers/char/cyclades.c
 
     accept 'MODULE_FIRMWARE[(]["]dsp56k[/]bootstrap\.bin["][)][;]' drivers/char/dsp56k.c
-    blobna 'const[ ]char[ ]fw_name\[\][ ]=[ ]["]dsp56k[/]bootstrap\.bin["][;]\([^}]\|[^\n}][}]*\)*request_firmware\([^}]\|[^\n}][}]*\)*[\n][	]err[ ]=[ ]request_firmware[(][&]fw,[ ]fw_name,[ ]' drivers/char/dsp56k.c
-    accept '[	]const[ ]char[ ]fw_name\[\][ ]=[ ]["]dsp56k[/]bootstrap\.bin["][;]\([^}]\|[^\n}][}]*\)*[\n][	]err[ ]=[ ]request_firmware[(][&]fw,[ ]fw_name,[ ]' drivers/char/dsp56k.c
+    blobna 'const[ ]char[ ]fw_name\[\][ ]=[ ]["]dsp56k[/]bootstrap\.bin["][;]\([\n]*[^\n}][}]*\)*request_firmware\([\n]*[^\n}][}]*\)*[\n]\+[	]err[ ]=[ ]request_firmware[(][&]fw,[ ]fw_name,[ ]' drivers/char/dsp56k.c
+    accept '[	]const[ ]char[ ]fw_name\[\][ ]=[ ]["]dsp56k[/]bootstrap\.bin["][;]\([\n]*[^\n}][}]*\)*[\n]\+[	]err[ ]=[ ]request_firmware[(][&]fw,[ ]fw_name,[ ]' drivers/char/dsp56k.c
 
     blobname 'isi\(6\(08\|\(08\|16\)em\)\|46\(08\|16\)\)\.bin' drivers/char/isicom.c
 
@@ -1237,10 +1231,10 @@ set_except () {
     blobname 'dvb-fe-xc5000-1\.1\.fw' drivers/media/common/tuners/xc5000.c
 
     blobname '4210\(100[12]\|%4X\)\.sb' drivers/net/irda/irda-usb.c
-    blobna '[/][*][ 	\n*]*[ ]Known[ ]firmware[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*\(STIR421x\|4210\(100[12]\|%4X\)\.sb\)[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]' drivers/net/irda/irda-usb.c
+    blobna '[/][*][ 	\n*]*[ ]Known[ ]firmware[/]*\([*]*[^*/][/]*\)*[*]*\(STIR421x\|4210\(100[12]\|%4X\)\.sb\)[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/net/irda/irda-usb.c
 
     blobname 'myri10ge_\(rss_\)\?ethp\?_z8e\.dat' drivers/net/myri10ge.c
-    blobna 'If[ ]the[ ]driver[ ]can[ ]neither[ ]enable[ ]ECRC[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*myri10ge_\(rss_\)\?ethp\?_z8e\.dat[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]' drivers/net/myri10ge.c
+    blobna 'If[ ]the[ ]driver[ ]can[ ]neither[ ]enable[ ]ECRC[/]*\([*]*[^*/][/]*\)*[*]*myri10ge_\(rss_\)\?ethp\?_z8e\.dat[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/net/myri10ge.c
 
     blobname 'spider_fw\.bin' drivers/net/spider_net.h
 
@@ -1261,7 +1255,7 @@ set_except () {
     blobna 'if[ ][(]IPW2100_FW_MAJOR[^{]*[{][^}]*[	][}]' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2100\.c'
     blobname '["]["][ ]x[ ]["]\.fw["]' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2100\.c'
 
-    accept '[/][*][ ]Call[ ]this[ ]function[ ]from[ ]process[ ]context[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*request_firmware' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2200.c'
+    accept '[/][*][ ]Call[ ]this[ ]function[ ]from[ ]process[ ]context[/]*\([*]*[^*/][/]*\)*[*]*request_firmware' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2200.c'
     blobname 'ipw2200-\(i\?bss\|sniffer\)\.fw' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2200.c'
     accept '[	][	]IPW_ERROR[(]["]%s[ ]request_firmware[ ]failed' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2200.c'
 
@@ -1279,7 +1273,7 @@ set_except () {
     blobname 'sd\(8385\|868[68]\)\(_helper\)\?\.bin' drivers/net/wireless/libertas/if_sdio.c
     accept '[	]*card->firmware[ ]=[ ]\(if_sdio\|lbs_fw\)' drivers/net/wireless/libertas/if_sdio.c
     blobname 'usb8388\(-5\.126\.0\.p5\)\?\.bin' drivers/net/wireless/libertas/if_usb.c
-    blob '[/][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*usb8388\(-5\.126\.0\.p5\)\?\.bin[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]' drivers/net/wireless/libertas/if_usb.c
+    blob '[/][*][/]*\([*]*[^*/][/]*\)*[*]*usb8388\(-5\.126\.0\.p5\)\?\.bin[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/net/wireless/libertas/if_usb.c
     accept '[	][	]lbs_pr_err[(]["]request_firmware\([(][)]\)\?[ ]failed' 'drivers/net/wireless/if_\(spi\|usb\)\.c'
     blobna 'o\.[ ]Copy[ ]the[ ]firmware[ ]image[^\n]*usb8388\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/libertas/README
     blobna '\[fw_name=usb8388[^]]*\]' drivers/net/wireless/libertas/README
@@ -1291,7 +1285,7 @@ set_except () {
     blobname 'lbtf_usb\.bin' drivers/net/wireless/libertas_tf/if_usb.c
 
     blobname 'isl38\(86\|87\|90\)\(usb\(_bare\)\?\)\?' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
-    blob '[/][*][ ]for[ ]isl3886[ ]register[ ]definitions[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]' drivers/net/wireless/p54/p54usb.h
+    blob '[/][*][ ]for[ ]isl3886[ ]register[ ]definitions[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/net/wireless/p54/p54usb.h
     blobna 'If[ ]you[ ]enable[ ]this\([^\n]\|[\n][ 	]*[^ 	\n]\)*isl3890\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/Kconfig
 
     blobname 'isl38\(77\|86\|90\)' drivers/net/wireless/prism54/islpci_dev.c
@@ -1387,7 +1381,7 @@ set_except () {
 
     blobname 'aica_firmware\.bin' sound/sh/aica.c
 
-    accept '[ ][*][/]*\([*]*[^*/][^*/]*[/]*\)*[*]*Caution:[ ]This[ ]API[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*request_firmware.' sound/sound_firmware.c
+    accept '[ ][*][/]*\([*]*[^*/][/]*\)*[*]*Caution:[ ]This[ ]API[/]*\([*]*[^*/][/]*\)*[*]*request_firmware.' sound/sound_firmware.c
     accept 'static[ ]int[ ]do_mod_firmware_load[(]' sound/sound_firmware.c
     accept 'int[ ]mod_firmware_load[(]' sound/sound_firmware.c
     accept '[	]r[ ]=[ ]do_mod_firmware_load[(]' sound/sound_firmware.c
@@ -1443,7 +1437,7 @@ set_except () {
 
     blobname 'dvb-fe-nxt2002\.fw' drivers/media/dvb/frontends/nxt200x.c
 
-    blob '[/][*][\n][ ][*][ ]This[ ]driver[ ]needs[ ]two[ ]external[ ]firmware[ ]files[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*dvb-fe-or51132-\(vsb\|qam\)\.fw[/]*\([*]*[^*/][^*/]*[/]*\)*[*]*[*][/]' drivers/media/dvb/frontends/or51132.c
+    blob '[/][*][\n][ ][*][ ]This[ ]driver[ ]needs[ ]two[ ]external[ ]firmware[ ]files[/]*\([*]*[^*/][/]*\)*[*]*dvb-fe-or51132-\(vsb\|qam\)\.fw[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/media/dvb/frontends/or51132.c
     blobname 'dvb-fe-or51132-\(vsb\|qam\)\.fw' drivers/media/dvb/frontends/or51132.c
 
     blobname 'dvb-fe-or51211\.fw' drivers/media/dvb/frontends/or51211.c
@@ -1633,7 +1627,7 @@ set_except () {
     # These are regarded as ok
     initnc 'static[ ]const[ ]u8[ ]SN9C102_\(Y\|UV\)_QTABLE[01]\[64\][ ]=[ ][{]'
     initnc '[	]static[ ]\(const[ ]\)\?u8[ ]jpeg_header\[589\][ ]=[ ][{]' media/video/sn9c102/sn9c102_core.c
-    accept '[	]\{1,2\}err[ ]=[ ]sn9c102_write_const_regs[(]cam\(,[ 	\n]\+[{]0x[0-9a-fA-F][0-9a-fA-F],[ ]0x[0-9a-fA-F][0-9a-fA-F][}]\)*[)][;]'
+    accept '[	][	]\?err[ ]=[ ]sn9c102_write_const_regs[(]cam\(,[ 	\n]\+[{]0x[0-9a-fA-F][0-9a-fA-F],[ ]0x[0-9a-fA-F][0-9a-fA-F][}]\)*[)][;]'
 
     # too lax?
     defsnc 'static[ ]yyconst[ ]\(flex_int\(16\|32\)_t\|\(\(short[ ]\)\?int\)\)[ ]yy_[^[]*\[[][0-9]*\][ ]='
@@ -2083,7 +2077,7 @@ set_except () {
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]onenand_oob_128[ ]=' drivers/mtd/onenand/onenand_base.c
     blobname 'bnx2x-e1h\?-\([0-9.%d]*\.fw\)\?' drivers/net/bnx2x_main.c
     blob '#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\([\n]#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\)*' drivers/net/bnx2x_hsi.h
-    blob 'static[ ]int[ ]__devinit[ ]bnx2x_check_firmware[(]struct[ ]bnx2x[ ][*]bp[)][\n][{]\([^}]\|[^\n}][}]*\)*[\n][}]' drivers/net/bnx2x_main.c
+    blob 'static[ ]int[ ]__devinit[ ]bnx2x_check_firmware[(]struct[ ]bnx2x[ ][*]bp[)][\n][{]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/bnx2x_main.c
     blobna 'if[ ][(][(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\([ ][|][|][\n][ 	]*[(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\)*[)][ ][{][^{}]*[}]' drivers/net/bnx2x_main.c
     blobna 'sprintf[(]fw_file_name[ ][+][ ]offset,[ ]["]%d[.]%d[.]%d[.]%d[.]fw["]\(,[\n][ 	]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)*[)][;]' drivers/net/bnx2x_main.c
     blob 'rc[ ]=[ ]bnx2x_check_firmware[(]bp[)][;]' drivers/net/bnx2x_main.c
@@ -2132,11 +2126,11 @@ set_except () {
     defsnc '[	][}][ ]common_modes\[17\][ ]=' drivers/gpu/drm/radeon/radeon_connectors.c
     defsnc '[	][	]*\(static[ ]\)\?struct[ ]phy_reg[ ]phy_reg_init\(_0\)\?\[\][ ]=' drivers/net/r8169.c
     accept '[	][	]*struct[ ]phy_reg[ ]phy_reg_init_1\[\][ ]=[ ][{][^;]*0x8300[^;]*[}][;]' drivers/net/r8169.c
-    blob 'static[ ]void[ ]rtl8168d_[12]_hw_phy_config[(]void[ ]__iomem[ ][*]ioaddr[)][\n][{][\n]\([^}]*\|[^\n}][}]*\)*[\n][}]' drivers/net/r8169.c
+    blob 'static[ ]void[ ]rtl8168d_[12]_hw_phy_config[(]void[ ]__iomem[ ][*]ioaddr[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/r8169.c
     blobna 'rtl8168d_[12]_hw_phy_config[(]ioaddr[)][;]' drivers/net/r8169.c
     blobna 'static[ ]struct[ ]phy_reg_init_[12]\[\][ ]=[ ][{][\n 	{}0-9a-fx]*0x06,[ ]0xf8f9[\n 	{}0-9a-fx]*[}][;]' drivers/net/r8169.c
     # This loads firmware to be flashed from filename provided through ethtool.
-    accept 'int[ ]be_load_fw[(][^\n;{]*[)][ \n][{]\([^}]*\|[^\n}][}]*\)*ETHTOOL_FLASH_MAX_FILENAME\([^}]*\|[^\n}][}]*\)*be_cmd_get_fw_ver\([^}]*\|[^\n}][}]*\)*request_firmware\([^}]*\|[^\n}][}]*\)*[\n][}]' drivers/net/benet/be_main.c
+    accept 'int[ ]be_load_fw[(][^\n;{]*[)][ \n][{]\([\n]*[^\n}][}]*\)*ETHTOOL_FLASH_MAX_FILENAME\([\n]*[^\n}][}]*\)*be_cmd_get_fw_ver\([\n]*[^\n}][}]*\)*request_firmware\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/benet/be_main.c
     defsnc '[	]u8[ ]init_hash_seed\[\][ ]=' drivers/net/qlge/qlge_main.c
     defsnc 'static[ ]const[ ]u_int32_t[ ]ar9287\(Common\|Modes\(_\([tr]x_gain\)\)\?\)_9287_1_[01]\[\]\[[236]\][ ]=' drivers/net/wireless/ath9k/initvals.h
     defsnc 'static[ ]const[ ]u_int32_t[ ]ar9271\(Common\|Modes\)_9271_1_0\[\]\[[26]\][ ]=' drivers/net/wireless/ath9k/initvals.h
@@ -2180,7 +2174,7 @@ set_except () {
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]hwecc4_2048[ ]__initconst[ ]=' drivers/mtd/nand/davinci_nand.c
     defsnc 'static[ ]const[ ]u16[ ]wm8974_reg\[WM8974_CACHEREGNUM\][ ]=' sound/soc/codecs/wm8974.c
     defsnc 'static[ ]const[ ]u16[ ]ak4642_reg\[AK4642_CACHEREGNUM\][ ]=' sound/soc/codecs/ak4642.c
-    accept 'int[ ]snd_hda_load_patch[(][^\n;{]*[)][ \n][{]\([^}]*\|[^\n}][}]*\)*hda_codec\([^}]*\|[^\n}][}]*\)*request_firmware\([^}]*\|[^\n}][}]*\)*[\n][}]' sound/pci/hda/hda_hwdep.c
+    accept 'int[ ]snd_hda_load_patch[(][^\n;{]*[)][ \n][{]\([\n]*[^\n}][}]*\)*hda_codec\([\n]*[^\n}][}]*\)*request_firmware\([\n]*[^\n}][}]*\)*[\n]\+[}]' sound/pci/hda/hda_hwdep.c
     accept '[ ][ ][ ]Bit[ 0-7]*' Documentation/input/sentelic.txt
     accept 'The[ ]hd-audio[ ]driver[ ]reads[ ]the[ ]file[ ]via[ ]request_firmware[(][)]\.' Documentation/sound/alsa/HD-Audio.txt
     blob 'SD8688[ ]firmware:[\n]*\([/]lib[/]firmware[^\n]*[\n]*\)*The[ ]images[^:]*:[\n]*[^\n]*[/]linux-firmware[^\n]*' Documentation/btmrvl.txt
@@ -2188,7 +2182,7 @@ set_except () {
     defsnc 'static[ ]int[ ]zoom2_batt_table\[\][ ]=' arch/arm/mach-omap2/board-zoom2.c
     defsnc 'static[ ]struct[ ]ad714x_platf\(or\|ro\)m_data[ ]ad714[27]_platf\(or\|ro\)m_data[ ]=' arch/blackfin/mach-bf537/boards/stamp.c
     blob 'static[ ]const[ ]u8[ ]lgs8g75_initdat\[\][ ]=[ ][{][^;]*[}][;]' drivers/media/dvb/frontends/lgs8gxx.c
-    blob 'static[ ]int[ ]lgs8g75_init_data[(][^\n;{]*[)][ \n][{]\([^}]*\|[^\n}][}]*\)*lgs8g75_initdat\([^}]*\|[^\n}][}]*\)*[\n][}]' drivers/media/dvb/frontends/lgs8gxx.c
+    blob 'static[ ]int[ ]lgs8g75_init_data[(][^\n;{]*[)][ \n][{]\([\n]*[^\n}][}]*\)*lgs8g75_initdat\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/media/dvb/frontends/lgs8gxx.c
     defsc 'static[ ]struct[ ]idxdata[ ]tbl_common_[a-e]\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi2020\|mi1320\|ov9655\|ov2640\)\.c'
     defsnc 'static[ ]struct[ ]validx[ ]tbl_\(commm\?on\|init_\(at_startup\|post_alt\)\|sensor_settings_common_[ab]\|big_[abc]\|640\|800\)\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi2020\|mi1320\|ov9655\|ov2640\).c'
     defsnc 'static[ ]u8[ ][*]tbl_\(640\|800\)\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi1320\|ov9655\).c'
@@ -2582,7 +2576,7 @@ set_except () {
 constx="[0-9][0-9a-fA-FxX]*"
 # Regular expression that matches a separator between consecutive
 # literal constants.
-sepx="\\([,:{} 	\\nLlUu\"\'\\\\]\\+[xX\$]\\?\\|[ 	\\n]*[.][a-zA-Z][a-zA-Z0-9]*[ 	]\\+[\$]\\?\\)"
+sepx="\\([ 	\\n]*\\(\\([ 	\\n]\\|[,:{}LlUu\"\'\\\\][,:{} 	\\nLlUu\"\'\\\\]*\\)[xX\$]\\?\\|[.][a-zA-Z][a-zA-Z0-9]*[ 	]\\+[\$]\\?\\)\\)"
 
 # Regular expression that matches a continuation of a blob, after an
 # initial constant.  *, \+ and \? can be safely appended to it without
@@ -2609,22 +2603,22 @@ bol="\\(^\\|[\\n]\\)"
 eol="\\([\\n]\\|\$\\)"
 
 # Regular expression that matches a C-style comment.
-comment="\\([/][*][/]*\\([*]*[^*/][^*/]*[/]*\\)*[*]*[*][/]\\|[/][/][^\\n]*[\\n]\\)"
+comment="\\([/]\\([*][/]*\\([*]*[^*/][/]*\\)*[*]\\+[/]\\|[/][^\\n]*[\\n]\\)\\)"
 
 # Regular expression that matches comments typically used in assembly.
 asmcomment="\\($comment\\|[;#][^\\n]*[\\n]\\)"
 
 # Regular expression that matches a braced initializer containing at
 # least one blob.
-initblob="[^\\n]*=\\([ 	\\n\\\\]*\\|$comment\\)*[{]\\([^;]*\\|$comment\\)*$blobseq\\([^;]*\\|$comment\\)*[}]\\?\\([ 	\\n\\\\]*\\|$comment\\)[;]\\?"
+initblob="[^\\n=]*=\\([ 	\\n\\\\]\\|$comment\\)*[{]\\([^;]\\|$comment\\)*$blobseq\\([^;]\\|$comment\\)*[}]\\?\\([ 	\\n\\\\]*\\|$comment\\)[;]\\?"
 
 # Regular expression that matches a C (possibly multi-line) #define
 # that contains a blob.
-defineblob='[ 	]*#[ 	]*define[ 	]\+\([^\n]*\\[\n]\)*[^\n]*'"$blobseq"'\([^\n]*\\[\n]\)*'
+defineblob='[ 	]*#[ 	]*define[ 	][^\n]*\([\\][\n][^\n]*\)*'"$blobseq"'\([^\n]*\\[\n]\)*'
 
 # Regular expression that matches an assembly label followed by a blob
 # without any intervening label.
-asmblob="[a-zA-Z_.][^\\n:;#/ 	]*[ ]*:\\([^:{}]*\\|$asmcomment\\)*$blobseq\\([^:]*\\|$asmcomment\\)*"
+asmblob="[a-zA-Z_.][^\\n:;#/ 	]*:\\([^:{}]\\|$asmcomment\\)*$blobseq\\([^:]*\\|$asmcomment\\)*"
 
 # Set up the sed script that will go through the (processed) input,
 # looking for sequences of blobs and printing whatever was requested.
@@ -2639,11 +2633,11 @@ asmblob="[a-zA-Z_.][^\\n:;#/ 	]*[ ]*:\\([^:{}]*\\|$asmcomment\\)*$blobseq\\([^:]
 # $4 is the action for every complete input pattern.
 
 set_sed_main () {
-  falsepos=`sed -n 's,^[+]\^*,,p' < "$regex_name" |
-    sed -n -e 's,[$]$,\\\\([\\\\n]\\\\|$\\\\),' \
+  falsepos=`${SED-sed} -n 's,^[+]\^*,,p' < "$regex_name" |
+    ${SED-sed} -n -e 's,[$]$,\\\\([\\\\n]\\\\|$\\\\),' \
 	-e '1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
-  blobs=`sed -n 's,^[-],,p' < "$regex_name" |
-    sed -n -e 's,[$]$,\\\\([\\\\n]\\\\|$\\\\),' \
+  blobs=`${SED-sed} -n 's,^[-],,p' < "$regex_name" |
+    ${SED-sed} -n -e 's,[$]$,\\\\([\\\\n]\\\\|$\\\\),' \
 	-e '1h; 1!H; ${g;s,[\n],\\\\|,g;s,^\(..*\)$,\\\\(\1\\\\),;p;}'`
 
   # Regular expression that matches one or more blobs without
@@ -3213,7 +3207,7 @@ b list_both
 
 " > "$scriptname"
 
-  scriptcmd='$sed -n -f "$scriptname"'
+  scriptcmd='${SED-sed} -n -f "$scriptname"'
 
   sedunbreak='
 : restart
@@ -3225,7 +3219,7 @@ b list_both
 }
 p
 '
-  scriptcmd2='$sed -n -e "$sedunbreak"'
+  scriptcmd2='${SED-sed} -n -e "$sedunbreak"'
 }
 
 set_flex_main () {
@@ -3237,7 +3231,7 @@ s,[-]$, { blob (); },
 '     
 
   echo '%%' > "$scriptname"
-  sed "$adjust_rx" < "$regex_name" >> "$scriptname"
+  ${SED-sed} "$adjust_rx" < "$regex_name" >> "$scriptname"
   echo '\n|. { unmatched (); }
 %%
 int falsepos () {}
@@ -3288,25 +3282,25 @@ $@ = 1
 EOF
 
   if test "X$DEBLOB_CHECK_PYTHON_REGEX" = Xdebug; then
-    sed -e "$adjust_rx" \
+    ${SED-sed} -e "$adjust_rx" \
 	-e 's,\([^-+]*\)\(.*\),re.compile (r'"'\\2'"'),g' \
 	< "$regex_name" >> "$scriptname"
   fi
 
-  sed -n 's,^[+],,p' < "$regex_name" |
-    sed -n -e "$adjust_rx" -e 's,\^,,' \
+  ${SED-sed} -n 's,^[+],,p' < "$regex_name" |
+    ${SED-sed} -n -e "$adjust_rx" -e 's,\^,,' \
 	-e '1h; 1!H; $ { g; s,[\n],|,g; '"\
 s,^\\(.*\\)\$,falsepos = r'(?P<falsepos>\\1)',;\
 "' p;}' >> "$scriptname"
 
-  sed -n 's,^[-],,p' < "$regex_name" |
-    sed -n -e "$adjust_rx" \
+  ${SED-sed} -n 's,^[-],,p' < "$regex_name" |
+    ${SED-sed} -n -e "$adjust_rx" \
 	-e '1h; 1!H; $ { g; s,[\n],|,g; '"\
 s,^\\(.*\\)\$,blob = r'(?P<blob>\\1)',;\
 "' p;}' >> "$scriptname"
 
   echo "\\($initblob\\|$defineblob\\|$asmblob\\)" | 
-    sed -e "$adjust_rx" \
+    ${SED-sed} -e "$adjust_rx" \
         -e "s,^\\(.*\\)\$,cblob = r'(?P<cblob>\\1)'," >> "$scriptname"
 
   cat >> "$scriptname" <<\EOF
@@ -3314,18 +3308,16 @@ s,^\\(.*\\)\$,blob = r'(?P<blob>\\1)',;\
 if no_falsepos or falsepos is None:
     falsepos = r'(?!)'
 
-# Use non-greedy operator to skip partial line before blob, to avoid
-# skipping blobs when more than one appears in the same line.
-rx = '^%s|[^\n]*?%s' % (falsepos, blob)
+rx = '^%s|%s' % (falsepos, blob)
 
 if with_context:
     rx += '|^' + cblob
 
-rxc = re.compile(rx, re.M | re.S)
+rxc = re.compile('(?<=.)(?:%s)' % rx, re.M | re.S)
 
 filenames = None
 
-s = ''
+s = '\n'
 
 for line in sys.stdin:
     # Read into s all lines between begin and end.  An empty line, without
@@ -3333,7 +3325,7 @@ for line in sys.stdin:
     if line[:3] == ';/*' and line[-4:] == '*/;\n':
         if line[3:9] == 'begin ':
             nextfilenames = (line[9:-4], filenames)
-            if s == '':
+            if s == '\n':
                 filenames = nextfilenames
                 del nextfilenames
                 continue
@@ -3345,7 +3337,7 @@ for line in sys.stdin:
             s += line
             continue
     else:
-	assert filenames != None
+        assert filenames != None
         s += line
         continue
         
@@ -3353,7 +3345,7 @@ for line in sys.stdin:
             print 'looking for matches'
             sfilenames = filenames
             while filenames != None:
-            	if filenames[0] == name_to_list:
+                if filenames[0] == name_to_list:
                     print name_to_list
                     assert filenames[1] == None
                 else:
@@ -3365,53 +3357,56 @@ for line in sys.stdin:
     if s[-1] == '\n':
         s = s[:-1]
 
-    pp = p = pend = 0
+    pp = 1
+    p = pend = 0
     match = rxc.search (s, p)
     while match != None:
         firstmatch = match
         blobs = falses = 0
-        while match != None:
+        while 1:
             if verbose:
                 print 'found match'
             what = match.lastgroup
 
             if what == 'cblob':
-		if verbose: print 'match is a blob context'
-		pend = match.end()
+                if verbose: print 'match is a blob context'
+                pend = s.find ('\n', match.end()) + 1
+                if pend == 0:
+                    pend = len(s)
                 p = match.start() + 1
-                match = rxc.search (s, p)
-                continue
-
-            blob_p = what == 'blob'
-            assert blob_p or what == 'falsepos'
-
-            if blob_p:
-		if verbose: print 'match is a blob'
-                blobs += 1
             else:
-		if verbose: print 'match is a false positive'
-                falses += 1
+                blob_p = what == 'blob'
+                assert blob_p or what == 'falsepos'
+
+                if blob_p:
+                    if verbose: print 'match is a blob'
+                    blobs += 1
+                else:
+                    if verbose: print 'match is a false positive'
+                    falses += 1
             
-            assert match.end(what) == match.end()
-            if blob_p and replace_blob or not blob_p and replace_falsepos:
-                s = s[:match.start(what)] + replacement + s[match.end():]
-                p = match.start(what) + len(replacement)
-            else:
-                p = match.end()
+                if blob_p and replace_blob or not blob_p and replace_falsepos:
+                    s = s[:match.start(what)] + replacement + s[match.end(what):]
+                    p = match.start(what) + len(replacement)
+                    if pend > match.start(what):
+                        pend += p - match.end(what)
+                else:
+                    p = match.end(what)
 
-            match = rxc.match (s, p)
-        
+                if p > pend:
+                    pend = s.find ('\n', p) + 1
+                    if (pend == 0):
+                        pend = len(s)
+
+            match = rxc.search (s, p)
+            if match == None or match.start () >= pend:
+                break
+
         if print_nomatch:
-            sys.stdout.write (s[pp:firstmatch.start()])
-        pp = firstmatch.start()
-
-	if (p < pend):
-	    p = pend
-
-        p = s.find ('\n', p)
-        if p == -1:
-            p = len(s)
-        p += 1
+            sys.stdout.write (s[pp:firstmatch.start() + 1])
+            pp = firstmatch.start() + 1
+        else:
+            pp = s.rfind ('\n', 0, firstmatch.start () + 1) + 1
 
         if print_blob and blobs or print_falsepos and falses:
             if not print_nomatch:
@@ -3424,12 +3419,12 @@ for line in sys.stdin:
                         assert filenames[1] != None
                     filenames = filenames[1]
                 filenames = sfilenames
-            sys.stdout.write (s[pp:p])
-            pp = p
+            sys.stdout.write (s[pp:pend])
+            pp = pend
 
         if list_blob and blobs or list_falsepos and falses:
             while filenames != None:
-            	if filenames[0] == name_to_list:
+                if filenames[0] == name_to_list:
                     print name_to_list
                     assert filenames[1] == None
                 else:
@@ -3438,15 +3433,13 @@ for line in sys.stdin:
                 filenames = filenames[1]
             exit (1)
 
-        match = rxc.search (s, p)
-
     if print_nomatch:
         sys.stdout.write(s[pp:])
 
     if verbose:
         print 'no further matches'
 
-    s = ''
+    s = '\n'
     filenames = nextfilenames
     del nextfilenames
 
@@ -3456,6 +3449,208 @@ exit (0)
 EOF
 
   scriptcmd="${PYTHON-python} "'"$scriptname"'
+}
+
+set_perl_main () {
+  adjust_rx='
+s,\\(,\\(?:,g;
+s,\\\([{(|)}?+]\),\1,g;
+'
+
+  # Add $ before arguments
+  set `echo "$@" | sed 's,\(^\|= *\),&$,g'`
+
+  cat >> "$scriptname" <<\EOF
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+# Should we replace blobs and false positives with replacement?
+my $replace_blob = 0;
+my $replace_falsepos = 0;
+my $replacement = '/*(DEBLOBBED)*/';
+
+# Should we print lines containing blobs, false positives, and neither?
+my $print_blob = 0;
+my $with_context = 0;
+my $print_falsepos = 0;
+my $print_nomatch = 0;
+
+# Should we print name_to_list and exit if we find blobs or false positives?
+my $list_blob = 0;
+my $list_falsepos = 0;
+
+# Should we forget everything we know about false positives?
+my $falsepos;
+my $no_falsepos = 0;
+
+EOF
+
+  cat >> "$scriptname" <<EOF
+my \$name_to_list = '$input';
+
+my \$verbose = $vp;
+
+# Which of the defaults above should we override?
+$@ = 1;
+
+EOF
+
+  ${SED-sed} -n 's,^[+],,p' < "$regex_name" |
+    ${SED-sed} -n -e "$adjust_rx" -e 's,\^,,' \
+	-e '1h; 1!H; $ { g; s,[\n],|,g; '"\
+s,^\\(.*\\)\$,\$falsepos = qr'(?<falsepos>\\1)'ms;,;\
+"' p;}' >> "$scriptname"
+
+  ${SED-sed} -n 's,^[-],,p' < "$regex_name" |
+    ${SED-sed} -n -e "$adjust_rx" \
+	-e '1h; 1!H; $ { g; s,[\n],|,g; '"\
+s,^\\(.*\\)\$,my \$blob = qr'(?<blob>\\1)'ms;,;\
+"' p;}' >> "$scriptname"
+
+  echo "\\($initblob\\|$defineblob\\|$asmblob\\)" | 
+    ${SED-sed} -e "$adjust_rx" \
+        -e "s,^\\(.*\\)\$,my \$cblob = qr'(?<cblob>\\1)'ms if \$with_context;," >> "$scriptname"
+
+  cat >> "$scriptname" <<\EOF
+
+$falsepos = qr/(?<falsepos>(?!))/ if $no_falsepos || ! defined $falsepos;
+
+my $rx = qr/^$falsepos|$blob/ms;
+
+$rx = qr/$rx|^$cblob/ms if $with_context;
+
+my @filenames;
+my $nfilenames = 0;
+my $nextnfilenames;
+
+my $s = '';
+
+while (<STDIN>) {
+    # Read into s all lines between begin and end.  An empty line, without
+    # even the '\n', flags the end of the input.
+    if (m:^[;][/][*](begin|end) (.*)[*][/][;]$:) {
+	if ($1 eq 'begin') {
+	    print "entering $2\n" if $verbose;
+	    $filenames[$nfilenames] = $2;
+	    $nextnfilenames = $nfilenames + 1;
+	    if ($s eq '') {
+		$nfilenames = $nextnfilenames;
+		next;
+	    }
+	} else {
+	    $nextnfilenames = $nfilenames - 1;
+	    print "processing $filenames[$nextnfilenames]\n" if $verbose;
+	}
+    } else {
+	$s .= $_;
+	next;
+    }
+	
+    if ($verbose) {
+	print "looking for matches in\n";
+	for (my $i = $nfilenames; --$i > 0; ) {
+	    print $filenames[$i], " within\n";
+	}
+	print $filenames[0], "\n";
+    }
+
+    $s =~ s/[\n]$//;
+
+    my $pp = my $p = 0;
+
+    my $matchfound = substr ($s, $p) =~ /$rx/o;
+    while ($matchfound) {
+	print "found first match\n" if $verbose;
+	my $firstmatchstart = $-[0] + $p;
+	my $blobs = my $falses = 0;
+	my $matchstart = $-[0] + $p;
+	my $pend = -1;
+	my $blob_p;
+	do {{
+	    my $matchend = $+[0] + $p;
+	    print "found match $matchstart..$matchend\n" if $verbose;
+	    print "$&" if $verbose > 1;
+
+	    if (defined $+{'cblob'}) {
+		print "match is a blob context\n" if ($verbose);
+		$pend = index ($s, "\n", $matchend) + 1;
+		$pend = length $s if !$pend;
+	    }
+
+	    if (defined $+{'falsepos'}) {
+		print "match is a false positive\n" if ($verbose);
+		# $matchend -= $+[0] - $+[1];
+		$blob_p = 0;
+		$falses++;
+	    } elsif (defined $+{'blob'}) {
+		$blob_p = 1;
+		$blobs++;
+		print "match is a blob at $matchstart\n" if ($verbose);
+	    } else {
+		$p = $matchstart;
+		print "searching up to $pend\n" if $verbose;
+		next;
+	    }
+
+	    if ($blob_p ? $replace_blob : $replace_falsepos) {
+		substr ($s, $matchstart, $matchend - $matchstart,
+			$replacement);
+		$p = $matchstart + length $replacement;
+		$pend += $p - $matchend if $pend >= $matchstart;
+	    } else {
+		$p = $matchend;
+	    }
+
+	    $pend = index ($s, "\n", $p) + 1 if $p >= $pend;
+	    $pend = length $s if !$pend;
+	    print "searching up to $pend\n" if $verbose;
+	    $p--;
+	}} while (($matchfound = (substr ($s, $p) =~ /(?<=.)$rx/mso))
+		  && ($matchstart = $-[0] + $p) < $pend);
+
+	print "last match before $pend\n" if $verbose;
+
+	if ($print_nomatch) {
+	    print substr ($s, $pp, $firstmatchstart - $pp);
+	    $pp = $firstmatchstart;
+	} elsif (($print_blob || $print_falsepos) && $firstmatchstart > 0) {
+	    $pp = rindex ($s, "\n", $firstmatchstart - 1) + 1;
+	}
+
+	if (($print_blob && $blobs) || ($print_falsepos && $falses)) {
+	    if (!$print_nomatch) {
+		for (my $i = $nfilenames; $i-- > 0;) {
+		    print "::: ", $filenames[$i], " :::\n";
+		}
+	    }
+
+	    print substr ($s, $pp, $pend - $pp);
+	    $pp = $pend;
+	}
+
+	if (($list_blob && $blobs) || ($list_falsepos && $falses)) {
+	    for (my $i = $nfilenames; --$i > 0;) {
+		print $filenames[$i], " within ";
+	    }
+	    print $filenames[0], "\n";
+	    exit (1);
+	}
+    }
+
+    print substr ($s, $pp) if $print_nomatch;
+	
+    print "no further matches\n" if $verbose;
+
+    $s = '';
+    $nfilenames = $nextnfilenames;
+}
+
+exit (0);
+EOF
+
+  scriptcmd="${PERL-perl} "'"$scriptname"'
 }
 
 set_awk_main () {
@@ -3468,22 +3663,22 @@ s,\\\([{(|)}?+]\),\1,g;
   case " = $@ = " in
   *" = no_falsepos = "*) falsepos='$.^';;
   *) falsepos=`
-    sed -n 's,^[+],,p' < "$regex_name" |
-    sed -n -e "$adjust_rx" -e 's,\^,,' \
+    ${SED-sed} -n 's,^[+],,p' < "$regex_name" |
+    ${SED-sed} -n -e "$adjust_rx" -e 's,\^,,' \
 	-e '1h; 1!H; $ { g; s,[\n],|,g; p;}'
     `
      case $falsepos in "") falsepos='$.^';; esac;;
   esac
 
   blob=`
-    sed -n 's,^[-],,p' < "$regex_name" |
-    sed -n -e "$adjust_rx" \
+    ${SED-sed} -n 's,^[-],,p' < "$regex_name" |
+    ${SED-sed} -n -e "$adjust_rx" \
 	-e '1h; 1!H; $ { g; s,[\n],|,g; p;}'`
 
   case " = $@ = " in
   *" = with_context = "*) cblob=`
     $echo "\\($initblob\\|$defineblob\\|$asmblob\\)" | 
-    sed -e "$adjust_rx"
+    ${SED-sed} -e "$adjust_rx"
    `;;
   *) cblob='$.^';;
   esac
@@ -3521,26 +3716,26 @@ BEGIN {
     verbose = $vp;
 
     nfilenames = 0;
-    s = "";
+    s = "\n";
 
     # Which of the defaults above should we override?
     $@ = 1;
 
     # requires GNU awk RS extension:
-$xrs    RS = "[;][/][*](begin|end) [^\n]*[*][/][;][\n]";
+$xrs	RS = "[;][/][*](begin|end) [^\n]*[*][/][;][\n]";
 }
 # requires GNU awk RS extension:
 $xrs { s = s \$0; }
 # does not require GNU awk RS extension:
 $nrs !/^[;][/][*].*[*][/][;]$/ {
-$nrs     s = s \$0 "\n";
-$nrs     next;
+$nrs	 s = s \$0 "\n";
+$nrs	 next;
 $nrs }
 $eormatch /^[;][/][*]begin .*[*][/][;]$eornl$/ {
     filenames[nfilenames] = substr($eor, 10, length ($eor) - 12 - $eornlsz);
     if (verbose) print "entering " nfilenames ": " filenames[nfilenames];
     nextnfilenames = nfilenames + 1;
-    if (s == "") {
+    if (s == "\n") {
 	nfilenames = nextnfilenames;
 	next;
     }
@@ -3553,92 +3748,97 @@ $eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
 {
     if (verbose) {
 	print "looking for matches";
-	for (i = nfilenames; --i >= 0;)
+	for (i = nfilenames; --i > 0;)
 	    print filenames[i] " within";
-        print filenames[0]
+	print filenames[0]
     }
 
     s = substr (s, 1, length (s) - 1)
 
-    pp = p = pend = 1;
+    pp = 2;
+    p = pend = 1;
     if (verbose > 1) print "searching starting at", substr (s, p, 10)
-    while (match (substr (s, p),
-		  /(^|[\n])($falsepos)|(^|[\n])($cblob)|$blob/)) {
+    matchfound = match (substr (s, p),
+			/[\n]($falsepos)|[\n]($cblob)|.($blob)/);
+    while (matchfound) {
 	blobs = falses = 0;
-	firstmatchstart = RSTART + p - 1;
-	if (substr (s, firstmatchstart, 1) == "\n")
-	    firstmatchstart++;
+	firstmatchstart = RSTART + p;
 	for (;;) {
 	    matchstart = RSTART + p - 1;
 	    matchlen = RLENGTH;
-	    if (substr (s, matchstart, 1) == "\n") {
-		matchstart++;
-		matchlen--;
-	    }
-	    if (verbose)
+	    if (verbose) {
 		print "found match", matchstart, matchlen;
-	    if (verbose > 1)
-		print substr (s, matchstart, matchlen);
-	    if (match (substr (s, matchstart, matchlen), /^($falsepos)$/) == 1) {
+		if (verbose > 1)
+		    print substr (s, matchstart + 1, matchlen - 1);
+	    }
+
+	    cblob_p = 0;
+
+	    if (match (substr (s, matchstart, matchlen), /^[\n]($falsepos)/) == 1) {
 		if (verbose) print "match is a false positive";
 		blob_p = 0;
 		falses++;
-	    } else if (match (substr (s, matchstart, matchlen), /^($cblob)$/) == 1) {
+	    } else if (match (substr (s, matchstart, matchlen), /^[\n]($cblob)$/) == 1) {
 		if (verbose) print "match is a blob context";
-		pend = p + matchlen;
+		pend = index (substr (s, matchstart + matchlen), "\n");
+		if (pend)
+		    pend += matchstart + matchlen;
+		else
+		    pend = length (s);
 		p = matchstart + 1;
-		if (verbose) print "search after cblob starting at", p;
-		match (substr (s, p, matchlen - 1), /^($falsepos)|^($cblob)|[^\n]*($blob)/);
-		continue;
+		if (verbose) print "range is:", substr (s, p, pend - p);
+		cblob_p = 1;
 	    } else {
 		if (verbose) print "match is a blob";
 		blob_p = 1;
 		blobs++;
 	    }
 
-	    if (blob_p ? replace_blob : replace_falsepos) {
-		s = substr (s, 1, matchstart - 1)	\\
-		    replacement				\\
-		    substr (s, matchstart + matchlen);
-		p = matchstart + length (replacement);
-	    } else
-		p = matchstart + matchlen;
-	    i = index (substr (s, p), "\n");
-	    if (!i)
-		i = length (s)
-	    p--;
-	    if (!match (substr (s, p),
-			/[\n]($falsepos)|[\n]($cblob)|$blob/) \\
-		|| (RSTART > i && p + RSTART >= pend))
+	    if (!cblob_p) {
+		if (blob_p ? replace_blob : replace_falsepos) {
+		    s = substr (s, 1, matchstart)		\\
+			replacement				\\
+			substr (s, matchstart + matchlen);
+		    p = matchstart + length (replacement) - 1;
+		    pend += (p + 2 - matchstart - matchlen);
+		} else
+		    p = matchstart + matchlen - 1;
+
+		if (p > pend) {
+		    i = index (substr (s, p), "\n");
+		    if (i)
+			pend = p + i;
+		    else
+			pend = length (s)
+		}
+	    }
+	    
+	    if (verbose) print "search until", pend;
+
+	    if (!(matchfound = match (substr (s, p),
+				      /[\n]($falsepos)|[\n]($cblob)|.($blob)/)) ||
+		p + RSTART >= pend)
 		break;
 	}
 
 	if (print_nomatch)
 	    printf "%s", substr (s, pp, firstmatchstart - pp);
-        else if (print_blob || print_falsepos) {
+	else if (print_blob || print_falsepos) {
 	    lastline = substr (s, pp, firstmatchstart - pp);
 	    sub (/.*[\n]/, "", lastline);
+	    if (verbose) print "lastline: " lastline "\\\\n"
 	    firstmatchstart -= length (lastline);
-        }
+	}
 	pp = firstmatchstart;
 
-	if (p < pend)
-	    p = pend;
-
-	i = index (substr (s, p), "\n");
-	if (i)
-	    p += i;
-	else
-	    p = length (s);
-
-	if (verbose) print "match set range:", pp, p
+	if (verbose) print "match set range:", pp, pend
 
 	if ((print_blob && blobs) || (print_falsepos && falses)) {
 	    if (!print_nomatch)
-		for (i = nfilenames; i--;)
+		for (i = nfilenames; i-- > 0;)
 		    print "::: " filenames[i] " :::";
-	    printf "%s", substr (s, pp, p - pp);
-	    pp = p;
+	    printf "%s", substr (s, pp, pend - pp);
+	    pp = pend;
 	}
 
 	if ((list_blob && blobs) || (list_falsepos && falses)) {
@@ -3655,7 +3855,7 @@ $eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
     if (verbose)
 	print "no further matches";
 
-    s = "";
+    s = "\n";
     nfilenames = nextnfilenames;
     next;
 }
@@ -3673,7 +3873,7 @@ s,[-]$, { blob (); },
 '     
 
   echo '%%' > "$scriptname"
-  sed "$adjust_rx" < "$regex_name" >> "$scriptname"
+  ${SED-sed} "$adjust_rx" < "$regex_name" >> "$scriptname"
   echo '\n|. { unmatched (); }
 %%
 int falsepos () {}
@@ -3777,7 +3977,7 @@ check () {
   set_except "$input"
 
   # Check that all regular expressions match our requirements.
-  sed -n '
+  ${SED-sed} -n '
 s,^\(-\^\?\|[+]\^\),,
 h
 s,[$]$,,
@@ -3845,7 +4045,7 @@ BAD regular expression:
 	s/\$/*\\/;/
       }
       s/^[ $s]//"
-    cmd='sed "$sedpatch"'
+    cmd='${SED-sed} "$sedpatch"'
     ;;
   *)
     cmd='cat'
