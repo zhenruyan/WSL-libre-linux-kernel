@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-01-24
+# deblob-check version 2010-01-26
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3929,12 +3929,12 @@ check () {
   # $1 (implicitly anchored to the beginning of the line), and ending
   # at the first ';' that's not within comments.
   initc () {
-    addx "$1\\([^;]*\\|$comment\\)*[;]\\?" $2
+    addx "$1\\([^;]\\|$comment\\)*[;]\\?" $2
   }
 
   # Same as initc, but require the terminating semicolon.
   defsc () {
-    addx "$1\\([^;]*\\|$comment\\)*[;]" $2
+    addx "$1\\([^;]\\|$comment\\)*[;]" $2
   }
 
   # Accept as a non-blob an expression $1 that would have otherwise
@@ -3946,13 +3946,13 @@ check () {
 
   # Match up to the end a comment started in $1.
   ocomment () {
-    addx "$1[/]*\\([^/]\\|[^*/][/]*\\)*[*][/]" $2
+    addx "$1[/]*\\([*]*[^*/][/]*\\)*[*]\+[/]" $2
   }
 
   # Match $1 followed by backslash-terminated lines and a last
   # non-backslash-terminated line.
   oprepline () {
-    addx "$1\\([^\\n]*\\\\[\\n]\\)*[^\\n\\\\]*$" $2
+    addx "$1\\([^\\\\\\n]*[\\\\][\\n]\\)*[^\\\\\\n]*$" $2
   }
 
   # Match $1 in $2 as a blob.  Not anchored.
