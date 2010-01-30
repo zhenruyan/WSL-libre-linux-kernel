@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-01-26
+# deblob-check version 2010-01-29
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -950,16 +950,16 @@ set_except () {
     accept '[	]-[ ]move[ ]firmware[ ]loading[ ]to[ ]request_firmware[(][)]' drivers/staging/slicoss/README
     accept 'config[ ]FIRMWARE_IN_KERNEL.*let[ ]firmware[ ]be[ ]loaded[ ]from[ ]userspace\.' drivers/base/Kconfig
     accept '[	 ]*and[ ]request_firmware[(][)][ ]in[ ]the[ ]source' drivers/base/Kconfig
-    accept 'static[ ]int[\n]_request_firmware[(]const[ ]struct[ ]firmware[ ][*][*]firmware_p,[ ]const[ ]char[ ][*]name,[^{]*[\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
-    accept 'static[ ]int[\n]request_firmware_work_func[(]void[ ][*]arg[)][\n][{][\n]\([\n]*[^\n}][}]*\)*ret[ ]=[ ]_request_firmware[(]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
-    accept '[/][*][*][\n][ ][*][ ]request_firmware:[ ]-[ ]send[ ]firmware[ ][^{]*[\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
-    accept '[/][*][*][\n][ ][*][ ]request_firmware_nowait:[ ]asynchronous[ ]version[^{]*[\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept 'static[ ]int[\n]_request_firmware[(]const[ ]struct[ ]firmware[ ][*][*]firmware_p,[ ]const[ ]char[ ][*]name,[^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept 'static[ ]int[\n]request_firmware_work_func[(]void[ ][*]arg[)][\n][{]\([\n]\+[^\n}][^\n]*\)*ret[ ]=[ ]_request_firmware[(][^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept '[/][*][*][\n][ ][*][ ]request_firmware:[ ]-[ ]send[ ]firmware[ ][^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept '[/][*][*][\n][ ][*][ ]request_firmware_nowait:[ ]asynchronous[ ]version[^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept 'EXPORT_SYMBOL[(]request_firmware\(_nowait\)\?[)][;]' drivers/base/firmware_class.c
     accept 'int[ ]request_firmware\(_nowait\)\?[(][^;]*[)][;]' include/linux/firmware.h
     accept 'static[ ]inline[ ]int[ ]request_firmware\(_nowait\)\?[(][^{]*[)][\n][{][\n][	]return[ ]-EINVAL[;][\n][}]' include/linux/firmware.h
-    accept 'static[ ]inline[ ]int[\n]\(maybe_\)\?reject_firmware\(_nowait\)\?[(][^{;]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' include/linux/firmware.h
+    accept 'static[ ]inline[ ]int[\n]\(maybe_\)\?reject_firmware\(_nowait\)\?[(][^{;]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]' include/linux/firmware.h
 
-    accept 'static[ ]inline[ ]int[ ]request_ihex_firmware\?[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}][\n]' include/linux/ihex.h
+    accept 'static[ ]inline[ ]int[ ]request_ihex_firmware\?[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' include/linux/ihex.h
     ocomment '[/][*][ ]Optional[ ]firmware\([^\n]*[\n][ ][*]\)*[^\n]*[ ]MODULE_FIRMWARE[(][)]'
     oprepline '#define[ ]MODULE_FIRMWARE[(]_firmware[)]' include/linux/module.h
     accept '[ ][*][ ]Sample[ ]code[ ]on[ ]how[ ]to[ ]use[ ]request_firmware[(][)][ ]from[ ]drivers\.' samples/firmware_class/firmware_sample_driver.c
@@ -1004,7 +1004,7 @@ set_except () {
     blob '\(#\(ifdef[ ]AMB_NEW_MICROCODE\|else\|endif\)[\n]#\(define\|include\)[ ]UCODE2\?[(][^\n]*[\n]\)\+\([\n]*static[ ]\(u32\|region\)[ ]__devinitdata[ ]ucode_\(start\|\(regions\|data\)\[\]\)[ ]=[^;]*[;]\)*' drivers/atm/ambassador.c
 
     blobname '\(pca\|sba\)200e\(_ecd\)\?\.\(data\|bin[12]\?\)' 'drivers/atm/\(Makefile\|fore200e\(_mkfirm\)\?\.c\)'
-    blobna '[/][*][/]*\([*]*[^*/][/]*\)*[*]*PCA-200E[ ]firmware[ ][*][/]' drivers/atm/fore200e_mkfirm.c
+    blobna '[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*PCA-200E[ ]firmware[ ][*][/]' drivers/atm/fore200e_mkfirm.c
     blobna '_fore200e_\(pca\|sba\)_fw_\(data\|size\)' drivers/atm/fore200e.c
     blob '#ifdef[ ]CONFIG_ATM_FORE200E_\(PCA\|SBA\)\([\n]extern[ ]const[ ]unsigned[ ]\(char\|int\)[ ]*_fore200e_\(pca\|sba\)_fw_\(data\[\]\|size\)[;]\)\+[\n]#endif\([\n]\+#ifdef[ ]CONFIG_ATM_FORE200E_\(PCA\|SBA\)\([\n]extern[ ]const[ ]unsigned[ ]\(char\|int\)[ ]*_fore200e_\(pca\|sba\)_fw_\(data\[\]\|size\)[;]\)\+[\n]#endif\)*' drivers/atm/fore200e.c
 
@@ -1025,18 +1025,18 @@ set_except () {
     blobname 'intelliport2\.bin' drivers/char/ip2/ip2main.c
 
     blob 'static[ ]unsigned[ ]char[ ]warp_g[24]00_t2\?gzs\?a\?f\?\[\][ ]=[ ][{][^{};]*[}][;]\([\n][\n]*static[ ]unsigned[ ]char[ ]warp_g[24]00_t2\?gzs\?a\?f\?\[\][ ]=[ ][{][^{};]*[}][;]\)*' drivers/gpu/drm/mga/mga_ucode.h
-    blob '\(#define[ ]WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]\)\([\n][\n]*\(#define[ ]WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]\)\)*' drivers/gpu/drm/mga/mga_warp.c
+    blob '\(#define[ ]WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]\)\([\n][\n]*\(#define[ ]WARP_UCODE_\(SIZE\|INSTALL\)[(][ ]*which\([^\n]*\\[ 	]*[\n]\)*[^\n]*\|static[ ]const[ ]unsigned[ ]int[ ]mga_warp_g[24]00_microcode_size[ ]=[^;]*[;]\|static[ ]int[ ]mga_warp_install_g[24]00_microcode[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]\)\)*' drivers/gpu/drm/mga/mga_warp.c
     blobna '\(case[ ]MGA_CARD_TYPE_G[^:]*:[ 	\n]*\)\+return[ ][^;]*mga_warp[^;]*microcode[^;]*[;]\([ 	\n]*\(case[ ]MGA_CARD_TYPE_G[^:]*:[ 	\n]*\)\+return[ ][^;]*mga_warp[^;]*microcode[^;]*[;][ 	]*\)*' drivers/gpu/drm/mga/mga_warp.c
 
     blob 'static[ ]u32[ ]r128_cce_microcode\[\][ ]=[ ][{][^;]*[}][;]' drivers/gpu/drm/r128/r128_cce.c
-    blob 'static[ ]void[ ]r128_cce_load_microcode[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/gpu/drm/r128/r128_cce.c
+    blob 'static[ ]void[ ]r128_cce_load_microcode[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]' drivers/gpu/drm/r128/r128_cce.c
     # blobna 'R128_WRITE[(]R128_PM4_MICROCODE_DATA[HL],[\n	 ]*r128_cce_microcode\[i[ ][*][ ]2\([ ][+][ ]1\)\?\][)]\([;][\n 	]*R128_WRITE[(]R128_PM4_MICROCODE_DATA[HL],[\n	 ]*r128_cce_microcode\[i[ ][*][ ]2\([ ][+][ ]1\)\?\][)]\)*' drivers/gpu/drm/r128/r128_cce.c
 
     blob 'static[ ]const[ ]u32[ ]R[SV0-9]*[05]_\(c\|pf\)p_microcode\[\]\(\[[23]\]\)\?[ ]=[ ][{][^;]*[}][;]\([\n][\n]*static[ ]const[ ]u32[ ]R[SV0-9]*[05]_\(c\|pf\)p_microcode\[\]\(\[[23]\]\)\?[ ]=[ ][{][^;]*[}][;]\)*' 'drivers/gpu/drm/radeon/\(radeon\|r600\)_microcode\.h'
-    blob 'static[ ]void[ ]r\(adeon\|[167]00\)_cp_load_microcode[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*cp_microcode\([\n]*[^\n}][}]*\)*[\n]\+[}]' 'drivers/gpu/drm/radeon/r\(\(adeon\|600\)_cp\|100\)\.c'
+    blob 'static[ ]void[ ]r\(adeon\|[167]00\)_cp_load_microcode[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*cp_microcode[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' 'drivers/gpu/drm/radeon/r\(\(adeon\|600\)_cp\|100\)\.c'
     # blobna 'RADEON_WRITE[(]R\(ADEON\|600\)_CP_\(ME_RAM\|PFP_UCODE\)_DATA[HL]\?,[\n	 ]*R[SV0-9]*[05]_\(c\|pf\)p_microcode\[i\]\(\[[012]\]\)\?[)]\([;][\n 	]*RADEON_WRITE[(]R\(ADEON\|600\)_CP_\(ME_RAM\|PFP_UCODE\)_DATA[HL]\?,[\n	 ]*R[SV0-9]*[05]_\(c\|pf\)p_microcode\[i\]\(\[[012]\]\)\?[)]\)*' 'drivers/gpu/drm/radeon/\(radeon\|r600\)_cp\.c'
 
-    blob 'sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]cx\(23\(1xx\|855\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\)[ ]*[{]\([^}]*\|[^\n}][}]*\)[\n][}]\([\n][\n]*sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]cx\(23\(1xx\|855\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\)[ ]*[{]\([^}]*\|[^\n}][}]*\)[\n][}]\)*' Documentation/dvb/get_dvb_firmware
+    blob 'sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\([\n]\+sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\)*' Documentation/dvb/get_dvb_firmware
     blobna 'Please[ ]use[^\n]*firmware[^\n]*sp887x[^\n]*\([\n][^\n]\+\)\+' Documentation/dvb/avermedia.txt
     blob 'To[ ]extract[ ]the[ ]firmware[^\n]*Opera[ ]DVB-S1[ ]USB-Box.*[/]lib[/]firmware[/][ ]\.' Documentation/dvb/opera-firmware.txt
     blobname '\(dvb-usb-opera[^\n]*\.fw\|2830S[^\n]*2\.sys\)' Documentation/dvb/opera-firmware.txt
@@ -1047,7 +1047,7 @@ set_except () {
     blobna '[\n][	]scriptlen[ ]=[ ]sizeof[(]script[)][^;]*[;][\n][	]for[^{]*scriptlen[^{]*[{][^}]*[^\n	}]' drivers/media/dvb/dvb-usb/af9005-fe.c
 
     accept 'struct[ ]\(sp8870\|tda1004x\)_config[\n][{][^}]*[(][*]request_firmware[)][^}]*[\n][}][;]' 'drivers/media/dvb/frontends/\(sp8870\|tda1004x\)\.h'
-    blob '[/][*][/]*\([*]*[^*/][/]*\)*[*]*get_dvb_firmware[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\([\n]\(#define[ ]\(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|["][^"]*["]\)[ ]\([^\n]\|[\\][\n]\)*\|[/][*][(]DEBLOBBED[)][*][/]\)\)*' 'drivers/media/dvb/frontends/\(nxt200x\|or51211\|sp887[0x]\|tda1004[8x]\)\.c'
+    blob '[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*get_dvb_firmware[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\([\n]\(#define[ ]\(\([^\n 	]*_DEFAULT\|NONFREE\)_FIRMWARE\|["][^"]*["]\)[ ]\([^\n]\|[\\][\n]\)*\|[/][*][(]DEBLOBBED[)][*][/]\)\)*' 'drivers/media/dvb/frontends/\(nxt200x\|or51211\|sp887[0x]\|tda1004[8x]\)\.c'
     blobname 'dvb-fe-sp8870\.fw' drivers/media/dvb/frontends/sp8870.c
     blobname 'dvb-fe-tda1004[56]\.fw' drivers/media/dvb/frontends/tda1004x.c
 
@@ -1068,21 +1068,21 @@ set_except () {
 
     blob 'static[ ]u32[ ]tigon2\?Fw\(Text\|Rodata\|Data\)\[[(]MAX_\(TEXT\|RODATA\|DATA\)_LEN[/]4[)][ ][+][ ]1\][ ]__devinitdata[ ]=[ ][{][^}]*[}][;]\([\n]static[ ]u32[ ]tigon2\?Fw\(Text\|Rodata\|Data\)\[[(]MAX_\(TEXT\|RODATA\|DATA\)_LEN[/]4[)][ ][+][ ]1\][ ]__devinitdata[ ]=[ ][{][^}]*[}][;]\)*' drivers/net/acenic_firwmare.h
     blob '#define[ ]tigon2\?Fw[^ ]*\(Addr\|Len\)[ ]0x[^\n]*\([\n]#define[ ]tigon2\?Fw[^ ]*\(Addr\|Len\)[ ]0x[^\n]*\)\+' drivers/net/acenic_firmware.h
-    blob '\([/][*][/]*\([*]*[^*/][/]*\)*[*]*Do[ ]not[ ]try[ ]to[ ]clear[/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n][	]\)\?ace_clear[^;]*[;][\n]\([^}]*[{][^}]*ace_copy[^}]*tigon2\?Fw[^}]*[}]\)*[\n]\+[	]return[ ]0[;][\n][}]' drivers/net/acenic.c
+    blob '\([/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*Do[ ]not[ ]try[ ]to[ ]clear[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/][\n][	]\)\?ace_clear[^;]*[;][\n]\([^}]*[{][^}]*ace_copy[^}]*tigon2\?Fw[^}]*[}]\)*[\n]\+[	]return[ ]0[;][\n][}]' drivers/net/acenic.c
     blob 'if[ ][(]\(ACE_IS_TIGON_I[(]ap[)]\|ap->version[ ]==[ ]2\)[)][\n][	][	]writel[(]tigon2\?FwStartAddr,[ ][&]regs->Pc[)][;]\([\n][	]if[ ][(]\(ACE_IS_TIGON_I[(]ap[)]\|ap->version[ ]==[ ]2\)[)][\n][	][	]writel[(]tigon2\?FwStartAddr,[ ][&]regs->Pc[)][;]\)*' drivers/net/acenic.c
 
     blob '#include[ ]["]starfire_firmware\.h["]' drivers/net/starfire.c
-    blob '[/][*][/]*\([*]*[^*/][/]*\)*[*]*Load[ ]Rx[/]Tx[ ]firmware[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\([\n][	]for[ ][(][^)]*FIRMWARE_[RT]X_SIZE[^)]*[)][\n][	][	]writel[^;]*firmware_[rt]x[^;]*[;]\)\+' drivers/net/starfire.c
+    blob '[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*Load[ ]Rx[/]Tx[ ]firmware[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\([\n][	]for[ ][(][^)]*FIRMWARE_[RT]X_SIZE[^)]*[)][\n][	][	]writel[^;]*firmware_[rt]x[^;]*[;]\)\+' drivers/net/starfire.c
 
     blob 'static[ ]\(u8\|const[ ]u32\|struct[ ]fw_info\)[ ]bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)*[ ]=[ ][{][^}]*[}][;]\([\n][\n]*static[ ]\(u8\|const[ ]u32\|struct[ ]fw_info\)[ ]bnx2_\(\(COM\|CP\|[RT]XP\|TPAT\)_b0[69]Fw\(Text\|Data\|Rodata\)\|\(xi_\)\?rv2p_proc[12]\|\(com\|cp\|[rt]xp\|tpat\)_fw_0[69]\)\(\[[^]};]*\]\)*[ ]=[ ][{][^}]*[}][;]\)*' 'drivers/net/bnx2_fw2\?.h'
     blob '#include[ ]["]bnx2_fw\.h["][\n][\n]*#include[ ]["]bnx2_fw2\.h["]' drivers/net/bnx2.c
-    blob 'static[ ]void[\n]load_rv2p_fw[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/bnx2.c
-    blob 'static[ ]int[\n]bnx2_init_cpus[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/bnx2.c
+    blob 'static[ ]void[\n]load_rv2p_fw[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]' drivers/net/bnx2.c
+    blob 'static[ ]int[\n]bnx2_init_cpus[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]' drivers/net/bnx2.c
 
     # init_data_e1h? might actually be just data, but it doesn't
     # really matter.
     blob 'static[ ]const[ ]u32[ ]\(init\?\|[tucx]sem_\(int_table\|pram\)\)_data_e1h\?\[\][ ]=[ ][{][^}]*[}][;]\([\n][\n]*static[ ]const[ ]u32[ ]\(init\?\|[tucx]sem_\(int_table\|pram\)\)_data_e1h\?\[\][ ]=[ ][{][^}]*[}][;]\)*' drivers/net/bnx2x_init_values.h
-    blob 'static[ ]\(void[ ]\|const[ ]u32[ ][*]\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]\([\n][\n]*static[ ]\(void[ ]\|const[ ]u32[ ][*]\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)[(][^{]*[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]\)*' 'drivers/net/bnx2x_init\(_ops\)\?\.h'
+    blob 'static[ ]\(void[ ]\|const[ ]u32[ ][*]\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]\([\n][\n]*static[ ]\(void[ ]\|const[ ]u32[ ][*]\)bnx2x_\(sel_blob\|init_wr_wb\|init_block\)[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]\)*' 'drivers/net/bnx2x_init\(_ops\)\?\.h'
 
     blobname 'sun[/]cassini\.bin' drivers/net/cassini.c
 
@@ -1090,12 +1090,12 @@ set_except () {
     blobna 'for[ ][(][^\n]*ARRAY_SIZE[(]\(sr\|twinax\)_edc[)][^\n]*[)][\n][^;]*mdio_write[^;]*[;]' drivers/net/cxgb3/ael1002.c
     blobname '\(cxgb3[/]\)\?t3\(fw\|\(%c\|.\)_p\(rotocol_\)\?sram\)-\(%d\|[0-9]*\)\.\(%d\|[0-9]*\)\.\(%d\|[0-9]*\)\.bin' drivers/net/cxgb3/cxgb3_main.c
 
-    blob '\([/][*][*]*[*][/][\n]*\)*\([/][*][/]*\([*]*[^*/][/]*\)*[*]*Micro[ ]code[/]*\([*]*[^*/][/]*\)*[*]*8086:[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\([\n]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)*\|#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)\([\n]*[/][*][/]*\([*]*[^*/][^*/]*[/]*\|[*]*[*][/][\n]*[/][*]\)*[*]*Micro[ ]code[/]*\([*]*[^*/][/]*\)*[*]*8086:[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\([\n]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)*\|[\n][\n]*#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)*' drivers/net/e100.c
-    blobna '\([/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n]*[	][	]\)\(ucode\[opts->\(timer\|bundle\|min_size\)_dword\][ ].=[ ][^;]*[;][\n][\n]*[	][	]\)*[^}]*UCODE_SIZE[^}]*cb_ucode[^}]*return[;][\n][	][}]' drivers/net/e100.c
+    blob '\([/][*][*]\+[/][\n]*\)*\([/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*Micro[ ]code[^*]*\([*]\+[^/*][^*]*\)*[*]*8086:[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\([\n]*[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\)*\|#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	][^\n]*\([\\][\n][^\n]*\)*\)\([\n]*[/][*][^*]*\([*]\+\([^/*]\|[/][\n]*[/][*]\+\)[^*]*\)*[*]*Micro[ ]code[^*]*\([*]\+[^/*][^*]*\)*[*]*8086:[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\([\n]*[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\)*\|[\n][\n]*#define[ ][ ]*D10\(1M\(_B\)\?\|1S\|2_E\)_\(CPUSAVER_\(TIMER\|BUNDLE\|MIN_SIZE\)_DWORD\|RCVBUNDLE_UCODE\)[ 	]\(\\[\n]\|[^\n]\)*\)*' drivers/net/e100.c
+    blobna '\([/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/][\n]*[	][	]\)\(ucode\[opts->\(timer\|bundle\|min_size\)_dword\][ ].=[ ][^;]*[;][\n][\n]*[	][	]\)*[^}]*UCODE_SIZE[^}]*cb_ucode[^}]*return[;][\n][	][}]' drivers/net/e100.c
 
     blob 'static[ ]unsigned[ ]char[ ]__devinitdata[ ]lanai4_\(code\|data\)\[[0-9]*\][ ]=[ ][{][^;]*[}][;]' drivers/net/myri_code.h
     blob '#include[ ]["]myri_code\.h["]' drivers/net/myri_sbus.c
-    blobna '\([/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n	 ]*\)\?for[ ][(][^\n]*sizeof[(]lanai4_\(code\|data\)[^\n]*[)][\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_code_off[^;]*[;]\([\n	 ]*\([/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n	 ]*\)\?for[ ][(][^\n]*sizeof[(]lanai4_\(code\|data\)[^\n]*[)][\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_\(code\|data\)_off[^;]*[;]\)*' drivers/net/myri_sbus.c
+    blobna '\([/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/][\n	 ]*\)\?for[ ][(][^\n]*sizeof[(]lanai4_\(code\|data\)[^\n]*[)][\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_code_off[^;]*[;]\([\n	 ]*\([/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/][\n	 ]*\)\?for[ ][(][^\n]*sizeof[(]lanai4_\(code\|data\)[^\n]*[)][\n][^\n]*sbus_writeb[^;]*lanai4_\(code\|data\)[^;]*lanai4_\(code\|data\)_off[^;]*[;]\)*' drivers/net/myri_sbus.c
 
     blob 'static[ ]u32[ ]s_firmLoad\[\][ ]=[ ][{][^;]*[}][;]' drivers/net/tehuti_fw.h
     blob 'bdx_tx_push_desc_safe[^;]*s_firmLoad[^;]*[;]' drivers/net/tehuti.c
@@ -1103,14 +1103,14 @@ set_except () {
 
     blob '[ ][*][ ]Firmware[ ]is:[\n][ ][*][	]Derived[ ]from[ ]proprietary[^/]*notice[ ]is[ ]accompanying[ ]it\.[\n][ ][*][/]' drivers/net/tg3.c
     blob 'Derived[ ]from[ ]proprietary[ ]unpublished[ ]source[ ]code' drivers/net/tg3.c
-    blob '\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\([\n][\n]*\(static[ ]const[ ]u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\|#if[ ]0\([ ][/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?[\n]\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;][\n]#endif\)\)*' drivers/net/tg3.c
+    blob '\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\([\n][\n]*\(static[ ]const[ ]u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\|#if[ ]0\([ ][/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\)\?[\n]\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;][\n]#endif\)\)*' drivers/net/tg3.c
 
     blob 'static[ ]const[ ]u8[ ]typhoon_firmware_image\[\][ ]=[ ][{][^}]*[}][;]' drivers/net/typhoon-firmware.h
 
     blobna 'licensed[^\n]*strictly[ ]for[ ]use[^\n]*[\n]*[^\n]*COPS[ ]LocalTalk' 'drivers/net/appletalk/cops_\(ff\|lt\)drv\.h'
     blob 'static[ ]const[ ]unsigned[ ]char[ ]ffdrv_code\[\][ ]=[ ][{][^}]*[}][;]' drivers/net/appletalk/cops_ffdrv.h
     blob 'static[ ]const[ ]unsgined[ ]char[ ]ltdrv_code\[\][ ]=[ ][{][^}]*[}][;]' drivers/net/appletalk/cops_ltdrv.h
-    blob '#include[ ]["]cops_\(lt\|ff\)drv\.h["][ 	]*\([/][*][/]*\([*]*[^*/][/]*\)*[*]*Firmware[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?\([\n][\n]*#include[ ]["]cops_\(lt\|ff\)drv\.h["][ 	]*\([/][*][/]*\([*]*[^*/][/]*\)*[*]*Firmware[/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?\)*' drivers/net/appletalk/cops.c
+    blob '#include[ ]["]cops_\(lt\|ff\)drv\.h["][ 	]*\([/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*Firmware[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\)\?\([\n][\n]*#include[ ]["]cops_\(lt\|ff\)drv\.h["][ 	]*\([/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*Firmware[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\)\?\)*' drivers/net/appletalk/cops.c
 
     blob 'static[ ]unsigned[ ]char[ ]bits_1200\[\][ ]*=[ ][{][^}]*[}][;]' drivers/net/hamradio/yam1200.h
     blob 'static[ ]unsigned[ ]char[ ]bits_9600\[\][ ]*=[ ][{][^}]*[}][;]' drivers/net/hamradio/yam9600.h
@@ -1122,7 +1122,7 @@ set_except () {
 
     blob 'static[ ]const[ ]u8[ ]microcode\[\][ ]=[ ][{][^}]*[}][ ]*[;]' drivers/net/tokenring/3c359_microcode.h
     blob '#include[ ]["]3c359_microcode\.h["]' drivers/net/tokenring/3c359.c
-    blobna 'start[ ]=[ ][(]0xFFFF[ ]-[ ][(]mc_size[)][^;]*[;][\n 	]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n 	]*printk[(]KERN_INFO[ ]["]3C359:[ ]Uploading[ ]Microcode:[ ]["][)][;][\n 	]*for[ ][(][^{]*\(mc_size[^{]*[)][ ][{][^}]*writeb[(]microcode\[\|[)][ ][{][^}]*writeb[(]microcode\[mc_size\)[^}]*[}]\([\n][ 	]*printk[^\n]*[;][\n 	]*for[ ][(][^{]*\(mc_size[^{]*[)][ ][{][^}]*writeb[(]microcode\[\|[)][ ][{][^}]*writeb[(]microcode\[mc_size\)[^}]*[}]\)*' drivers/net/tokenring/3c359.c
+    blobna 'start[ ]=[ ][(]0xFFFF[ ]-[ ][(]mc_size[)][^;]*[;][\n 	]*[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/][\n 	]*printk[(]KERN_INFO[ ]["]3C359:[ ]Uploading[ ]Microcode:[ ]["][)][;][\n 	]*for[ ][(][^{]*\(mc_size[^{]*[)][ ][{][^}]*writeb[(]microcode\[\|[)][ ][{][^}]*writeb[(]microcode\[mc_size\)[^}]*[}]\([\n][ 	]*printk[^\n]*[;][\n 	]*for[ ][(][^{]*\(mc_size[^{]*[)][ ][{][^}]*writeb[(]microcode\[\|[)][ ][{][^}]*writeb[(]microcode\[mc_size\)[^}]*[}]\)*' drivers/net/tokenring/3c359.c
 
     blobname 'tr_smctr\.bin' drivers/net/tokenring/smctr.c
 
@@ -1135,7 +1135,7 @@ set_except () {
     blob 'unsigned[ ]short[ ]sbus_risc_code01\[\][ ]__devinitdata[ ]=[ ][{][^}]*[}][;]' drivers/scsi/qlogicpti_asm.c
     blob '#include[ ]["]qlogicpti_asm\.c["]' drivers/scsi/qlogicpti.c
 
-    blob '\([/][*][ ]Microcode[/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n]*\)\?static[ ]\(u\(nsigned[ ]\)\?char\|unsigned[ ]short\|ADV_DCNT\)[ ]_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\][ ]=[ ][{][^}]*[}]\|size[ ]=[ ]sizeof[^;]*\|chksum[ ]=[ ]0x[^;]*\)[;]\([ 	]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?\([\n][\n]*\([/][*][ ]Microcode[/]*\([*]*[^*/][/]*\)*[*]*[*][/][\n]*\)\?static[ ]\(u\(nsigned[ ]\)\?char\|unsigned[ ]short\|ADV_DCNT\)[ ]_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\][ ]=[ ][{][^}]*[}]\|size[ ]=[ ]sizeof[^;]*\|chksum[ ]=[ ]0x[^;]*\)[;]\([ 	]*[/][*][/]*\([*]*[^*/][/]*\)*[*]*[*][/]\)\?\)*' drivers/scsi/advansys.c
+    blob '\([/][*][ ]Microcode[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/][\n]*\)\?static[ ]\(u\(nsigned[ ]\)\?char\|unsigned[ ]short\|ADV_DCNT\)[ ]_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\][ ]=[ ][{][^}]*[}]\|size[ ]=[ ]sizeof[^;]*\|chksum[ ]=[ ]0x[^;]*\)[;]\([ 	]*[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\)\?\([\n][\n]*\([/][*][ ]Microcode[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/][\n]*\)\?static[ ]\(u\(nsigned[ ]\)\?char\|unsigned[ ]short\|ADV_DCNT\)[ ]_\(asc_mcode\|adv_asc3\(550\|8C\(08\|16\)00\)\)_\(buf\[\][ ]=[ ][{][^}]*[}]\|size[ ]=[ ]sizeof[^;]*\|chksum[ ]=[ ]0x[^;]*\)[;]\([ 	]*[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\)\?\)*' drivers/scsi/advansys.c
 
     blob '\(#ifdef[ ]UNIQUE_FW_NAME[\n]\)\?static[ ]unsigned[ ]short[ ]\(risc\|fw12\(80e\|160\)i\)_code01\[\][ ]=[ ][{]\([\n]#else[\n]static[ ]unsigned[ ]short[ ]risc_code01\[\][ ]=[ ][{][\n]#endif[\n]\)\?[^}]*[}][;]\([\n][\n]*\(#ifdef[ ]UNIQUE_FW_NAME[\n]\)\?static[ ]unsigned[ ]short[ ]\(risc_code\|fw12\(80e\|160\)i\)_length01[ ]=[ ][^;]*[;]\([\n]#else[\n]static[ ]unsigned[ ]short[ ]risc_code_length01[ ]=[ ][^;]*[;][\n]#endif\)\?\)\?' 'drivers/scsi/ql1\(04\|2\(8\|16\)\)0_fw\.h'
 
@@ -1146,7 +1146,7 @@ set_except () {
     blobname 'keyspan[/]\(mpr\|usa\(18x\|19\(q[iw]\|w\)\?\|28\(x\(a\|b\)\?\)\?\|49w\(lc\)\?\)\)\.fw' drivers/usb/serial/keyspan.c
 
     accept '[	][	]fw_name[ ]=[ ]["]keyspan_pda[/]\(keyspan_pda\|xircom_pgs\)\.fw["][;]' drivers/usb/serial/keyspan_pda.c
-    blobna 'fw_name[ ]=[ ]\([\n]*[^\n}][}]*\)*\([/][*]KEYSPAN_PDA[*][/]\)\?request_ihex_firmware' drivers/usb/serial/keyspan_pda.c
+    blobna 'fw_name[ ]=[ ][^\n]*\([\n]\+[^\n}][^\n]*\)*\([/][*]KEYSPAN_PDA[*][/]\)\?request_ihex_firmware' drivers/usb/serial/keyspan_pda.c
     accept '[	]if[ ][(][/][*]KEYSPAN_PDA[*][/]request_ihex_firmware' drivers/usb/serial/keyspan_pda.c
 
     blobname 'edgeport[/]\(boot\|down\)2\?\.fw' drivers/usb/serial/io_edgeport.c
@@ -1209,8 +1209,8 @@ set_except () {
     blobname 'cyzfirm\.bin' drivers/char/cyclades.c
 
     accept 'MODULE_FIRMWARE[(]["]dsp56k[/]bootstrap\.bin["][)][;]' drivers/char/dsp56k.c
-    blobna 'const[ ]char[ ]fw_name\[\][ ]=[ ]["]dsp56k[/]bootstrap\.bin["][;]\([\n]*[^\n}][}]*\)*request_firmware\([\n]*[^\n}][}]*\)*[\n]\+[	]err[ ]=[ ]request_firmware[(][&]fw,[ ]fw_name,[ ]' drivers/char/dsp56k.c
-    accept '[	]const[ ]char[ ]fw_name\[\][ ]=[ ]["]dsp56k[/]bootstrap\.bin["][;]\([\n]*[^\n}][}]*\)*[\n]\+[	]err[ ]=[ ]request_firmware[(][&]fw,[ ]fw_name,[ ]' drivers/char/dsp56k.c
+    blobna 'const[ ]char[ ]fw_name\[\][ ]=[ ]["]dsp56k[/]bootstrap\.bin["][;][^\n]*\([\n]\+[^\n}][^\n]*\)*request_firmware[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[	]err[ ]=[ ]request_firmware[(][&]fw,[ ]fw_name,[ ]' drivers/char/dsp56k.c
+    accept '[	]const[ ]char[ ]fw_name\[\][ ]=[ ]["]dsp56k[/]bootstrap\.bin["][;][^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[	]err[ ]=[ ]request_firmware[(][&]fw,[ ]fw_name,[ ]' drivers/char/dsp56k.c
 
     blobname 'isi\(6\(08\|\(08\|16\)em\)\|46\(08\|16\)\)\.bin' drivers/char/isicom.c
 
@@ -1231,10 +1231,10 @@ set_except () {
     blobname 'dvb-fe-xc5000-1\.1\.fw' drivers/media/common/tuners/xc5000.c
 
     blobname '4210\(100[12]\|%4X\)\.sb' drivers/net/irda/irda-usb.c
-    blobna '[/][*][ 	\n*]*[ ]Known[ ]firmware[/]*\([*]*[^*/][/]*\)*[*]*\(STIR421x\|4210\(100[12]\|%4X\)\.sb\)[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/net/irda/irda-usb.c
+    blobna '[/][*][ 	\n*]*[ ]Known[ ]firmware[^*]*\([*]\+[^/*][^*]*\)*[*]*\(STIR421x\|4210\(100[12]\|%4X\)\.sb\)[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/net/irda/irda-usb.c
 
     blobname 'myri10ge_\(rss_\)\?ethp\?_z8e\.dat' drivers/net/myri10ge.c
-    blobna 'If[ ]the[ ]driver[ ]can[ ]neither[ ]enable[ ]ECRC[/]*\([*]*[^*/][/]*\)*[*]*myri10ge_\(rss_\)\?ethp\?_z8e\.dat[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/net/myri10ge.c
+    blobna 'If[ ]the[ ]driver[ ]can[ ]neither[ ]enable[ ]ECRC[^*]*\([*]\+[^/*][^*]*\)*[*]*myri10ge_\(rss_\)\?ethp\?_z8e\.dat[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/net/myri10ge.c
 
     blobname 'spider_fw\.bin' drivers/net/spider_net.h
 
@@ -1255,7 +1255,7 @@ set_except () {
     blobna 'if[ ][(]IPW2100_FW_MAJOR[^{]*[{][^}]*[	][}]' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2100\.c'
     blobname '["]["][ ]x[ ]["]\.fw["]' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2100\.c'
 
-    accept '[/][*][ ]Call[ ]this[ ]function[ ]from[ ]process[ ]context[/]*\([*]*[^*/][/]*\)*[*]*request_firmware' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2200.c'
+    accept '[/][*][ ]Call[ ]this[ ]function[ ]from[ ]process[ ]context[^*]*\([*]\+[^/*][^*]*\)*[*]*request_firmware' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2200.c'
     blobname 'ipw2200-\(i\?bss\|sniffer\)\.fw' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2200.c'
     accept '[	][	]IPW_ERROR[(]["]%s[ ]request_firmware[ ]failed' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2200.c'
 
@@ -1273,7 +1273,7 @@ set_except () {
     blobname 'sd\(8385\|868[68]\)\(_helper\)\?\.bin' drivers/net/wireless/libertas/if_sdio.c
     accept '[	]*card->firmware[ ]=[ ]\(if_sdio\|lbs_fw\)' drivers/net/wireless/libertas/if_sdio.c
     blobname 'usb8388\(-5\.126\.0\.p5\)\?\.bin' drivers/net/wireless/libertas/if_usb.c
-    blob '[/][*][/]*\([*]*[^*/][/]*\)*[*]*usb8388\(-5\.126\.0\.p5\)\?\.bin[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/net/wireless/libertas/if_usb.c
+    blob '[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*usb8388\(-5\.126\.0\.p5\)\?\.bin[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/net/wireless/libertas/if_usb.c
     accept '[	][	]lbs_pr_err[(]["]request_firmware\([(][)]\)\?[ ]failed' 'drivers/net/wireless/if_\(spi\|usb\)\.c'
     blobna 'o\.[ ]Copy[ ]the[ ]firmware[ ]image[^\n]*usb8388\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/libertas/README
     blobna '\[fw_name=usb8388[^]]*\]' drivers/net/wireless/libertas/README
@@ -1285,7 +1285,7 @@ set_except () {
     blobname 'lbtf_usb\.bin' drivers/net/wireless/libertas_tf/if_usb.c
 
     blobname 'isl38\(86\|87\|90\)\(usb\(_bare\)\?\)\?' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
-    blob '[/][*][ ]for[ ]isl3886[ ]register[ ]definitions[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/net/wireless/p54/p54usb.h
+    blob '[/][*][ ]for[ ]isl3886[ ]register[ ]definitions[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/net/wireless/p54/p54usb.h
     blobna 'If[ ]you[ ]enable[ ]this\([^\n]\|[\n][ 	]*[^ 	\n]\)*isl3890\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/Kconfig
 
     blobname 'isl38\(77\|86\|90\)' drivers/net/wireless/prism54/islpci_dev.c
@@ -1381,7 +1381,7 @@ set_except () {
 
     blobname 'aica_firmware\.bin' sound/sh/aica.c
 
-    accept '[ ][*][/]*\([*]*[^*/][/]*\)*[*]*Caution:[ ]This[ ]API[/]*\([*]*[^*/][/]*\)*[*]*request_firmware.' sound/sound_firmware.c
+    accept '[ ][*][^*]*\([*]\+[^/*][^*]*\)*[*]*Caution:[ ]This[ ]API[^*]*\([*]\+[^/*][^*]*\)*[*]*request_firmware.' sound/sound_firmware.c
     accept 'static[ ]int[ ]do_mod_firmware_load[(]' sound/sound_firmware.c
     accept 'int[ ]mod_firmware_load[(]' sound/sound_firmware.c
     accept '[	]r[ ]=[ ]do_mod_firmware_load[(]' sound/sound_firmware.c
@@ -1437,7 +1437,7 @@ set_except () {
 
     blobname 'dvb-fe-nxt2002\.fw' drivers/media/dvb/frontends/nxt200x.c
 
-    blob '[/][*][\n][ ][*][ ]This[ ]driver[ ]needs[ ]two[ ]external[ ]firmware[ ]files[/]*\([*]*[^*/][/]*\)*[*]*dvb-fe-or51132-\(vsb\|qam\)\.fw[/]*\([*]*[^*/][/]*\)*[*]*[*][/]' drivers/media/dvb/frontends/or51132.c
+    blob '[/][*][\n][ ][*][ ]This[ ]driver[ ]needs[ ]two[ ]external[ ]firmware[ ]files[^*]*\([*]\+[^/*][^*]*\)*[*]*dvb-fe-or51132-\(vsb\|qam\)\.fw[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/media/dvb/frontends/or51132.c
     blobname 'dvb-fe-or51132-\(vsb\|qam\)\.fw' drivers/media/dvb/frontends/or51132.c
 
     blobname 'dvb-fe-or51211\.fw' drivers/media/dvb/frontends/or51211.c
@@ -2077,7 +2077,7 @@ set_except () {
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]onenand_oob_128[ ]=' drivers/mtd/onenand/onenand_base.c
     blobname 'bnx2x-e1h\?-\([0-9.%d]*\.fw\)\?' drivers/net/bnx2x_main.c
     blob '#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\([\n]#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\)*' drivers/net/bnx2x_hsi.h
-    blob 'static[ ]int[ ]__devinit[ ]bnx2x_check_firmware[(]struct[ ]bnx2x[ ][*]bp[)][\n][{]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/bnx2x_main.c
+    blob 'static[ ]int[ ]__devinit[ ]bnx2x_check_firmware[(]struct[ ]bnx2x[ ][*]bp[)][\n][{][^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' drivers/net/bnx2x_main.c
     blobna 'if[ ][(][(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\([ ][|][|][\n][ 	]*[(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\)*[)][ ][{][^{}]*[}]' drivers/net/bnx2x_main.c
     blobna 'sprintf[(]fw_file_name[ ][+][ ]offset,[ ]["]%d[.]%d[.]%d[.]%d[.]fw["]\(,[\n][ 	]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)*[)][;]' drivers/net/bnx2x_main.c
     blob 'rc[ ]=[ ]bnx2x_check_firmware[(]bp[)][;]' drivers/net/bnx2x_main.c
@@ -2126,11 +2126,11 @@ set_except () {
     defsnc '[	][}][ ]common_modes\[17\][ ]=' drivers/gpu/drm/radeon/radeon_connectors.c
     defsnc '[	][	]*\(static[ ]\)\?struct[ ]phy_reg[ ]phy_reg_init\(_0\)\?\[\][ ]=' drivers/net/r8169.c
     accept '[	][	]*struct[ ]phy_reg[ ]phy_reg_init_1\[\][ ]=[ ][{][^;]*0x8300[^;]*[}][;]' drivers/net/r8169.c
-    blob 'static[ ]void[ ]rtl8168d_[12]_hw_phy_config[(]void[ ]__iomem[ ][*]ioaddr[)][\n][{][\n]\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/r8169.c
+    blob 'static[ ]void[ ]rtl8168d_[12]_hw_phy_config[(]void[ ]__iomem[ ][*]ioaddr[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]' drivers/net/r8169.c
     blobna 'rtl8168d_[12]_hw_phy_config[(]ioaddr[)][;]' drivers/net/r8169.c
     blobna 'static[ ]struct[ ]phy_reg_init_[12]\[\][ ]=[ ][{][\n 	{}0-9a-fx]*0x06,[ ]0xf8f9[\n 	{}0-9a-fx]*[}][;]' drivers/net/r8169.c
     # This loads firmware to be flashed from filename provided through ethtool.
-    accept 'int[ ]be_load_fw[(][^\n;{]*[)][ \n][{]\([\n]*[^\n}][}]*\)*ETHTOOL_FLASH_MAX_FILENAME\([\n]*[^\n}][}]*\)*be_cmd_get_fw_ver\([\n]*[^\n}][}]*\)*request_firmware\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/net/benet/be_main.c
+    accept 'int[ ]be_load_fw[(][^\n;{]*[)][ \n][{][^\n]*\([\n]\+[^\n}][^\n]*\)*ETHTOOL_FLASH_MAX_FILENAME[^\n]*\([\n]\+[^\n}][^\n]*\)*be_cmd_get_fw_ver[^\n]*\([\n]\+[^\n}][^\n]*\)*request_firmware[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' drivers/net/benet/be_main.c
     defsnc '[	]u8[ ]init_hash_seed\[\][ ]=' drivers/net/qlge/qlge_main.c
     defsnc 'static[ ]const[ ]u_int32_t[ ]ar9287\(Common\|Modes\(_\([tr]x_gain\)\)\?\)_9287_1_[01]\[\]\[[236]\][ ]=' drivers/net/wireless/ath9k/initvals.h
     defsnc 'static[ ]const[ ]u_int32_t[ ]ar9271\(Common\|Modes\)_9271_1_0\[\]\[[26]\][ ]=' drivers/net/wireless/ath9k/initvals.h
@@ -2174,7 +2174,7 @@ set_except () {
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]hwecc4_2048[ ]__initconst[ ]=' drivers/mtd/nand/davinci_nand.c
     defsnc 'static[ ]const[ ]u16[ ]wm8974_reg\[WM8974_CACHEREGNUM\][ ]=' sound/soc/codecs/wm8974.c
     defsnc 'static[ ]const[ ]u16[ ]ak4642_reg\[AK4642_CACHEREGNUM\][ ]=' sound/soc/codecs/ak4642.c
-    accept 'int[ ]snd_hda_load_patch[(][^\n;{]*[)][ \n][{]\([\n]*[^\n}][}]*\)*hda_codec\([\n]*[^\n}][}]*\)*request_firmware\([\n]*[^\n}][}]*\)*[\n]\+[}]' sound/pci/hda/hda_hwdep.c
+    accept 'int[ ]snd_hda_load_patch[(][^\n;{]*[)][ \n][{][^\n]*\([\n]\+[^\n}][^\n]*\)*hda_codec[^\n]*\([\n]\+[^\n}][^\n]*\)*request_firmware[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' sound/pci/hda/hda_hwdep.c
     accept '[ ][ ][ ]Bit[ 0-7]*' Documentation/input/sentelic.txt
     accept 'The[ ]hd-audio[ ]driver[ ]reads[ ]the[ ]file[ ]via[ ]request_firmware[(][)]\.' Documentation/sound/alsa/HD-Audio.txt
     blob 'SD8688[ ]firmware:[\n]*\([/]lib[/]firmware[^\n]*[\n]*\)*The[ ]images[^:]*:[\n]*[^\n]*[/]linux-firmware[^\n]*' Documentation/btmrvl.txt
@@ -2182,7 +2182,7 @@ set_except () {
     defsnc 'static[ ]int[ ]zoom2_batt_table\[\][ ]=' arch/arm/mach-omap2/board-zoom2.c
     defsnc 'static[ ]struct[ ]ad714x_platf\(or\|ro\)m_data[ ]ad714[27]_platf\(or\|ro\)m_data[ ]=' arch/blackfin/mach-bf537/boards/stamp.c
     blob 'static[ ]const[ ]u8[ ]lgs8g75_initdat\[\][ ]=[ ][{][^;]*[}][;]' drivers/media/dvb/frontends/lgs8gxx.c
-    blob 'static[ ]int[ ]lgs8g75_init_data[(][^\n;{]*[)][ \n][{]\([\n]*[^\n}][}]*\)*lgs8g75_initdat\([\n]*[^\n}][}]*\)*[\n]\+[}]' drivers/media/dvb/frontends/lgs8gxx.c
+    blob 'static[ ]int[ ]lgs8g75_init_data[(][^\n;{]*[)][ \n][{][^\n]*\([\n]\+[^\n}][^\n]*\)*lgs8g75_initdat[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' drivers/media/dvb/frontends/lgs8gxx.c
     defsc 'static[ ]struct[ ]idxdata[ ]tbl_common_[a-e]\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi2020\|mi1320\|ov9655\|ov2640\)\.c'
     defsnc 'static[ ]struct[ ]validx[ ]tbl_\(commm\?on\|init_\(at_startup\|post_alt\)\|sensor_settings_common_[ab]\|big_[abc]\|640\|800\)\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi2020\|mi1320\|ov9655\|ov2640\).c'
     defsnc 'static[ ]u8[ ][*]tbl_\(640\|800\)\[\][ ]=' 'drivers/media/video/gspca/gl860/gl860-\(mi1320\|ov9655\).c'
@@ -2603,7 +2603,7 @@ bol="\\(^\\|[\\n]\\)"
 eol="\\([\\n]\\|\$\\)"
 
 # Regular expression that matches a C-style comment.
-comment="\\([/]\\([*][/]*\\([*]*[^*/][/]*\\)*[*]\\+[/]\\|[/][^\\n]*[\\n]\\)\\)"
+comment="\\([/][*][^*]*\\([*]\\+[^*/][^*]*\\)*[*]\\+[/]\\|[/][/][^\\n]*[\\n]\\)"
 
 # Regular expression that matches comments typically used in assembly.
 asmcomment="\\($comment\\|[;#][^\\n]*[\\n]\\)"
@@ -3929,12 +3929,12 @@ check () {
   # $1 (implicitly anchored to the beginning of the line), and ending
   # at the first ';' that's not within comments.
   initc () {
-    addx "$1\\([^;]\\|$comment\\)*[;]\\?" $2
+    addx "$1\\([^;/]\\+\\($comment\\|[/][^/*;]\\)\\+\\)*[^;/]*[;]\\?" $2
   }
 
   # Same as initc, but require the terminating semicolon.
   defsc () {
-    addx "$1\\([^;]\\|$comment\\)*[;]" $2
+    addx "$1\\([^;/]\\+\\($comment\\|[/][^/*;]\\)\\+\\)*[^;/]*[;]" $2
   }
 
   # Accept as a non-blob an expression $1 that would have otherwise
