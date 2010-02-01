@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-01-29
+# deblob-check version 2010-02-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2673,17 +2673,12 @@ g
   $4
   d
 }
-/^;[/][*]begin /!{
-  : internal_error
-  $v:internal_error
-  i\\
-Internal error at
-  p
-  i\\
-/*(DEBLOB-\\
-ERROR)*/
-  q 2
-}
+# /^;[/][*]begin /!{
+#   : internal_error
+#   $v:internal_error
+#   s,.*,Internal error at\\n&[\\n]/*(DEBLOB-\\nERROR)*/,;
+#   q 2
+# }
 $v:reading file in
 h
 n
@@ -2708,6 +2703,7 @@ $v:blob
 $1
 d
 : clean
+$v:clean
 $2
 d
 : falsepos
@@ -3842,7 +3838,7 @@ $eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
 	}
 
 	if ((list_blob && blobs) || (list_falsepos && falses)) {
-	    for (i = nfilenames; --i >= 0;)
+	    for (i = nfilenames; --i > 0;)
 		print filenames[i] " within";
 	    print filenames[0];
 	    exit (1);
@@ -4035,16 +4031,59 @@ BAD regular expression:
       s=+ r=-
     fi
     sedpatch="
-      /^[$r]/d
-      /^\\(@@\\|$s$s$s\\) / {
-	i\\
-\\
-;/*end patchlet */;\\
-;/*begin patchlet */;
-	s/^/;\\/*/
-	s/\$/*\\/;/
+      /^[$r]/d;
+      # /^[*!]/ {
+      # 	s,^,context diffs are not properly supported\\n,;
+      # 	W /dev/stderr
+      # 	d;
+      # }
+      /^\\(@@ \\|$s$s$s \\|[^$s @]\\|$\\)/ {
+	x;
+	/^@@ /{
+	  s,^,;&/*end ,;
+	  s,\\([\\n]\\|$\\),*/;&,;
+	  i\\
+
+	  P;
+	  s,^[^\\n]*\\([\\n]\\|$\\),,;
+	}
+	x;
       }
-      s/^[ $s]//"
+      /^\\($s$s$s \\|[^$s @]\\|$\\)/ {
+	x;
+	/^$s$s$s /{
+	  s,^$s$s$s,;/*end,;
+	  s,\\([\\n]\\|$\\),*/;&,;
+	  i\\
+
+	  P;
+	  s,^[^\\n]*\\([\\n]\\|$\\),,;
+	}
+	x;
+      }
+      /^$s$s$s / {
+	H;
+	x;
+	s,^[\\n],,;
+	s,^\\(.*\\)[\\n]\\([^\\n]*\\)$,\\2\\n\\1,;
+	x;
+	s,^$s$s$s,;/*begin,;
+	s,\\([\\n]\\|$\\),*/;&,;
+	p;
+	d;
+      }
+      /^@@ / {
+        H;
+	x;
+	s,^[\\n],,;
+	s,^\\(.*\\)[\\n]\\([^\\n]*\\)$,\\2\\n\\1,;
+	x;
+	s,^,;/*begin ,;
+	s,\\([\\n]\\|$\\),*/;&,;
+	p;
+	d;
+      }	
+      s,^[ !$s],,;"
     cmd='${SED-sed} "$sedpatch"'
     ;;
   *)
