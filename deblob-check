@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-02-01
+# deblob-check version 2010-02-01a
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2488,6 +2488,17 @@ set_except () {
     blobname 'atmel_at76c50\(3-\(i386[13]\|rfmd\(-acc\)\?\)\|5\(a\(mx\)\?\)\?-rfmd\(2958\)\?\)\.bin' drivers/net/wireless/at76_usb/at76_usb.c
     ;;
   */linux-2.6-v4l-dvb*.patch)
+    # rebase-gspca-to-latest 2.6.33ish starts here
+    defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
+    defsnc 'static[ ]const[ ]u8[ ]bridge_start_\([qs]\?v\|x\)ga\[\]\[2\][ ]=' drivers/media/video/gspca/ov435_9.c
+    defsnc 'static[ ]const[ ]__u8[ ]\(start\|page3\)_7302\[\][ ]=' drivers/media/video/gspca/pac7302.c
+    defsnc '[	]struct[ ]init_command[ ]\(spy\|cif\|ms350\|genius\|vivitar\)_start_commands\[\][ ]=' drivers/media/video/gspca/sn9c2028.c
+    defsnc 'static[ ]const[ ]u8[ ]\(adcm1700\|om6802\|po1030\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u8[ ]hv7131r_sensor_init\[\]\[8\][ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sonixj.c
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u8[ ]\(mi1320\|po3130\)_initVGA_data\[\]\[4\][ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sonixj.c
+    defsnc 'static[ ]const[ ]u8[ ]poxxxx_init\(_common\|Q\?VGA\|_end_1\)\[\]\[4\][ ]=' drivers/media/video/gspca/vc032x.c
+    defsnc '[	]static[ ]const[ ]u8[ ]gamma_tb\[6\]\[16\][ ]=' drivers/media/video/gspca/zc3xx.c
+    # rebase-gspca-to-latest ends here
     defsnc 'static[ ]u8[ ]af9015_ir_table_\(avermedia\(_ks\)\?\|digittrade\)\[\][ ]=' drivers/media/dvb/dvb-usb/af9015.h
     defsnc 'struct[ ]au8522_register_config[ ]lpfilter_coef\[\][ ]=' drivers/media/dvb/frontends/au8522_decoder.c
     defsnc 'static[ ]struct[ ]mse2snr_tab[ ]\(vsb\|qam\(64\|256\)\)_mse2snr_tab\[\][ ]=' drivers/media/dvb/frontends/au8522.c
@@ -4040,9 +4051,10 @@ BAD regular expression:
       /^\\(@@ \\|$s$s$s \\|[^$s @]\\|$\\)/ {
 	x;
 	/^@@ /{
-	  s,^,;&/*end ,;
+	  s,^,;/*end ,;
 	  s,\\([\\n]\\|$\\),*/;&,;
 	  i\\
+;/**/;
 
 	  P;
 	  s,^[^\\n]*\\([\\n]\\|$\\),,;
@@ -4067,8 +4079,7 @@ BAD regular expression:
 	s,^[\\n],,;
 	s,^\\(.*\\)[\\n]\\([^\\n]*\\)$,\\2\\n\\1,;
 	x;
-	s,^$s$s$s,;/*begin,;
-	s,\\([\\n]\\|$\\),*/;&,;
+	s,^$s$s$s \\(.*\\)$,;/*begin \\1*/;,;
 	p;
 	d;
       }
@@ -4078,8 +4089,9 @@ BAD regular expression:
 	s,^[\\n],,;
 	s,^\\(.*\\)[\\n]\\([^\\n]*\\)$,\\2\\n\\1,;
 	x;
-	s,^,;/*begin ,;
-	s,\\([\\n]\\|$\\),*/;&,;
+	# A number of patterns for patches depend on the ;/*@@ lines for
+	# context.
+	s,^.*$,;/*begin &*/;\\n;/*&*/;,;
 	p;
 	d;
       }	
