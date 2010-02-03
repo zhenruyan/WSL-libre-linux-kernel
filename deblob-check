@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-02-03
+# deblob-check version 2010-02-03a
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -696,7 +696,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|cis\|dat\|elf\|xlx\|rfb\|ucode\|img\|ctx\(prog\|vals\)\)["]'
+  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|cis\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\)["]'
 
   case $prefix$1 in
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
@@ -1543,7 +1543,7 @@ set_except () {
     blobname 'e100[/]d10\(1[ms]\|2e\)_ucode\.bin' drivers/net/e100.c
     blobname 'tigon[/]tg3\(_tso5\?\)\?\.bin' drivers/net/tg3.c
     blobname '\(ti_usb-v\(%04x\|[0-9a-f]*\)-p\(%04x\|[0-9a-f]*\)\|mts_\(cdma\|gsm\|edge\)\)\.\(bin\|fw\)' drivers/usb/serial/ti_usb_3410_5052.c
-    blobname 'iw\?2400m-fw-\(sdio\|usb\)-\(\(["][ ]I2400M_FW_VERSION[ ]["]\|[0-9.]*\)\.sbcf\|[^". \n]*\)' 'drivers/net/wimax/i2400m/\(sdio\|usb\)\.c'
+    blobname 'iw\?\(2400\|6050\)m-fw-\(sdio\|usb\)-\(\(["][ ]I2400M_FW_VERSION[ ]["]\|[0-9.]*\)\.sbcf\|[^". \n]*\)' 'drivers/net/wimax/i2400m/\(sdio\|usb\)\.c'
     blob '3\.[ ]Installing[ ]the[ ]firmware[^\n]*\([\n][\n]*[ ][ ][ ][^\n]*\)*[\n]*[$][^\n]*i2400m-fw[^\n]*\([\n][\n]*[ ][ ][ ][^\n]*\)*' Documentation/wimax/README.i2400m
     blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*\([\n][\n]*\([ ][ ][ ]\|i2400m_usb\)[^\n]*\)*' Documentation/wimax/README.i2400m
     accept '[	][	]ranges[ ]=[ ]<'"$blobpat*"'>[;]' 'arch/powerpc/boot/dts/\(mpc8572ds\|p2020ds\|katmai\)\.dts'
@@ -1589,7 +1589,7 @@ set_except () {
     blob '\(UCHAR\|u8\)[ ]FirmwareImage\(_\(2870\|30[79]0\)\)\?[ ]\[\][ ]=[ ][{][^;]*[}][ ][;]' 'drivers/staging/rt\(28[67]\|30[79]\)0/common/firmware\(_3070\)\?\.h'
     defsnc 'ULONG[ ][ ]*BIT32\[\][ ]=' 'drivers/staging/rt28[67]0/common/rtmp_init\.c'
     defsnc 'const[ ]unsigned[ ]short[ ]ccitt_16Table\[\][ ]=' 'drivers/staging/rt\(28[67]0\|3090\)/common/rtmp_init\.c'
-    blobna '\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[(]PUCHAR[)][&]FirmwareImage\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\([\n	 ]*\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[(]PUCHAR[)][&]FirmwareImage\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\)*' 'drivers/staging/rt\(28[67]0\|30[79]0\)/common/rtmp_init\.c'
+    blobna '\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\([\n	 ]*\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\)*' 'drivers/staging/rt\(28[67]0\|30[79]0\)/common/rtmp_init\.c'
     blobname 'rate\.bin' drivers/staging/rt2870/rtmp_init.c
     defsnc '\(U\(INT\|CHAR\)\|u\(32\|8\)\)[ ]\(Tkip_Sbox_\(Lower\|Upper\)\|SboxTable\)\[256\][ ]=' 'drivers/staging/rt\(28[67]0\|3070\)/common/\(rtmp\|cmm\)_tkip\.c'
     defsnc '\(UINT\|u32\)[ ]FCSTAB_32\[256\][ ]=' 'drivers/staging/rt\(28[67]0\|3070\)/common/\(rtmp\|cmm\)_wep\.c'
@@ -2128,7 +2128,7 @@ set_except () {
     accept '[	][	]*struct[ ]phy_reg[ ]phy_reg_init_1\[\][ ]=[ ][{][^;]*0x8300[^;]*[}][;]' drivers/net/r8169.c
     blob 'static[ ]void[ ]rtl8168d_[12]_hw_phy_config[(]void[ ]__iomem[ ][*]ioaddr[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]' drivers/net/r8169.c
     blobna 'rtl8168d_[12]_hw_phy_config[(]ioaddr[)][;]' drivers/net/r8169.c
-    blobna 'static[ ]struct[ ]phy_reg_init_[12]\[\][ ]=[ ][{][\n 	{}0-9a-fx]*0x06,[ ]0xf8f9[\n 	{}0-9a-fx]*[}][;]' drivers/net/r8169.c
+    blobna 'static[ ]\(const[ ]\)\?struct[ ]phy_reg_init_[12]\[\][ ]=[ ][{][\n 	{}0-9a-fx]*0x06,[ ]0xf8f9[\n 	{}0-9a-fx]*[}][;]' drivers/net/r8169.c
     # This loads firmware to be flashed from filename provided through ethtool.
     accept 'int[ ]be_load_fw[(][^\n;{]*[)][ \n][{][^\n]*\([\n]\+[^\n}][^\n]*\)*ETHTOOL_FLASH_MAX_FILENAME[^\n]*\([\n]\+[^\n}][^\n]*\)*be_cmd_get_fw_ver[^\n]*\([\n]\+[^\n}][^\n]*\)*request_firmware[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' drivers/net/benet/be_main.c
     defsnc '[	]u8[ ]init_hash_seed\[\][ ]=' drivers/net/qlge/qlge_main.c
@@ -2168,7 +2168,7 @@ set_except () {
     defsnc 'static[ ]const[ ]UINT32[ ]SHA256_K\[64\][ ]=' drivers/staging/rt3090/common/crpt_sha2.c
     defsnc '\(DOT11_REGULATORY_INFORMATION\|struct[ ]rt_dot11_regulatory_information\)[ ]\(USA\|Europe\|Japan\)RegulatoryInfo\[\][ ]=' 'drivers/staging/\(rt3090\|rt2860\)/common/spectrum\.c'
     defsnc 'static[ ]const[ ]USHORT[ ]Sbox\[256\][ ]=' drivers/staging/rt3090/sta/rtmp_ckipmic.c
-    blob '#include[ 	]*["]\(\.\.[/]\)\?firmware\.h["]' 'drivers/staging/rt\(28[67]\|309\)0/common/rtmp_\(init\|mcu\)\.c'
+    blob '#include[ 	]*["]\(\.\.[/]\(\.\.[/]rt30[79]0[/]\)\?\)\?firmware\.h["]' 'drivers/staging/rt\(28[67]\|309\)0/common/rtmp_\(init\|mcu\)\.c'
     blobna 'FIRMWAREIMAGE_LENGTH[ ]==' drivers/staging/rt3090/common/rtmp_mcu.c
     defsnc 'int[ ]wm831x_isinkv_values\[WM831X_ISINK_MAX_ISEL[ ][+][ ][1]\][ ]=' drivers/mfd/wm831x-core.c
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]hwecc4_2048[ ]__initconst[ ]=' drivers/mtd/nand/davinci_nand.c
@@ -2298,6 +2298,13 @@ set_except () {
     accept '[	]len[ ]=[ ]mod_firmware_load[(]fn,[ ][&]data[)][;][\n][	]if[ ][^{]*[ ][{][\n][	][	 ]*printk[(]KERN_ERR[ ]["]sscape:' sound/oss/sscape.c
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]wm_vol\[256\][ ]=' 'sound/pci/ice1712/\(phase\|aureon\)\.c'
     accept '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?\(static[ ]inline[ ]\)\?int[ ]request_firmware\(_nowait\)\?[(]\(const[ ]struct[ ]firmware[ ][*][*]\|[\n][	]struct[ ]module[ ][*]\)' include/linux/firmware.h
+    blobname 'isl38\(77\|86\|90\)' drivers/net/wireless/prism54/islpci_dev.c
+    accept '[ ]*#[ ]*define[ ]\(STA_PROFILE\|CARD_INFO\)_PATH[	]*["][/]etc[/]Wireless[/]RT\(28[67]\|307\)0STA[/]RT\(28[67]\|307\)0STA\(Card\)\?\.dat["]' 'drivers/staging/rt\(28[67]0\|3070\)/rt_linux\.h'
+    accept '#include[ ]["]rf\.h["][\n]#include[ ]["]firmware\.h["]' drivers/staging/vt6656/main_usb.c
+    blob '#include[ 	]*["]\(\.\.[/]\(\.\.[/]rt30[79]0[/]\)\?\)\?firmware\.h["]' 'drivers/staging/rt\(28[67]\|309\)0/common/rtmp_\(init\|mcu\)\.c'
+    blob 'Derived[ ]from[ ]proprietary[ ]unpublished[ ]source[ ]code' drivers/net/tg3.c
+    blobname 'atmel_at76c50\(2\([de]\|_3com\)\?\|4a\?\(_2958\)\?\|6\)\(\.bin\)\?' drivers/net/wireless/atmel.c
+    blobna '\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\([\n	 ]*\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\)*' 'drivers/staging/rt\(28[67]0\|30[79]0\)/common/rtmp_init\.c'
     # The above are covered by the main Linux patterns.  The patterns
     # below are to be kept in sync in the 2.6.33 block within the main
     # Linux patterns, until 2.6.33 is released.
