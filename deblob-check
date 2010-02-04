@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-02-03a
+# deblob-check version 2010-02-04
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2251,6 +2251,7 @@ set_except () {
     ;;
 
   */patch*2.6.33-rc*)
+    accept 'static[ ]inline[ ]int[\n]\(maybe_\)\?reject_firmware\(_nowait\)\?[(][^{;]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*\([\n]\+[}]\)\?' include/linux/firmware.h
     accept '[	][	]ranges[ ]=[ ]<'"$blobpat*"'>[;]' 'arch/powerpc/boot/dts/\(mpc8572ds\|p2020ds\|katmai\)\.dts'
     defsnc 'static[ ]unsigned[ ]char[ ]camera_ncm03j_magic\[\][ ]=' 'arch/sh/boards/\(board-ap325rxa\.c\|mach-ap325rxa/setup\.c\)'
     defsnc 'static[ ]unsigned[ ]char[ ]vga_font\[cmapsz\][ ]\(BTDATA[ ]\)\?=' arch/sparc/kernel/btext.c
