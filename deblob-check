@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-02-04
+# deblob-check version 2010-02-07
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -619,10 +619,18 @@ case $1 in
 esac
 
 if $test_mode; then
+ allpass=:
+ for tool in awk perl python sed; do
+  echo testing $tool...
+  
+  targs="-s 4 -i /deblob-check-testsuite/ --use-$tool"
+
   pass=:
 
-  # Exercise some nasty inputs to see that we recognize them as blobs
-  # with full context.
+
+  # Exercise some nasty inputs to see that we
+  # recognize them as blobs with full context.
+  test="positive context"
   for string in \
     "1,2,3,4" \
     "= {
@@ -642,7 +650,7 @@ if $test_mode; then
     "#define X { 1, 2, \\
 		 3, 4, /* comment */ \\
 	       }" \
-  "= {
+    "= {
 /*
  * multi-line
  * comment
@@ -651,37 +659,216 @@ if $test_mode; then
    0x4c00c000, 0x00000000, 0x00060000, 0x00000000,
  },
 }" \
+    "= {
+blob(
+)
+accept(
+)
+1, 2, 3, 4
+}" \
   ; do
-    case `echo "$string" | $0 -s 4 -C` in
+    case `echo "$string" | $0 $targs -C` in
     "::: - :::
 $string") ;;
-    *) echo "failed positive test for:
+    *) echo "failed $test test for:
 $string" >&2
        pass=false;;
     esac
   done
 
   # Make sure we do not recognize these as blobs.
+  test=negative
   for string in \
     "#define X { 1, 2 }
 #define Y { 3, 4 }" \
     " 0x00, 0x00, 0x00 " \
+    "accept(1, 2, 3,
+4, 5, 6)" \
   ; do
-    case `echo "$string" | $0 -s 4` in
+    case `echo "$string" | $0 $targs` in
     "") ;;
-    *) echo "failed negative test for:
+    *) echo "failed $test test for:
 $string" >&2
        pass=false;;
     esac
   done
 
+  # Make sure we print only the lines with blobs.
+  test="only blob"
+  odd=:
+  for string in \
+    "= {
+1, 0x2, 03, L'\x4'
+}" \
+	"1, 0x2, 03, L'\x4'" \
+\
+    "=
+{
+  '\\x1', '\\002'
+  ,
+  {
+    { \"\\x3\", },
+    \"\\004\"
+  },
+};" \
+	"  '\\x1', '\\002'
+  ,
+  {
+    { \"\\x3\", },
+    \"\\004\"" \
+\
+    ".long 1,2
+     .long \$3,\$4" \
+	".long 1,2
+     .long \$3,\$4" \
+\
+    "#define X { 1, 2, \\
+		 3, 4, /* comment */ \\
+	       }" \
+	"#define X { 1, 2, \\
+		 3, 4, /* comment */ \\" \
+\
+    "= {
+/*
+ * multi-line
+ * comment
+ */
+ {
+   0x4c00c000, 0x00000000, 0x00060000, 0x00000000,
+ },
+}" \
+	"   0x4c00c000, 0x00000000, 0x00060000, 0x00000000," \
+\
+    "MODULE_FIRMWARE(x);
+MODULE_FIRMWARE(y);
+1, 2, 3, 4; 5, 6, 7, 8;
+9, 10, 11" \
+      "MODULE_FIRMWARE(x);
+MODULE_FIRMWARE(y);
+::: - :::
+1, 2, 3, 4; 5, 6, 7, 8;" \
+\
+    "= {
+blob()
+accept()
+1, 2, 3, 4
+}" \
+	"blob()
+::: - :::
+1, 2, 3, 4" \
+\
+    "a blobeol y
+x" \
+	"a blobeol y
+x" \
+\
+  ; do
+    if $odd; then
+      input=$string odd=false
+      continue
+    fi
+    case `echo "$input" | $0 $targs -B` in
+    "::: - :::
+$string") ;;
+    *)
+      echo "failed $test test for:
+$input" >&2
+      pass=false
+      ;;
+    esac
+    odd=:
+  done
+  $odd || { echo "internal testsuite failure in $test" >&2; }
+
+  # Make sure we deblob only the blobs.
+  test="deblobs"
+  odd=:
+  for string in \
+    "= { 1, 0x2, 03, L'\x4' }" \
+	"= { /*(DEBLOBBED)*/' }" \
+\
+    "=
+{
+  '\\x1', '\\002'
+  ,
+  {
+    { \"\\x3\", },
+    \"\\004\"
+  },
+};" \
+	"  '\\x/*(DEBLOBBED)*/\"" \
+\
+    ".long 1,2
+     .long \$3,\$4" \
+	".long /*(DEBLOBBED)*/" \
+\
+    "#define X { 1, 2, \\
+		 3, 4, /* comment */ \\
+	       }" \
+	"#define X { /*(DEBLOBBED)*/, /* comment */ \\" \
+\
+    "= {
+/*
+ * multi-line
+ * comment
+ */
+ {
+   0x4c00c000, 0x00000000, 0x00060000, 0x00000000,
+ },
+}" \
+	"   /*(DEBLOBBED)*/," \
+\
+    "MODULE_FIRMWARE(x);
+MODULE_FIRMWARE(y);
+1, 2, 3, 4; 5, 6; 7, 8, 9, 10;
+9, 10, 11" \
+      "/*(DEBLOBBED)*/
+::: - :::
+/*(DEBLOBBED)*/; 5, 6; /*(DEBLOBBED)*/;" \
+\
+    "= {
+accept() blob() x blob(
+) y
+}" \
+	"accept() /*(DEBLOBBED)*/ x /*(DEBLOBBED)*/ y" \
+\
+    "= {
+accept() blob() x blob(
+w) y
+}" \
+	"accept() /*(DEBLOBBED)*/ x /*(DEBLOBBED)*/ y" \
+\
+    "a blobeol y
+x" \
+	"a /*(DEBLOBBED)*/x" \
+\
+  ; do
+    if $odd; then
+      input=$string odd=false
+      continue
+    fi
+    case `echo "$input" | $0 $targs -b` in
+    "::: - :::
+$string") ;;
+    *)
+      echo "failed $test test for:
+$input" >&2
+      pass=false
+      ;;
+    esac
+    odd=:
+  done
+  $odd || { echo "internal testsuite failure in $test" >&2; }
+
   # How did we do?
   if $pass; then
-    echo success
+    echo success for $tool
+  else
+    allpass=$pass
   fi
-
-  $pass
-  exit
+ done
+ $allpass
+ exit
 fi
 
 # Call addx as needed to set up more patterns to be recognized as
@@ -2723,6 +2910,12 @@ set_except () {
   */linux-2.6-netdev-e1000e*.patch)
     initnc 'static[ ]const[ ]u16[ ]e1000_igp_2_cable_length_table\[\][ ]=' drivers/net/e1000e/phy.c
     ;;
+
+  */deblob-check-testsuite/*)
+    accept 'accept[(][^)]*[)]'
+    blobname 'blob[(][^)]*[)]'
+    blobname 'blobeol[^\n]*[\n]'
+    ;;
   esac
 }  
 
@@ -2986,7 +3179,7 @@ i\\
   b print_blobs_output_false_positive
 }
 h
-s/\\(\\($blobs[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
+s/\\($blobs\\([^\\n]*$blobs\\)*[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 p
 g
@@ -3050,7 +3243,7 @@ i\\
   b print_marked_blobs_output_false_positive
 }
 h
-s/\\(\\($blobs[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
+s/\\($blobs\\([^\\n]*$blobs\\)*[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 # s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
 s/$blobs/\/*(DEBLOBBED)*\//g
@@ -3116,7 +3309,7 @@ i\\
   b print_cblobs_output_false_positive
 }
 h
-s/^\\($lblobctx[^\\n]*\\($blobs[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
+s/^\\($lblobctx\\([^\\n]*$blobs\\)*[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 p
 g
@@ -3180,7 +3373,7 @@ i\\
   b print_marked_cblobs_output_false_positive
 }
 h
-s/^\\($lblobctx[^\\n]*\\($blobs[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
+s/^\\($lblobctx\\([^\\n]*$blobs\\)*[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 # s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
 s/$blobs/\/*(DEBLOBBED)*\//g
@@ -3215,7 +3408,7 @@ $v:print_both
 h
 i\\
 ::: $file :::
-s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobs[^\\n]*\\)\\($blobs[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
+s/^\\(\\($falsepos\\|[^\\n]*$blobs\\)\\([^\\n]*$blobs\\)*[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 p
 g
@@ -3308,7 +3501,7 @@ $v:list_blobs
   b list_blobs_delete_to_eol
 }
 h
-s/\\(\\($blobs[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/
+s/\\($blobs\\([^\\n]*$blobs\\)*[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 # s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
 s/$blobs/\/*(DEBLOBBED)*\//g
@@ -3341,7 +3534,7 @@ $v:list_both
   b list_both_delete_to_eol
 }
 h
-s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobs[^\\n]*\\)\\($blobs[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/
+s/^\\(\\($falsepos\\|[^\\n]*$blobs\\)\\([^\\n]*$blobs\\)*[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/
 $v:narrowed to blob
 # s/{\\($sepx\\)\\?$blobseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g
 s/$blobs/\/*(DEBLOBBED)*\//g
@@ -3359,12 +3552,17 @@ b list_both
 
   scriptcmd='${SED-sed} -n -f "$scriptname"'
 
+  case $vp in
+  [01]) xv= ;;
+  2) xv='# ';;
+  esac
+
   sedunbreak='
 : restart
 /[/][*](DEBLOB-$/ {
   N
-  /[/][*](DEBLOB-[\n]ERROR)[*][/]/{q 1;}
-  s,[/][*](DEBLOB-[\n]BED)[*][/],,
+  /[/][*](DEBLOB-[\n]ERROR)[*][/]/{q 1;}'"
+$xv"'s,[/][*](DEBLOB-[\n]BED)[*][/],,
   b restart
 }
 p
@@ -3524,6 +3722,7 @@ for line in sys.stdin:
                 if pend == 0:
                     pend = len(s)
                 p = match.start() + 1
+		blob_p = 2
             else:
                 blob_p = what == 'blob'
                 assert blob_p or what == 'falsepos'
@@ -3549,7 +3748,9 @@ for line in sys.stdin:
                         pend = len(s)
 
             match = rxc.search (s, p)
-            if match == None or match.start () >= pend:
+            if match == None or match.start () >= pend or \
+	       (blob_p and not print_blob and not falses) or \
+	       (not blob_p and not print_falsepos and not blobs):
                 break
 
         if print_nomatch:
@@ -3739,6 +3940,7 @@ while (<STDIN>) {
 		$blobs++;
 		print "match is a blob at $matchstart\n" if ($verbose);
 	    } else {
+		$blob_p = 2;
 		$p = $matchstart;
 		print "searching up to $pend\n" if $verbose;
 		next;
@@ -3758,7 +3960,10 @@ while (<STDIN>) {
 	    print "searching up to $pend\n" if $verbose;
 	    $p--;
 	}} while (($matchfound = (substr ($s, $p) =~ /(?<=.)$rx/mso))
-		  && ($matchstart = $-[0] + $p) < $pend);
+		  && ($matchstart = $-[0] + $p) < $pend
+		  && !($blob_p
+		       ? (!$print_blob && !$falses)
+		       : (!$print_falsepos && !$blobs)));
 
 	print "last match before $pend\n" if $verbose;
 
@@ -3922,8 +4127,6 @@ $eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
 		    print substr (s, matchstart + 1, matchlen - 1);
 	    }
 
-	    cblob_p = 0;
-
 	    if (match (substr (s, matchstart, matchlen), /^[\n]($falsepos)/) == 1) {
 		if (verbose) print "match is a false positive";
 		blob_p = 0;
@@ -3937,27 +4140,27 @@ $eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
 		    pend = length (s);
 		p = matchstart + 1;
 		if (verbose) print "range is:", substr (s, p, pend - p);
-		cblob_p = 1;
+		blob_p = 2;
 	    } else {
 		if (verbose) print "match is a blob";
 		blob_p = 1;
 		blobs++;
 	    }
 
-	    if (!cblob_p) {
+	    if (blob_p < 2) {
 		if (blob_p ? replace_blob : replace_falsepos) {
 		    s = substr (s, 1, matchstart)		\\
 			replacement				\\
 			substr (s, matchstart + matchlen);
 		    p = matchstart + length (replacement) - 1;
-		    pend += (p + 2 - matchstart - matchlen);
+		    pend += (p + 1 - matchstart - matchlen);
 		} else
 		    p = matchstart + matchlen - 1;
 
-		if (p > pend) {
-		    i = index (substr (s, p), "\n");
+		if (p >= pend) {
+		    i = index (substr (s, p + 1), "\n");
 		    if (i)
-			pend = p + i;
+			pend = p + 1 + i;
 		    else
 			pend = length (s)
 		}
@@ -3967,7 +4170,10 @@ $eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
 
 	    if (!(matchfound = match (substr (s, p),
 				      /[\n]($falsepos)|[\n]($cblob)|.($blob)/)) ||
-		p + RSTART >= pend)
+		p + RSTART >= pend ||
+		(blob_p ?
+		 (!print_blob && !falses) :
+		 (!print_falsepos && !blobs)))
 		break;
 	}
 
