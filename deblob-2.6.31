@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.31 extra=2
+kver=2.6.31 extra=2++
 
 case $1 in
 --force)
@@ -1386,7 +1386,7 @@ clean_sed '
 /^INT[	]set_eFuseLoadFromBin_Proc(/,/^}$/{
   /src = kmalloc/i\
 	printk("%s: missing Free firmware\\n", __func__);\
-	return FALSE;	
+	return FALSE;
 }' drivers/staging/rt2860/common/eeprom.c 'report missing Free firmware'
 clean_blob drivers/staging/rt2860/common/eeprom.c
 clean_kconfig drivers/staging/rt2860/Kconfig RT2860
