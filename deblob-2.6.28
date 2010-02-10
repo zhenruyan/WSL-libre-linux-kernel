@@ -973,6 +973,9 @@ clean_blob drivers/staging/slicoss/oasisdownload.h
 clean_blob drivers/staging/slicoss/oasisdbgdownload.h
 clean_blob drivers/staging/slicoss/gbrcvucode.h
 clean_blob drivers/staging/slicoss/oasisrcvucode.h
+clean_sed '
+s,^\([	]*\)\(instruction[ ]=[ ][^;]*\(Oasis\|GB\|Mojave\)\(Rcv\)\?UCode[^:}]*;\),\1printk(KERN_ERR "slicoss: missing Free firmware\\n");\n\1return STATUS_NOT_SUPPORTED;\n\1\2,' drivers/staging/slicoss/slicoss.c 'report missing Free firmware'
+clean_blob drivers/staging/slicoss/slicoss.c
 clean_kconfig drivers/staging/slicoss/Kconfig 'SLICOSS'
 clean_mk CONFIG_SLICOSS drivers/staging/slicoss/Makefile
 
@@ -985,8 +988,31 @@ clean_kconfig drivers/net/Kconfig 'SPIDER_NET'
 clean_mk CONFIG_SPIDER_NET drivers/net/Makefile
 
 announce SXG - "Alacritech SLIC Technology Non-Accelerated 10Gbe cards"
-clean_blob drivers/staging/sxg/saharadbgdownload.h
-clean_blob drivers/staging/sxg/sxgphycode.h
+clean_file drivers/staging/sxg/saharadbgdownload.h
+clean_file drivers/staging/sxg/sxgphycode.h
+clean_sed '
+/^static bool sxg_download_microcode(/,/^}$/{
+  /^{$/{
+    p
+    i\
+#if 1\
+	printk(KERN_ERR KBUILD_MODNAME ": missing Free firmware\\n");\
+	return (FALSE);\
+#else
+    d
+  }
+  /^}/{
+    i\
+#endif
+  }
+}
+/^static int sxg_phy_init(/,/^}$/{
+  /for (p = PhyUcode/i\
+		printk(KERN_ERR KBUILD_MODNAME ": missing Free firmware\\n");\
+		return (STATUS_FAILURE);\
+#define PhyUcode NULL		
+}' drivers/staging/sxg/sxg.c 'report missing Free firmware'
+clean_blob drivers/staging/sxg/sxg.c
 clean_kconfig drivers/staging/sxg/Kconfig 'SXG'
 clean_mk CONFIG_SXG drivers/staging/sxg/Makefile
 
@@ -1346,6 +1372,14 @@ clean_mk CONFIG_SERIAL_QE drivers/serial/Makefile
 announce ME4000 - "Meilhaus ME-4000 I/O board"
 clean_file drivers/staging/me4000/me4000_firmware.h
 clean_file drivers/staging/me4000/me4610_firmware.h
+clean_sed '
+/^static int me4000_xilinx_download([^;]*$/,/^}$/{
+  /firm = .*xilinx_firm.*/i\
+	printk(KERN_ERR "me4000: Missing Free firmware\\n");\
+	return -EIO;
+}
+' drivers/staging/me4000/me4000.c 'report missing Free firmware'
+clean_blob drivers/staging/me4000/me4000.c
 clean_kconfig drivers/staging/me4000/Kconfig 'ME4000'
 clean_mk CONFIG_ME4000 drivers/staging/me4000/Makefile
 
