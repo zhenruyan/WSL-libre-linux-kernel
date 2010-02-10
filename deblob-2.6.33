@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.33 extra=-- # up to -rc6
+kver=2.6.33 extra=-- # up to -rc7
 
 case $1 in
 --force)
@@ -324,14 +324,14 @@ discard_rejected_firmware(const struct firmware *fw, void *context)\
 static inline int\
 reject_firmware_nowait(struct module *module, int uevent,\
 		       const char *name, struct device *device,\
-		       void *context,\
+		       gfp_t gfp, void *context,\
 		       void (*cont)(const struct firmware *fw,\
 				    void *context))\
 {\
 	int retval;\
 	report_missing_free_firmware(dev_name(device), NULL);\
 	retval = request_firmware_nowait(module, uevent, NONFREE_FIRMWARE,\
-					 device, NULL,\
+					 device, gfp, NULL,\
 					 discard_rejected_firmware);\
 	if (retval)\
 		return retval;\
@@ -340,16 +340,16 @@ reject_firmware_nowait(struct module *module, int uevent,\
 static inline int\
 maybe_reject_firmware_nowait(struct module *module, int uevent,\
 			     const char *name, struct device *device,\
-			     void *context,\
+			     gfp_t gfp, void *context,\
 			     void (*cont)(const struct firmware *fw,\
 					  void *context))\
 {\
 	if (strstr (name, NONFREE_FIRMWARE))\
 		return reject_firmware_nowait(module, uevent, name,\
-					      device, context, cont);\
+					      device, gfp, context, cont);\
 	else\
 		return request_firmware_nowait(module, uevent, name,\
-					       device, context, cont);\
+					       device, gfp, context, cont);\
 }\
 \
 #endif /* _LINUX_LIBRE_FIRMWARE_H */\
@@ -1208,11 +1208,15 @@ announce WLAGS49_H2 - 'Agere Systems HERMES II Wireless PC Card Model 0110'
 # Some pieces of the firmware images are most definitely data, but
 # others seem to be code.
 clean_file drivers/staging/wlags49_h2/ap_h2.c
-clean_file drivers/staging/wlags49_h2/ap_h25.c
 clean_file drivers/staging/wlags49_h2/sta_h2.c
-clean_file drivers/staging/wlags49_h2/sta_h25.c
 clean_kconfig drivers/staging/wlags49_h2/Kconfig 'WLAGS49_H2'
-clean_mk CONFIG_WLAGS49_H2 drivers/staging/wlags49_h2/Makefile
+clean_mk CONFIG_WLAGS49_H2 drivers/staging/Makefile
+
+announce WLAGS49_H25 - 'Linksys Systems HERMES II.5 Wireless-G_CompactFlash_Card'
+clean_file drivers/staging/wlags49_h2/ap_h25.c
+clean_file drivers/staging/wlags49_h2/sta_h25.c
+clean_kconfig drivers/staging/wlags49_h25/Kconfig 'WLAGS49_H25'
+clean_mk CONFIG_WLAGS49_H25 drivers/staging/Makefile
 
 announce IPW2100 - "Intel PRO/Wireless 2100 Network Connection"
 reject_firmware drivers/net/wireless/ipw2x00/ipw2100.c
@@ -1258,12 +1262,12 @@ clean_kconfig drivers/net/wireless/iwmc3200wifi/Kconfig 'IWM'
 clean_mk CONFIG_IWM drivers/net/wireless/iwmc3200wifi/Makefile
 
 announce IWMC3200TOP - "Intel Wireless MultiCom Top Driver"
-reject_firmware drivers/net/wireless/iwmc3200top/fw-download.c
+reject_firmware drivers/misc/iwmc3200top/fw-download.c
 undefine_macro '_FW_NAME(api)' '"/*(DEBLOBBED)*/"' \
-  drivers/net/wireless/iwmc3200top/iwmc3200top.h
-clean_blob drivers/net/wireless/iwmc3200top/main.c
-clean_kconfig drivers/net/wireless/iwmc3200top/Kconfig 'IWMC3200TOP'
-clean_mk CONFIG_IWMC3200TOP drivers/net/wireless/iwmc3200top/Makefile
+  drivers/misc/iwmc3200top/iwmc3200top.h
+clean_blob drivers/misc/iwmc3200top/main.c
+clean_kconfig drivers/misc/iwmc3200top/Kconfig 'IWMC3200TOP'
+clean_mk CONFIG_IWMC3200TOP drivers/misc/iwmc3200top/Makefile
 
 announce LIBERTAS_CS - "Marvell Libertas 8385 CompactFlash 802.11b/g cards"
 reject_firmware drivers/net/wireless/libertas/if_cs.c
@@ -1396,48 +1400,24 @@ clean_blob drivers/net/wireless/rt2x00/rt2800usb.c
 clean_kconfig drivers/net/wireless/rt2x00/Kconfig RT2800USB
 clean_mk CONFIG_RT2800USB drivers/net/wireless/rt2x00/Makefile
 
-announce RT2860 - "Ralink 2860 wireless support"
+announce RT2860 - "Ralink 2860/3090 wireless support"
 clean_file drivers/staging/rt2860/common/firmware.h
 clean_file drivers/staging/rt2860/common/firmware_3070.h
-clean_blob drivers/staging/rt2860/rt_linux.h
+clean_file drivers/staging/rt3090/firmware.h
+clean_sed '
+/^int RtmpAsicLoadFirmware(/,/^}$/{
+  s/^\(	*\)pFirmwareImage =\( .*FirmwareImage.*;\|$\)/\1return printk("%s: missing Free firmware\\n", __func__),\n\1	NDIS_STATUS_FAILURE;\n&/
+}' drivers/staging/rt2860/common/rtmp_mcu.c 'report missing Free firmware'
+clean_blob drivers/staging/rt2860/common/rtmp_mcu.c
 clean_blob drivers/staging/rt2860/rtmp_def.h
-clean_sed '
-/^NDIS_STATUS NICLoadFirmware(/,/^}$/{
-  s/^\(	*\)pFirmwareImage = .*FirmwareImage.*;/\1printk("%s: missing Free firmware\\n", __func__);\n\1return NDIS_STATUS_FAILURE;\n&/
-}' drivers/staging/rt2860/common/rtmp_init.c 'report missing Free firmware'
-clean_blob drivers/staging/rt2860/common/rtmp_init.c
-clean_sed '
-/^INT[	]set_eFuseLoadFromBin_Proc(/,/^}$/{
-  /src = kmalloc/i\
-	printk("%s: missing Free firmware\\n", __func__);\
-	return FALSE;	
-}' drivers/staging/rt2860/common/eeprom.c 'report missing Free firmware'
-clean_blob drivers/staging/rt2860/common/eeprom.c
 clean_blob drivers/staging/rt2860/common/ee_efuse.c
 clean_kconfig drivers/staging/rt2860/Kconfig RT2860
 clean_mk CONFIG_RT2860 drivers/staging/rt2860/Makefile
 
-announce RT2870 - "Ralink 2870 wireless support"
+announce RT2870 - "Ralink 2870/3070 wireless support"
+clean_file drivers/staging/rt3070/firmware.h
 clean_kconfig drivers/staging/rt2870/Kconfig RT2870
 clean_mk CONFIG_RT2870 drivers/staging/rt2870/Makefile
-
-announce RT3070 - "Ralink 3070 wireless support"
-clean_file drivers/staging/rt3070/firmware.h
-clean_kconfig drivers/staging/rt3070/Kconfig RT3070
-
-announce RT3090 - "Ralink 3090 wireless support"
-clean_file drivers/staging/rt3090/firmware.h
-clean_blob drivers/staging/rt3090/common/ee_efuse.c
-clean_blob drivers/staging/rt3090/rtmp_def.h
-clean_blob drivers/staging/rt3090/rt_ate.h
-clean_blob drivers/staging/rt3090/rt_ate.c
-clean_sed '
-/^NDIS_STATUS RtmpAsicLoadFirmware(/,/^}$/{
-  s/^\(	*\)pFirmwareImage = .*FirmwareImage.*;/\1printk("%s: missing Free firmware\\n", __func__);\n\1return NDIS_STATUS_FAILURE;\n&/
-}' drivers/staging/rt3090/common/rtmp_mcu.c 'report missing Free firmware'
-clean_blob drivers/staging/rt3090/common/rtmp_mcu.c
-clean_kconfig drivers/staging/rt3090/Kconfig RT3090
-clean_mk CONFIG_RT3090 drivers/staging/rt3090/Makefile
 
 announce RTL8192E - "RealTek RTL8192E Wireless LAN NIC driver"
 reject_firmware drivers/staging/rtl8192e/r819xE_firmware.c
@@ -1448,14 +1428,14 @@ clean_mk CONFIG_RTL8192E drivers/staging/rtl8192e/Makefile
 announce RTL8192U - "RealTek RTL8192U Wireless LAN NIC driver"
 reject_firmware drivers/staging/rtl8192u/r819xU_firmware.c
 clean_blob drivers/staging/rtl8192u/r819xU_firmware.c
-clean_blob drivers/staging/rtl8192u/r8192xU_firmware_img.c
+clean_blob drivers/staging/rtl8192u/r819xU_firmware_img.c
 clean_kconfig drivers/staging/rtl8192u/Kconfig 'RTL8192U'
 clean_mk CONFIG_RTL8192U drivers/staging/rtl8192u/Makefile
 
 announce RTL8192SU - "RealTek RTL8192SU Wireless LAN NIC driver"
 reject_firmware drivers/staging/rtl8192su/r8192S_firmware.c
-clean_blob drivers/staging/rtl8192su/r8192SU_HWImg.c
 clean_blob drivers/staging/rtl8192su/r8192S_firmware.c
+clean_blob drivers/staging/rtl8192su/r8192SU_HWImg.c
 clean_kconfig drivers/staging/rtl8192su/Kconfig 'RTL8192SU'
 clean_mk CONFIG_RTL8192SU drivers/staging/rtl8192su/Makefile
 
@@ -1463,10 +1443,10 @@ announce VT6656 - "VIA Technologies VT6656 support"
 clean_sed '
 /^FIRMWAREbDownload($/,/^}$/ {
   /PBYTE.*pBuffer/ i\
-	PBYTE abyFirmware[1] = 0;
+    PBYTE abyFirmware[1] = { 0 };
   /-->Download firmware/ i\
-	printk("vt6656: missing Free firmware\\n");\
-	return (FALSE);
+    printk("vt6656: missing Free firmware\\n");\
+    return (FALSE);
 }' drivers/staging/vt6656/firmware.c 'report missing Free firmware'
 clean_blob drivers/staging/vt6656/firmware.c
 clean_kconfig drivers/staging/vt6656/Kconfig 'VT6656'
@@ -2023,14 +2003,6 @@ clean_sed '
   /^	default.*pndsperm\.bin/ s,".*","/*(DEBLOBBED)*/",;
 }' sound/oss/Kconfig 'removed default firmware'
 clean_mk CONFIG_SOUND_MSNDPIN sound/oss/Makefile
-
-announce SOUND_SSCAPE - "Ensoniq SoundScape support"
-clean_blob sound/oss/sscape.c
-clean_sed '
-s,\(scope\.cod\|sndscape\.co[dx?]\),/*(DEBLOBBED)*/,g
-' sound/isa/Kconfig 'deblobbed non-Free firmware names'
-clean_kconfig sound/oss/Kconfig 'SOUND_SSCAPE'
-clean_mk CONFIG_SOUND_SSCAPE sound/oss/Makefile
 
 announce SOUND_TRIX - "MediaTrix AudioTrix Pro support"
 clean_blob sound/oss/trix.c
