@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-02-07
+# deblob-check version 2010-02-10
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1093,7 +1093,6 @@ set_except () {
     initnc 'struct[ ]pattern[ ][{][^}]*int[ ]tone[;][^}]*[}][ ]pattern\[\][ ]=' drivers/isdn/mISDN/dsp_tones.c
     initnc 'static[ ]u8[ ]\([au]\|_4\)law_to_\([ua]law\|4bit\)\[256\][ ]=' drivers/isdn/mISDN/l1oip_codec.c
     initnc 'static[ ]unsigned[ ]char[ ]banner_table\[\][ ]=' arch/sh/boards/mach-microdev/led.c
-    accept 'irq_prio_\([hdl]\|l[cd]\):'"$sepx$blobpat*" arch/arm/inlcude/asm/hardware/entry-macro-iomd.S
     defsnc '[	]static[ ]const[ ]int[ ]desc_idx_table\[\][ ]=' arch/arm/include/asm/hardware/iop3xx-adma.h
     defsnc 'static[ ]\(const[ ]\)\?u32[ ]ar\(5416\|9280\)\(Modes\(_fast_clock\)\?\|Common\|BB_RfGain\|Bank6\(TPC\)\?\|Addac\)\(_91[06]0\(1_1\)\?\|_9280\(_2\)\?\)\?\[\]\[[236]\][ ]=' drivers/net/wireless/ath9k/initvals.h
 
@@ -1591,13 +1590,13 @@ set_except () {
     blobname '\([/]etc[/]sound[/]\)\?midi0001\.bin' sound/oss/sb_common.c
     blobname '\([/]etc[/]sound[/]\|turtlebeach[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/Kconfig
 
-    blob 'When[ ]the[ ]module[ ]is[ ]loaded\([^\n]\|[\n][^\n]\)*[/]pss_synth\([^\n]\|[\n][^\n]\)*' Documentation/sound/oss/PSS
-    blob 'pss_firmware[ \n	]*This[ ]parameter\([^\n]\|[\n][^\n]\)*[/]pss_synth\([^\n]\|[\n][^\n]\)*' Documentation/sound/oss/PSS-updates
+    blob 'When[ ]the[ ]module[ ]is[ ]loaded[^\n]*\([\n][^\n]*\)*[/]pss_synth[^\n]*\([\n][^\n]*\)*' Documentation/sound/oss/PSS
+    blob 'pss_firmware[ \n	]*This[ ]parameter[^\n]*\([\n][^\n]*\)*[/]pss_synth[^\n]*\([\n][^\n]*\)*' Documentation/sound/oss/PSS-updates
     accept '[	][	]pss_synthLen[ ]=[ ]mod_firmware_load[(]pss_firmware,[ ][(]void[ ][*][)][ ][&]pss_synth[)][;]' sound/oss/pss.c
     accept '[	]*if[ ]\?[(]\(!\|fw_load[ ][&][&][ ]\)\?pss_synth' sound/oss/pss.c
     accept '[	]*if[ ][(]!pss_download_boot[(]devc,[ ]pss_synth,[ ]pss_synthLen,' sound/oss/pss.c
     accept '[	]*vfree[(]pss_synth[)][;]' sound/oss/pss.c
-    blob 'to[ ]allow[ ]the[ ]user[ ]\([^/"]\|[^*"][/]*\)*fir[em]ware[ ]file\([^/"]\|[^*"][/]*\)*["][^"]*["]' sound/oss/pss.c
+    blob 'to[ ]allow[ ]the[ ]user[ ][^/"]*fir[em]ware[ ]file[^/"]*["][^"*]*["]' sound/oss/pss.c
     blobname '\([/]etc[/]sound[/]\)\?pss_synth' sound/oss/pss.c
     accept '[	][$][(]obj[)][/]bin2hex[ ]pss_synth' sound/oss/Makefile
     accept '[	][ ]*echo[ ][\'"'"']static[ ]\(unsigned[ ]char[ ][*][ ]*\|int[ ]\)pss_synth\(Len\)\?[ ]=[ ]\(NULL\|0\)[;]' sound/oss/Makefile
@@ -1730,7 +1729,7 @@ set_except () {
     blobname 'e100[/]d10\(1[ms]\|2e\)_ucode\.bin' drivers/net/e100.c
     blobname 'tigon[/]tg3\(_tso5\?\)\?\.bin' drivers/net/tg3.c
     blobname '\(ti_usb-v\(%04x\|[0-9a-f]*\)-p\(%04x\|[0-9a-f]*\)\|mts_\(cdma\|gsm\|edge\)\)\.\(bin\|fw\)' drivers/usb/serial/ti_usb_3410_5052.c
-    blobname 'iw\?\(2400\|6050\)m-fw-\(sdio\|usb\)-\(\(["][ ]I2400M_FW_VERSION[ ]["]\|[0-9.]*\)\.sbcf\|[^". \n]*\)' 'drivers/net/wimax/i2400m/\(sdio\|usb\)\.c'
+    blobname 'iw\?\(2400\|6050\)m\?-fw-\(sdio\|usb\)-\(\(["][ ]I2400M_FW_VERSION[ ]["]\|[0-9.]*\)\.sbcf\|[^". \n]*\)' 'drivers/net/wimax/i2400m/\(sdio\|usb\)\.c'
     blob '3\.[ ]Installing[ ]the[ ]firmware[^\n]*\([\n][\n]*[ ][ ][ ][^\n]*\)*[\n]*[$][^\n]*i2400m-fw[^\n]*\([\n][\n]*[ ][ ][ ][^\n]*\)*' Documentation/wimax/README.i2400m
     blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*\([\n][\n]*\([ ][ ][ ]\|i2400m_usb\)[^\n]*\)*' Documentation/wimax/README.i2400m
     accept '[	][	]ranges[ ]=[ ]<'"$blobpat*"'>[;]' 'arch/powerpc/boot/dts/\(mpc8572ds\|p2020ds\|katmai\)\.dts'
@@ -1776,7 +1775,7 @@ set_except () {
     blob '\(UCHAR\|u8\)[ ]FirmwareImage\(_\(2870\|30[79]0\)\)\?[ ]\[\][ ]=[ ][{][^;]*[}][ ][;]' 'drivers/staging/rt\(28[67]\|30[79]\)0/common/firmware\(_3070\)\?\.h'
     defsnc 'ULONG[ ][ ]*BIT32\[\][ ]=' 'drivers/staging/rt28[67]0/common/rtmp_init\.c'
     defsnc 'const[ ]unsigned[ ]short[ ]ccitt_16Table\[\][ ]=' 'drivers/staging/rt\(28[67]0\|3090\)/common/rtmp_init\.c'
-    blobna '\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\([\n	 ]*\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\)*' 'drivers/staging/rt\(28[67]0\|30[79]0\)/common/rtmp_init\.c'
+    blobna '\(pFirmwareImage[ ]=\([ ]FirmwareImage\(_\(28[67]\|30[79]\)0\)\?\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\|_MAX\)\?_LENGTH\)\)[;]\([\n	 ]*\(pFirmwareImage[ ]=\([ ]FirmwareImage\(_\(28[67]\|30[79]\)0\)\?\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\|_MAX\)\?_LENGTH\)\)[;]\)*' 'drivers/staging/rt\(28[67]0\|30[79]0\)/common/rtmp_init\.c'
     blobname 'rate\.bin' drivers/staging/rt2870/rtmp_init.c
     defsnc '\(U\(INT\|CHAR\)\|u\(32\|8\)\)[ ]\(Tkip_Sbox_\(Lower\|Upper\)\|SboxTable\)\[256\][ ]=' 'drivers/staging/rt\(28[67]0\|3070\)/common/\(rtmp\|cmm\)_tkip\.c'
     defsnc '\(UINT\|u32\)[ ]FCSTAB_32\[256\][ ]=' 'drivers/staging/rt\(28[67]0\|3070\)/common/\(rtmp\|cmm\)_wep\.c'
@@ -1791,6 +1790,17 @@ set_except () {
     defsnc '[ ]\?static[ ]u\(8\|32\)[ ]\(MAC_REG_TABLE\[\]\[2\]\|[ ]*ZEBRA_\(AGC\|RF_RX_GAIN_TABLE\)\[\]\|OFDM_CONFIG\[\]\)=' drivers/staging/rtl8187se/r8185b_init.c
     accept '[	]-[ ]move[ ]firmware[ ]loading[ ]to[ ]request_firmware[(][)]' drivers/staging/slicoss/README
     blobname '\(\(oasis\|gb\)_rcv\|slic_\(oasis\|mojave\)\)\.bin' drivers/staging/slicoss/slicoss.c
+
+    blob 'static[ ]unsigned[ ]char[ ]xilinx_firm\(_4610\)\?\[\][ ]=[ ][{]'"$sepx$blobpat*$sepx"'[}][;]' 'drivers/staging/me4000/me4\(00\|61\)0_firmware\.h'
+    blob 'static[ ]struct[ ]PHY_UCODE[ ]PhyUcode\[\][ ]=[^;]*[;]' drivers/staging/sxg/sxgphycode.h
+    blob 'static[ ]unsigned[ ]char[ ]SaharaUCode\[2\]\[57972\][ ]=[^;]*[;]' drivers/staging/sxg/saharadbgdownload.h
+    blob '#include[ ]["]\(sxgphycode\(-1\.2\)\?\|saharadbgdownload\)\.h["]\([\n][\n]*#include[ ]["]\(sxgphycode\(-1\.2\)\?\|saharadbgdownload\)\.h["]\)*' drivers/staging/sxg/sxg.c
+    blob 'static[ ]u8[ ]\(Mojave\|Oasis\)UCode\[2\]\[65536\][ ]=[^;]*[;]' 'drivers/staging/slicoss/\(gb\|oasis\(dbg\)\?\)download\.h'
+    blob 'static[ ]u8[ ]\(GB\|Oasis\)RcvUCode\[2560\][ ]=[^;]*[;]' 'drivers/staging/slicoss/\(gb\|oasis\)rcvucode\.h'
+    blob '#include[ ]["]\(gb\|oasis\)\(dbg\)\?\(download\|rcvucode\)\.h["]\([\n][\n]*#include[ ]["]\(gb\|oasis\)\(dbg\)\?\(download\|rcvucode\)\.h["]\)*' drivers/staging/slicoss/slicoss.c
+    blobna 'instruction[ ]=[ ][^;]*\(Oasis\|GB\|Mojave\)\(Rcv\)\?UCode[^:}]*[;]' drivers/staging/slicoss/slicoss.c
+    blobna 'seq_printf[(]seq[,][ ]["][^"]*%s[ ]%s[^"]*["][,][ 	\n]*\(GB_RCV\|MOJAVE_\)UCODE_VERS_STRING[,][ ]\(GB_RCV\|MOJAVE_\)UCODE_VERS_DATE[)][;]\([ 	\n]*seq_printf[(]seq[,][ ]["][^"]*%s[ ]%s[^"]*["][,][ 	\n]*\(GB_RCV\|MOJAVE_\)UCODE_VERS_STRING[,][ ]\(GB_RCV\|MOJAVE_\)UCODE_VERS_DATE[)][;]\)*' drivers/staging/slicoss/slicoss.c
+    blobna 'numsects[ ]=[ ][OM]NumSections[;][\n][	]*for[ ][(][^;]*[;][^;]*[;][^;{]*[)][ ][{][\n][^}]*[\n][	][	][}]' drivers/staging/slicoss/slicoss.c
 
     # post 2.6.29 patches
     defsnc 'static[ ]int[ ]atom_dst_to_src\[8\]\[4\][ ]=' drivers/gpu/drm/radeon/atom.c
@@ -2229,11 +2239,9 @@ set_except () {
     blobname '\(comedi[/]\)\?jr3pci\.idm' drivers/staging/comedi/drivers/jr3_pci.c
     blobname 'usbdux\(fast\)\?_firmware\.\(hex\|bin\)' 'drivers/staging/comedi/drivers/usbdux\(fast\)\?\.c'
     blobname 'RT30xxEEPROM\.bin' drivers/staging/rt3070/common/eeprom.c
-    blob '#include[ 	]*["]\.\.[/]firmware.h["]' drivers/staging/rt3070/common/rtmp_init.c
     defsnc 'static[ ]const[ ]u8[ ]default_cal_\(channels\|rssi\)\[\][ ]=' drivers/staging/stlc45xx/stlc45xx.c
     accept '[	][	]stlc45xx_error[(]["]request_firmware[(][)][ ]failed' drivers/staging/stlc45xx/stlc45xx.c
     blob 'static[ ]struct[ ]phy_ucode[	]PhyUcode\[\][ ]=[^;]*[;]' drivers/staging/sxg/sxgphycode-1.2.h
-    blob '#include[ ]["]sxgphycode\(-1\.2\)\?\.h["]' drivers/staging/sxg/sxg.c
     accept 'device[ ]drivers[ ]which[ ]predate[ ]the[ ]common[ ]use[ ]of[ ]request_firmware[(][)]' firmware/README.AddingFirmware
     accept 'As[ ]we[ ]update[ ]those[ ]drivers[ ]to[ ]use[ ]request_firmware[(][)]' firmware/README.AddingFirmware
     blob 'This[ ]directory[ ]is[ ]_NOT_[ ]for[ ]adding[ ]arbitrary[ ]new[ ]firmware[ ]images.*git[ ]pull[ ]request[ ]to:[\n][^\n]*infradead\.org>' firmware/README.AddingFirmware
@@ -2244,7 +2252,7 @@ set_except () {
     blobname 'ositech[/]Xilinx7OD\.bin' drivers/net/pcmcia/smc91c92_cs.c
     blobname 'tehuti[/]\(firmware\|bdx\)\.bin' drivers/net/tehuti.c
     accept '[ 	]*["]b43-open%s[/]%s\.fw["]' drivers/net/wireless/b43/main.c
-    blobname 'nx\(romimg\|3fw\(ct\|mn\)\)\.bin' 'drivers/net/netxen/netxen_nic_\(hw\|init\)\.c'
+    blobname '\(nx\(romimg\|3fw\(ct\|mn\)\)\|phanfw\)\.bin' 'drivers/net/netxen/netxen_nic\(_\(hw\|init\)\.c\|\.h\)'
 
     # New in 2.6.31
     accept '[ ][*][ ]page[ ]tables[ ]as[ ]follows:[\n][ ][*][\n][ ][*][ ][ ][ ]3[ ]3[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[\n][ ][*][ ][ ][ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0' arch/arm/include/asm/pgtable.h
@@ -2262,7 +2270,6 @@ set_except () {
     defsnc 'static[ ]\(u16\|struct[ ]i2c_reg_u16\)[ ]\(bridge\|mt9\(v\(11[12]\|011\)\|m001\)\)_init\[\]\(\[2\]\)\?[ ]=' drivers/media/video/gspca/sn9c20x.c
     defsnc 'static[ ]\(u8\|struct[ ]i2c_reg_u8\)[ ]\(soi968\|ov\(76[67]0\|965[05]\)\|hv7131r\)_init\[\]\(\[2\]\)\?[ ]=' drivers/media/video/gspca/sn9c20x.c
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]onenand_oob_128[ ]=' drivers/mtd/onenand/onenand_base.c
-    blobname 'bnx2x-e1h\?-\([0-9.%d]*\.fw\)\?' drivers/net/bnx2x_main.c
     blob '#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\([\n]#define[ ]BCM_5710_FW_\(\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\|COMPILE_FLAGS\)[ 	]*[0-9]\+\)*' drivers/net/bnx2x_hsi.h
     blob 'static[ ]int[ ]__devinit[ ]bnx2x_check_firmware[(]struct[ ]bnx2x[ ][*]bp[)][\n][{][^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' drivers/net/bnx2x_main.c
     blobna 'if[ ][(][(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\([ ][|][|][\n][ 	]*[(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\)*[)][ ][{][^{}]*[}]' drivers/net/bnx2x_main.c
@@ -2281,7 +2288,7 @@ set_except () {
     defsnc '\(static[ ]\)\?u32[ ]Rtl8192PciE\(PHY_REG\(_1T2R\)\?\|\(Radio[ABCD]\|MACPHY\|AGCTAB\)_\)Array\(_PG\)\?\(DTM\)\?\[\(\(PHY_REG\(_1T2R\)\?\|\(Radio[ABCD]\|MACPHY\|AGCTAB\)_\)Array\(_PG\)\?Length\(DTM\)\?\)\?\][ ]=' drivers/staging/rtl8192su/rtl8192S_FwImgDTM.h
     blob '\([&]\|sizeof[(]\)rtl8190_fw\(boot\|main\|data\)_array\(\[0\]\|[)]\)\(,[ 	\n]*\([&]\|sizeof[(]\)rtl8190_fw\(boot\|main\|data\)_array\(\[0\]\|[)]\)\)*' 'drivers/staging/rtl8192su/r819\(2S\|xU\)_firmware\.c'
     blobname 'RTL8192U[/]\(boot\|main\|data\)\.img' 'drivers/staging/rtl8192s\?u/r819xU_firmware\.c'
-    blob 'u8[ ]rtl8190_fw\(boot\|main\|data\)_array\[\][ ]=[ ][{][^}]*[}][;]' 'drivers/staging/rtl8192s\?u/r8192xU_firmware_img\.c'
+    blob 'u8[ ]rtl8190_fw\(boot\|main\|data\)_array\[\][ ]=[ ]\?[{][^}]*[}][;]' 'drivers/staging/rtl8192s\?u/r8192xU_firmware_img\.c'
     defsnc 'u32[ ]Rtl8192Usb\(PHY_REG\(_1T2R\)\?\|\(Radio[ABCD]\|MACPHY\|AGCTAB\)_\)Array\(_PG\)\?\[\][ ]=' drivers/staging/rtl8192su/rtl819xU_firmware_img.c
     defsnc 'BYTE[ ]\(sbox\|dot[23]\)_table\[256\][ ]=' drivers/staging/vt6655/aes_ccmp.c
     defsnc 'BYTE[ ]byVT3253\(InitTab\|B0\(_AGC4\?\)\?\)_\(RFMD\(2959\)\?\|AIROHA2230\|UW2451\|AGC\)\[CB_VT3253\(B0\(_AGC4\?\)\?\)\?\(\(_INIT\)\?_FOR_\(RFMD\(2959\)\?\|AIROHA2230\|UW2451\|AGC\)\)\?\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
@@ -2355,7 +2362,7 @@ set_except () {
     defsnc 'static[ ]const[ ]UINT32[ ]SHA256_K\[64\][ ]=' drivers/staging/rt3090/common/crpt_sha2.c
     defsnc '\(DOT11_REGULATORY_INFORMATION\|struct[ ]rt_dot11_regulatory_information\)[ ]\(USA\|Europe\|Japan\)RegulatoryInfo\[\][ ]=' 'drivers/staging/\(rt3090\|rt2860\)/common/spectrum\.c'
     defsnc 'static[ ]const[ ]USHORT[ ]Sbox\[256\][ ]=' drivers/staging/rt3090/sta/rtmp_ckipmic.c
-    blob '#include[ 	]*["]\(\.\.[/]\(\.\.[/]rt30[79]0[/]\)\?\)\?firmware\.h["]' 'drivers/staging/rt\(28[67]\|309\)0/common/rtmp_\(init\|mcu\)\.c'
+    blob '#include[ 	]*["]\(\.\.[/]\(\.\.[/]rt\(28[67]\|30[79]\)0[/]\(common[/]\)\?\)\?\)\?firmware\(_\(28[67]\|30[79]\)0\)\?\.h["]\([\n][\n]*#include[ 	]*["]\(\.\.[/]\(\.\.[/]rt\(28[67]\|30[79]\)0[/]\(common[/]\)\?\)\?\)\?firmware\(_\(28[67]\|30[79]\)0\)\?\.h["]\)' 'drivers/staging/rt\(28[67]\|309\)0/common/rtmp_\(init\|mcu\)\.c'
     blobna 'FIRMWAREIMAGE_LENGTH[ ]==' drivers/staging/rt3090/common/rtmp_mcu.c
     defsnc 'int[ ]wm831x_isinkv_values\[WM831X_ISINK_MAX_ISEL[ ][+][ ][1]\][ ]=' drivers/mfd/wm831x-core.c
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]hwecc4_2048[ ]__initconst[ ]=' drivers/mtd/nand/davinci_nand.c
@@ -2398,9 +2405,10 @@ set_except () {
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]nandv2_hw_eccoob_largepage[ ]=' drivers/mtd/nand/mxc_nand.c
     blob '#define[ ]FW_FILE_VERSION\([	]*[\\][\n][	]__stringify[(]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\([ ]["][.]["]\)\?\)\+' drivers/net/bnx2x_main.c
     blobname 'bnx2x-e1h\?-["][ ]FW_FILE_VERSION[ ]["]\.fw' drivers/net/bnx2x_main.c
-    blob '#define[ ]FW_VERSION\([ ]__stringify[(]FW_VERSION_\(MAJOR\|MINOR\|MICRO\)[)]\([ ]["][.]["]\)\?\([	]*[\\][\n]\)\?\)\+' drivers/net/cxgb3/cxgb3_main.c
+    blobname 'bnx2x-e1h\?-\([0-9.%d]*\.fw\)\?' drivers/net/bnx2x_main.c
+    blob '#define[ ]FW_VERSION\([ 	]__stringify[(]FW_VERSION_\(MAJOR\|MINOR\|MICRO\)[)]\([ ]["][.]["]\)\?\([	]*[\\][\n]\)\?\)\+' drivers/net/cxgb3/cxgb3_main.c
     blobname 'cxgb3[/]t3fw-["][ ]FW_VERSION[ ]["]\.bin' drivers/net/cxgb3/cxgb3_main.c
-    blob '#define[ ]TPSRAM_VERSION\([ ]__stringify[(]TP_VERSION_\(MAJOR\|MINOR\|MICRO\)[)]\([ ]["][.]["]\)\?\([	]*[\\][\n]\)\?\)\+' drivers/net/cxgb3/cxgb3_main.c
+    blob '#define[ ]TPSRAM_VERSION\([ 	]__stringify[(]TP_VERSION_\(MAJOR\|MINOR\|MICRO\)[)]\([ ]["][.]["]\)\?\([	]*[\\][\n]\)\?\)\+' drivers/net/cxgb3/cxgb3_main.c
     blobname 'cxgb3[/]t3\(%c\|[bc]\)_psram-["][ ]TPSRAM_VERSION[ ]["]\.bin' drivers/net/cxgb3/cxgb3_main.c
     defsnc '[	]static[ ]const[ ]u8[ ]rsshash\[40\][ ]=' drivers/net/igb/igb_main.c
     defsnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals_302x\[\][ ]=' drivers/net/wireless/rt2x00/rt2800lib.c
@@ -2416,6 +2424,7 @@ set_except () {
     blobname 'scope\.cod' 'sound/isa/\(Kconfig\|sscape\.c\)'
     blobname 'sndscape\.co\([?dx01234]\|%d\)' 'sound/isa/\(Kconfig\|sscape\.c\)'
     defsnc 'static[ ]const[ ]u8[ ]\(adcm1700\|om6802\|po1030\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
+    blobname 'ath3k-1\.fw' drivers/bluetooth/ath3k.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -2492,7 +2501,8 @@ set_except () {
     blob '#include[ 	]*["]\(\.\.[/]\(\.\.[/]rt30[79]0[/]\)\?\)\?firmware\.h["]' 'drivers/staging/rt\(28[67]\|309\)0/common/rtmp_\(init\|mcu\)\.c'
     blob 'Derived[ ]from[ ]proprietary[ ]unpublished[ ]source[ ]code' drivers/net/tg3.c
     blobname 'atmel_at76c50\(2\([de]\|_3com\)\?\|4a\?\(_2958\)\?\|6\)\(\.bin\)\?' drivers/net/wireless/atmel.c
-    blobna '\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\([\n	 ]*\(pFirmwareImage[ ]=[ ]\(FirmwareImage\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\)\?_LENGTH\)\)[;]\)*' 'drivers/staging/rt\(28[67]0\|30[79]0\)/common/rtmp_init\.c'
+    blobna '\(pFirmwareImage[ ]=\([ ]FirmwareImage\(_\(28[67]\|30[79]\)0\)\?\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\|_MAX\)\?_LENGTH\)\)[;]\([\n	 ]*\(pFirmwareImage[ ]=\([ ]FirmwareImage\(_\(28[67]\|30[79]\)0\)\?\|[\n 	]*[(]\(PUCHAR\|u8[ ][*]\)[)][&][\n 	]*FirmwareImage\(_\(28\|30\)70\)\?\[FIRMWAREIMAGE\(V[12]\)\?_LENGTH\]\)\|File[lL]ength[ ]=[ ]\(sizeof[(]FirmwareImage[)]\|FIRMWAREIMAGE\(V[12]\|_MAX\)\?_LENGTH\)\)[;]\)*' 'drivers/staging/rt\(28[67]0\|30[79]0\)/common/rtmp_init\.c'
+    blobname '\(nx\(romimg\|3fw\(ct\|mn\)\)\|phanfw\)\.bin' 'drivers/net/netxen/netxen_nic\(_\(hw\|init\)\.c\|\.h\)'
     # The above are covered by the main Linux patterns.  The patterns
     # below are to be kept in sync in the 2.6.33 block within the main
     # Linux patterns, until 2.6.33 is released.
@@ -2536,6 +2546,7 @@ set_except () {
     blobname 'scope\.cod' 'sound/isa/\(Kconfig\|sscape\.c\)'
     blobname 'sndscape\.co\([?dx01234]\|%d\)' 'sound/isa/\(Kconfig\|sscape\.c\)'
     defsnc 'static[ ]const[ ]u8[ ]\(adcm1700\|om6802\|po1030\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
+    blobname 'ath3k-1\.fw' drivers/bluetooth/ath3k.c
     ;;
 
   */patch*2.6.27*|*/patch*2.6.31.*)
@@ -2578,13 +2589,12 @@ set_except () {
     blobname 'haup-ir-blaster\.bin' drivers/input/lirc/lirc_zilog.c
 
     # Non-Free license in entire file.
-    blob 'static[ ]unsigned[ ]char[ ]xilinx_firm\(_4610\)\?\[\][ ]=[ ][{]'"$sepx$blobpat*$sepx"'[}][;]' 'drivers/staging/me4000/me4\(00\|61\)0_firmware\.h' # CONFIG_ME4000
-
-    # Deblobbing needed.
-    blob 'static[ ]u8[ ]\(Mojave\|Oasis\)UCode\[2\]\[65536\][ ]='"$sepx$blobpat*$sepx"'[;]' 'drivers/staging/slicoss/\(gb\|oasis\(dbg\)\?\)download\.h' # CONFIG_SLICOSS
-    blob 'static[ ]u8[ ]\(GB\|Oasis\)RcvUCode\[2560\][ ]='"$sepx$blobpat*$sepx"'[;]' 'drivers/staging/slicoss/\(gb\|oasis\)rcvucode\.h' # CONFIG_SLICOSS
-    blob 'static[ ]unsigned[ ]char[ ]SaharaUCode\[2\]\[57972\][ ]='"$sepx$blobpat*$sepx"'[;]' drivers/staging/sxg/saharadbgdownload.h # CONFIG_SXG
-    blob 'static[ ]PHY_UCODE[ ]PhyUcode\[\][ ]=[^;]*[;]' drivers/staging/sxg/sxgphycode.h # CONFIG_SXG
+    blob 'static[ ]unsigned[ ]char[ ]xilinx_firm\(_4610\)\?\[\][ ]=[ ][{]'"$sepx$blobpat*$sepx"'[}][;]' 'drivers/staging/me4000/me4\(00\|61\)0_firmware\.h'
+    blob 'static[ ]struct[ ]PHY_UCODE[ ]PhyUcode\[\][ ]=[^;]*[;]' drivers/staging/sxg/sxgphycode.h
+    blob 'static[ ]unsigned[ ]char[ ]SaharaUCode\[2\]\[57972\][ ]=[^;]*[;]' drivers/staging/sxg/saharadbgdownload.h
+    blob '#include[ ]["]saharadbgdownload\.h["]' drivers/staging/sxg/sxg.c
+    blob 'static[ ]u8[ ]\(Mojave\|Oasis\)UCode\[2\]\[65536\][ ]=[^;]*[;]' 'drivers/staging/slicoss/\(gb\|oasis\(dbg\)\?\)download\.h'
+    blob 'static[ ]u8[ ]\(GB\|Oasis\)RcvUCode\[2560\][ ]=[^;]*[;]' 'drivers/staging/slicoss/\(gb\|oasis\)rcvucode\.h'
 
     # ok from earlier releases
     accept 'for[ ]i[ ]in[ ][ 	0-9\\\n]*[\n]do' 'Documentation/specialix.txt|Documentation/serial/specialix.txt'
@@ -2923,7 +2933,7 @@ set_except () {
 constx="[0-9][0-9a-fA-FxX]*"
 # Regular expression that matches a separator between consecutive
 # literal constants.
-sepx="\\([ 	\\n]*\\(\\([ 	\\n]\\|[,:{}LlUu\"\'\\\\][,:{} 	\\nLlUu\"\'\\\\]*\\)[xX\$]\\?\\|[.][a-zA-Z][a-zA-Z0-9]*[ 	]\\+[\$]\\?\\)\\)"
+sepx="\\([ 	\\n]*\\(\\([ 	\\n]\\|[,:{}LlUu\"\'\\\\][,:{} 	\\nLlUu\"\'\\\\]*\\)[xX\$]\\?\\|[.][a-zA-Z][a-zA-Z0-9]*[ 	][ 	]*[\$]\\?\\)\\)"
 
 # Regular expression that matches a continuation of a blob, after an
 # initial constant.  *, \+ and \? can be safely appended to it without
@@ -3613,10 +3623,9 @@ with_context = 0
 print_falsepos = 0
 print_nomatch = 0
 
-# Should we print name_to_list and exit if we find blobs or false positives?
+# Should we print the input stack if we find blobs or false positives?
 list_blob = 0
 list_falsepos = 0
-name_to_list = '$input'
 
 # Should we forget everything we know about false positives?
 falsepos = None
@@ -3693,12 +3702,10 @@ for line in sys.stdin:
             print 'looking for matches'
             sfilenames = filenames
             while filenames != None:
-                if filenames[0] == name_to_list:
-                    print name_to_list
-                    assert filenames[1] == None
+                if filenames[1] is None:
+                    print filenames[0]
                 else:
                     print filenames[0] + ' within'
-                    assert filenames[1] != None
                 filenames = filenames[1]
             filenames = sfilenames
 
@@ -3748,7 +3755,7 @@ for line in sys.stdin:
                         pend = len(s)
 
             match = rxc.search (s, p)
-            if match == None or match.start () >= pend or \
+            if match is None or match.start () >= pend or \
 	       (blob_p and not print_blob and not falses) or \
 	       (not blob_p and not print_falsepos and not blobs):
                 break
@@ -3764,10 +3771,6 @@ for line in sys.stdin:
                 sfilenames = filenames
                 while filenames != None:
                     print '::: ' + filenames[0] + ' :::'
-                    if filenames[0] == name_to_list:
-                        assert filenames[1] == None
-                    else:
-                        assert filenames[1] != None
                     filenames = filenames[1]
                 filenames = sfilenames
             sys.stdout.write (s[pp:pend])
@@ -3775,12 +3778,10 @@ for line in sys.stdin:
 
         if list_blob and blobs or list_falsepos and falses:
             while filenames != None:
-                if filenames[0] == name_to_list:
-                    print name_to_list
-                    assert filenames[1] == None
-                else:
+                if filenames[1] is None:
                     print filenames[0] + ' within'
-                    assert filenames[1] != None
+                else:
+                    print filenames[0]
                 filenames = filenames[1]
             exit (1)
 
@@ -3794,7 +3795,7 @@ for line in sys.stdin:
     filenames = nextfilenames
     del nextfilenames
 
-assert filenames == None
+assert filenames is None
 
 exit (0)
 EOF
@@ -3828,7 +3829,7 @@ my $with_context = 0;
 my $print_falsepos = 0;
 my $print_nomatch = 0;
 
-# Should we print name_to_list and exit if we find blobs or false positives?
+# Should we print the input stack and exit if we find blobs or false positives?
 my $list_blob = 0;
 my $list_falsepos = 0;
 
@@ -3839,8 +3840,6 @@ my $no_falsepos = 0;
 EOF
 
   cat >> "$scriptname" <<EOF
-my \$name_to_list = '$input';
-
 my \$verbose = $vp;
 
 # Which of the defaults above should we override?
@@ -4060,10 +4059,10 @@ BEGIN {
     print_falsepos = 0;
     print_nomatch = 0;
 
-    # Should we print name_to_list and exit if we find blobs or false positives?
+    # Should we print the input stack and exit if we find blobs or
+    # false positives?
     list_blob = 0;
     list_falsepos = 0;
-    name_to_list = "$input";
 
     # Should we forget everything we know about false positives?
     no_falsepos = 0;
@@ -4128,9 +4127,15 @@ $eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
 	    }
 
 	    if (match (substr (s, matchstart, matchlen), /^[\n]($falsepos)/) == 1) {
-		if (verbose) print "match is a false positive";
+		matchlen = RLENGTH;
+		if (verbose) print "match is a false positive of length", matchlen;
 		blob_p = 0;
 		falses++;
+	    } else if (match (substr (s, matchstart, matchlen), /^.($blob)/) == 1) {
+		matchlen = RLENGTH;
+		if (verbose) print "match is a blob of length", matchlen;
+		blob_p = 1;
+		blobs++;
 	    } else if (match (substr (s, matchstart, matchlen), /^[\n]($cblob)$/) == 1) {
 		if (verbose) print "match is a blob context";
 		pend = index (substr (s, matchstart + matchlen), "\n");
@@ -4139,12 +4144,8 @@ $eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
 		else
 		    pend = length (s);
 		p = matchstart + 1;
-		if (verbose) print "range is:", substr (s, p, pend - p);
 		blob_p = 2;
-	    } else {
-		if (verbose) print "match is a blob";
-		blob_p = 1;
-		blobs++;
+		if (verbose > 1) print "range is:", substr (s, p, pend - p);
 	    }
 
 	    if (blob_p < 2) {
