@@ -190,7 +190,7 @@ clean_sed () {
   filetest $2 || return
   sed -e "$1" "$2" > "$2".deblob || {
     die $2: failed: ${3-applied sed script $1} && return 1; }
-  check_changed $2 && echo $2: ${3-applied sed script $1} 
+  check_changed $2 && echo $2: ${3-applied sed script $1}
 }
 
 reject_firmware () {

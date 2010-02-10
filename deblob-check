@@ -112,7 +112,7 @@
 #		to be blobs, be they known false positives or not.
 
 # -p --mark-false-positives: print the processed input, replacing
-#		sequences that match the blob detector test, even those 
+#		sequences that match the blob detector test, even those
 #		known to be false positives, with /*(DEBLOBBED)*/.
 
 # -P --list-false-positives: list files that contain false positives.
@@ -254,20 +254,20 @@ case ${LANG+set} in set) LANG=C; export LANG;; esac
 rm="rm -f"
 
 for echo in 'echo' 'printf %s\n'; do
-  case `$echo '\nx'` in 
+  case `$echo '\nx'` in
   '\nx') break;;
   esac
 done
-case `$echo '\nx'` in 
+case `$echo '\nx'` in
 '\nx') ;; *) echo Cannot find out what echo to use >&2; exit 1;;
 esac
 
 for echo_n in "echo -n" "printf %s"; do
-  case `$echo_n '\na'; $echo_n '\nb'` in 
+  case `$echo_n '\na'; $echo_n '\nb'` in
   '\na\nb') break;;
   esac
 done
-case `$echo_n a; $echo_n b` in 
+case `$echo_n a; $echo_n b` in
 'ab') ;; *) echo Cannot find out an echo -n equivalent to use >&2; exit 1;;
 esac
 
@@ -300,7 +300,7 @@ i\\
     ;;
   esac
   ;;
-*) 
+*)
   v="# "
   vp="0"
   ;;
@@ -408,7 +408,7 @@ case $1 in
   set_cmd=set_eqscript_cmd;
   set_main_cmd=set_perl_main;
   ;;
-	
+
 --use-awk)
   shift;
   set_cmd=set_eqscript_cmd;
@@ -622,7 +622,7 @@ if $test_mode; then
  allpass=:
  for tool in awk perl python sed; do
   echo testing $tool...
-  
+
   targs="-s 4 -i /deblob-check-testsuite/ --use-$tool"
 
   pass=:
@@ -1343,7 +1343,7 @@ set_except () {
     blobname 'whiteheat\(_loader\(_debug\)\?\)\?\.fw' drivers/usb/serial/whiteheat.c
 
     blob 'static[ ]struct[ ]BA1struct[ ]BA1Struct[ ]=[ ][{][^;]*[}][;]' sound/pci/cs46xx/cs46xx_image.h
-    
+
     blob 'static[ ]u32[ ]cwc\(4630\|async\|snoop\)_\(code\|parameter\)\[\][ ]=[ ][{][^;]*[}][;]' 'sound/pci/cs46xx/imgs/cwc\(4630\|async\|snoop\)\.h'
     # cwcbinhack appears to have been created by hand.
     # cwcdma has sources (not verified) in cwcdma.asp.
@@ -1600,7 +1600,7 @@ set_except () {
     blobname '\([/]etc[/]sound[/]\)\?pss_synth' sound/oss/pss.c
     accept '[	][$][(]obj[)][/]bin2hex[ ]pss_synth' sound/oss/Makefile
     accept '[	][ ]*echo[ ][\'"'"']static[ ]\(unsigned[ ]char[ ][*][ ]*\|int[ ]\)pss_synth\(Len\)\?[ ]=[ ]\(NULL\|0\)[;]' sound/oss/Makefile
-    
+
     accept '[	]\.request_firmware[ ]=[ ]NULL,' drivers/media/dvb/dvb-usb/m920x.c
 
     accept '[	 ]*["]request_firmware[ ]\(fatal[ ]error\|unable[ ]to[ ]locate\|:[ ]Failed[ ]to[ ]find\)' drivers/media/video/pvrusb2/pvrusb2-hdw.c
@@ -2927,7 +2927,7 @@ set_except () {
     blobname 'blobeol[^\n]*[\n]'
     ;;
   esac
-}  
+}
 
 # Regular expression that matches a literal constant.
 constx="[0-9][0-9a-fA-FxX]*"
@@ -3586,7 +3586,7 @@ s,\\\([{(|)}?+]\),\1,g
 s,^\([-+]\)\(\^\?\)\(.*\)\(\$\?\)$,\2(?s:\3)\4\1,g
 s,[+]$, { falsepos (); },
 s,[-]$, { blob (); },
-'     
+'
 
   echo '%%' > "$scriptname"
   ${SED-sed} "$adjust_rx" < "$regex_name" >> "$scriptname"
@@ -3656,7 +3656,7 @@ s,^\\(.*\\)\$,falsepos = r'(?P<falsepos>\\1)',;\
 s,^\\(.*\\)\$,blob = r'(?P<blob>\\1)',;\
 "' p;}' >> "$scriptname"
 
-  echo "\\($initblob\\|$defineblob\\|$asmblob\\)" | 
+  echo "\\($initblob\\|$defineblob\\|$asmblob\\)" |
     ${SED-sed} -e "$adjust_rx" \
         -e "s,^\\(.*\\)\$,cblob = r'(?P<cblob>\\1)'," >> "$scriptname"
 
@@ -3697,7 +3697,7 @@ for line in sys.stdin:
         assert filenames != None
         s += line
         continue
-        
+
     if verbose:
             print 'looking for matches'
             sfilenames = filenames
@@ -3740,7 +3740,7 @@ for line in sys.stdin:
                 else:
                     if verbose: print 'match is a false positive'
                     falses += 1
-            
+
                 if blob_p and replace_blob or not blob_p and replace_falsepos:
                     s = s[:match.start(what)] + replacement + s[match.end(what):]
                     p = match.start(what) + len(replacement)
@@ -3859,7 +3859,7 @@ s,^\\(.*\\)\$,\$falsepos = qr'(?<falsepos>\\1)'ms;,;\
 s,^\\(.*\\)\$,my \$blob = qr'(?<blob>\\1)'ms;,;\
 "' p;}' >> "$scriptname"
 
-  echo "\\($initblob\\|$defineblob\\|$asmblob\\)" | 
+  echo "\\($initblob\\|$defineblob\\|$asmblob\\)" |
     ${SED-sed} -e "$adjust_rx" \
         -e "s,^\\(.*\\)\$,my \$cblob = qr'(?<cblob>\\1)'ms if \$with_context;," >> "$scriptname"
 
@@ -3897,7 +3897,7 @@ while (<STDIN>) {
 	$s .= $_;
 	next;
     }
-	
+
     if ($verbose) {
 	print "looking for matches in\n";
 	for (my $i = $nfilenames; --$i > 0; ) {
@@ -3994,7 +3994,7 @@ while (<STDIN>) {
     }
 
     print substr ($s, $pp) if $print_nomatch;
-	
+
     print "no further matches\n" if $verbose;
 
     $s = '';
@@ -4031,7 +4031,7 @@ s,\\\([{(|)}?+]\),\1,g;
 
   case " = $@ = " in
   *" = with_context = "*) cblob=`
-    $echo "\\($initblob\\|$defineblob\\|$asmblob\\)" | 
+    $echo "\\($initblob\\|$defineblob\\|$asmblob\\)" |
     ${SED-sed} -e "$adjust_rx"
    `;;
   *) cblob='$.^';;
@@ -4166,7 +4166,7 @@ $eormatch /^[;][/][*]end .*[*][/][;]$eornl$/ {
 			pend = length (s)
 		}
 	    }
-	    
+
 	    if (verbose) print "search until", pend;
 
 	    if (!(matchfound = match (substr (s, p),
@@ -4227,7 +4227,7 @@ s,\\\([{(|)}?+]\),\1,g
 s,^\([-+]\)\(\^\?\)\(.*\)\(\$\?\)$,\2(?s:\3)\4\1,g
 s,[+]$, { falsepos (); },
 s,[-]$, { blob (); },
-'     
+'
 
   echo '%%' > "$scriptname"
   ${SED-sed} "$adjust_rx" < "$regex_name" >> "$scriptname"
@@ -4444,7 +4444,7 @@ BAD regular expression:
 	s,^.*$,;/*begin &*/;\\n;/*&*/;,;
 	p;
 	d;
-      }	
+      }
       s,^[ !$s],,;"
     cmd='${SED-sed} "$sedpatch"'
     ;;
@@ -4541,7 +4541,7 @@ do
     continue
     ;;
   esac
-  
+
   # If we print anything whatsoever (even a blank line) while
   # processing it, we've failed.
   if check "$file"; then

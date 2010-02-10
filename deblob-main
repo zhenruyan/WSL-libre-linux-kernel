@@ -171,7 +171,7 @@ cp -lR linux-$kver/. linux-$kver-$libre
 
 rm -f linux-$kver-$libre.log linux-$kver-$libre.log.tmp
 echo Deblobbing within linux-$kver-$libre, saving output to linux-$kver-$libre.log
-# We can't just pipe deblob into tee, for then we fail to detect 
+# We can't just pipe deblob into tee, for then we fail to detect
 # error conditions.  Use file renaming to tell whether we succeeded.
 if (cd linux-$kver-$libre && /bin/sh ../$deblob $force) 2>&1; then
   mv linux-$kver-$libre.log.tmp linux-$kver-$libre.log

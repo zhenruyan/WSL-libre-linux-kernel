@@ -190,7 +190,7 @@ clean_sed () {
   filetest $2 || return
   sed -e "$1" "$2" > "$2".deblob || {
     die $2: failed: ${3-applied sed script $1} && return 1; }
-  check_changed $2 && echo $2: ${3-applied sed script $1} 
+  check_changed $2 && echo $2: ${3-applied sed script $1}
 }
 
 reject_firmware () {
@@ -995,7 +995,7 @@ clean_sed '
   /for (p = PhyUcode/i\
 		printk(KERN_ERR KBUILD_MODNAME ": missing Free firmware\\n");\
 		return (STATUS_FAILURE);\
-#define PhyUcode NULL		
+#define PhyUcode NULL
 }' drivers/staging/sxg/sxg.c 'report missing Free firmware'
 clean_blob drivers/staging/sxg/sxg.c
 clean_kconfig drivers/staging/sxg/Kconfig 'SXG'

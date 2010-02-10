@@ -383,12 +383,12 @@ patch --no-backup-if-mismatch --batch -p0 <<\EOF || \
 - *	data in hexadecimal or equivalent format, provided this copyright
 - *	notice is accompanying it.
   */
- 
- 
+
+
 EOF
 clean_blob drivers/net/tg3.c -s 9
 if $have_check; then
-  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/tg3.c 
+  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/tg3.c
 else
   clean_kconfig drivers/net/Kconfig 'TIGON3'
   clean_mk CONFIG_TIGON3 drivers/net/Makefile
