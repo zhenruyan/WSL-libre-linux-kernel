@@ -1,0 +1,642 @@
+#!/bin/sh
+
+#    Copyright (C) 2008 Jeff Moe
+#    Copyright (C) 2008, 2009 Alexandre Oliva <lxoliva@fsfla.org>
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+
+# deblob - remove non-free blobs from the vanilla linux kernel
+
+# http://www.fsfla.org/svn/fsfla/software/linux-libre
+
+
+# This script, suited for the kernel version named below, in kver,
+# attempts to remove only non-Free Software bits, without removing
+# Free Software that happens to be in the same file.
+
+# Drivers that currently require non-Free firmware are retained, but
+# firmware included in GPLed sources is replaced with /*(DEBLOBBED)*/
+# if the deblob-check script, that knows how to do this, is present.
+# -lxoliva
+
+
+# See also:
+# http://wiki.debian.org/KernelFirmwareLicensing
+# svn://svn.debian.org/kernel/dists/trunk/linux-2.6/debian/patches/debian/dfsg/files-1
+# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/firmware/firmware-removed
+# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/gen-kernel
+
+# Thanks to Brian Brazil @ gnewsense
+
+
+# For each kver release, start extra with an empty string, then count
+# from 1 if changes are needed that require rebuilding the tarball.
+kver=2.6.26 extra=2++
+
+case $1 in
+--force) die () { echo ERROR: "$@": ignored >&2; }; shift;;
+*) die () { echo "$@" >&2; exit 1; };;
+esac
+
+if unifdef -Utest /dev/null; then :; else
+    die unifdef is required
+fi
+
+check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
+if [ ! -f $check ] ; then
+  echo optional deblob-check missing, will remove entire files >&2
+  have_check=false
+else
+  have_check=:
+fi
+
+clean_file () {
+	#$1 = filename
+	if test ! -f $1; then
+		die $1 does not exist, something is wrong
+	fi
+	rm -v $1
+}
+
+check_changed () {
+	if test ! -f $1; then
+		die $1 does not exist, something is wrong
+	elif cmp $1.deblob $1 > /dev/null; then
+		die $1 did not change, something is wrong
+	fi
+	mv $1.deblob $1
+}
+
+clean_blob () {
+	#$1 = filename
+	if $have_check; then
+	    if test ! -f $1; then
+		die $1 does not exist, something is wrong
+	    fi
+	    name=$1
+	    echo Removing blobs from $name
+	    set fnord "$@" -d
+	    shift 2
+	    $check "$@" -i linux-$kver $name > $name.deblob
+	    check_changed $name
+	else
+	    clean_file $1
+	fi
+}
+
+clean_kconfig () {
+        #$1 = filename $2 = things to remove
+        echo Marking config $2 as depending on NONFREE in $1
+	sed "/^config \\($2\\)\$/{p;i\
+	depends on NONFREE
+d;}" $1 > $1.deblob
+	check_changed $1
+}
+
+clean_mk () {
+	#$1 = config $2 = Makefile name
+	# We don't clean up Makefiles any more --lxoliva
+	# sed -i "/\\($1\\)/d" $2
+	# check_changed $2
+	if sed -n "/\\($1\\)/p" $2 | grep . > /dev/null; then
+	    :
+	else
+	    die $2 does not contain matches for $1
+	fi
+}
+
+clean_ifdef () {
+	#$1 = filename $2 = macro to -U
+	echo unifdefing $1 with -U$2
+	unifdef -U$2 $1 > $1.deblob
+	check_changed $1
+}
+
+
+# First, check that files that contain firmwares and their
+# corresponding sources are present.
+
+for f in \
+  drivers/char/ser_a2232fw.h \
+    drivers/char/ser_a2232fw.ax \
+  drivers/net/ixp2000/ixp2400_rx.ucode \
+    drivers/net/ixp2000/ixp2400_rx.uc \
+  drivers/net/ixp2000/ixp2400_tx.ucode \
+    drivers/net/ixp2000/ixp2400_rx.uc \
+  drivers/net/wan/wanxlfw.inc_shipped \
+    drivers/net/wan/wanxlfw.S \
+  drivers/net/wireless/atmel.c \
+    drivers/net/wireless/atmel.c \
+  drivers/scsi/53c700_d.h_shipped \
+    drivers/scsi/53c700.scr \
+  drivers/scsi/aic7xxx/aic79xx_seq.h_shipped \
+    drivers/scsi/aic7xxx/aic79xx.seq \
+  drivers/scsi/aic7xxx/aic7xxx_seq.h_shipped \
+    drivers/scsi/aic7xxx/aic7xxx.seq \
+  drivers/scsi/aic7xxx_old/aic7xxx_seq.c \
+    drivers/scsi/aic7xxx_old/aic7xxx.seq \
+  drivers/scsi/53c7xx_d.h_shipped \
+    drivers/scsi/53c7xx.scr \
+  drivers/scsi/sym53c8xx_2/sym_fw1.h \
+    drivers/scsi/sym53c8xx_2/sym_fw1.h \
+  drivers/scsi/sym53c8xx_2/sym_fw2.h \
+    drivers/scsi/sym53c8xx_2/sym_fw2.h \
+  drivers/usb/serial/keyspan_pda_fw.h \
+    drivers/usb/serial/keyspan_pda.S \
+  drivers/usb/serial/xircom_pgs_fw.h \
+    drivers/usb/serial/xircom_pgs.S \
+  sound/pci/cs46xx/imgs/cwcbinhack.h \
+    sound/pci/cs46xx/imgs/cwcdma.asp \
+; do
+  if test ! $f; then
+    die $f is not present, something is amiss
+  fi
+done
+
+# Identify the tarball.
+sed -i "s,^EXTRAVERSION.*,&-libre$extra," Makefile
+
+#######################
+# Removed ATM Drivers #
+#######################
+
+# ATM_AMBASSADOR -  Madge Ambassador (Collage PCI 155 Server)
+clean_blob drivers/atm/atmsar11.data
+
+# ATM_FORE200E_PCA
+# ATM_FORE200E_SBA - SBA-200E
+clean_kconfig drivers/atm/Kconfig 'ATM_FORE.*'
+clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
+
+clean_file drivers/atm/pca200e.data
+clean_file drivers/atm/pca200e_ecd.data
+clean_file drivers/atm/sba200e_ecd.data
+clean_kconfig drivers/atm/Kconfig 'ATM_AMBASSADOR'
+clean_mk CONFIG_ATM_AMBASSADOR drivers/atm/Makefile
+
+
+########################
+# Removed char Drivers #
+########################
+
+# COMPUTONE - Computone IntelliPort Plus serial
+clean_blob drivers/char/ip2/fip_firm.h
+clean_kconfig drivers/char/Kconfig 'COMPUTONE'
+clean_mk CONFIG_COMPUTONE drivers/char/Makefile
+
+# DSP56001 Device Driver
+clean_blob drivers/char/dsp56k.c
+clean_kconfig arch/m68k/Kconfig 'ATARI_DSP56K'
+clean_mk CONFIG_ATARI_DSP56K drivers/char/Makefile
+
+# gpu drm
+
+# DRM_MGA - Matrox g200/g400
+clean_blob drivers/char/drm/mga_ucode.h
+clean_kconfig drivers/char/drm/Kconfig 'DRM_MGA'
+clean_mk CONFIG_DRM_MGA drivers/char/drm/Makefile
+
+# DRM_R128 - ATI Rage 128
+clean_blob drivers/char/drm/r128_cce.c
+clean_kconfig drivers/char/drm/Kconfig 'DRM_R128'
+clean_mk CONFIG_DRM_R128 drivers/char/drm/Makefile
+
+# DRM_RADEON - ATI Radeon
+clean_blob drivers/char/drm/radeon_microcode.h
+clean_kconfig drivers/char/drm/Kconfig 'DRM_RADEON'
+clean_mk CONFIG_DRM_RADEON drivers/char/drm/Makefile
+
+
+#########################
+# Removed Media Drivers #
+#########################
+
+
+# dvb/dvb-usb
+clean_blob drivers/media/dvb/dvb-usb/af9005-script.h
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
+clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
+
+# dvb/frontends
+
+# DVB_TDA10021 - Philips TDA10021 based
+clean_blob drivers/media/dvb/frontends/tda10021.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_TDA10021'
+clean_mk CONFIG_DVB_TDA10021 drivers/media/dvb/frontends/Makefile
+
+# DVB_TDA8083 - Philips TDA8083 based
+clean_blob drivers/media/dvb/frontends/tda8083.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_TDA8083'
+clean_mk CONFIG_DVB_TDA8083 drivers/media/dvb/frontends/Makefile
+
+# DVB_VES1820 - VLSI VES1820 based
+clean_blob drivers/media/dvb/frontends/ves1820.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_VES1820'
+clean_mk CONFIG_DVB_VES1820 drivers/media/dvb/frontends/Makefile
+
+# DVB_VES1X93 - VLSI VES1893 or VES1993 based
+clean_blob drivers/media/dvb/frontends/ves1x93.c
+clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_VES1X93'
+clean_mk CONFIG_DVB_VES1X93 drivers/media/dvb/frontends/Makefile
+
+# dvb/ttpci
+
+# DVB_AV7110 - AV7110 cards
+clean_blob drivers/media/dvb/ttpci/av7110_hw.c
+clean_blob drivers/media/dvb/ttpci/av7110.c
+clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_AV7110'
+clean_mk CONFIG_DVB_AV7110 drivers/media/dvb/ttpci/Makefile
+
+# DVB_BUDGET_AV - Budget cards with analog video inputs
+clean_blob drivers/media/dvb/ttpci/budget-av.c
+clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET_AV'
+clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET_PATCH'
+clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET'
+clean_mk CONFIG_DVB_BUDGET_AV drivers/media/dvb/ttpci/Makefile
+clean_mk CONFIG_DVB_BUDGET_PATCH drivers/media/dvb/ttpci/Makefile
+clean_mk CONFIG_DVB_BUDGET drivers/media/dvb/ttpci/Makefile
+
+# DVB_BUDGET_CI - Budget cards with onboard CI connector
+clean_blob drivers/media/dvb/ttpci/budget-ci.c
+clean_kconfig drivers/media/dvb/ttpci/Kconfig 'DVB_BUDGET_CI'
+clean_mk CONFIG_DVB_BUDGET_CI drivers/media/dvb/ttpci/Makefile
+
+# dvb/ttusb-budget
+
+# DVB_TTUSB_BUDGET - Technotrend/Hauppauge Nova-USB devices
+clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-dspbootcode.h
+clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
+clean_kconfig drivers/media/dvb/ttusb-budget/Kconfig 'DVB_TTUSB_BUDGET'
+clean_mk CONFIG_DVB_TTUSB_BUDGET drivers/media/dvb/ttusb-budget/Makefile
+
+# video
+
+# USB_PWC - USB Philips Cameras
+clean_blob drivers/media/video/pwc/pwc-kiara.c
+clean_blob drivers/media/video/pwc/pwc-timon.c
+clean_kconfig drivers/media/video/pwc/Kconfig 'USB_PWC'
+clean_mk CONFIG_USB_PWC drivers/media/video/Makefile
+
+# VIDEO_CPIA - CPiA Video For Linux
+clean_blob drivers/media/video/cpia2/cpia2patch.h
+clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA'
+clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_PP'
+clean_kconfig drivers/media/video/Kconfig 'VIDEO_CPIA_USB'
+clean_kconfig drivers/media/video/cpia2/Kconfig 'VIDEO_CPIA2'
+clean_mk CONFIG_VIDEO_CPIA drivers/media/video/Makefile
+clean_mk CONFIG_VIDEO_CPIA_PP drivers/media/video/Makefile
+clean_mk CONFIG_VIDEO_CPIA_USB drivers/media/video/Makefile
+clean_mk CONFIG_VIDEO_CPIA2 drivers/media/video/Makefile
+
+# USB_DABUSB - DABUSB driver
+clean_blob drivers/media/video/dabfirmware.h
+clean_kconfig drivers/media/Kconfig 'USB_DABUSB'
+clean_mk CONFIG_USB_DABUSB drivers/media/video/Makefile
+
+# video/usbvideo
+
+# USB_IBMCAM - USB IBM (Xirlink) C-it Camera support
+clean_blob drivers/media/video/usbvideo/ibmcam.c
+clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_IBMCAM'
+clean_mk CONFIG_USB_IBMCAM drivers/media/video/usbvideo/Makefile
+
+# USB_VICAM - USB 3com HomeConnect (aka vicam)
+clean_blob drivers/media/video/usbvideo/vicam.c
+clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_VICAM'
+clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
+
+
+#######################
+# Removed net Drivers #
+#######################
+
+# ACENIC - Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit
+clean_blob drivers/net/acenic_firmware.h
+clean_kconfig drivers/net/Kconfig 'ACENIC'
+clean_mk CONFIG_ACENIC drivers/net/Makefile
+
+# ADAPTEC_STARFIRE - Adaptec Starfire/DuraLAN support
+
+# This file requires prior acceptance of the GPL before you can even
+# run the code in it.  It's not clear whether this is a further
+# requirement that would make the distribution incompatible with the
+# GPL, but since nothing remains after we remove the blob, it's
+# irrelevant whether the explicit acceptance would be a problem.
+clean_blob drivers/net/starfire_firmware.h
+clean_kconfig drivers/net/Kconfig 'ADAPTEC_STARFIRE'
+clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
+
+# BNX2 - Broadcom NetXtremeII
+clean_blob drivers/net/bnx2_fw.h
+clean_blob drivers/net/bnx2_fw2.h
+clean_kconfig drivers/net/Kconfig 'BNX2'
+clean_mk CONFIG_BNX2 drivers/net/Makefile
+
+clean_blob drivers/net/bnx2x_init_values.h
+clean_kconfig drivers/net/Kconfig 'BNX2X'
+clean_mk CONFIG_BNX2X drivers/net/Makefile
+
+# CASSINI - Sun Cassini
+clean_blob drivers/net/cassini.h
+clean_kconfig drivers/net/Kconfig 'CASSINI'
+clean_mk CONFIG_CASSINI drivers/net/Makefile
+
+# E100 - Intel(R) PRO/100+
+clean_blob drivers/net/e100.c
+if $have_check; then
+  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/e100.c
+else
+  clean_kconfig drivers/net/Kconfig 'E100'
+  clean_mk CONFIG_E100 drivers/net/Makefile
+fi
+
+# MYRI_SBUS - MyriCOM Gigabit Ethernet
+clean_blob drivers/net/myri_code.h
+clean_kconfig drivers/net/Kconfig 'MYRI_SBUS'
+clean_mk CONFIG_MYRI_SBUS drivers/net/Makefile
+
+# TEHUTI - Tehuti Networks 10G Ethernet
+clean_blob drivers/net/tehuti_fw.h
+clean_kconfig drivers/net/Kconfig 'TEHUTI'
+clean_mk CONFIG_TEHUTI drivers/net/Makefile
+
+# TIGON3 - Broadcom Tigon3
+patch --no-backup-if-mismatch --batch -p0 <<\EOF || \
+  die failed to remove license comments from drivers/net/tg3.c \
+  # patches/linux-2.6-tg3-clean.patch
+--- drivers/net/tg3.c
++++ drivers/net/tg3.c
+@@ -5,14 +5,6 @@
+  * Copyright (C) 2001, 2002, 2003 Jeff Garzik (jgarzik@pobox.com)
+  * Copyright (C) 2004 Sun Microsystems Inc.
+  * Copyright (C) 2005-2007 Broadcom Corporation.
+- *
+- * Firmware is:
+- *	Derived from proprietary unpublished source code,
+- *	Copyright (C) 2000-2003 Broadcom Corporation.
+- *
+- *	Permission is hereby granted for the distribution of this firmware
+- *	data in hexadecimal or equivalent format, provided this copyright
+- *	notice is accompanying it.
+  */
+
+
+EOF
+clean_blob drivers/net/tg3.c -s 9
+if $have_check; then
+  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/tg3.c
+else
+  clean_kconfig drivers/net/Kconfig 'TIGON3'
+  clean_mk CONFIG_TIGON3 drivers/net/Makefile
+fi
+
+# TYPHOON - 3cr990 series Typhoon
+clean_blob drivers/net/typhoon-firmware.h
+clean_kconfig drivers/net/Kconfig 'TYPHOON'
+clean_mk CONFIG_TYPHOON drivers/net/Makefile
+
+# appletalk
+
+# COPS - COPS LocalTalk PC
+# clean_blob drivers/net/appletalk/cops.c
+# clean_blob drivers/net/appletalk/cops.h
+clean_blob drivers/net/appletalk/cops_ffdrv.h
+clean_blob drivers/net/appletalk/cops_ltdrv.h
+clean_kconfig drivers/net/appletalk/Kconfig 'COPS'
+clean_mk CONFIG_COPS drivers/net/appletalk/Makefile
+
+# hamradio
+
+# YAM - YAM driver for AX.25
+clean_blob drivers/net/hamradio/yam1200.h
+clean_blob drivers/net/hamradio/yam9600.h
+clean_kconfig drivers/net/hamradio/Kconfig 'YAM'
+clean_mk CONFIG_YAM drivers/net/hamradio/Makefile
+
+# pcmcia
+
+# PCMCIA_SMC91C92 - SMC 91Cxx PCMCIA
+clean_blob drivers/net/pcmcia/ositech.h
+clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_SMC91C92'
+clean_mk CONFIG_PCMCIA_SMC91C92 drivers/net/pcmcia/Makefile
+
+
+# tokenring
+
+# 3C359 - 3Com 3C359 Token Link Velocity XL adapter
+# No need to remove these, they don't contain non-Free code.
+# clean_blob drivers/net/tokenring/3c359.c
+# clean_blob drivers/net/tokenring/3c359.h
+# This file is not under the GPL, better remove it all.
+clean_file drivers/net/tokenring/3c359_microcode.h
+clean_kconfig drivers/net/tokenring/Kconfig '3C359'
+clean_mk CONFIG_3C359 drivers/net/tokenring/Makefile
+
+# SMCTR - SMC ISA/MCA adapter
+# No need to remove these, they don't contain non-Free code.
+# clean_blob drivers/net/tokenring/smctr.c
+# clean_blob drivers/net/tokenring/smctr.h
+# This file is not under the GPL, better remove it all.
+clean_file drivers/net/tokenring/smctr_firmware.h
+clean_kconfig drivers/net/tokenring/Kconfig 'SMCTR'
+clean_mk CONFIG_SMCTR drivers/net/tokenring/Makefile
+
+# usb
+
+# USB_KAWETH - USB KLSI KL5USB101-based ethernet device support
+clean_blob drivers/net/usb/kawethfw.h
+clean_kconfig drivers/net/usb/Kconfig 'USB_KAWETH'
+clean_mk CONFIG_USB_KAWETH drivers/net/usb/Makefile
+
+
+########################
+# Removed s390 Drivers #
+########################
+
+# QETH - Gigabit Ethernet device support
+clean_blob drivers/s390/net/qeth_core_mpc.c
+clean_kconfig drivers/s390/net/Kconfig 'QETH'
+clean_mk CONFIG_QETH drivers/s390/net/Makefile
+
+########################
+# Removed SCSI Drivers #
+########################
+
+# SCSI_QLOGICPTI - PTI Qlogic, ISP Driver
+clean_blob drivers/scsi/qlogicpti_asm.c
+clean_kconfig drivers/scsi/Kconfig 'SCSI_QLOGICPTI'
+clean_mk CONFIG_SCSI_QLOGICPTI drivers/scsi/Makefile
+
+# SCSI_ADVANSYS - AdvanSys SCSI
+clean_blob drivers/scsi/advansys.c
+clean_kconfig drivers/scsi/Kconfig 'SCSI_ADVANSYS'
+clean_mk CONFIG_SCSI_ADVANSYS drivers/scsi/Makefile
+
+# SCSI_QLOGIC_1280 - Qlogic QLA 1240/1x80/1x160 SCSI
+clean_blob drivers/scsi/ql1280_fw.h
+clean_blob drivers/scsi/ql1040_fw.h
+clean_blob drivers/scsi/ql12160_fw.h
+clean_kconfig drivers/scsi/Kconfig 'SCSI_QLOGIC_1280'
+clean_mk CONFIG_SCSI_QLOGIC_1280 drivers/scsi/Makefile
+
+
+#######################
+# Removed USB Drivers #
+#######################
+
+# misc
+
+# USB_EMI26 - EMI 2|6 USB Audio interface
+# No need to remove this, it doesn't contain non-Free code.
+# clean_blob drivers/usb/misc/emi26.c
+# This file is not under the GPL, better remove it all.
+clean_file drivers/usb/misc/emi26_fw.h
+clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI26'
+clean_mk CONFIG_USB_EMI26 drivers/usb/misc/Makefile
+
+# USB_EMI62 - EMI 6|2m USB Audio interface
+# No need to remove this, it doesn't contain non-Free code.
+# clean_blob drivers/usb/misc/emi62.c
+# This file are probably not under the GPL, better remove them all.
+clean_file drivers/usb/misc/emi62_fw_m.h
+clean_file drivers/usb/misc/emi62_fw_s.h
+clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI62'
+clean_mk CONFIG_USB_EMI62 drivers/usb/misc/Makefile
+
+# USB_SISUSBVGA - USB 2.0 SVGA dongle support (Net2280/SiS315)
+clean_blob drivers/usb/misc/sisusbvga/sisusb_init.h
+clean_kconfig drivers/usb/misc/sisusbvga/Kconfig 'USB_SISUSBVGA'
+clean_mk CONFIG_USB_SISUSBVGA drivers/usb/misc/sisusbvga/Makefile
+
+# serial
+
+# USB_SERIAL_KEYSPAN_MPR - USB Keyspan MPR Firmware
+clean_file drivers/usb/serial/keyspan_mpr_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_MPR'
+# USB_SERIAL_KEYSPAN_USA18X - USB Keyspan USA-18X Firmware
+clean_file drivers/usb/serial/keyspan_usa18x_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA18X'
+# USB_SERIAL_KEYSPAN_USA19 - USB Keyspan USA-19 Firmware
+clean_file drivers/usb/serial/keyspan_usa19_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19'
+# USB_SERIAL_KEYSPAN_USA19QI - USB Keyspan USA-19QI Firmware
+clean_file drivers/usb/serial/keyspan_usa19qi_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QI'
+# USB_SERIAL_KEYSPAN_USA19QW - USB Keyspan USA-19QW Firmware
+clean_file drivers/usb/serial/keyspan_usa19qw_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QW'
+# USB_SERIAL_KEYSPAN_USA19W - USB Keyspan USA-19W Firmware
+clean_file drivers/usb/serial/keyspan_usa19w_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19W'
+# USB_SERIAL_KEYSPAN_USA28 - USB Keyspan USA-28 Firmware
+clean_file drivers/usb/serial/keyspan_usa28_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28'
+# USB_SERIAL_KEYSPAN_USA28XA - USB Keyspan USA-28XA Firmware
+clean_file drivers/usb/serial/keyspan_usa28xa_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XA'
+# USB_SERIAL_KEYSPAN_USA28XB - USB Keyspan USA-28XB Firmware
+clean_file drivers/usb/serial/keyspan_usa28xb_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XB'
+# USB_SERIAL_KEYSPAN_USA28X - USB Keyspan USA-28X Firmware
+clean_file drivers/usb/serial/keyspan_usa28x_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28X'
+# USB_SERIAL_KEYSPAN_USA49W - USB Keyspan USA-49W Firmware
+clean_file drivers/usb/serial/keyspan_usa49w_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49W'
+# USB_SERIAL_KEYSPAN_USA49WLC - USB Keyspan USA-49WLC Firmware
+clean_file drivers/usb/serial/keyspan_usa49wlc_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49WLC'
+clean_mk CONFIG_USB_SERIAL_KEYSPAN drivers/usb/serial/Makefile
+
+# USB_SERIAL_EDGEPORT - USB Inside Out Edgeport Serial Driver
+clean_file drivers/usb/serial/io_fw_boot.h
+clean_file drivers/usb/serial/io_fw_down.h
+clean_file drivers/usb/serial/io_fw_down2.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT'
+clean_mk CONFIG_USB_SERIAL_EDGEPORT drivers/usb/serial/Makefile
+
+# USB_SERIAL_EDGEPORT_TI - USB Inside Out Edgeport Serial Driver (TI devices)
+clean_file drivers/usb/serial/io_fw_boot2.h
+clean_file drivers/usb/serial/io_fw_down3.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT_TI'
+clean_mk CONFIG_USB_SERIAL_EDGEPORT_TI drivers/usb/serial/Makefile
+
+# USB_SERIAL_TI - USB TI 3410/5052 Serial Driver
+clean_blob drivers/usb/serial/ti_fw_3410.h
+clean_blob drivers/usb/serial/ti_fw_5052.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_TI'
+clean_mk CONFIG_USB_SERIAL_TI drivers/usb/serial/Makefile
+
+# USB_SERIAL_WHITEHEAT - USB ConnectTech WhiteHEAT Serial Driver
+clean_blob drivers/usb/serial/whiteheat_fw.h
+clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_WHITEHEAT'
+clean_mk CONFIG_USB_SERIAL_WHITEHEAT drivers/usb/serial/Makefile
+
+
+#########################
+# Removed video Drivers #
+#########################
+
+# FB_ASILIANT - Asiliant (Chips) 69000 display support
+clean_blob drivers/video/asiliantfb.c
+clean_kconfig drivers/video/Kconfig 'FB_ASILIANT'
+clean_mk CONFIG_FB_ASILIANT drivers/video/Makefile
+
+# FB_CT65550 - Chips 65550 display support
+clean_blob drivers/video/chipsfb.c
+clean_kconfig drivers/video/Kconfig 'FB_CT65550'
+clean_mk CONFIG_FB_CT65550 drivers/video/Makefile
+
+
+#########################
+# Removed Sound Drivers #
+#########################
+
+# SND_CS46XX - Cirrus Logic (Sound Fusion) CS4280/CS461x/CS462x/CS463x
+clean_blob sound/pci/cs46xx/cs46xx_image.h
+# Blobs containing comments, not recognized by deblob-check
+clean_file sound/pci/cs46xx/imgs/cwc4630.h
+clean_file sound/pci/cs46xx/imgs/cwcasync.h
+clean_file sound/pci/cs46xx/imgs/cwcdma.h
+clean_file sound/pci/cs46xx/imgs/cwcsnoop.h
+clean_kconfig sound/pci/Kconfig 'SND_CS46XX'
+# sed -i '/cs46xx\/ \\/d' sound/pci/Makefile
+
+# SND_KORG1212 - Korg 1212 IO
+clean_blob sound/pci/korg1212/korg1212-firmware.h
+clean_ifdef sound/pci/korg1212/korg1212.c CONFIG_SND_KORG1212_FIRMWARE_IN_KERNEL
+clean_kconfig sound/pci/Kconfig 'SND_KORG1212_FIRMWARE_IN_KERNEL'
+
+# SND_MAESTRO3 - ESS Allegro/Maestro3
+clean_ifdef sound/pci/maestro3.c CONFIG_SND_MAESTRO3_FIRMWARE_IN_KERNEL
+clean_kconfig sound/pci/Kconfig 'SND_MAESTRO3_FIRMWARE_IN_KERNEL'
+
+# SND_YMFPCI - Yamaha YMF724/740/744/754
+clean_blob sound/pci/ymfpci/ymfpci_image.h
+clean_ifdef sound/pci/ymfpci/ymfpci_main.c CONFIG_SND_YMFPCI_FIRMWARE_IN_KERNEL
+clean_kconfig sound/pci/Kconfig 'SND_YMFPCI_FIRMWARE_IN_KERNEL'
+
+# SND_SB16_CSP_FIRMWARE_IN_KERNEL - SB16 Advanced Signal Processor
+clean_blob sound/isa/sb/sb16_csp_codecs.h
+clean_kconfig sound/isa/Kconfig 'SND_SB16_CSP_FIRMWARE_IN_KERNEL'
+
+# SND_WAVEFRONT_FIRMWARE_IN_KERNEL
+# Most of this file is not matched by deblob-check because of WAIT_IDLE.
+# Just remove it.
+clean_file sound/isa/wavefront/yss225.c
+clean_kconfig sound/isa/Kconfig 'SND_WAVEFRONT_FIRMWARE_IN_KERNEL'
+
+exit 0
