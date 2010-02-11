@@ -120,41 +120,6 @@ clean_blob () {
   fi
 }
 
-# *** drop this
-dummy_blob () {
-  #$1 = filename
-  if test -f $1; then
-    die $1 exists, something is wrong && return
-  elif test ! -f firmware/Makefile; then
-    die firmware/Makefile does not exist, something is wrong && return
-  fi
-
-  clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
-    firmware/Makefile "dropped $1"
-}
-
-# *** drop this
-clean_fw () {
-  #$1 = firmware text input, $2 = firmware output
-  filetest $1 || return
-  if test -f $2; then
-    die $2 exists, something is wrong && return
-  fi
-  clean_blob $1 -s 4
-  dummy_blob $2
-}
-
-# *** drop this
-drop_fw_file () {
-  #$1 = firmware text input, $2 = firmware output
-  filetest $1 || return
-  if test -f $2; then
-    die $2 exists, something is wrong && return
-  fi
-  clean_file $1
-  dummy_blob $2
-}
-
 clean_kconfig () {
   #$1 = filename $2 = things to remove
   case $1 in
@@ -392,9 +357,8 @@ clean_mk CONFIG_ARCH_NETX arch/arm/Makefile
 
 announce ATM_AMBASSADOR - "Madge Ambassador, Collage PCI 155 Server"
 clean_file drivers/atm/atmsar11.data
-clean_file drivers/atm/atmsar11.regions -s 6
-clean_file drivers/atm/atmsar11.start -s 1
-# *** testme
+clean_file drivers/atm/atmsar11.regions
+clean_file drivers/atm/atmsar11.start
 clean_sed '
 /^static int __devinit ucode_init *(/,/^}$/{
   s,ucode_\(start\|regions\[i\]\.\(start\|count\)\|data\),0,g;
@@ -417,7 +381,7 @@ clean_file drivers/atm/sba200e_ecd.data
 # *** testme
 clean_sed '
 /^static const struct fore200e_bus fore200e_bus\[\] =/,/^};$/{
-  s,[&]\?_fore200e_\(pca\|sba\)_fw_\(data\|size\),NULL,;
+  s,[&]\?_fore200e_\(pca\|sba\)_fw_\(data\|size\),NULL,g;
 }' drivers/atm/fore200e.c 'removed non-Free firmware'
 clean_sed '
 /^fore200e_load_fw(/,/^}$/{
@@ -431,7 +395,7 @@ clean_sed '
 }' drivers/atm/fore200e.c 'removed non-Free firmware'
 clean_blob drivers/atm/fore200e.c
 clean_blob Documentation/networking/fore200e.txt
-clean_sed 's,\(\(\(pca\|sba\)200e\(\$(if.*,\)\?\(_ecd\)\?\.bin[12]\?\|fore200e_\(pca\|sba\)_fw\.o\)[ )]\?\)\+,/*(DEBLOBBED)*/,g' \
+clean_sed 's:\(\(\(pca\|sba\)200e\(\$(if.*[,]\)\?\(_ecd\)\?\.bin[12]\?\|fore200e_\(pca\|sba\)_fw\.o\)[ )]\?\)\+:/*(DEBLOBBED)*/:g' \
   drivers/atm/Makefile 'removed non-Free firmware names'
 clean_kconfig drivers/atm/Kconfig 'ATM_FORE200E'
 clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
@@ -476,14 +440,15 @@ clean_mk CONFIG_MOXA_INTELLIO drivers/char/Makefile
 # gpu drm
 
 announce DRM_MGA - "Matrox g200/g400"
-clean_blob drivers/gpu/drm/mga/mga_ucode.h
-clean_blob drivers/gpu/drm/mga/mga_warp.c
-clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_MGA'
-clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
+clean_blob drivers/char/drm/mga_ucode.h
+clean_blob drivers/char/drm/mga_warp.c
+clean_kconfig -f drivers/char/drm/Kconfig 'DRM_MGA'
+clean_mk CONFIG_DRM_MGA drivers/char/drm/Makefile
 
 announce DRM_R128 - "ATI Rage 128"
 clean_sed '
-/^static void r128_cce_load_microcode(drm_r128_private_t \* dev_priv)/i\
+/^static void r128_cce_load_microcode(drm_r128_private_t \* dev_priv)/{
+  i\
 #define r128_cce_load_microcode(dev_priv) \\\
   do { \\\
     DRM_ERROR("Missing Free microcode!\\n"); \\\
@@ -491,22 +456,23 @@ clean_sed '
     r128_do_cleanup_cce(dev); \\\
     return -EINVAL; \\\
   } while (0)
-}' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
+}' drivers/char/drm/r128_cce.c 'report missing Free microcode'
 clean_blob drivers/char/drm/r128_cce.c
 clean_kconfig -f drivers/char/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/char/drm/Makefile
 
 announce DRM_RADEON - "ATI Radeon"
 clean_sed '
-/^static void radeon_cp_load_microcode(drm_radeon_private_t \* dev_priv)/i\
+/^static void radeon_cp_load_microcode(drm_radeon_private_t \* dev_priv)/{
+  i\
 #define radeon_cp_load_microcode(dev_priv) \\\
   do { \\\
     DRM_ERROR("Missing Free microcode!\\n"); \\\
     radeon_do_cleanup_cp(dev); \\\
     return -EINVAL; \\\
   } while (0)
-}' drivers/char/drm/radeon/radeon_cp.c 'report missing Free microcode'
-clean_blob drivers/char/drm/radeon/radeon_cp.c
+}' drivers/char/drm/radeon_cp.c 'report missing Free microcode'
+clean_blob drivers/char/drm/radeon_cp.c
 clean_blob drivers/char/drm/radeon_microcode.h
 clean_kconfig -f drivers/char/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/char/drm/Makefile
@@ -598,12 +564,6 @@ announce DVB_USB_DTT200U - "WideView WT-200U and WT-220U (pen) DVB-T USB2.0 supp
 clean_blob drivers/media/dvb/dvb-usb/dtt200u.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DTT200U'
 clean_mk CONFIG_DVB_USB_DTT200U drivers/media/dvb/dvb-usb/Makefile
-
-announce DVB_USB_DW2102 - "DvbWorld DVB-S/S2 USB2.0 support"
-reject_firmware drivers/media/dvb/dvb-usb/dw2102.c
-clean_blob drivers/media/dvb/dvb-usb/dw2102.c
-clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DW2102'
-clean_mk CONFIG_DVB_USB_DW2102 drivers/media/dvb/dvb-usb/Makefile
 
 announce DVB_USB_GP8PSK - "GENPIX 8PSK->USB module support"
 reject_firmware drivers/media/dvb/dvb-usb/gp8psk.c
@@ -742,29 +702,14 @@ reject_firmware drivers/media/dvb/ttpci/budget-av.c
 announce DVB_BUDGET_CI - "Budget cards with onboard CI connector"
 reject_firmware drivers/media/dvb/ttpci/budget-ci.c
 
-announce DVB_DRX397XD - "Micronas DRX3975D/DRX3977D based"
-reject_firmware drivers/media/dvb/frontends/drx397xD.c
-clean_blob drivers/media/dvb/frontends/drx397xD_fw.h
-clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_DRX397XD'
-clean_mk CONFIG_DVB_DRX397XD drivers/media/dvb/frontends/Makefile
-
 announce DVB_PLUTO2 - "Pluto2 cards"
 reject_firmware drivers/media/dvb/pluto2/pluto2.c
-
-announce DVB_SIANO_SMS1XXX - "Siano SMS1XXX USB dongle support"
-reject_firmware drivers/media/dvb/siano/smscoreapi.c
-reject_firmware drivers/media/dvb/siano/smsusb.c
-clean_blob drivers/media/dvb/siano/smscoreapi.c
-clean_blob drivers/media/dvb/siano/smsusb.c
-clean_blob drivers/media/dvb/siano/sms-cards.c
-clean_kconfig drivers/media/dvb/siano/Kconfig 'DVB_SIANO_SMS1XXX'
-clean_mk CONFIG_DVB_SIANO_SMS1XXX drivers/media/dvb/siano/Makefile
 
 announce DVB_TTUSB_BUDGET - "Technotrend/Hauppauge Nova-USB devices"
 # ***
 clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-dspbootcode.h
-drop_fw_file firmware/ttusb-budget/dspbootcode.bin.ihex firmware/ttusb-budget/dspbootcode.bin
 reject_firmware drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
+# ***
 clean_blob drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.c
 clean_kconfig drivers/media/dvb/ttusb-budget/Kconfig 'DVB_TTUSB_BUDGET'
 clean_mk CONFIG_DVB_TTUSB_BUDGET drivers/media/dvb/ttusb-budget/Makefile
@@ -784,6 +729,7 @@ clean_mk CONFIG_VIDEO_BT848 drivers/media/video/bt8xx/Makefile
 
 announce VIDEO_CPIA2 - "CPiA2 Video For Linux"
 clean_blob drivers/media/video/cpia2/cpia2patch.h
+# ***
 reject_firmware drivers/media/video/cpia2/cpia2_core.c
 clean_blob drivers/media/video/cpia2/cpia2_core.c
 clean_kconfig drivers/media/video/cpia2/Kconfig 'VIDEO_CPIA2'
@@ -861,7 +807,6 @@ clean_mk CONFIG_USB_IBMCAM drivers/media/video/usbvideo/Makefile
 
 announce USB_VICAM - "USB 3com HomeConnect, AKA vicam"
 # ***
-drop_fw_file firmware/vicam/firmware.H16 firmware/vicam/firmware.fw
 reject_firmware drivers/media/video/usbvideo/vicam.c
 clean_blob drivers/media/video/usbvideo/vicam.c
 clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_VICAM'
@@ -927,7 +872,7 @@ clean_sed '
 #define bnx2x_init_block(bp, start, end) \\\
   return (printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\\\
 	  -EINVAL)
-}' drivers/net/bnx2x_main.c 'report missing Free firmware'
+}' drivers/net/bnx2x.c 'report missing Free firmware'
 clean_blob drivers/net/bnx2x_hsi.h
 clean_kconfig drivers/net/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/Makefile
@@ -1140,8 +1085,6 @@ announce SMCTR - "SMC ISA/MCA adapter"
 # This file is not under the GPL, better remove it all.
 clean_file drivers/net/tokenring/smctr_firmware.h
 # ***
-drop_fw_file firmware/tr_smctr.bin.ihex firmware/tr_smctr.bin
-reject_firmware drivers/net/tokenring/smctr.c
 clean_blob drivers/net/tokenring/smctr.c
 clean_kconfig drivers/net/tokenring/Kconfig 'SMCTR'
 clean_mk CONFIG_SMCTR drivers/net/tokenring/Makefile
@@ -1157,11 +1100,6 @@ clean_mk CONFIG_TMS380TR drivers/net/tokenring/Makefile
 announce USB_KAWETH - "USB KLSI KL5USB101-based ethernet device support"
 clean_blob drivers/net/usb/kawethfw.h
 # ***
-drop_fw_file firmware/kaweth/new_code.bin.ihex firmware/kaweth/new_code.bin
-drop_fw_file firmware/kaweth/new_code_fix.bin.ihex firmware/kaweth/new_code_fix.bin
-drop_fw_file firmware/kaweth/trigger_code.bin.ihex firmware/kaweth/trigger_code.bin
-drop_fw_file firmware/kaweth/trigger_code_fix.bin.ihex firmware/kaweth/trigger_code_fix.bin
-reject_firmware drivers/net/usb/kaweth.c
 clean_blob drivers/net/usb/kaweth.c
 clean_kconfig drivers/net/usb/Kconfig 'USB_KAWETH'
 clean_mk CONFIG_USB_KAWETH drivers/net/usb/Makefile
@@ -1211,20 +1149,10 @@ clean_blob drivers/net/wireless/iwlwifi/iwl-3945.c
 clean_kconfig drivers/net/wireless/iwlwifi/Kconfig 'IWL3945'
 clean_mk CONFIG_IWL3945 drivers/net/wireless/iwlwifi/Makefile
 
-announce IWLAGN - "Intel Wireless WiFi Next Gen AGN"
-reject_firmware drivers/net/wireless/iwlwifi/iwl-agn.c
-clean_kconfig drivers/net/wireless/iwlwifi/Kconfig 'IWLAGN'
-clean_mk CONFIG_IWLAGN drivers/net/wireless/iwlwifi/Makefile
-
 announce IWL4965 - "Intel Wireless WiFi 4965AGN"
 clean_blob drivers/net/wireless/iwlwifi/iwl-4965.c
 clean_kconfig drivers/net/wireless/iwlwifi/Kconfig 'IWL4965'
 clean_mk CONFIG_IWL4965 drivers/net/wireless/iwlwifi/Makefile
-
-announce IWL5000 - "Intel Wireless WiFi 5000AGN"
-clean_blob drivers/net/wireless/iwlwifi/iwl-5000.c
-clean_kconfig drivers/net/wireless/iwlwifi/Kconfig 'IWL5000'
-clean_mk CONFIG_IWL5000 drivers/net/wireless/iwlwifi/Makefile
 
 announce LIBERTAS_CS - "Marvell Libertas 8385 CompactFlash 802.11b/g cards"
 reject_firmware drivers/net/wireless/libertas/if_cs.c
@@ -1478,11 +1406,6 @@ announce USB_EMI26 - "EMI 2|6 USB Audio interface"
 # This file is not under the GPL, better remove it all.
 clean_file drivers/usb/misc/emi26_fw.h
 # ***
-# These files are not under the GPL, better remove them all.
-drop_fw_file firmware/emi26/bitstream.HEX firmware/emi26/bitstream.fw
-drop_fw_file firmware/emi26/firmware.HEX firmware/emi26/firmware.fw
-drop_fw_file firmware/emi26/loader.HEX firmware/emi26/loader.fw
-reject_firmware drivers/usb/misc/emi26.c
 clean_blob drivers/usb/misc/emi26.c
 clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI26'
 clean_mk CONFIG_USB_EMI26 drivers/usb/misc/Makefile
@@ -1492,12 +1415,6 @@ announce USB_EMI62 - "EMI 6|2m USB Audio interface"
 clean_file drivers/usb/misc/emi62_fw_m.h
 clean_file drivers/usb/misc/emi62_fw_s.h
 # ***
-# These files are probably not under the GPL, better remove them all.
-drop_fw_file firmware/emi62/bitstream.HEX firmware/emi62/bitstream.fw
-drop_fw_file firmware/emi62/loader.HEX firmware/emi62/loader.fw
-drop_fw_file firmware/emi62/midi.HEX firmware/emi62/midi.fw
-drop_fw_file firmware/emi62/spdif.HEX firmware/emi62/spdif.fw
-reject_firmware drivers/usb/misc/emi62.c
 clean_blob drivers/usb/misc/emi62.c
 clean_kconfig drivers/usb/misc/Kconfig 'USB_EMI62'
 clean_mk CONFIG_USB_EMI62 drivers/usb/misc/Makefile
@@ -1513,61 +1430,39 @@ clean_mk CONFIG_USB_ISIGHTFW drivers/usb/misc/Makefile
 # *****
 announce USB_SERIAL_KEYSPAN - "USB Keyspan USA-xxx Serial Driver"
 clean_file drivers/usb/serial/keyspan_mpr_fw.h
-drop_fw_file firmware/keyspan/mpr.HEX firmware/keyspan/mpr.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_MPR'
 clean_file drivers/usb/serial/keyspan_usa18x_fw.h
-drop_fw_file firmware/keyspan/usa18x.HEX firmware/keyspan/usa18x.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA18X'
 clean_file drivers/usb/serial/keyspan_usa19_fw.h
-drop_fw_file firmware/keyspan/usa19.HEX firmware/keyspan/usa19.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19'
 clean_file drivers/usb/serial/keyspan_usa19qi_fw.h
-drop_fw_file firmware/keyspan/usa19qi.HEX firmware/keyspan/usa19qi.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QI'
 clean_file drivers/usb/serial/keyspan_usa19qw_fw.h
-drop_fw_file firmware/keyspan/usa19qw.HEX firmware/keyspan/usa19qw.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19QW'
 clean_file drivers/usb/serial/keyspan_usa19w_fw.h
-drop_fw_file firmware/keyspan/usa19w.HEX firmware/keyspan/usa19w.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA19W'
 clean_file drivers/usb/serial/keyspan_usa28_fw.h
-drop_fw_file firmware/keyspan/usa28.HEX firmware/keyspan/usa28.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28'
 clean_file drivers/usb/serial/keyspan_usa28xa_fw.h
-drop_fw_file firmware/keyspan/usa28xa.HEX firmware/keyspan/usa28xa.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XA'
 clean_file drivers/usb/serial/keyspan_usa28xb_fw.h
-drop_fw_file firmware/keyspan/usa28xb.HEX firmware/keyspan/usa28xb.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28XB'
 clean_file drivers/usb/serial/keyspan_usa28x_fw.h
-drop_fw_file firmware/keyspan/usa28x.HEX firmware/keyspan/usa28x.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA28X'
 clean_file drivers/usb/serial/keyspan_usa49w_fw.h
-drop_fw_file firmware/keyspan/usa49w.HEX firmware/keyspan/usa49w.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49W'
 clean_file drivers/usb/serial/keyspan_usa49wlc_fw.h
-drop_fw_file firmware/keyspan/usa49wlc.HEX firmware/keyspan/usa49wlc.fw
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN_USA49WLC'
-reject_firmware drivers/usb/serial/keyspan.c
+# ***
 clean_blob drivers/usb/serial/keyspan.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_KEYSPAN'
 clean_mk CONFIG_USB_SERIAL_KEYSPAN drivers/usb/serial/Makefile
-
-announce USB_SERIAL_KEYSPAN_PDA - "USB Keyspan PDA Single Port Serial Driver"
-clean_sed '
-s,request_ihex_firmware,/*KEYSPAN_PDA*/&,
-' drivers/usb/serial/keyspan_pda.c 'accept Free firmware'
 
 announce USB_SERIAL_EDGEPORT - "USB Inside Out Edgeport Serial Driver"
 clean_file drivers/usb/serial/io_fw_boot.h
 clean_file drivers/usb/serial/io_fw_down.h
 clean_file drivers/usb/serial/io_fw_down2.h
 # ***
-clean_fw firmware/edgeport/boot.H16 firmware/edgeport/boot.fw
-clean_fw firmware/edgeport/boot2.H16 firmware/edgeport/boot2.fw
-clean_fw firmware/edgeport/down.H16 firmware/edgeport/down.fw
-clean_fw firmware/edgeport/down2.H16 firmware/edgeport/down2.fw
-reject_firmware drivers/usb/serial/io_edgeport.c
 clean_blob drivers/usb/serial/io_edgeport.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT drivers/usb/serial/Makefile
@@ -1576,8 +1471,6 @@ announce USB_SERIAL_EDGEPORT_TI - "USB Inside Out Edgeport Serial Driver (TI dev
 clean_file drivers/usb/serial/io_fw_boot2.h
 clean_file drivers/usb/serial/io_fw_down3.h
 # ***
-clean_fw firmware/edgeport/down3.bin.ihex firmware/edgeport/down3.bin
-reject_firmware drivers/usb/serial/io_ti.c
 clean_blob drivers/usb/serial/io_ti.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_EDGEPORT_TI'
 clean_mk CONFIG_USB_SERIAL_EDGEPORT_TI drivers/usb/serial/Makefile
@@ -1586,9 +1479,6 @@ announce USB_SERIAL_TI - "USB TI 3410/5052 Serial Driver"
 clean_blob drivers/usb/serial/ti_fw_3410.h
 clean_blob drivers/usb/serial/ti_fw_5052.h
 # ***
-drop_fw_file firmware/ti_3410.fw.ihex firmware/ti_3410.fw
-drop_fw_file firmware/ti_5052.fw.ihex firmware/ti_5052.fw
-reject_firmware drivers/usb/serial/ti_usb_3410_5052.c
 clean_blob drivers/usb/serial/ti_usb_3410_5052.c
 clean_kconfig drivers/usb/serial/Kconfig 'USB_SERIAL_TI'
 clean_mk CONFIG_USB_SERIAL_TI drivers/usb/serial/Makefile
@@ -1653,7 +1543,6 @@ clean_blob sound/pci/korg1212/korg1212-firmware.h
 clean_ifdef sound/pci/korg1212/korg1212.c CONFIG_SND_KORG1212_FIRMWARE_IN_KERNEL
 clean_kconfig sound/pci/Kconfig 'SND_KORG1212_FIRMWARE_IN_KERNEL'
 # ***
-drop_fw_file firmware/korg/k1212.dsp.ihex firmware/korg/k1212.dsp
 reject_firmware sound/pci/korg1212/korg1212.c
 clean_blob sound/pci/korg1212/korg1212.c
 clean_kconfig sound/pci/Kconfig 'SND_KORG1212'
@@ -1663,8 +1552,6 @@ announce SND_MAESTRO3 - "ESS Allegro/Maestro3"
 clean_ifdef sound/pci/maestro3.c CONFIG_SND_MAESTRO3_FIRMWARE_IN_KERNEL
 clean_kconfig sound/pci/Kconfig 'SND_MAESTRO3_FIRMWARE_IN_KERNEL'
 # ***
-drop_fw_file firmware/ess/maestro3_assp_kernel.fw.ihex firmware/ess/maestro3_assp_kernel.fw
-drop_fw_file firmware/ess/maestro3_assp_minisrc.fw.ihex firmware/ess/maestro3_assp_minisrc.fw
 reject_firmware sound/pci/maestro3.c
 clean_blob sound/pci/maestro3.c
 clean_kconfig sound/pci/Kconfig 'SND_MAESTRO3'
@@ -1675,9 +1562,6 @@ clean_blob sound/pci/ymfpci/ymfpci_image.h
 clean_ifdef sound/pci/ymfpci/ymfpci_main.c CONFIG_SND_YMFPCI_FIRMWARE_IN_KERNEL
 clean_kconfig sound/pci/Kconfig 'SND_YMFPCI_FIRMWARE_IN_KERNEL'
 # ***
-drop_fw_file firmware/yamaha/ds1_ctrl.fw.ihex firmware/yamaha/ds1_ctrl.fw
-drop_fw_file firmware/yamaha/ds1_dsp.fw.ihex firmware/yamaha/ds1_dsp.fw
-drop_fw_file firmware/yamaha/ds1e_ctrl.fw.ihex firmware/yamaha/ds1e_ctrl.fw
 reject_firmware sound/pci/ymfpci/ymfpci_main.c
 clean_blob sound/pci/ymfpci/ymfpci_main.c
 clean_kconfig sound/pci/Kconfig 'SND_YMFPCI'
@@ -1687,11 +1571,6 @@ announce SND_SB16_CSP - "SB16 Advanced Signal Processor"
 clean_blob sound/isa/sb/sb16_csp_codecs.h
 clean_kconfig sound/isa/Kconfig 'SND_SB16_CSP_FIRMWARE_IN_KERNEL'
 # ***
-drop_fw_file firmware/sb16/alaw_main.csp.ihex firmware/sb16/alaw_main.csp
-drop_fw_file firmware/sb16/mulaw_main.csp.ihex firmware/sb16/mulaw_main.csp
-drop_fw_file firmware/sb16/ima_adpcm_init.csp.ihex firmware/sb16/ima_adpcm_init.csp
-drop_fw_file firmware/sb16/ima_adpcm_capture.csp.ihex firmware/sb16/ima_adpcm_capture.csp
-drop_fw_file firmware/sb16/ima_adpcm_playback.csp.ihex firmware/sb16/ima_adpcm_playback.csp
 reject_firmware sound/isa/sb/sb16_csp.c
 clean_blob sound/isa/sb/sb16_csp.c
 clean_kconfig sound/isa/Kconfig 'SND_SB16_CSP'
@@ -1890,8 +1769,6 @@ clean_blob Documentation/sound/oss/PSS-updates
 clean_blob Documentation/sound/oss/README.OSS
 clean_file Documentation/dvb/get_dvb_firmware
 clean_file Documentation/video4linux/extract_xc3028.pl
-clean_sed s,usb8388,whatever,g drivers/base/Kconfig 'removed blob name'
-clean_blob firmware/WHENCE
 
 if $errors; then
   echo errors above were ignored because of --force >&2
