@@ -445,6 +445,13 @@ clean_mk CONFIG_MOXA_INTELLIO drivers/char/Makefile
 
 # gpu drm
 
+announce DRM_NOUVEAU - "Nouveau (nVidia) cards"
+reject_firmware drivers/gpu/drm/nouveau/nouveau_grctx.c
+clean_blob drivers/gpu/drm/nouveau/nouveau_grctx.c
+clean_blob drivers/gpu/drm/nouveau/nv50_graph.c
+clean_kconfig drivers/gpu/drk/nouveau/Kconfig 'DRM_NOUVEAU'
+clean_mk CONFIG_DRM_NOUVEAU drivers/gpu/drm/nouveau/Makefile
+
 announce DRM_MGA - "Matrox g200/g400"
 drop_fw_file firmware/matrox/g200_warp.H16 firmware/matrox/g200_warp.fw
 drop_fw_file firmware/matrox/g400_warp.H16 firmware/matrox/g400_warp.fw
@@ -1029,6 +1036,7 @@ announce SPIDER_NET - "Spider Gigabit Ethernet driver"
 reject_firmware drivers/net/spider_net.c
 clean_sed 's,spider_fw\.bin,DEBLOBBED.bin,g' \
   drivers/net/spider_net.c 'removed non-Free firmware notes'
+clean_blob drivers/net/spider_net.c
 clean_blob drivers/net/spider_net.h
 clean_kconfig drivers/net/Kconfig 'SPIDER_NET'
 clean_mk CONFIG_SPIDER_NET drivers/net/Makefile
@@ -1124,6 +1132,7 @@ drop_fw_file firmware/cis/DP83903.cis.ihex firmware/cis/DP83903.cis
 drop_fw_file firmware/cis/NE2K.cis.ihex firmware/cis/NE2K.cis
 drop_fw_file firmware/cis/tamarack.cis.ihex firmware/cis/tamarack.cis
 drop_fw_file firmware/cis/PE-200.cis.ihex firmware/cis/PE-200.cis
+drop_fw_file firmware/cis/PE520.cis.ihex firmware/cis/PE520.cis
 clean_blob drivers/net/pcmcia/pcnet_cs.c
 clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_PCNET'
 clean_mk CONFIG_PCMCIA_PCNET drivers/net/pcmcia/Makefile
@@ -1209,6 +1218,7 @@ announce WLAGS49_H2 - 'Agere Systems HERMES II Wireless PC Card Model 0110'
 # others seem to be code.
 clean_file drivers/staging/wlags49_h2/ap_h2.c
 clean_file drivers/staging/wlags49_h2/sta_h2.c
+clean_blob drivers/staging/wlags49_h2/wl_profile.c
 clean_kconfig drivers/staging/wlags49_h2/Kconfig 'WLAGS49_H2'
 clean_mk CONFIG_WLAGS49_H2 drivers/staging/Makefile
 
@@ -1264,7 +1274,7 @@ clean_mk CONFIG_IWM drivers/net/wireless/iwmc3200wifi/Makefile
 announce IWMC3200TOP - "Intel Wireless MultiCom Top Driver"
 reject_firmware drivers/misc/iwmc3200top/fw-download.c
 undefine_macro '_FW_NAME(api)' '"/*(DEBLOBBED)*/"' \
-  drivers/misc/iwmc3200top/iwmc3200top.h
+  'removed non-Free firmware name' drivers/misc/iwmc3200top/iwmc3200top.h
 clean_blob drivers/misc/iwmc3200top/main.c
 clean_kconfig drivers/misc/iwmc3200top/Kconfig 'IWMC3200TOP'
 clean_mk CONFIG_IWMC3200TOP drivers/misc/iwmc3200top/Makefile
@@ -1454,12 +1464,14 @@ clean_mk CONFIG_VT6656 drivers/staging/vt6656/Makefile
 
 announce WL1251 - "TI wl1251 support"
 reject_firmware drivers/net/wireless/wl12xx/wl1251_main.c
+clean_blob drivers/net/wireless/wl12xx/wl1251_main.c
 clean_blob drivers/net/wireless/wl12xx/wl1251.h
 clean_kconfig drivers/net/wireless/wl12xx/Kconfig 'WL1251'
 clean_mk CONFIG_WL1251 drivers/net/wireless/wl12xx/Makefile
 
 announce WL1271 - "TI wl1271 support"
 reject_firmware drivers/net/wireless/wl12xx/wl1271_main.c
+clean_blob drivers/net/wireless/wl12xx/wl1271_main.c
 clean_blob drivers/net/wireless/wl12xx/wl1271.h
 clean_kconfig drivers/net/wireless/wl12xx/Kconfig 'WL1271'
 clean_mk CONFIG_WL1271 drivers/net/wireless/wl12xx/Makefile
@@ -1477,6 +1489,12 @@ clean_kconfig drivers/net/wireless/zd1211rw/Kconfig 'ZD1211RW'
 clean_mk CONFIG_ZD1211RW drivers/net/wireless/zd1211rw/Makefile
 
 # bluetooth
+
+announce BT_ATH3K - "Atheros firmware download driver"
+reject_firmware drivers/bluetooth/ath3k.c
+clean_blob drivers/bluetooth/ath3k.c
+clean_kconfig drivers/bluetooth/Kconfig 'BT_ATH3K'
+clean_mk CONFIG_BT_ATH3K drivers/bluetooth/Makefile
 
 announce BT_HCIBCM203X - "HCI BCM203x USB driver"
 reject_firmware drivers/bluetooth/bcm203x.c
@@ -2004,6 +2022,15 @@ clean_sed '
 }' sound/oss/Kconfig 'removed default firmware'
 clean_mk CONFIG_SOUND_MSNDPIN sound/oss/Makefile
 
+announce SND_SSCAPE - "Ensoniq SoundScape driver"
+clean_blob sound/isa/sscape.c
+clean_sed '
+/^config SND_SSCAPE$/, /^config / {
+  s,"\(scope\|sndscape\)\.co[d?]","/*(DEBLOBBED)*/",;
+}' sound/isa/Kconfig 'removed firmware names'
+clean_kconfig sound/isa/Kconfig 'SND_SSCAPE'
+clean_mk CONFIG_SND_SSCAPE sound/isa/Makefile
+
 announce SOUND_TRIX - "MediaTrix AudioTrix Pro support"
 clean_blob sound/oss/trix.c
 clean_kconfig sound/oss/Kconfig 'SOUND_TRIX'
@@ -2054,6 +2081,7 @@ clean_blob Documentation/sound/alsa/ALSA-Configuration.txt
 clean_blob Documentation/sound/oss/MultiSound
 clean_blob Documentation/sound/oss/PSS
 clean_blob Documentation/sound/oss/PSS-updates
+clean_blob Documentation/sound/oss/README.OSS
 clean_file Documentation/dvb/get_dvb_firmware
 clean_file Documentation/video4linux/extract_xc3028.pl
 clean_sed s,usb8388,whatever,g drivers/base/Kconfig 'removed blob name'
