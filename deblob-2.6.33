@@ -2026,7 +2026,7 @@ announce SND_SSCAPE - "Ensoniq SoundScape driver"
 clean_blob sound/isa/sscape.c
 clean_sed '
 /^config SND_SSCAPE$/, /^config / {
-  s,"\(scope\|sndscape\)\.co[d?]","/*(DEBLOBBED)*/",;
+  s,"\(scope\|sndscape\)\.co[d?]","/*(DEBLOBBED)*/",g;
 }' sound/isa/Kconfig 'removed firmware names'
 clean_kconfig sound/isa/Kconfig 'SND_SSCAPE'
 clean_mk CONFIG_SND_SSCAPE sound/isa/Makefile
