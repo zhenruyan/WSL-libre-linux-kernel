@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-02-23
+# deblob-check version 2010-02-23a
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4400,7 +4400,7 @@ BAD regular expression:
       s=+ r=-
     fi
     sedpatch="
-      /^[$r]/d;
+      /^[$r]/b testlastline;
       # /^[*!]/ {
       # 	s,^,context diffs are not properly supported\\n,;
       # 	W /dev/stderr
@@ -4453,7 +4453,31 @@ BAD regular expression:
 	p;
 	d;
       }
-      s,^[ !$s],,;"
+      s,^[ !$s],,
+      p;
+      :testlastline
+      $ {
+	x;
+	/^@@ /{
+	  s,^,;/*end ,;
+	  s,\\([\\n]\\|$\\),*/;&,;
+	  i\\
+;/**/;
+
+	  P;
+	  s,^[^\\n]*\\([\\n]\\|$\\),,;
+	}
+	/^$s$s$s /{
+	  s,^$s$s$s,;/*end,;
+	  s,\\([\\n]\\|$\\),*/;&,;
+	  i\\
+
+	  P;
+	  s,^[^\\n]*\\([\\n]\\|$\\),,;
+	}
+	x;
+      }
+      d;"
     cmd='${SED-sed} "$sedpatch"'
     ;;
   *)
