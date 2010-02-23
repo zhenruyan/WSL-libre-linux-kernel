@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-02-11
+# deblob-check version 2010-02-23
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2833,8 +2833,12 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]bridge_start_\([qs]\?v\|x\)ga\[\]\[2\][ ]=' drivers/media/video/gspca/ov435_9.c
     defsnc 'static[ ]const[ ]__u8[ ]\(start\|page3\)_7302\[\][ ]=' drivers/media/video/gspca/pac7302.c
     defsnc '[	]struct[ ]init_command[ ]\(spy\|cif\|ms350\|genius\|vivitar\)_start_commands\[\][ ]=' drivers/media/video/gspca/sn9c2028.c
+    defsnc 'static[ ]const[ ]__u8[ ]initOv6650\[\][ ]=' drivers/media/video/gspca/sonixb.c
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]__u8[ ]ov6650_sensor_init\[\]\[8\][ ]=[*][/][;]' drivers/media/video/gspca/sonixb.c
+    defsnc 'static[ ]const[ ]__u8[ ]pas202_sensor_init\[\]\[8\][ ]=' drivers/media/video/gspca/sonixb.c
     defsnc 'static[ ]const[ ]u8[ ]\(adcm1700\|om6802\|po1030\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u8[ ]hv7131r_sensor_init\[\]\[8\][ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sonixj.c
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u8[ ]po1030_sensor_param1\[\]\[8\][ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sonixj.c
     defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u8[ ]\(mi1320\|po3130\)_initVGA_data\[\]\[4\][ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sonixj.c
     defsnc 'static[ ]const[ ]u8[ ]poxxxx_init\(_common\|Q\?VGA\|_end_1\)\[\]\[4\][ ]=' drivers/media/video/gspca/vc032x.c
     defsnc '[	]static[ ]const[ ]u8[ ]gamma_tb\[6\]\[16\][ ]=' drivers/media/video/gspca/zc3xx.c
@@ -2848,6 +2852,7 @@ set_except () {
     defsnc 'static[ ]\(const[ ]\)\?\(__\)\?u8[ ]\(mt9v111\|sp80708\|hv7131r\|mi0360\|mo4000\|ov76\([36]0\|48\)\|om6802\)_sensor_init\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     defsnc '[	]static[ ]const[ ]u8[ ]probe_tb\[\]\[4\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     defsnc 'static[ ]const[ ]\(__u16\|u8\)[ ]spca505b\?_\(init\|open\)_data\(_ccd\)\?\[\]\[3\][ ]=' drivers/media/video/gspca/spca505.c
+    defsnc 'static[ ]const[ ]u8[ ]n4_lt168g\[\][ ]=' drivers/media/video/gspca/t613.c
     defsnc '[	]static[ ]const[ ]\(__\)\?u8[ ]\(read_indexs\|n\(set\)\?[0-9]*\(_other\)\?\|missing\)\[[0-9x]*\][ ]=' drivers/media/video/gspca/t613.c
     defsnc 'static[ ]const[ ]u8[ ]eeprom_data\[\]\[3\][ ]=' drivers/media/gspca/tv8532.c
     initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]__u16[ ]spca508_vista_init_data\[\]\[3\][ ]=[ ][{][*][/][;]' drivers/media/video/gspca/spca508.c
