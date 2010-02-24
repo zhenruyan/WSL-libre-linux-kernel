@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.33 extra=-- # up to -rc7
+kver=2.6.33 extra=
 
 case $1 in
 --force)
@@ -2023,6 +2023,7 @@ clean_sed '
 clean_mk CONFIG_SOUND_MSNDPIN sound/oss/Makefile
 
 announce SND_SSCAPE - "Ensoniq SoundScape driver"
+reject_firmware sound/isa/sscape.c
 clean_blob sound/isa/sscape.c
 clean_sed '
 /^config SND_SSCAPE$/, /^config / {

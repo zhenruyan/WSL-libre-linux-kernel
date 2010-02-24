@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-02-23a
+# deblob-check version 2010-02-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1364,7 +1364,7 @@ set_except () {
     blobname 'yamaha[/]yss225_registers\.bin' sound/isa/wavefront/wavefront_fx.c
     blobna 'firmware[ ]=[ ][&]yss225_registers_firmware[;]' sound/isa/wavefront/wavefront_fx.c
     blob 'static[ ]const[ ]struct[ ]firmware[ ]yss225_registers_firmware[ ]=[ ][{][^;]*[}][;]' sound/isa/wavefront/wavefront_fx.c
-    blobna '\(ospath[	 ]*-[ ]Pathname[^\n]*ICS2115[^-]*wavefront\.os\|Note:[ ]the[ ]firmware[ ]file[ ]["]wavefront\.os["]\)[^-]*[/]lib[/]firmware\.' Documentation/sound/alsa/ALSA-Configuration.txt
+    blobna '\(ospath[	 ]*-[ ]Pathname[^\n]*ICS2115[^-]*wavefront\.os\|Note:[ ]the[ ]firmware[ ]file[ ]["]wavefront\.os["]\)[^-]*[/]lib[/]firmware\.\([^.]*after[ ]upgrading[ ]the[ ]kernel\)\?' Documentation/sound/alsa/ALSA-Configuration.txt
     blobname 'wavefront\.os' sound/isa/wavefront/wavefront_synth.c
 
     blobna 'and[\n]require[ ]the[ ]use[ ]of[^\n]*propr\?ietary[^:]*' Documentation/arm/IXP4xx
@@ -1457,7 +1457,7 @@ set_except () {
     blobname '%s%[du]%s["],[ ]name_pre,[ ]index,[ ]["]\.ucode' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\).c'
 
     blobname 'libertas_cs\(_helper\)\?\.fw' drivers/net/wireless/libertas/if_cs.c
-    blobna 'sd\(8385\|868[68]\)_helper\.bin["],[\n][	]\.firmware[	]=[ ]["]sd\(8385\|868[68]\)\.bin' 'drivers/\(net/wireless/libertas/if_sdio\.c\|bluetooth/btmrvl_sdio\.c\)'
+    blobname 'sd\(8385\|868[68]\)\(_helper\)\?\.bin\(["],[\n][	]*\.firmware[ 	]=[ ]["]sd\(8385\|868[68]\)\.bin\)\?' 'drivers/\(net/wireless/libertas/if_sdio\.c\|bluetooth/btmrvl_sdio\.c\)'
     blobname 'sd\(8385\|868[68]\)\(_helper\)\?\.bin' 'drivers/\(net/wireless/libertas/if_sdio\.c\|bluetooth/btmrvl_sdio\.c\)'
     accept '[	]*card->firmware[ ]=[ ]\(if_sdio\|lbs_fw\)' drivers/net/wireless/libertas/if_sdio.c
     blobname 'usb8388\(-5\.126\.0\.p5\)\?\.bin' drivers/net/wireless/libertas/if_usb.c
@@ -1593,7 +1593,7 @@ set_except () {
     blobname '\([/]etc[/]sound[/]\|turtlebeach[/]\)\?msnd\(init\|perm\)\.bin' sound/oss/Kconfig
 
     blob 'When[ ]the[ ]module[ ]is[ ]loaded[^\n]*\([\n][^\n]*\)*[/]pss_synth[^\n]*\([\n][^\n]*\)*' Documentation/sound/oss/PSS
-    blob 'pss_firmware[ \n	]*This[ ]parameter[^\n]*\([\n][^\n]*\)*[/]pss_synth[^\n]*\([\n][^\n]*\)*' Documentation/sound/oss/PSS-updates
+    blob 'pss_firmware[ \n	]*This[ ]parameter[^\n]*\([\n][^\n]*\)*[/]pss_synth[^\n]*\([\n][^\n]\+\)*' Documentation/sound/oss/PSS-updates
     accept '[	][	]pss_synthLen[ ]=[ ]mod_firmware_load[(]pss_firmware,[ ][(]void[ ][*][)][ ][&]pss_synth[)][;]' sound/oss/pss.c
     accept '[	]*if[ ]\?[(]\(!\|fw_load[ ][&][&][ ]\)\?pss_synth' sound/oss/pss.c
     accept '[	]*if[ ][(]!pss_download_boot[(]devc,[ ]pss_synth,[ ]pss_synthLen,' sound/oss/pss.c
@@ -2319,7 +2319,7 @@ set_except () {
     defsnc 'static[ ]const[ ]struct[ ]aper_size_info_32[ ]u3_sizes\[8\?\][ ]=' drivers/char/agp/uninorth-agp.c
     defsnc 'static[ ]const[ ]unsigned[ ]short[ ]atkbd_set[23]_keycode\[\(512\|ATKBD_KEYMAP_SIZE\)\][ ]=' drivers/input/keyboard/atkbd.c
     defsnc '[	][}][ ]common_modes\[17\][ ]=' drivers/gpu/drm/radeon/radeon_connectors.c
-    defsnc '[	][	]*\(static[ ]\)\?struct[ ]phy_reg[ ]phy_reg_init\(_0\)\?\[\][ ]=' drivers/net/r8169.c
+    defsnc '[	][	]*\(static[ ]\)\?\(const[ ]\)\?struct[ ]phy_reg[ ]phy_reg_init\(_0\)\?\[\][ ]=' drivers/net/r8169.c
     accept '[	][	]*struct[ ]phy_reg[ ]phy_reg_init_1\[\][ ]=[ ][{][^;]*0x8300[^;]*[}][;]' drivers/net/r8169.c
     blob 'static[ ]void[ ]rtl8168d_[12]_hw_phy_config[(]void[ ]__iomem[ ][*]ioaddr[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]' drivers/net/r8169.c
     blobna 'rtl8168d_[12]_hw_phy_config[(]ioaddr[)][;]' drivers/net/r8169.c
@@ -2420,8 +2420,9 @@ set_except () {
     blob 'static[ ]const[ ]hcf_8[ ]fw_image_[1234]_data\[\][ ]=[^;]*[;]\([ ]*[/][*][ ]fw_image_[1234]_data[ ][*][/]\)\?' 'drivers/staging/wlags49_h2/\(ap\|sta\)_h25\?\.c'
     blobname '[/]etc[/]agere[/]fw\.bin' drivers/staging/wlags49_h2/wl_profile.c
     defsnc 'static[ ]const[ ]long[ ]chan_freq_list\[\]\[MAX_CHAN_FREQ_MAP_ENTRIES\][ ]=' drivers/staging/wlags49_h2/wl_util.c
+    blob 'The[ ]ssinit[ ]program.*nsoniq.*sndscape.*sound[ ]weird\.' Documentation/sound/oss/README.OSS
     blobname 'scope\.cod' 'sound/isa/\(Kconfig\|sscape\.c\)'
-    blobname 'sndscape\.co\([?dx01234]\|%d\)' 'sound/\(isa/\(Kconfig\|sscape\.c\)\|oss/README\.OSS\)'
+    blobname '\(sndscape\|soundscape\)\.co\([?dx01234]\|%d\)' 'sound/isa/\(Kconfig\|sscape\.c\)\|Documentation/sound/oss/README\.OSS'
     defsnc 'static[ ]const[ ]u8[ ]\(adcm1700\|om6802\|po1030\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     blobname 'ath3k-1\.fw' drivers/bluetooth/ath3k.c
     blobname 'nouveau[/]nv\([0-9a-f][0-9a-f]\|%02x\)\.ctx\(prog\|vals\)' 'drivers/gpu/drm/nouveau/\(nv50_graph\|nouveau_grctx\)\.c'
