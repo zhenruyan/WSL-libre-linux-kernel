@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-02-24
+# deblob-check version 2010-03-21
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2829,6 +2829,9 @@ set_except () {
     blobname 'atmel_at76c50\(3-\(i386[13]\|rfmd\(-acc\)\?\)\|5\(a\(mx\)\?\)\?-rfmd\(2958\)\?\)\.bin' drivers/net/wireless/at76_usb/at76_usb.c
     ;;
   */linux-2.6-v4l-dvb*.patch)
+    # post 2.6.33 fixes start here
+    defsnc 'static[ ]struct[ ]i2c_reg_u8[ ]ov9655_init\[\][ ]=' drivers/media/video/gspca/sn9c20x.c
+    defsnc 'static[ ]const[ ]u8[ ]\(gc0307\|po2030n\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     # rebase-gspca-to-latest 2.6.33ish starts here
     defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
     defsnc 'static[ ]const[ ]u8[ ]bridge_start_\([qs]\?v\|x\)ga\[\]\[2\][ ]=' drivers/media/video/gspca/ov435_9.c
