@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-03-21a
+# deblob-check version 2010-03-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1075,7 +1075,7 @@ set_except () {
     defsnc 'static[ ]const[ ]\(__u16\|u8\)[ ]spca505b\?_\(init\|open\)_data\(_ccd\)\?\[\]\[3\][ ]=' drivers/media/video/gspca/spca505.c
     defsnc 'static[ ]const[ ]\(__\)\?u16[ ]spca508\(cs110\|_sightcam2\?\|_vista\)\?_init_data\[\]\[[23]\][ ]=' drivers/media/video/gspca/spca508.c
     initnc 'static[ ]const[ ]__u16[ ]\(spca561\|rev72a\)_init_data3\?\[\]\[2\][ ]=' drivers/media/video/gspca/spca561.c
-    defsnc 'static[ ]const[ ]\(__u16\|struct[ ]cmd\)[ ]spca504\(_pccam600\|A_clicksmart420\)_\(init\|open\)_data\[\]\(\[3\]\)\?[ ]=' drivers/media/video/gspca/sunplus.c
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]\(__u16\|struct[ ]cmd\)[ ]spca504\(_pccam600\|A_clicksmart420\)_\(init\|open\)_data\[\]\(\[3\]\)\?[ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sunplus.c
     defsnc 'static[ ]const[ ]\(__\)\?u8[ ]qtable_\(creative_pccam\|spca504_default\)\[2\]\[64\][ ]=' drivers/media/video/gspca/sunplus.c
     initnc 'static[ ]const[ ]__u8[ ]\(effects\|gamma\)_table\[\(MAX_[A-Z]*\|[A-Z]*_MAX\)\]\[[0-9]*\][ ]=' drivers/media/video/gspca/t631.c
     initnc 'static[ ]const[ ]\(__\)\?u8[ ]tas5130a_sensor_init\[\]\[8\][ ]=' drivers/media/video/gspca/t613.c
@@ -2461,19 +2461,21 @@ set_except () {
     blobname 'sms1xxx-hcw-55xxx-sdbt-02\.fw' drivers/media/dvb/siano/sms-cards.c
     defsnc 'static[ ]u8[ ]samsung_smt_7020_inittab\[\][ ]=' drivers/media/video/cx88/cx88-dvb.c
     defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
-    defsnc 'static[ ]const[ ]u8[ ]bridge_start_\([qs]\?v\|x\)ga\[\]\[2\][ ]=' drivers/media/video/gspca/ov435_9.c
+    defsnc 'static[ ]const[ ]u8[ ]bridge_start_\([qs]\?v\|x\)ga\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
     defsnc '[	]struct[ ]init_command[ ]\(spy\|cif\|ms350\|genius\|vivitar\)_start_commands\[\][ ]=' drivers/media/video/gspca/sn9c2028.c
     defsnc 'static[ ]const[ ]u8[ ]n4_lt168g\[\][ ]=' drivers/media/video/gspca/t613.c
-    initc 'static[ ]const[ ]\(__\)\?u8[ ]\(mi\(0360\|13[12]0\)\|po\(1200\|3130\)\|hv7131r\|ov76[67]0\)_\(\(soc\)\?_\?[iI]nit\(Q\?V\|SX\)GA\(_\(JPG\|data\)\)\?\|rundata\)\[\]\[4\][ ]=' drivers/media/video/gspca/vc032x.c
+    initc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]\(__\)\?u8[ ]\(mi\(0360\|13[12]0\)\|po\(1200\|3130\)\|hv7131r\|ov76[67]0\)_\(\(soc\)\?_\?[iI]nit\(Q\?V\|SX\)GA\(_\(JPG\|data\)\)\?\|rundata\)\[\]\[4\][ ]=\([ ][{][*][/][;]\)\?' drivers/media/video/gspca/vc032x.c
     defsnc '[	]static[ ]const[ ]u8[ ]gamma_tb\[6\]\[16\][ ]=' drivers/media/video/gspca/zc3xx.c
     blobname 'tlg2300_firmware\.bin' drivers/media/video/tlg2300/pd-main.c
     defsnc '[	]u8[ ]pattern\[42\][ ]=' drivers/net/ksz884x.c
-    defsnc 'static[ ]const[ ]u8[ ]b43_ntab_framelookup\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    defsnc '\(static[ ]\)\?const[ ]u8[ ]b43_ntab_framelookup\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
     defsnc 'const[ ]u32[ ]\(b43_ntab_tx_gain_rev\(0_1_2\|3plus_2ghz\|\([34]\|5plus\)_5ghz\)\|txpwrctrl_tx_gain_ipa\(_\(rev\)\?[56]g\?\)\?\)\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
     defsnc 'const[ ]u16[ ]tbl_iqcal_gainparams\[2\]\[9\]\[8\][ ]=' drivers/net/wireless/b43/tables_nphy.c
     defsnc 'const[ ]struct[ ]nphy_txiqcal_ladder[ ]ladder_\(lo\|iq\)\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
     defsnc 'const[ ]u16[ ]loscale\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
     blobname 'isl38\(86\|87\|90\)\(pci\|usb\(_bare\)\?\)\?' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]struct[ ]conf_drv_settings[ ]default_conf[ ]=[ ][{][*][/][;]' drivers/net/wireless/wl12xx/wl1271_main.c
+    defsnc '[	][}][ ]grtpkts\[\][ ]=' drivers/staging/mimio/mimio.c
     blobname 'rt\(28[67]0\|30[79][01]\)\.bin' drivers/staging/rt2860/common/rtmp_mcu.c
     accept '[	]adapter->firmware[ ]=[ ]fw[;]' drivers/staging/rt2860/common/rtmp_mcu.c
     blob '[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*RTL8192SU[/]rtl1892swf\.bin[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/staging/rtl8192su/r8192S_firmware.c
@@ -2499,7 +2501,7 @@ set_except () {
     defsnc 'static[ ]const[ ]u32[ ]camellia_sp1110\[256\][ ]=' crypto/camellia.c
     defsnc 'static[ ]const[ ]u32[ ]camellia_sp3033\[256\][ ]=' crypto/camellia.c
     defsnc 'static[ ]const[ ]u32[ ]camellia_sp4404\[256\][ ]=' crypto/camellia.c
-    defsnc 'static[ ]const[ ]__u8[ ]\(start\|page3\)_7302\[\][ ]=' drivers/media/video/gspca/pac7302.c
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]__u8[ ]\(start\|page3\)_7302\[\][ ]=[ ][{][*][/][;]' drivers/media/video/gspca/pac7302.c
     defsnc 'static[ ]const[ ]__u8[ ]pas202_sensor_init\[\]\[8\][ ]=' drivers/media/video/gspca/sonixb.c
     defsnc 'static[ ]const[ ]u8[ ]\(adcm1700\|om6802\|po1030\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     blob 'sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\|ngene\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\([\n]\+sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\|ngene\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\)*' Documentation/dvb/get_dvb_firmware
@@ -2508,6 +2510,9 @@ set_except () {
     blobname '\(sep[/]\)\?\(cache\|resident\)\.image\.bin' drivers/staging/sep/sep_driver.c
     defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u8[ ]\(mi1320\|po3130\)_initVGA_data\[\]\[4\][ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sonixj.c
     accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]request_firmware_work_func' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init_ov965x\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534.c
+    defsnc 'static[ ]const[ ]u8[ ]bridge_start_ov965x_\(\([qs]\?v\|x\)ga\|cif\)\[\]\[2\][ ]=' drivers/media/video/gspca/ov534.c
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]\(__u16\|struct[ ]cmd\)[ ]spca504\(_pccam600\|A_clicksmart420\)_\(init\|open\)_data\[\]\(\[3\]\)\?[ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sunplus.c
     ;;
 
   */patch*2.6.33-rc*)
@@ -2529,7 +2534,7 @@ set_except () {
     accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]request_firmware_work_func[(]void[ ][*]arg[)][*][/][;][\n]\([^\n]*[\n]\)\+\([	]ret[ ]=[ ]_request_firmware[(]\|request_firmware_nowait[(]\)\?' drivers/base/firmware_class.c
     accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]struct[ ]dvb_usb_device_properties[ ]af9015_properties\(\[\]\)\?[ ]=[ ][{][*][/][;][\n][	][	]\.firmware[ ]=[ ]' drivers/media/dvb/dvb-usb/af9015.c
     defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u8[ ]bridge_start_ov965x\[\]\[2\][ ]=[ ][{][*][/][;][\n]' drivers/media/video/gspca/ov534.c
-    defsnc 'static[ ]const[ ]u8[ ]bridge_start_ov965x_\(\(s\?v\|x\)ga\|cif\)\[\]\[2\][ ]=' drivers/media/video/gspca/ov534.c
+    defsnc 'static[ ]const[ ]u8[ ]bridge_start_ov965x_\(\([qs]\?v\|x\)ga\|cif\)\[\]\[2\][ ]=' drivers/media/video/gspca/ov534.c
     defsnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]\(const[ ]\)\?\(__\)\?u8[ ]\(mt9v111\|sp80708\|hv7131r\|mi0360\|mo4000\|ov76\([36]0\|48\)\|om6802\|po1030\)_sensor_init\[\]\[8\][ ]=[ ][{]\([*][/][;]\)\?[\n]' drivers/media/video/gspca/sonixj.c
     defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]\(const[ ]\)\?u32[ ]ar\(5416\|9280\)\(Modes\(_fast_clock\)\?\|Common\|BB_RfGain\|Bank6\(TPC\)\?\|Addac\)\(_91[06]0\(1_1\)\?\|_9280\(_2\)\?\)\?\[\]\[[236]\][ ]=[ ][{][*][/][;][\n]' drivers/net/wireless/ath9k/initvals.h
     defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u_int32_t[ ]ar9271\(Common\|Modes\)_9271_1_0\[\]\[[26]\][ ]=[ ][{][*][/][;][\n]' drivers/net/wireless/ath9k/initvals.h
@@ -2897,7 +2902,7 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]\(gc0307\|po2030n\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     # rebase-gspca-to-latest 2.6.33ish starts here
     defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
-    defsnc 'static[ ]const[ ]u8[ ]bridge_start_\([qs]\?v\|x\)ga\[\]\[2\][ ]=' drivers/media/video/gspca/ov435_9.c
+    defsnc 'static[ ]const[ ]u8[ ]bridge_start_\([qs]\?v\|x\)ga\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
     defsnc 'static[ ]const[ ]__u8[ ]\(start\|page3\)_7302\[\][ ]=' drivers/media/video/gspca/pac7302.c
     defsnc '[	]struct[ ]init_command[ ]\(spy\|cif\|ms350\|genius\|vivitar\)_start_commands\[\][ ]=' drivers/media/video/gspca/sn9c2028.c
     defsnc 'static[ ]const[ ]__u8[ ]initOv6650\[\][ ]=' drivers/media/video/gspca/sonixb.c
