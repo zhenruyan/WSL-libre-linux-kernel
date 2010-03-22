@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-03-21
+# deblob-check version 2010-03-21a
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1117,7 +1117,7 @@ set_except () {
     defsnc 'static[ ]const[ ]\(UINT32\|u32\)[ ]wep_crc32_table\[256\][ ]=' drivers/staging/wlan-ng/p80211wep.c
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]wm_vol\[256\][ ]=' 'sound/pci/ice1712/\(phase\|aureon\)\.c'
     defsnc 'static[ ]const[ ]u16[ ]wm8900_reg_defaults\[WM8900_MAXREG\][ ]=' sound/soc/wm8900.c
-    defsnc '[}][ ]\(clk_sys_ratios\|bclk_divs\)\[\][ ]=' sound/soc/wm8903.c
+    defsnc '[}][ ]\(clk_sys_ratios\|bclk_divs\)\[\][ ]=' 'sound/soc/wm890[34]\.c'
     defsnc 'static[ ]u8[ ]af9015_ir_table_\(leadtek\|twinhan\|a_link\|msi\|mygictv\|kworld\)\[\][ ]=' drivers/media/dvb/dvb-usb/af9015.h
     defsnc 'static[ ]struct[ ]snr_table[ ]\(qpsk\|qam\(16\|64\)\)_snr_table\[\][ ]=' drivers/media/dvb/frontends/af9013_priv.h
     defsnc 'static[ ]struct[ ]regdesc[ ]\(ofsm_init\|tuner_init_\(env77h11d5\|mt2060\(_2\)\?\|mxl500\(3d\|5\)\|qt1010\|mc44s803\|unknown\|tda18271\)\)\[\][ ]=' drivers/media/dvb/frontends/af9013_priv.h
@@ -1141,7 +1141,7 @@ set_except () {
     accept 'static[ ]int[\n]_request_firmware[(]const[ ]struct[ ]firmware[ ][*][*]firmware_p,[ ]const[ ]char[ ][*]name,[^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept 'static[ ]int[\n]request_firmware_work_func[(]void[ ][*]arg[)][\n][{]\([\n]\+[^\n}][^\n]*\)*ret[ ]=[ ]_request_firmware[(][^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept '[/][*][*][\n][ ][*][ ]request_firmware:[ ]-[ ]send[ ]firmware[ ][^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
-    accept '[/][*][*][\n][ ][*][ ]request_firmware_nowait:[ ]asynchronous[ ]version[^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept '[/][*][*][\n][ ][*][ ]request_firmware_nowait\(:\|[ ]-\)[ ]asynchronous[ ]version[^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept 'EXPORT_SYMBOL[(]request_firmware\(_nowait\)\?[)][;]' drivers/base/firmware_class.c
     accept 'int[ ]request_firmware\(_nowait\)\?[(][^;]*[)][;]' include/linux/firmware.h
     accept 'static[ ]inline[ ]int[ ]request_firmware\(_nowait\)\?[(][^{]*[)][\n][{][\n][	]return[ ]-EINVAL[;][\n][}]' include/linux/firmware.h
@@ -1224,7 +1224,7 @@ set_except () {
     blob 'static[ ]void[ ]r\(adeon\|[167]00\)_cp_load_microcode[(][^{]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*cp_microcode[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' 'drivers/gpu/drm/radeon/r\(\(adeon\|600\)_cp\|100\)\.c'
     # blobna 'RADEON_WRITE[(]R\(ADEON\|600\)_CP_\(ME_RAM\|PFP_UCODE\)_DATA[HL]\?,[\n	 ]*R[SV0-9]*[05]_\(c\|pf\)p_microcode\[i\]\(\[[012]\]\)\?[)]\([;][\n 	]*RADEON_WRITE[(]R\(ADEON\|600\)_CP_\(ME_RAM\|PFP_UCODE\)_DATA[HL]\?,[\n	 ]*R[SV0-9]*[05]_\(c\|pf\)p_microcode\[i\]\(\[[012]\]\)\?[)]\)*' 'drivers/gpu/drm/radeon/\(radeon\|r600\)_cp\.c'
 
-    blob 'sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\([\n]\+sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\)*' Documentation/dvb/get_dvb_firmware
+    blob 'sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\|ngene\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\([\n]\+sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\|ngene\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\)*' Documentation/dvb/get_dvb_firmware
     blobna 'Please[ ]use[^\n]*firmware[^\n]*sp887x[^\n]*\([\n][^\n]\+\)\+' Documentation/dvb/avermedia.txt
     blob 'To[ ]extract[ ]the[ ]firmware[^\n]*Opera[ ]DVB-S1[ ]USB-Box.*[/]lib[/]firmware[/][ ]\.' Documentation/dvb/opera-firmware.txt
     blobname '\(dvb-usb-opera[^\n]*\.fw\|2830S[^\n]*2\.sys\)' Documentation/dvb/opera-firmware.txt
@@ -1431,7 +1431,7 @@ set_except () {
     blobname 'atmel_at76c50\(2\([de]\|_3com\)\?\|4a\?\(_2958\)\?\|6\)\(\.bin\)\?' drivers/net/wireless/atmel.c
     accept '[	]*priv->firmware[ ]=[ ]\(NULL\|new_firmware\)[;]' drivers/net/wireless/atmel.c
 
-    blobname 'b43\(legacy\)\?\(%s\)\?[/]\(%s\|ucode\(5\|1[13]\)\|pcm5\|[abn]0g[01]initvals\(5\|1[13]\)\)\.fw' 'drivers/net/wireless/b43\(legacy\)\?/main.c'
+    blobname 'b43\(legacy\)\?\(%s\)\?[/]\(%s\|ucode\([2459]\|1[1345]\)\|pcm5\|[abn]0g[01]initvals\(5\|1[13]\)\)\.fw' 'drivers/net/wireless/b43\(legacy\)\?/main.c'
     blobna 'b43legacyerr[(][^;]*must[ ]go[ ]to[ ]http[^;]*b43#devicefirmware[^;]*[)][;]' drivers/net/wireless/b43legacy/main.c
 
     blob '#define[ ]IPW2100_FW_\(\(\(MAJOR\|MINOR\)_VERSION\|\(MAJOR\|MINOR\)[(]x[)]\)\|VERSION\)\([^\n]*\\[\n]\)*[^\n]*\([\n][\n]*#define[ ]IPW2100_FW_\(\(\(MAJOR\|MINOR\)_VERSION\|\(MAJOR\|MINOR\)[(]x[)]\)\|VERSION\)\([^\n]*\\[\n]\)*[^\n]*\)*' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2100\.c'
@@ -1472,7 +1472,7 @@ set_except () {
 
     blobname 'lbtf_usb\.bin' drivers/net/wireless/libertas_tf/if_usb.c
 
-    blobname 'isl38\(86\|87\|90\)\(usb\(_bare\)\?\)\?' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
+    blobname 'isl38\(86\|87\|90\)\(pci\|usb\(_bare\)\?\)\?' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
     blob '[/][*][ ]for[ ]isl3886[ ]register[ ]definitions[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/net/wireless/p54/p54usb.h
     blobna 'If[ ]you[ ]enable[ ]this\([^\n]\|[\n][ 	]*[^ 	\n]\)*isl3890\([^\n]\|[\n][ 	]*[^ 	\n]\)*' drivers/net/wireless/Kconfig
 
@@ -1982,10 +1982,10 @@ set_except () {
     initnc 'static[ ]const[ ]u32[ ]Tm\[24\]\[8\][ ]='
     initnc 'static[ ]const[ ]u32[ ]bass_table\[41\]\[5\][ ]='
     initnc 'static[ ]const[ ]u32[ ]bf_sbox\[256[ ][*][ ]4\][ ]='
-    initnc 'static[ ]const[ ]u32[ ]camellia_sp0222\[256\][ ]='
-    initnc 'static[ ]const[ ]u32[ ]camellia_sp1110\[256\][ ]='
-    initnc 'static[ ]const[ ]u32[ ]camellia_sp3033\[256\][ ]='
-    initnc 'static[ ]const[ ]u32[ ]camellia_sp4404\[256\][ ]='
+    defsnc 'static[ ]const[ ]u32[ ]camellia_sp0222\[256\][ ]=' crypto/camellia.c
+    defsnc 'static[ ]const[ ]u32[ ]camellia_sp1110\[256\][ ]=' crypto/camellia.c
+    defsnc 'static[ ]const[ ]u32[ ]camellia_sp3033\[256\][ ]=' crypto/camellia.c
+    defsnc 'static[ ]const[ ]u32[ ]camellia_sp4404\[256\][ ]=' crypto/camellia.c
     initnc 'static[ ]const[ ]u32[ ]crc32c_table\[256\][ ]='
     initnc 'static[ ]const[ ]u32[ ]db_table\[101\][ ]='
     initnc 'static[ ]const[ ]u32[ ]m8xx_size_to_gray\[M8XX_SIZES_NO\][ ]='
@@ -2276,7 +2276,7 @@ set_except () {
     blobna 'if[ ][(][(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\([ ][|][|][\n][ 	]*[(]fw_ver\[[0-3]\][ ]!=[ ]BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION[)]\)*[)][ ][{][^{}]*[}]' drivers/net/bnx2x_main.c
     blobna 'sprintf[(]fw_file_name[ ][+][ ]offset,[ ]["]%d[.]%d[.]%d[.]%d[.]fw["]\(,[\n][ 	]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)*[)][;]' drivers/net/bnx2x_main.c
     blobna 'rc[ ]=[ ]bnx2x_check_firmware[(]bp[)][;]' drivers/net/bnx2x_main.c
-    defsnc 'crb_128M_2M_map\[64\][ ]__cacheline_aligned_in_smp[ ]='  drivers/net/netxen/netxen_nic_hw.c
+    defsnc 'crb_128M_2M_map\[64\][ ]__cacheline_aligned_in_smp[ ]=' 'drivers/net/\(netxen/netxen_nic_hw.c\|qlcnic/qlcnic_hw.c\)'
     defsnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals\(_3070\)\?\[\][ ]=' 'drivers/net/wireless/\(prism54/islpci_dev\.c\|rt2x00/rt2800usb\.c\)'
     blobname 'wl1251-\(fw\|nvs\)\.bin' drivers/net/wireless/wl12xx/wl1251.h
     blobname 'iwmc3200wifi-\([ul]mac\|calib\)-sdio\.bin' drivers/net/wireless/iwmc3200wifi/sdio.c
@@ -2348,7 +2348,7 @@ set_except () {
     accept '[	][	]card->firmware[ ]=[ ]data->firmware[;]'  drivers/bluetooth/btmrvl_sdio.c
     accept '[	]isar->firmware[ ]=[ ][&]load_firmware[;]' drivers/isdn/hardware/mISDN/mISDNisar.c
     blobname 'isdn[/]ISAR\.BIN' drivers/isdn/hardware/mISDN/speedfax.c
-    blobname '\(cache\|resident\)\.image\.bin' drivers/staging/sep/sep_driver.c
+    blobname '\(sep[/]\)\?\(cache\|resident\)\.image\.bin' drivers/staging/sep/sep_driver.c
     blobname 'RTL8192E[/]\(boot\|main\|data\)\.img' drivers/staging/rtl8192e/r819xE_firmware.c
     defsnc '\(static[ ]\)\?u32[ ]Rtl8190PciE\?\(AGCTAB_\|PHY_REG\(_1T2R\)\?\|Radio[ABCD]_\)Array\[\(AGCTAB_\|PHY_REG\(_1T2R\)\?\|Radio[ABCD]_\)ArrayLength\][ ]=' 'drivers/staging/\(rtl8192e/r819xE_phy\.c\|rtl8192u/r819xU_firmware_img.c\)'
     accept '[ ][*][ ]File:[ ]main_usb\.c\([\n][ ][*]\([^\n/]*\|[^*\n/][/]*\)*\)*[\n][ ][*][/]\([\n][\n]*#\(undef[ ][^\n]*\|include[ ]["][^\n]*["]\)\)*[\n][\n]*#include[ ]["]firmware\.h["]' drivers/staging/vt6656/main_usb.c
@@ -2445,6 +2445,69 @@ set_except () {
     defsnc 'u8[ ]rtl8225z2_tx_power_cck\(_ch14\)\?\[\]=' drivers/net/wireless/rtl8187b/r8180_rtl8225z2.c
     defsnc 'static[ ]struct[ ]vesa_mode_table[ ]vesa_mode\[\][ ]=' drivers/staging/sm7xx/smtcfb.c
     defsnc 'struct[ ]ModeInit[ ]VGAMode\[\][ ]=' drivers/staging/sm7xx/smtcfb.h
+    ;;
+
+  */patch*2.6.34-rc*)
+    # New in 2.6.34, should be duplicated in the main pattern set.
+    accept '#[ ]\(Usage:[ ]cxacru-cf\.py[ ][<]\|Warning:\|Note:[ ]support[ ]for\)[ ]cxacru-cf\.bin' 'Documentation/networking/cxacru\(-cf\.py\|\.txt\)'
+    defsnc 'static[ ]struct[ ]cdce_reg[ ]cdce_y1_27000\[\][ ]=' arch/arm/mach-davinci/cdce949.c
+    defsnc '[	]u16[ ]map\[\][ ]=' drivers/hwmon/asc7621.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]az6027_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/az6027.c
+    blobname 'dvb-usb-az6027-03\.fw' drivers/media/dvb/dvb-usb/az6027.c
+    accept '[	]p7500->firmware[ ]=' drivers/media/dvb/dvb-usb/dw2102.c
+    blobname 'dvb-usb-p7500\.fw' drivers/media/dvb/dvb-usb/dw2102.c
+    defsnc 'static[ ]u8[ ]ITUDecoderSetup\[4\]\[16\][ ]=' drivers/media/dvb/ngene/ngene-core.c
+    blobname 'ngene_1[567]\.fw' drivers/media/dvb/ngene/ngene-core.c
+    blobname 'sms1xxx-hcw-55xxx-sdbt-02\.fw' drivers/media/dvb/siano/sms-cards.c
+    defsnc 'static[ ]u8[ ]samsung_smt_7020_inittab\[\][ ]=' drivers/media/video/cx88/cx88-dvb.c
+    defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
+    defsnc 'static[ ]const[ ]u8[ ]bridge_start_\([qs]\?v\|x\)ga\[\]\[2\][ ]=' drivers/media/video/gspca/ov435_9.c
+    defsnc '[	]struct[ ]init_command[ ]\(spy\|cif\|ms350\|genius\|vivitar\)_start_commands\[\][ ]=' drivers/media/video/gspca/sn9c2028.c
+    defsnc 'static[ ]const[ ]u8[ ]n4_lt168g\[\][ ]=' drivers/media/video/gspca/t613.c
+    initc 'static[ ]const[ ]\(__\)\?u8[ ]\(mi\(0360\|13[12]0\)\|po\(1200\|3130\)\|hv7131r\|ov76[67]0\)_\(\(soc\)\?_\?[iI]nit\(Q\?V\|SX\)GA\(_\(JPG\|data\)\)\?\|rundata\)\[\]\[4\][ ]=' drivers/media/video/gspca/vc032x.c
+    defsnc '[	]static[ ]const[ ]u8[ ]gamma_tb\[6\]\[16\][ ]=' drivers/media/video/gspca/zc3xx.c
+    blobname 'tlg2300_firmware\.bin' drivers/media/video/tlg2300/pd-main.c
+    defsnc '[	]u8[ ]pattern\[42\][ ]=' drivers/net/ksz884x.c
+    defsnc 'static[ ]const[ ]u8[ ]b43_ntab_framelookup\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    defsnc 'const[ ]u32[ ]\(b43_ntab_tx_gain_rev\(0_1_2\|3plus_2ghz\|\([34]\|5plus\)_5ghz\)\|txpwrctrl_tx_gain_ipa\(_\(rev\)\?[56]g\?\)\?\)\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    defsnc 'const[ ]u16[ ]tbl_iqcal_gainparams\[2\]\[9\]\[8\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    defsnc 'const[ ]struct[ ]nphy_txiqcal_ladder[ ]ladder_\(lo\|iq\)\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    defsnc 'const[ ]u16[ ]loscale\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    blobname 'isl38\(86\|87\|90\)\(pci\|usb\(_bare\)\?\)\?' 'drivers/net/wireless/p54/p54\(pci\.c\|usb\.[ch]\)'
+    blobname 'rt\(28[67]0\|30[79][01]\)\.bin' drivers/staging/rt2860/common/rtmp_mcu.c
+    accept '[	]adapter->firmware[ ]=[ ]fw[;]' drivers/staging/rt2860/common/rtmp_mcu.c
+    blob '[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*RTL8192SU[/]rtl1892swf\.bin[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/staging/rtl8192su/r8192S_firmware.c
+    accept 'MODULE_FIRMWARE[(]["]keyspan_pda[/]\(keyspan_pda\|xircom_pgs\)\.fw["][)][;]' drivers/usb/serial/keyspan_pda.c
+    # It's not clear that wm2000_anc.bin is pure data.
+    # Check with developer, clean up for now.
+    blobname 'wm2000_anc\.bin' sound/soc/codecs/wm2000.c
+    blob '[ ][*][ ]The[ ]download[ ]image[ ]for[ ]the[ ]WM2000[^*]*\([*]\+[^/*][^*]*\)*[*]*[<][ ]file[^*\n]*[\n][ ][*][/]' sound/soc/codecs/wm2000.c
+    # accept '[ ][*][ ].wm2000_anc\.bin.[ ]by[ ]default' sound/soc/codecs/wm2000.c
+    # accept '[ ][*][ 	]*[<][ ]file[ ]\+[>]wm2000_anc\.bin' sound/soc/codecs/wm2000.c
+    # accept '[	]filename[ ]=[ ]["]wm2000_anc\.bin["][;]' sound/soc/codecs/wm2000.c
+    defsnc '[}][ ]\(clk_sys_ratios\|bclk_divs\)\[\][ ]=' 'sound/soc/wm890[34]\.c'
+    defsnc '[}][ ]clock_cfgs\[\][ ]=' sound/soc/codecs/wm8955.c
+    blobname 'siu_spb\.bin' sound/soc/sh/siu_dai.c
+    defsnc 'static[ ]const[ ]u8[ ]poxxxx_init\(_common\|Q\?VGA\|_end_1\)\[\]\[4\][ ]=' drivers/media/video/gspca/vc032x.c
+    defsnc 'crb_128M_2M_map\[64\][ ]__cacheline_aligned_in_smp[ ]=' 'drivers/net/\(netxen/netxen_nic_hw.c\|qlcnic/qlcnic_hw.c\)'
+    # Pattern present prior to 2.6.34, or already adjusted for 2.6.34 in
+    # the main pattern set.
+    accept '[ ][ ][ ]Bit[ 0-7]*' Documentation/input/sentelic.txt
+    accept 'The[ ]hd-audio[ ]driver[ ]reads[ ]the[ ]file[ ]via[ ]request_firmware[(][)]\.' Documentation/sound/alsa/HD-Audio.txt
+    accept '[	]\.section[ ]__ex_table,["]a["]'"$sepx$blobpat*" arch/powerpc/lib/copyuser_64.S
+    defsnc 'static[ ]const[ ]u32[ ]camellia_sp0222\[256\][ ]=' crypto/camellia.c
+    defsnc 'static[ ]const[ ]u32[ ]camellia_sp1110\[256\][ ]=' crypto/camellia.c
+    defsnc 'static[ ]const[ ]u32[ ]camellia_sp3033\[256\][ ]=' crypto/camellia.c
+    defsnc 'static[ ]const[ ]u32[ ]camellia_sp4404\[256\][ ]=' crypto/camellia.c
+    defsnc 'static[ ]const[ ]__u8[ ]\(start\|page3\)_7302\[\][ ]=' drivers/media/video/gspca/pac7302.c
+    defsnc 'static[ ]const[ ]__u8[ ]pas202_sensor_init\[\]\[8\][ ]=' drivers/media/video/gspca/sonixb.c
+    defsnc 'static[ ]const[ ]u8[ ]\(adcm1700\|om6802\|po1030\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
+    blob 'sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\|ngene\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\([\n]\+sub[ ]\(sp887[0x]\|tda1004\(5\|6\(lifeview\)\?\)\|av7110\|dec\(2\(00\|54\)0t\|3000s\)\|opera1\|vp7041\|dibusb\|nxt200[24]\|cx\(23\(1xx\|885\)\|18\)\|pvrusb2\|or51\(211\|132_\(qam\|vsb\)\)\|bluebird\|mpc718\|af9015\|ngene\)[ ]*[{]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]\)*' Documentation/dvb/get_dvb_firmware
+    accept '\([/][*][*][\n]\)\?[ ][*][ ]request_firmware_nowait\(:\|[ ]-\)[ ]asynchronous[ ]version[ ]of[ ]request_firmware' drivers/base/firmware_class.c
+    blobname 'b43\(legacy\)\?\(%s\)\?[/]\(%s\|ucode\([2459]\|1[1345]\)\|pcm5\|[abn]0g[01]initvals\(5\|1[13]\)\)\.fw' 'drivers/net/wireless/b43\(legacy\)\?/main.c'
+    blobname '\(sep[/]\)\?\(cache\|resident\)\.image\.bin' drivers/staging/sep/sep_driver.c
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u8[ ]\(mi1320\|po3130\)_initVGA_data\[\]\[4\][ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sonixj.c
+    accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]request_firmware_work_func' drivers/base/firmware_class.c
     ;;
 
   */patch*2.6.33-rc*)
