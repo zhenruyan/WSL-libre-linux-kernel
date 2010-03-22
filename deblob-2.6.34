@@ -959,7 +959,7 @@ clean_sed '
 /^#include "bnx2x_init\.h"/,/^$/{
   /^$/i\
 #define bnx2x_init_block(bp, start, end) \\\
-  return (printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\\\
+  return (printk(KERN_ERR "%s: Missing Free firmware\\n", bp->dev->name),\\\
 	  -EINVAL)
 }' drivers/net/bnx2x_main.c 'report missing Free firmware'
 clean_blob drivers/net/bnx2x_main.c
