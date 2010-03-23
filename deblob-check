@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-03-22
+# deblob-check version 2010-03-22a
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1101,7 +1101,7 @@ set_except () {
     # new in 2.6.28
     accept '\(static[ ]\)\?const[ ]char[ ]\(inv\)\?parity\[256\][ ]=[ ][{][	 \n01,]*[}][;]' 'Documentation/mtd/nand_ecc\.txt\|drivers/mtd/nand/nand_ecc\.c'
     defsnc 'static[ ]const[ ]char[ ]\(bitsperbyte\|addressbits\)\[256\][ ]=' drivers/mtd/nand/nand_ecc.c
-    defsnc 'static[ ]struct[ ]pinmux_cfg_reg[ ]pinmux_config_regs\[\][ ]=' arch/sh/kernel/cpu/sh2a/pinmux-sh7203.c
+    defsnc 'static[ ]struct[ ]pinmux_cfg_reg[ ]pinmux_config_regs\[\][ ]=' 'arch/sh/kernel/cpu/sh2a/pinmux-sh7203\.c\|arch/arm/mach-shmobile/pfc-sh73[67]7\.c'
     defsnc '[	]static[ ]const[ ]u8[ ]e_keymap\[\][ ]=' drivers/hid/hid-lg.c
     defsnc 'DEFINE_DEFAULT_PDR[(]0x0161,[ ]256,' drivers/net/wireless/hermes_dld.c
     defsnc 'static[ ]const[ ]int[ ]isink_cur\[\][ ]=' drivers/regulator/wm8350-regulator.c
@@ -1454,7 +1454,7 @@ set_except () {
     accept '[	][ ][*][ ]request_firmware[(][)][ ]is[ ]synchronous' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\)\.c'
     blobname 'iwlwifi-4965-' drivers/net/iwlwifi/iwl-4965.c
     blobname 'iwlwifi-5\(00\|15\)0-' drivers/net/iwlwifi/iwl-5000.c
-    blobname '%s%[du]%s["],[ ]name_pre,[ ]index,[ ]["]\.ucode' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\).c'
+    blobname '%s%[du]%s["],[\n 	]*name_pre,[ ]\(priv->fw_\)\?index,[ ]["]\.ucode' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\).c'
 
     blobname 'libertas_cs\(_helper\)\?\.fw' drivers/net/wireless/libertas/if_cs.c
     blobname 'sd\(8385\|868[68]\)\(_helper\)\?\.bin\(["],[\n][	]*\.firmware[ 	]=[ ]["]sd\(8385\|868[68]\)\.bin\)\?' 'drivers/\(net/wireless/libertas/if_sdio\.c\|bluetooth/btmrvl_sdio\.c\)'
@@ -1536,7 +1536,7 @@ set_except () {
 
     blobname '\(i1480-\(pre-phy\|usb\|phy\)\|ptc\)-0\.0\.bin' drivers/uwb/i1480/dfu/usb.c
 
-    accept '[	]retval[ ]=[ ]request_firmware[(][&]fw_entry,[ ]["]metronome.wbf["],[ ][&]dev->dev[)][;]' drivers/video/metronomefb.c
+    accept '[	]retval[ ]=[ ]request_firmware[(][&]fw_entry,[ ]["]metronome\.wbf["],[ ][&]dev->dev[)][;]' drivers/video/metronomefb.c
 
     blobname '\(vx[/]\)\?\(bx_1_v\(xp\|p4\)\.b56\|x1_\(1_v\(x[2p]\|p4\)\|2_v22\)\.xlx\|bd56\(002\|3v2\|3s3\)\.boot\|l_1_v\(x[2p]\|p4\|22\)\.d56\)' sound/drivers/vx/vx_hwdep.c
 
@@ -1968,7 +1968,7 @@ set_except () {
     initnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals_noseq\[\][ ]='
     initnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals_seq\[\][ ]='
     defsnc 'static[ ]const[ ]u16[ ]Sbox\[256\][ ]=' # 'drivers/staging/rtl8192u/r819xU_firmware.c' and elsewhere
-    initnc 'static[ ]const[ ]u16[ ]count_lut\[\][ ]='
+    initnc 'static[ ]const[ ]u16[ ]count_lut\[\][ ]=' drivers/misc/tsl2550.c
     # drivers/net/e1000e/phy.c
     initnc 'static[ ]const[ ]u16[ ]e1000_igp_2_cable_length_table\[\][ ]='
     initnc 'static[ ]const[ ]u16[ ]rtl8225bcd_rxgain\[\][ ]='
@@ -2007,7 +2007,7 @@ set_except () {
     initnc 'static[ ]const[ ]u8[ ]pc1\[256\][ ]='
     initnc 'static[ ]const[ ]u8[ ]poly_to_exp\[255\][ ]='
     initnc 'static[ ]const[ ]u8[ ]q[01]\[256\][ ]='
-    initnc 'static[ ]const[ ]u8[ ]ratio_lut\[\][ ]='
+    defsnc 'static[ ]const[ ]u8[ ]ratio_lut\[\][ ]=' drivers/misc/tsl2550.c
     initnc 'static[ ]const[ ]u8[ ]rs\[256\][ ]='
     initnc 'static[ ]const[ ]u8[ ]rtl8225_agc\[\][ ]='
     initnc 'static[ ]const[ ]u8[ ]rtl8225_tx_power_cck\[\][ ]='
@@ -2219,7 +2219,7 @@ set_except () {
     defsnc 'static[ ]struct[ ]ar9170_rf_init[ ]ar9170_rf_init\[\][ ]=' drivers/net/wireless/ar9170/phy.c
     defsnc 'static[ ]const[ ]struct[ ]ar9170_phy_freq_entry[ ]ar9170_phy_freq_params\[\][ ]=' drivers/net/wireless/ar9170/phy.c
     accept 'static[ ]int[ ]ar9170_usb_request_firmware[(]' drivers/net/wireless/ar9170/usb.c
-    accept '[	]err[ ]=[ ]request_firmware[(][^\n]*["]ar9170\(-[12]\)\?\.fw["],' drivers/net/wireless/ar9170/usb.c
+    accept '[	]\(err[ ]=\|return\)[ ]request_firmware\(_nowait\)\?[(][^\n]*["]ar9170\(-[12]\)\?\.fw["],' drivers/net/wireless/ar9170/usb.c
     accept '[	]err[ ]=[ ]ar9170_usb_request_firmware[(]' drivers/net/wireless/ar9170/usb.c
     accept 'MODULE_FIRMWARE[(]["]ar9170\(-[12]\)\?\.fw["][)][;]\([\n]MODULE_FIRMWARE[(]["]ar9170\(-[12]\)\?\.fw["][)][;]\)*' drivers/net/wireless/ar9170/usb.c
     blobname 'slicoss[/]\(oasis\|gb\)\(rcvucode\|download\)\.sys' drivers/staging/slicoss/slicoss.c
@@ -2449,6 +2449,10 @@ set_except () {
 
   */patch*2.6.34-rc*)
     # New in 2.6.34, should be duplicated in the main pattern set.
+    defsnc 'static[ ]u32[ ]epll_div\[\]\[5\][ ]=' arch/arm/mach-s5p6440/clock.c
+    accept '[	]aru->firmware[ ]=[ ]fw[;]' drivers/net/wireless/ath/ar9170/usb.c
+    accept '[	]err[ ]=[ ]request_firmware[(][&]fw_entry,[ ]["]broadsheet\.wbf["],[ ]dev[)][;]' drivers/video/broadsheetfb.c
+    # above in -rc2, below in -rc1
     accept '#[ ]\(Usage:[ ]cxacru-cf\.py[ ][<]\|Warning:\|Note:[ ]support[ ]for\)[ ]cxacru-cf\.bin' 'Documentation/networking/cxacru\(-cf\.py\|\.txt\)'
     defsnc 'static[ ]struct[ ]cdce_reg[ ]cdce_y1_27000\[\][ ]=' arch/arm/mach-davinci/cdce949.c
     defsnc '[	]u16[ ]map\[\][ ]=' drivers/hwmon/asc7621.c
@@ -2513,6 +2517,14 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init_ov965x\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534.c
     defsnc 'static[ ]const[ ]u8[ ]bridge_start_ov965x_\(\([qs]\?v\|x\)ga\|cif\)\[\]\[2\][ ]=' drivers/media/video/gspca/ov534.c
     defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]\(__u16\|struct[ ]cmd\)[ ]spca504\(_pccam600\|A_clicksmart420\)_\(init\|open\)_data\[\]\(\[3\]\)\?[ ]=[ ][{][*][/][;]' drivers/media/video/gspca/sunplus.c
+    # above is in -rc1, below in -rc2
+    defsnc 'static[ ]struct[ ]pinmux_cfg_reg[ ]pinmux_config_regs\[\][ ]=' 'arch/sh/kernel/cpu/sh2a/pinmux-sh7203\.c\|arch/arm/mach-shmobile/pfc-sh73[67]7\.c'
+    defsnc 'static[ ]const[ ]u8[ ]ratio_lut\[\][ ]=' drivers/misc/tsl2550.c
+    initnc 'static[ ]const[ ]u16[ ]count_lut\[\][ ]=' drivers/misc/tsl2550.c
+    accept 'static[ ]int[ ]ar9170_usb_request_firmware[(]' drivers/net/wireless/ar9170/usb.c
+    accept '[	]\(err[ ]=\|return\)[ ]request_firmware\(_nowait\)\?[(][^\n]*["]ar9170\(-[12]\)\?\.fw["],' drivers/net/wireless/ar9170/usb.c
+    accept '[	]err[ ]=[ ]ar9170_usb_request_firmware[(]' drivers/net/wireless/ar9170/usb.c
+    blobname '%s%[du]%s["],[\n 	]*name_pre,[ ]\(priv->fw_\)\?index,[ ]["]\.ucode' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\).c'
     ;;
 
   */patch*2.6.33-rc*)
