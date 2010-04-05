@@ -941,10 +941,10 @@ clean_kconfig drivers/net/Kconfig 'ADAPTEC_STARFIRE'
 clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
 
 announce BNX2 - "Broadcom NetXtremeII"
-drop_fw_file firmware/bnx2/bnx2-mips-09-5.0.0.j3.fw.ihex firmware/bnx2/bnx2-mips-09-5.0.0.j3.fw
-drop_fw_file firmware/bnx2/bnx2-rv2p-09-5.0.0.j3.fw.ihex firmware/bnx2/bnx2-rv2p-09-5.0.0.j3.fw
-drop_fw_file firmware/bnx2/bnx2-rv2p-09ax-5.0.0.j3.fw.ihex firmware/bnx2/bnx2-rv2p-09ax-5.0.0.j3.fw
-drop_fw_file firmware/bnx2/bnx2-mips-06-5.0.0.j3.fw.ihex firmware/bnx2/bnx2-mips-06-5.0.0.j3.fw
+drop_fw_file firmware/bnx2/bnx2-mips-09-5.0.0.j9.fw.ihex firmware/bnx2/bnx2-mips-09-5.0.0.j9.fw
+drop_fw_file firmware/bnx2/bnx2-rv2p-09-5.0.0.j10.fw.ihex firmware/bnx2/bnx2-rv2p-09-5.0.0.j10.fw
+drop_fw_file firmware/bnx2/bnx2-rv2p-09ax-5.0.0.j10.fw.ihex firmware/bnx2/bnx2-rv2p-09ax-5.0.0.j10.fw
+drop_fw_file firmware/bnx2/bnx2-mips-06-5.0.0.j6.fw.ihex firmware/bnx2/bnx2-mips-06-5.0.0.j6.fw
 drop_fw_file firmware/bnx2/bnx2-rv2p-06-5.0.0.j3.fw.ihex firmware/bnx2/bnx2-rv2p-06-5.0.0.j3.fw
 reject_firmware drivers/net/bnx2.c
 clean_blob drivers/net/bnx2.c
