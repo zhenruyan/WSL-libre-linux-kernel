@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-03-22a
+# deblob-check version 2010-04-18
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2874,6 +2874,7 @@ set_except () {
     initnc 'const[ ]u\(8\|16\|32\)[ ]b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\][ ]='
     ;;
   */*drm*.patch)
+    defsnc '[}][ ]est3_modes\[\][ ]=' drivers/gpu/drm/drm_edid.c
     defsnc 'const[ ]u32[ ]r[67]xx_default_state\[\][ ]=' drivers/gpu/drm/radeon/r600_blit_shaders.c
     defsnc 'struct[ ]nv17_tv_norm_params[ ]nv17_tv_norms\[NUM_TV_NORMS\][ ]=' drivers/gpu/drm/nouveau/nv17_tv_modes.c
     defsnc 'static[ ]int[ ]atom_dst_to_src\[8\]\[4\][ ]=' drivers/gpu/drm/radeon/atom.c
