@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-04-18
+# deblob-check version 2010-04-19
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2449,6 +2449,10 @@ set_except () {
 
   */patch*2.6.34-rc*)
     # New in 2.6.34, should be duplicated in the main pattern set.
+    blobname 'cxgb4[/]t4fw\.bin' drivers/net/cxgb4/cxgb4_main.c
+    defsnc '[	]static[ ]const[ ]unsigned[ ]int[ ]reg_ranges\[\][ ]=' drivers/net/cxgb4/cxgb4_main.c
+    defsnc '[	]static[ ]const[ ]unsigned[ ]int[ ]avg_pkts\[NCCTRL_WIN\][ ]=' drivers/net/cxgb4/t4_hw.c
+    # above in -rc5
     defsnc 'static[ ]u32[ ]epll_div\[\]\[5\][ ]=' arch/arm/mach-s5p6440/clock.c
     accept '[	]aru->firmware[ ]=[ ]fw[;]' drivers/net/wireless/ath/ar9170/usb.c
     accept '[	]err[ ]=[ ]request_firmware[(][&]fw_entry,[ ]["]broadsheet\.wbf["],[ ]dev[)][;]' drivers/video/broadsheetfb.c
@@ -2525,6 +2529,7 @@ set_except () {
     accept '[	]\(err[ ]=\|return\)[ ]request_firmware\(_nowait\)\?[(][^\n]*["]ar9170\(-[12]\)\?\.fw["],' drivers/net/wireless/ar9170/usb.c
     accept '[	]err[ ]=[ ]ar9170_usb_request_firmware[(]' drivers/net/wireless/ar9170/usb.c
     blobname '%s%[du]%s["],[\n 	]*name_pre,[ ]\(priv->fw_\)\?index,[ ]["]\.ucode' 'drivers/net/iwlwifi/iwl\(3945-base\|-agn\).c'
+    accept '#include[ ]["]ixp2400_[rt]x\.ucode["]' drivers/net/ixp2000/ixpdev.c
     ;;
 
   */patch*2.6.33-rc*)

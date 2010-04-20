@@ -987,6 +987,12 @@ clean_blob drivers/net/cxgb3/cxgb3_main.c
 clean_kconfig drivers/net/Kconfig 'CHELSIO_T3'
 clean_mk CONFIG_CHELSIO_T3 drivers/net/cxgb3/Makefile
 
+announce CHELSIO_T4 - "Chelsio Communications T4 Ethernet support"
+reject_firmware drivers/net/cxgb4/cxgb4_main.c
+clean_blob drivers/net/cxgb4/cxgb4_main.c
+clean_kconfig drivers/net/Kconfig 'CHELSIO_T4'
+clean_mk CONFIG_CHELSIO_T4 drivers/net/cxgb4/Makefile
+
 announce E100 - "Intel PRO/100+"
 drop_fw_file firmware/e100/d101m_ucode.bin.ihex firmware/e100/d101m_ucode.bin
 drop_fw_file firmware/e100/d101s_ucode.bin.ihex firmware/e100/d101s_ucode.bin
