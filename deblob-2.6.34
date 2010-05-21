@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.34 extra=--
+kver=2.6.34 extra=
 
 case $1 in
 --force)
@@ -448,7 +448,6 @@ clean_mk CONFIG_MOXA_INTELLIO drivers/char/Makefile
 announce DRM_NOUVEAU - "Nouveau (nVidia) cards"
 reject_firmware drivers/gpu/drm/nouveau/nouveau_grctx.c
 clean_blob drivers/gpu/drm/nouveau/nouveau_grctx.c
-clean_blob drivers/gpu/drm/nouveau/nv50_graph.c
 clean_kconfig drivers/gpu/drk/nouveau/Kconfig 'DRM_NOUVEAU'
 clean_mk CONFIG_DRM_NOUVEAU drivers/gpu/drm/nouveau/Makefile
 
@@ -575,6 +574,11 @@ announce DVB_USB_AF9015 - "Afatech AF9015 DVB-T USB2.0 support"
 clean_blob drivers/media/dvb/dvb-usb/af9015.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9015'
 clean_mk CONFIG_DVB_USB_AF9015 drivers/media/dvb/dvb-usb/Makefile
+
+announce DVB_USB_AZ6027 - "Azurewave DVB-S/S2 USB2.0 AZ6027 support"
+clean_blob drivers/media/dvb/dvb-usb/az6027.c
+clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AZ6027'
+clean_mk CONFIG_DVB_USB_AZ6027 drivers/media/dvb/dvb-usb/Makefile
 
 announce DVB_USB_CXUSB - "Conexant USB2.0 hybrid reference design support"
 clean_blob drivers/media/dvb/dvb-usb/cxusb.c
@@ -781,6 +785,12 @@ clean_blob drivers/media/dvb/frontends/drx397xD_fw.h
 clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_DRX397XD'
 clean_mk CONFIG_DVB_DRX397XD drivers/media/dvb/frontends/Makefile
 
+announce DVB_NGENE - "Micronas nGene support"
+reject_firmware drivers/media/dvb/ngene/ngene-core.c
+clean_blob drivers/media/dvb/ngene/ngene-core.c
+clean_kconfig drivers/media/dvb/ngene/Kconfig 'DVB_NGENE'
+clean_mk CONFIG_DVB_NGENE drivers/media/dvb/ngene/Makefile
+
 announce DVB_PLUTO2 - "Pluto2 cards"
 reject_firmware drivers/media/dvb/pluto2/pluto2.c
 
@@ -952,8 +962,8 @@ clean_kconfig drivers/net/Kconfig 'BNX2'
 clean_mk CONFIG_BNX2 drivers/net/Makefile
 
 announce BNX2X - "Broadcom NetXtremeII 10Gb support"
-drop_fw_file firmware/bnx2x-e1-5.2.7.0.fw.ihex firmware/bnx2x-e1-5.2.7.0.fw
-drop_fw_file firmware/bnx2x-e1h-5.2.7.0.fw.ihex firmware/bnx2x-e1h-5.2.7.0.fw
+drop_fw_file firmware/bnx2x-e1-5.2.13.0.fw.ihex firmware/bnx2x-e1-5.2.13.0.fw
+drop_fw_file firmware/bnx2x-e1h-5.2.13.0.fw.ihex firmware/bnx2x-e1h-5.2.13.0.fw
 reject_firmware drivers/net/bnx2x_main.c
 clean_sed '
 /^#include "bnx2x_init\.h"/,/^$/{
