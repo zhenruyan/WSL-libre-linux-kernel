@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-06-14
+# deblob-check version 2010-07-06
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2484,6 +2484,10 @@ set_except () {
 
   */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
+    ;;
+
+  */sched-fix-over-scheduling-bug.patch)
+    accept 'CPU[ ]\+before[ ]\+after[\n]\([\n][01][0-9][ ]\+:[ ][0-9]\+[ ]\+:[ ][67]\)*'
     ;;
 
   */*-loongson.patch)
