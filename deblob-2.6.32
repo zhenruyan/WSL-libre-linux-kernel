@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.32 extra=1
+kver=2.6.32 extra=1++
 
 case $1 in
 --force)
@@ -1471,7 +1471,7 @@ announce BT_MRVL_SDIO - "Marvell BT-over-SDIO driver"
 reject_firmware drivers/bluetooth/btmrvl_sdio.c
 clean_blob drivers/bluetooth/btmrvl_sdio.c
 clean_blob Documentation/btmrvl.txt
-clean_kconfig drivers/bluetooth/Kcofnig 'BT_MRVL_SDIO'
+clean_kconfig drivers/bluetooth/Kconfig 'BT_MRVL_SDIO'
 clean_mk CONFIG_BT_MRVL_SDIO drivers/bluetooth/Makefile
 
 # wimax
