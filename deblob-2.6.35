@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.34 extra=1
+kver=2.6.35 extra=
 
 case $1 in
 --force)
@@ -530,6 +530,11 @@ reject_firmware drivers/media/common/tuners/tuner-xc2028.c
 clean_kconfig drivers/media/common/tuners/Kconfig 'MEDIA_TUNER_XC2028'
 clean_mk CONFIG_MEDIA_TUNER_XC2028 drivers/media/common/tuners/Makefile
 
+announce VIDEO_TM6000_DVB - "DVB Support for tm6000 based TV cards"
+clean_blob drivers/staging/tm6000/tm6000-cards.c
+clean_kconfig drivers/staging/tm6000/Kconfig 'VIDEO_TM6000_DVB'
+clean_mk CONFIG_VIDEO_TM6000_DVB drivers/staging/tm6000/Makefile
+
 announce MEDIA_TUNER_XC5000 - "Xceive XC5000 silicon tuner"
 undefine_macro 'XC5000_DEFAULT_FIRMWARE_SIZE' 0 \
   'removed non-Free firmware size' drivers/media/common/tuners/xc5000.c
@@ -951,7 +956,7 @@ clean_kconfig drivers/net/Kconfig 'ADAPTEC_STARFIRE'
 clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
 
 announce BNX2 - "Broadcom NetXtremeII"
-drop_fw_file firmware/bnx2/bnx2-mips-09-5.0.0.j9.fw.ihex firmware/bnx2/bnx2-mips-09-5.0.0.j9.fw
+drop_fw_file firmware/bnx2/bnx2-mips-09-5.0.0.j15.fw.ihex firmware/bnx2/bnx2-mips-09-5.0.0.j15.fw
 drop_fw_file firmware/bnx2/bnx2-rv2p-09-5.0.0.j10.fw.ihex firmware/bnx2/bnx2-rv2p-09-5.0.0.j10.fw
 drop_fw_file firmware/bnx2/bnx2-rv2p-09ax-5.0.0.j10.fw.ihex firmware/bnx2/bnx2-rv2p-09ax-5.0.0.j10.fw
 drop_fw_file firmware/bnx2/bnx2-mips-06-5.0.0.j6.fw.ihex firmware/bnx2/bnx2-mips-06-5.0.0.j6.fw
@@ -1242,8 +1247,14 @@ clean_mk CONFIG_B43LEGACY drivers/net/wireless/b43legacy/Makefile
 announce HERMES - "Hermes chipset 802.11b support (Orinoco/Prism2/Symbol)"
 reject_firmware drivers/net/wireless/orinoco/fw.c
 clean_blob drivers/net/wireless/orinoco/fw.c
-clean_kconfig drivers/net/wireless/Kconfig 'HERMES'
+clean_kconfig drivers/net/wireless/orinoco/Kconfig 'HERMES'
 clean_mk CONFIG_HERMES drivers/net/wireless/orinoco/Makefile
+
+announce ORINOCO_USB - "Agere Orinoco USB support"
+reject_firmware drivers/net/wireless/orinoco/orinoco_usb.c
+clean_blob drivers/net/wireless/orinoco/orinoco_usb.c
+clean_kconfig drivers/net/wireless/orinoco/Kconfig 'ORINOCO_USB'
+clean_mk CONFIG_ORINOCO_USB drivers/net/wireless/orinoco/Makefile
 
 announce WLAGS49_H2 - 'Agere Systems HERMES II Wireless PC Card Model 0110'
 # Some pieces of the firmware images are most definitely data, but
@@ -1347,6 +1358,12 @@ reject_firmware drivers/net/wireless/mwl8k.c
 clean_blob drivers/net/wireless/mwl8k.c
 clean_kconfig drivers/net/wireless/Kconfig 'MWL8K'
 clean_mk CONFIG_MWL8K drivers/net/wireless/Makefile
+
+announce ATH9K_HTC - "Atheros HTC based wireless cards support"
+reject_firmware drivers/net/wireless/ath/ath9k/hif_usb.c
+clean_blob drivers/net/wireless/ath/ath9k/hif_usb.c
+clean_kconfig drivers/net/wireless/ath/ath9k/Kconfig 'ATH9K_HTC'
+clean_mk CONFIG_ATH9K_HTC drivers/net/wireless/ath/ath9k/Makefile
 
 announce OTUS - "Atheros OTUS 802.11n USB wireless support"
 clean_blob drivers/staging/otus/hal/hpDKfwu.c
@@ -1496,10 +1513,19 @@ clean_mk CONFIG_WL1251 drivers/net/wireless/wl12xx/Makefile
 
 announce WL1271 - "TI wl1271 support"
 reject_firmware drivers/net/wireless/wl12xx/wl1271_main.c
-clean_blob drivers/net/wireless/wl12xx/wl1271_main.c
 clean_blob drivers/net/wireless/wl12xx/wl1271.h
 clean_kconfig drivers/net/wireless/wl12xx/Kconfig 'WL1271'
 clean_mk CONFIG_WL1271 drivers/net/wireless/wl12xx/Makefile
+
+announce WL1271_SDIO - "TI wl1271 SDIO support"
+clean_blob drivers/net/wireless/wl12xx/wl1271_sdio.c
+clean_kconfig drivers/net/wireless/wl12xx/Kconfig 'WL1271_SDIO'
+clean_mk CONFIG_WL1271_SDIO drivers/net/wireless/wl12xx/Makefile
+
+announce WL1271_SPI - "TI wl1271 SPI support"
+clean_blob drivers/net/wireless/wl12xx/wl1271_spi.c
+clean_kconfig drivers/net/wireless/wl12xx/Kconfig 'WL1271_SPI'
+clean_mk CONFIG_WL1271_SPI drivers/net/wireless/wl12xx/Makefile
 
 announce USB_ZD1201 - "USB ZD1201 based Wireless device support"
 reject_firmware drivers/net/wireless/zd1201.c
@@ -1546,6 +1572,12 @@ clean_blob Documentation/btmrvl.txt
 clean_kconfig drivers/bluetooth/Kconfig 'BT_MRVL_SDIO'
 clean_mk CONFIG_BT_MRVL_SDIO drivers/bluetooth/Makefile
 
+announce TI_ST - "Texas Instruments shared transport line discipline"
+reject_firmware drivers/staging/ti-st/st_kim.c
+clean_blob drivers/staging/ti-st/st_kim.c
+clean_kconfig drivers/staging/ti-st/Kconfig 'TI_ST'
+clean_mk CONFIG_TI_ST drivers/staging/ti-st/Makefile
+
 # wimax
 
 announce WIMAX_I2400M - "Intel Wireless WiMAX Connection 2400"
@@ -1555,6 +1587,15 @@ clean_blob drivers/net/wimax/i2400m/usb.c
 clean_blob Documentation/wimax/README.i2400m
 clean_kconfig drivers/net/wimax/i2400m/Kconfig CONFIG_WIMAX_I2400M
 clean_mk CONFIG_WIMAX_I2400M drivers/net/wimax/i2400m/Makefile
+
+# infiniband
+
+announce INFINIBAND_QIB - "QLogic PCIe HCA support"
+drop_fw_file firmware/qlogic/sd7220.fw.ihex firmware/qlogic/sd7220.fw
+reject_firmware drivers/infiniband/hw/qib/qib_sd7220.c
+clean_blob drivers/infiniband/hw/qib/qib_sd7220.c
+clean_kconfig drivers/infiniband/hw/qib/Kconfig 'INFINIBAND_QIB'
+clean_mk CONFIG_INFINIBAND_QIB drivers/infiniband/hw/qib/Makefile
 
 ########
 # ISDN #
@@ -1610,13 +1651,17 @@ clean_blob drivers/staging/comedi/drivers/jr3_pci.c
 clean_kconfig drivers/staging/comedi/Kconfig 'COMEDI_PCI_DRIVERS'
 clean_mk CONFIG_COMEDI_PCI_DRIVERS drivers/staging/comedi/drivers/Makefile
 
-announce COMEDI_USB_DRIVERS - "Data acquisition support Comedi USB drivers"
+announce COMEDI_USBDUX - "ITL USBDUX support"
 reject_firmware drivers/staging/comedi/drivers/usbdux.c
 clean_blob drivers/staging/comedi/drivers/usbdux.c
+clean_kconfig drivers/staging/comedi/Kconfig 'COMEDI_USBDUX'
+clean_mk CONFIG_COMEDI_USBDUX drivers/staging/comedi/drivers/Makefile
+
+announce COMEDI_USBDUXFAST - "ITL USB-DUXfast support"
 reject_firmware drivers/staging/comedi/drivers/usbduxfast.c
 clean_blob drivers/staging/comedi/drivers/usbduxfast.c
-clean_kconfig drivers/staging/comedi/Kconfig 'COMEDI_USB_DRIVERS'
-clean_mk CONFIG_COMEDI_USB_DRIVERS drivers/staging/comedi/drivers/Makefile
+clean_kconfig drivers/staging/comedi/Kconfig 'COMEDI_USBDUXFAST'
+clean_mk CONFIG_COMEDI_USBDUXFAST drivers/staging/comedi/drivers/Makefile
 
 
 ########
@@ -1666,6 +1711,7 @@ announce SCSI_QLA_FC - "QLogic QLA2XXX Fibre Channel Support"
 reject_firmware drivers/scsi/qla2xxx/qla_gbl.h
 reject_firmware drivers/scsi/qla2xxx/qla_init.c
 reject_firmware drivers/scsi/qla2xxx/qla_os.c
+reject_firmware drivers/scsi/qla2xxx/qla_nx.c
 clean_sed '
 /^config SCSI_QLA_FC$/,/^config /{
   /^	By default, firmware/i\
@@ -1819,6 +1865,13 @@ clean_mk CONFIG_UWB_I1480U drivers/uwb/i1480/dfu/Makefile
 #########
 # Sound #
 #########
+
+announce SND_ASIHPI - "AudioScience ASIxxxx"
+reject_firmware sound/pci/asihpi/hpidspcd.c
+clean_blob sound/pci/asihpi/hpidspcd.c
+clean_blob sound/pci/asihpi/hpioctl.c
+clean_kconfig sound/pci/Kconfig 'SND_ASIHPI'
+clean_mk CONFIG_SND_ASIHPI sound/pci/asihpi/Makefile
 
 announce SND_CS46XX - "Cirrus Logic (Sound Fusion) CS4280/CS461x/CS462x/CS463x"
 # This appears to have been extracted from some non-Free driver
