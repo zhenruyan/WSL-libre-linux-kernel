@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.35 extra=1
+kver=2.6.35 extra=2
 
 case $1 in
 --force)
@@ -1015,7 +1015,7 @@ drop_fw_file firmware/e100/d102e_ucode.bin.ihex firmware/e100/d102e_ucode.bin
 reject_firmware drivers/net/e100.c
 clean_sed '
 /^static const struct firmware \*e100_\(reject\|request\)_firmware(/,/^}$/{
-  s:^\(.*\)return ERR_PTR(err);$:\1DPRINTK(PROBE,ERR, "Proceeding without firmware\\n");\n\1return NULL;:
+  s:^\(.*\)return ERR_PTR(err);$:\1netif_err(nic, probe, nic->netdev, "Proceeding without firmware\\n");\n\1return NULL;:
 }' drivers/net/e100.c 'proceed without firmware'
 clean_blob drivers/net/e100.c
 clean_kconfig drivers/net/Kconfig 'E100'
