@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-09-27
+# deblob-check version 2010-10-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1208,7 +1208,7 @@ set_except () {
     blob '\(#ifdef[ ]__\(LITTLE\|BIG\)_ENDIAN[\n]\)\?#define[ ]FW_EXT[ ]["]\(_ecd\)\?\.bin2\?["]\([\n]#else[\n]#define[ ]FW_EXT[ ]["]\(_ecd\)\?\.bin2\?["]\)*\([\n]#endif\)\?' drivers/atm/fore200e.c
     blobna 'sprintf[(][^;]*fore200[^;]*FW_EXT[^;]*[)][;]' drivers/atm/fore200e.c
     blobname '\(pc\|sb\)a200e\(_ecd\)\?\.bin[12]\?' drivers/atm/fore200e.c
-    blobna 'The[ ]supplied[ ]firmware[ ]images.*fore.*Rebuild[ ]and[ ]re-install[^.]*\.' Documentation/networking/fore200e.txt
+    blobna 'The[ ]supplied[ ]firmware[ ]images.*http://[^\n]*\(fore\|FORE_Systems\).*Rebuild[ ]and[ ]re-install[^.]*\.' Documentation/networking/fore200e.txt
 
     blobname 'intelliport2\.bin' drivers/char/ip2/ip2main.c
 
