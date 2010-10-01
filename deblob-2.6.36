@@ -984,7 +984,6 @@ clean_mk CONFIG_CASSINI drivers/net/Makefile
 announce CHELSIO_T3 - "Chelsio AEL 2005 support"
 drop_fw_file firmware/cxgb3/t3b_psram-1.1.0.bin.ihex firmware/cxgb3/t3b_psram-1.1.0.bin
 drop_fw_file firmware/cxgb3/t3c_psram-1.1.0.bin.ihex firmware/cxgb3/t3c_psram-1.1.0.bin
-drop_fw_file firmware/cxgb3/t3fw-7.4.0.bin.ihex firmware/cxgb3/t3fw-7.4.0.bin
 drop_fw_file firmware/cxgb3/t3fw-7.10.0.bin.ihex firmware/cxgb3/t3fw-7.10.0.bin
 drop_fw_file firmware/cxgb3/ael2005_opt_edc.bin.ihex firmware/cxgb3/ael2005_opt_edc.bin
 drop_fw_file firmware/cxgb3/ael2005_twx_edc.bin.ihex firmware/cxgb3/ael2005_twx_edc.bin
@@ -2153,16 +2152,6 @@ clean_sed '
   /^	default.*dsp001\.ld/ s,".*","/*(DEBLOBBED)*/",;
 }' sound/oss/Kconfig 'removed default firmware'
 clean_mk CONFIG_SOUND_PSS sound/oss/Makefile
-
-##########
-# Crypto #
-##########
-
-announce DX_SEP - "Discretix SEP driver"
-reject_firmware drivers/staging/sep/sep_driver.c
-clean_blob drivers/staging/sep/sep_driver.c
-clean_kconfig drivers/staging/sep/Kconfig 'DX_SEP'
-clean_mk CONFIG_DX_SEP drivers/staging/sep/Makefile
 
 #################
 # Documentation #
