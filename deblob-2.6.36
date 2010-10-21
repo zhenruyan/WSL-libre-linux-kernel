@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.36 extra=--rc3
+kver=2.6.36 extra=
 
 case $1 in
 --force)
@@ -1641,6 +1641,12 @@ reject_firmware drivers/input/touchscreen/qt602240_ts.c
 clean_blob drivers/input/touchscreen/qt602240_ts.c
 clean_kconfig drivers/net/Kconfig 'TOUCHSCREEN_QT602240'
 clean_mk CONFIG_TOUCHSCREEN_QT602240 drivers/input/touchscreen/Makefile
+
+announce LIRC_ZILOG - "Zilog/Hauppauge IR Transmitter"
+reject_firmware drivers/staging/lirc/lirc_zilog.c
+clean_blob drivers/staging/lirc/lirc_zilog.c
+clean_kconfig drivers/staging/lirc/Kconfig 'LIRC_ZILOG'
+clean_mk CONFIG_LIRC_ZILOG drivers/staging/lirc/Makefile
 
 ####################
 # Data acquisition #

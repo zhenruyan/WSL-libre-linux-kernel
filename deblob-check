@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-10-01
+# deblob-check version 2010-10-21
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2572,6 +2572,7 @@ set_except () {
     defsnc '[	][	]degrade_factor\[CPU_LOAD_IDX_MAX\]\[DEGRADE_SHIFT[ ][+][ ]1\][ ]=' kernel/sched.c
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]expected_result\[FIFO_SIZE\][ ]=' samples/kfifo/bytestream-example.c
     defsnc 'static[ ]const[ ]int[ ]expected_result\[FIFO_SIZE\][ ]=' samples/kfifo/inttype-example.c
+    blobname 'haup-ir-blaster\.bin' drivers/input/lirc/lirc_zilog.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -2638,7 +2639,6 @@ set_except () {
     blobname 'iwlwifi-6000g2[ab]-' drivers/net/iwlwifi/iwl-6000.c
     blobname '#api[ ]["]\.ucode["]' 'drivers/net/iwlwifi/iwl-\(3945.h\|\(4965\|[156]000\)\.c\)'
     blobname 'c[tb]fw\(_\(fc\|cna\)\)\?\.bin' drivers/scsi/bfa/bfad_fwimg.c
-    blobname 'haup-ir-blaster\.bin' drivers/input/lirc/lirc_zilog.c
     blobna 'seq_printf[(]seq[,][ ]["][^"]*%s[ ]%s[^"]*["][,][ 	\n]*\(GB_RCV\|MOJAVE_\)UCODE_VERS_STRING[,][ ]\(GB_RCV\|MOJAVE_\)UCODE_VERS_DATE[)][;]\([ 	\n]*seq_printf[(]seq[,][ ]["][^"]*%s[ ]%s[^"]*["][,][ 	\n]*\(GB_RCV\|MOJAVE_\)UCODE_VERS_STRING[,][ ]\(GB_RCV\|MOJAVE_\)UCODE_VERS_DATE[)][;]\)*' drivers/staging/slicoss/slicoss.c
     blobname 'slicoss[/]\(oasis\|gb\)\(rcvucode\|download\)\.sys' drivers/staging/slicoss/slicoss.c
     blobname 'CMV[x9ae][yip]\.bin\(\.v2\)\?' drivers/usb/atm/ueagle-atm.c
@@ -2671,6 +2671,7 @@ set_except () {
     defsnc '[	][	]degrade_factor\[CPU_LOAD_IDX_MAX\]\[DEGRADE_SHIFT[ ][+][ ]1\][ ]=' kernel/sched.c
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]expected_result\[FIFO_SIZE\][ ]=' samples/kfifo/bytestream-example.c
     defsnc 'static[ ]const[ ]int[ ]expected_result\[FIFO_SIZE\][ ]=' samples/kfifo/inttype-example.c
+    blobname 'haup-ir-blaster\.bin' drivers/input/lirc/lirc_zilog.c
     ;;
 
   */hid-support*.patch)
