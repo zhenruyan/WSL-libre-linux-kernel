@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-10-21
+# deblob-check version 2010-10-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3167,6 +3167,9 @@ set_except () {
     ;;
   */linux-2.6*-at76.patch)
     blobname 'atmel_at76c50\(3-\(i386[13]\|rfmd\(-acc\)\?\)\|5\(a\(mx\)\?\)\?-rfmd\(2958\)\?\)\.bin' drivers/net/wireless/at76_usb/at76_usb.c
+    ;;
+  */v4l1*.patch)
+    accept '[(]at[ ]which[ ]point[ ]it[ ]should[ ]use[ ]request_firmware'
     ;;
   */linux-2.6-v4l-dvb*.patch)
     # post 2.6.33 fixes start here
