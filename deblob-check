@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-12-03
+# deblob-check version 2010-12-13
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2581,6 +2581,12 @@ set_except () {
 
   */rtl8180*.patch)
     defsnc 'static[ ]u8[ ]sa2400_rf_rssi_map\[\][ ]=' drivers/net/wireless/rtl818x/rtl8180_sa2400.c
+    ;;
+
+  */patch*-2.6.36.*)
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u32[ ]ar9300_2p[02]_\(radio\|mac\|baseband\)_postamble\[\]\[5\][ ]=\([ ][{][*][/][;]\)\?' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u32[ ]ar9300Modes_\(\(low\(est\)\?\|high\)_ob_db\|high_power\)_tx_gain_table_2p[02]\[\]\[5\][ ]=\([ ][{][*][/][;]\)\?' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u32[ ]ar9\(300\|200_merlin\)_2p[02]_\(radio\|mac\|baseband\)_core\[\]\[2\][ ]=\([ ][{][*][/][;]\)\?' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
     ;;
 
   */patch*-2.6.36-rc*)
