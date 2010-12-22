@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-12-13
+# deblob-check version 2010-12-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1067,7 +1067,7 @@ set_except () {
     defsnc 'static[ ]const[ ]__u8[ ]\(start\|page[34]\)_73\(02\|11\)\[\][ ]=' 'drivers/media/video/gspca/pac73\(02\|11\)\.c'
     initnc 'static[ ]const[ ]__u8[ ]init\(Hv7131\|Ov\(6650\|7630\(_3\)\?\)\|Pas\(106\|202\)\|Tas51[13]0\)\[\][ ]=' drivers/media/video/gspca/sonixb.c
     initnc 'static[ ]const[ ]__u8[ ]\(hv7131\|ov\(6650\|7630\(_3\)\?\)\|pas\(106\|202\)\|tas51[13]0\)_sensor_init\(_com\)\?\[\]\[8\][ ]=' drivers/media/video/gspca/sonixb.c
-    defsnc 'static[ ]\(const[ ]\)\?\(__\)\?u8[ ]\(mt9v111\|sp80708\|hv7131r\|mi0360\|mo4000\|ov76\([36]0\|48\)\|om6802\|po1030\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
+    defsnc 'static[ ]\(const[ ]\)\?\(__\)\?u8[ ]\(mt9v111\|sp80708\|hv7131r\|mi0360b\?\|mo4000\|ov76\([36]0\|48\)\|om6802\|po1030\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     initnc 'static[ ]const[ ]__u8[ ]qtable4\[\][ ]=' drivers/media/video/gspca/sonixj.c
     initnc 'static[ ]const[ ]__u16[ ]\(spca500_visual\|Clicksmart510\)_defaults\[\]\[3\][ ]=' drivers/media/video/gspca/spca500.c
     initnc 'static[ ]const[ ]__u8[ ]qtable_\(creative_pccam\|kodak_ez200\|pocketdv\)\[2\]\[64\][ ]=' drivers/media/video/gspca/spca500.c
@@ -3182,6 +3182,42 @@ set_except () {
     accept '[(]at[ ]which[ ]point[ ]it[ ]should[ ]use[ ]request_firmware'
     ;;
   */linux-2.6-v4l-dvb*.patch)
+    # post 2.6.35 fixes start here
+    defsnc '[	]static[ ]u8[ ]def_regs\[\][ ]=' drivers/media/common/tuners/tda18218.c
+    accept '[	]p7500->firmware[ ]=' drivers/media/dvb/dvb-usb/dw2102.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]lme2510c\?_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*\([	]\.download_firmware[ ]=[ ]lme2510_download_firmware,[\n]\)\?[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/lmedm04.c
+    blobname 'dvb-usb-lme2510c-\(s7395\|lg\)\.fw' drivers/media/dvb/dvb-usb/lmedm04.c
+    defsnc 'static[ ]u8[ ]s7395_inittab\[\][ ]=' drivers/media/dvb/dvb-usb/lmedm04.h
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]struct[ ]regdesc[ ]\(ofsm_init\|tuner_init_\(env77h11d5\|mt2060\(_2\)\?\|mxl500\(3d\|5\)\|qt1010\|mc44s803\|unknown\|tda18271\)\)\[\][ ]=\([ ][{][*][/][;]\)\?' drivers/media/dvb/frontends/af9013_priv.h
+    blobname 'lgs8g75\.fw' drivers/media/dvb/frontends/lgs8gxxx.c
+    defsnc 'static[ ]struct[ ]regdata[ ]mb86a20s_init\[\][ ]=' drivers/media/dvb/frontends/mb86a20s.c
+    accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]struct[ ]dvb_usb_device_properties[ ][*][/][;][\n][	]\.firmware[ ]*=[ ]["][/][*][(]DEBLOBBED[)][*][/]["],[\n][	]\.download_firmware[ ]=[ ]m920x_firmware_download' drivers/media/dvb/dvb-usb/m920x.c
+    defsnc 'static[ ]struct[ ]regdata[ ]s921_init\[\][ ]=' drivers/media/dvb/frontends/s921.c
+    blobname 'v4l-cx23885-enc\.fw' drivers/media/video/cx23885/cx23885-417.c
+    initc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]struct[ ]idxdata[ ]tbl_common\(_[a-e]\|5\|_\?3B\?\)\[\][ ]=\([ ][{][*][/][;]\)\?' 'drivers/media/video/gspca/gl860/gl860-\(mi2020\|mi1320\|ov9655\|ov2640\)\.c'
+    initc '[	]\?static[ ]const[ ]struct[ ]ov_i2c_regvals[ ]norm_7660\[\][ ]=' drivers/media/video/gspca/ov519.c
+    defsnc '[	]static[ ]const[ ]struct[ ]ov_regvals[ ]bridge_ov7660\[2\]\[10\][ ]=' drivers/media/video/gspca/ov519.c
+    defsnc '[	]static[ ]const[ ]u8[ ]fr_tb\[2\]\[6\]\[3\][ ]=' drivers/media/video/gspca/ov519.c
+    defsnc '[	]static[ ]const[ ]struct[ ]ov_i2c_regvals[ ]brit_7660\[\]\[7\][ ]=' drivers/media/video/gspca/ov519.c
+    defsnc '[	]static[ ]const[ ]struct[ ]ov_i2c_regvals[ ]contrast_7660\[\]\[31\][ ]=' drivers/media/video/gspca/ov519.c
+    defsnc '[	]static[ ]const[ ]struct[ ]ov_i2c_regvals[ ]colors_7660\[\]\[6\][ ]=' drivers/media/video/gspca/ov519.c
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]__u8[ ]pac207_sensor_init\[\]\[8\(\][ ]=[ ][{]\)\?\([*][/][;]\)\?' drivers/media/video/gspca/pac207.c
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]__u8[ ]pas202_sensor_init\[\]\[8\(\][ ]=[ ][{]\)\?\([*][/][;]\)\?' drivers/media/video/gspca/sonixb.c
+    defsnc 'static[ ]\(const[ ]\)\?\(__\)\?u8[ ]\(mt9v111\|sp80708\|hv7131r\|mi0360b\?\|mo4000\|ov76\([36]0\|48\)\|om6802\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
+    defsnc 'static[ ]const[ ]struct[ ]ucbus_write_cmd[ ]\(icx098bq\|lz24bp\)_start_[012]\[\][ ]=' drivers/media/video/gspca/sq930x.c
+    defsnc '[}][ ]capconfig\[4\]\[2\][ ]=' drivers/media/video/gspca/sq930x.c
+    defsnc 'static[ ]const[ ]u16[ ]rca_initdata\[\]\[3\][ ]=' drivers/media/video/gspca/xirlink_cit.c
+    defsnc 'static[ ]const[ ]struct[ ]usb_action[ ]\(cs2102\|hdcs2020xx\|icm105a\(xx\)\?\|ov7630c\|mt9v111_[13]\|pb0330\([3x]x\)\?\|mi0360soc\)_Initial\(Scale\)\?\[\][ ]=' drivers/media/video/gspca/zc3xx.c
+    blobname 'NXP7164-2010-03-10\.1\.fw' drivers/media/video/saa7164/saa7164-fw.c
+    defsnc 'const[ ]unsigned[ ]char[ ]map_table\[\][ ]=' drivers/input/lirc/lirc_ttusbir.c
+    blobname 'haup-ir-blaster\.bin' drivers/input/lirc/lirc_zilog.c
+    # removed bits
+    defsnc 'static[ ]u8[ ]af9015_ir_table_\(leadtek\|twinhan\|a_link\|msi\|mygictv\|kworld\)\[\][ ]=' drivers/media/dvb/dvb-usb/af9015.h
+    defsnc 'static[ ]u8[ ]af9015_ir_table_\(avermedia\(_ks\)\?\|digittrade\|trekstor\)\[\][ ]=' drivers/media/dvb/dvb-usb/af9015.h
+    defsnc 'static[ ]struct[ ]keyboard_layout_map_t[ ]keyboard_layout_maps\[\][ ]=' drivers/media/dvb/siano/smsir.c
+    defsnc 'static[ ]\(u16\|struct[ ]i2c_reg_u16\)[ ]\(bridge\|mt9\(v\(11[12]\|011\)\|m001\)\)_init\[\]\(\[2\]\)\?[ ]=' drivers/media/video/gspca/sn9c20x.c
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u8[ ]\(gc0307\|po2030n\)_sensor_\(init\|param1\)\[\]\[8\][ ]\(=[ ][{]\)\?\([*][/][;]\)\?' drivers/media/video/gspca/sonixj.c
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u8[ ]poxxxx_init\(_common\|Q\?VGA\|_end_1\)\[\]\[4\][ ]\(=[ ][{]\)\?\([*][/][;]\)\?' drivers/media/video/gspca/vc032x.c
     # post 2.6.33 fixes start here
     defsnc 'static[ ]struct[ ]i2c_reg_u8[ ]ov9655_init\[\][ ]=' drivers/media/video/gspca/sn9c20x.c
     defsnc 'static[ ]const[ ]u8[ ]\(gc0307\|po2030n\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
@@ -3206,7 +3242,6 @@ set_except () {
     defsnc '[}][ ]\(VSB\|QAM\)_mod_tab\[\][ ]=' drivers/media/dvb/frontends/au8522.c
     initc 'static[ ]const[ ]u8[ ]jpeg_head\[\][ ]=' drivers/media/video/gspca/jpeg.h
     defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init_ov965x\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534.c
-    defsnc 'static[ ]\(const[ ]\)\?\(__\)\?u8[ ]\(mt9v111\|sp80708\|hv7131r\|mi0360\|mo4000\|ov76\([36]0\|48\)\|om6802\)_sensor_init\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     defsnc '[	]static[ ]const[ ]u8[ ]probe_tb\[\]\[4\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     defsnc 'static[ ]const[ ]\(__u16\|u8\)[ ]spca505b\?_\(init\|open\)_data\(_ccd\)\?\[\]\[3\][ ]=' drivers/media/video/gspca/spca505.c
     defsnc 'static[ ]const[ ]u8[ ]n4_lt168g\[\][ ]=' drivers/media/video/gspca/t613.c
