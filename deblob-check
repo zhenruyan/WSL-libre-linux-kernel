@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-12-27
+# deblob-check version 2010-12-28
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2866,6 +2866,7 @@ set_except () {
     blobna '\([&]\|sizeof[(]\)rtl8190_fw\(boot\|main\|data\)_array\(\[0\]\|[)]\)\(,[ 	\n]*\([&]\|sizeof[(]\)rtl8190_fw\(boot\|main\|data\)_array\(\[0\]\|[)]\)\)*' 'drivers/staging/rtl8192su/r819\(2S\|xU\)_firmware\.c'
     initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u8[ ]\(gc0307\|po2030n\)_sensor_\(init\|param1\)\[\]\[8\][ ]\(=[ ][{]\)\?\([*][/][;]\)\?' drivers/media/video/gspca/sonixj.c
     accept '[*][ ]drivers[/]staging[/]ft1000[/]ft1000-\(pcmcia\|usb\)[/]ft[13]000\.img:[ ]Removed\.' 'patch-libre.*'
+    initc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]struct[ ]ar9300_eeprom[ ]ar9300_default[ ]=\([ ][{][*][/][;]\)\?' drivers/net/wireless/ath/ath9k/ar9003_eeprom.c
     ;;
 
   */patch*-2.6.36.*)
