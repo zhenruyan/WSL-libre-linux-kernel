@@ -37,15 +37,14 @@
 # See also:
 # http://wiki.debian.org/KernelFirmwareLicensing
 # svn://svn.debian.org/kernel/dists/trunk/linux-2.6/debian/patches/debian/dfsg/files-1
-# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/firmware/firmware-removed
-# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/gen-kernel
+# http://wiki.gnewsense.org/Builder gen-kernel
 
 # Thanks to Brian Brazil @ gnewsense
 
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.27 extra=4
+kver=2.6.27 extra=4++
 
 case $1 in
 --force)

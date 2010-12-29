@@ -36,8 +36,7 @@
 # See also:
 # http://wiki.debian.org/KernelFirmwareLicensing
 # svn://svn.debian.org/kernel/dists/trunk/linux-2.6/debian/patches/debian/dfsg/files-1
-# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/firmware/firmware-removed
-# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/gen-kernel
+# http://wiki.gnewsense.org/Builder gen-kernel
 
 # Thanks to Brian Brazil @ gnewsense
 
