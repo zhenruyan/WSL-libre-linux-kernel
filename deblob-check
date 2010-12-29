@@ -886,6 +886,12 @@ set_except () {
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
   blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|cis\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\)["]'
+  # Ideally we'd whitelist URLs that don't recommend non-Free
+  # Software, but there are just too many URLs in Linux, and most are
+  # fine, so we just blacklist when we find undesirable URLs.
+  # Please report if you find any inappropriate URL in Linux-libre
+  # deblobbed documentation, sources or run-time log messages.
+  # blobna '\(f\|ht\)tp:[/]\([/]\+[^/ \n ]\+\)\+'
 
   case $prefix$1 in
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
@@ -1432,7 +1438,10 @@ set_except () {
     accept '[	]*priv->firmware[ ]=[ ]\(NULL\|new_firmware\)[;]' drivers/net/wireless/atmel.c
 
     blobname 'b43\(legacy\)\?\(%s\)\?[/]\(%s\|ucode\([2459]\|1[1345]\)\|pcm5\|[abn]0g[01]initvals\(5\|1[13]\)\)\.fw' 'drivers/net/wireless/b43\(legacy\)\?/main.c'
+    blobname 'pcm5\.fw' drivers/net/wireless/b43/main.c
     blobna 'b43legacyerr[(][^;]*must[ ]go[ ]to[ ]http[^;]*b43#devicefirmware[^;]*[)][;]' drivers/net/wireless/b43legacy/main.c
+    blobna 'You[ ]must[ ]go[ ]to[^;]*b43#devicefirmware[^;]*[^";)]' drivers/net/wireless/b43/main.c
+    blobna 'http:[/][/]wireless[^ ";)]*b43#devicefirmware' drivers/net/wireless/b43/main.c
 
     blob '#define[ ]IPW2100_FW_\(\(\(MAJOR\|MINOR\)_VERSION\|\(MAJOR\|MINOR\)[(]x[)]\)\|VERSION\)\([^\n]*\\[\n]\)*[^\n]*\([\n][\n]*#define[ ]IPW2100_FW_\(\(\(MAJOR\|MINOR\)_VERSION\|\(MAJOR\|MINOR\)[(]x[)]\)\|VERSION\)\([^\n]*\\[\n]\)*[^\n]*\)*' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2100\.c'
     blobname 'ipw2100-\(["]\([^"\n]\|[\\][\n]\)*["]\([^"]\|[\\]["]\)*\)\+' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2100\.c'
