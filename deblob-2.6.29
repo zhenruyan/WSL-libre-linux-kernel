@@ -37,15 +37,14 @@
 # See also:
 # http://wiki.debian.org/KernelFirmwareLicensing
 # svn://svn.debian.org/kernel/dists/trunk/linux-2.6/debian/patches/debian/dfsg/files-1
-# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/firmware/firmware-removed
-# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/gen-kernel
+# http://wiki.gnewsense.org/Builder gen-kernel
 
 # Thanks to Brian Brazil @ gnewsense
 
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.29 extra=2
+kver=2.6.29 extra=2++
 
 case $1 in
 --force)
@@ -1381,7 +1380,7 @@ reject_firmware drivers/net/wimax/i2400m/fw.c
 clean_blob drivers/net/wimax/i2400m/sdio.c
 clean_blob drivers/net/wimax/i2400m/usb.c
 clean_blob Documentation/wimax/README.i2400m
-clean_kconfig drivers/net/wimax/i2400m/Kconfig CONFIG_WIMAX_I2400M
+clean_kconfig drivers/net/wimax/i2400m/Kconfig 'WIMAX_I2400M'
 clean_mk CONFIG_WIMAX_I2400M drivers/net/wimax/i2400m/Makefile
 
 ########
