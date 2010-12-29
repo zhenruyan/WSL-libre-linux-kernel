@@ -1797,6 +1797,7 @@ clean_kconfig drivers/scsi/aic94xx/Kconfig 'SCSI_AIC94XX'
 clean_mk CONFIG_SCSI_AIC94XX drivers/scsi/aic94xx/Makefile
 
 announce SCSI_BFA_FC - "Brocade BFA Fibre Channel Support"
+clean_blob drivers/scsi/bfa/bfad_im.h
 reject_firmware drivers/scsi/bfa/bfad.c
 clean_blob drivers/scsi/bfa/bfad.c
 clean_kconfig drivers/scsi/Kconfig 'SCSI_BFA_FC'
