@@ -2078,7 +2078,7 @@ set_except () {
     initnc 'static[ ]u8[ ]alps_tdee4_stv0297_inittab\[\][ ]='
     defsnc 'static[ ]u8[ ]bnx2_570[68]_stats_len_arr\[BNX2_NUM_STATS\][ ]=' drivers/net/bnx2.c
     initnc 'static[ ]u8[ ]flit_desc_map\[\][ ]='
-    defsnc 'static[ ]u8[ ]init_tab[ ]\?\[\][ ]=' 'drivers/media/dvb/frontends/cx2270\(0\|2\)\.c'
+    defsnc 'static[ ]\(const[ ]\)\?u8[ ]init_tab[ ]\?\[\][ ]=' 'drivers/media/dvb/frontends/cx2270\(0\|2\)\.c'
     defsnc 'static[ ]u8[ ]mac_reader\[\][ ]=' drivers/net/wireless/atmel.c
     initnc 'static[ ]u8[ ]mt2131_config1\[\][ ]=' drivers/media/dvb/frontends/mt2131.c # <= 2.6.25
     initnc 'static[ ]u8[ ]mt2131_config1\[\][ ]=' drivers/media/common/tuners/mt2131.c # >= 2.6.26
@@ -2327,7 +2327,7 @@ set_except () {
     defsnc 'static[ ]const[ ]u32[ ]lpphy_\(\(rev01_ps\|tx_power\)_control\|\(a0_\)\?gain_\(idx\|value\)\|papd_\(eps\|mult\)\)_table\[\][ ]=' drivers/net/wireless/b43/tables_lpphy.c
     blobname 'v4l-saa7164-1\.0\.[23]\.fw' drivers/media/video/saa7164/saa7164-fw.c
     defsnc 'static[ ]const[ ]u8[ ]n4_\(om6802\|other\|tas5130a\)\[\][ ]=' drivers/media/video/gspca/t613.c
-    defsnc '[	][	]const[ ]struct[ ]sensor_w_data[ ]\(cif\|vga\)_sensor[01]_init_data\[\][ ]=' drivers/media/video/gspca/mr97310a.c
+    defsnc '[	][	]\(static[ ]\)\?const[ ]struct[ ]sensor_w_data[ ]\(cif\|vga\)_sensor[01]_init_data\[\][ ]=' drivers/media/video/gspca/mr97310a.c
     defsnc '[	]struct[ ]jlj_command[ ]start_commands\[\][ ]=' drivers/media/video/gspca/jeilinj.c
     defsnc 'static[ ]u8[ ]init_code\[\]\[2\][ ]=' drivers/media/dvb/dvb-usb/friio-fe.c
     defsnc 'static[ ]const[ ]u8[ ]va1j5jf8007[ts]_\(2[05]mhz_\)\?prepare_bufs\[\]\[2\][ ]=' 'drivers/media/dvb/pt1/va1j5jf8007[st]\.c'
@@ -2405,7 +2405,7 @@ set_except () {
     defsnc '[	]static[ ]const[ ]u8[ ]rsshash\[40\][ ]=' drivers/net/igb/igb_main.c
     defsnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals_3\(02\)\?x\[\][ ]=' drivers/net/wireless/rt2x00/rt2800lib.c
     defsnc 'static[ ]struct[ ]conf_drv_settings[ ]default_conf[ ]=' drivers/net/wireless/wl12xx/wl1271_main.c
-    defsnc 'static[ ]u16[ ]bios_to_linux_keycode\[256\][ ]=' drivers/platform/x86/dell-wmi.c
+    defsnc 'static[ ]\(const[ ]\)\?u16[ ]bios_to_linux_keycode\[256\][ ]\(__initconst[ ]\)\?=' drivers/platform/x86/dell-wmi.c
     accept '[	]err[ ]=[ ]request_firmware[(][&]pm8001_ha->fw_image,' drivers/scsi/pm8001/pm8001_ctl.c
     defsnc 'static[ ]unsigned[ ]char[ ]vpdb0_data\[\][ ]=' drivers/scsi/scsi_debug.c
     defsnc 'static[ ]struct[ ]vesa_mode_table[ ]vesa_mode\[\][ ]=' drivers/staging/sm7xx/smtcfb.c
@@ -2440,7 +2440,7 @@ set_except () {
     defsnc 'static[ ]u8[ ]ITUDecoderSetup\[4\]\[16\][ ]=' drivers/media/dvb/ngene/ngene-core.c
     blobname 'ngene_1[567]\.fw' drivers/media/dvb/ngene/ngene-core.c
     blobname 'sms1xxx-hcw-55xxx-i\?sdbt-02\.fw' drivers/media/dvb/siano/sms-cards.c
-    defsnc 'static[ ]u8[ ]samsung_smt_7020_inittab\[\][ ]=' drivers/media/video/cx88/cx88-dvb.c
+    defsnc 'static[ ]\(const[ ]\)\?u8[ ]samsung_smt_7020_inittab\[\][ ]=' drivers/media/video/cx88/cx88-dvb.c
     defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
     defsnc 'static[ ]const[ ]u8[ ]bridge_start_\([qs]\?v\|x\)ga\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
     defsnc '[	]struct[ ]init_command[ ]\(spy\|cif\|ms350\|genius\|vivitar\)_start_commands\[\][ ]=' drivers/media/video/gspca/sn9c2028.c
@@ -2541,7 +2541,7 @@ set_except () {
     blobna '[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*[(]f2255usb\.bin[)][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/media/video/s2255drv.c
 
     # New in 2.6.36:
-    defsnc 'static[ ]struct[ ]clk_pll_table[ ]tegra_pll_[pxm]_table\[\][ ]=' arch/arm/mach-tegra/tegra2_clocks.c
+    defsnc 'static[ ]struct[ ]clk_pll_table[ ]tegra_pll_[apxm]_table\[\][ ]=' arch/arm/mach-tegra/tegra2_clocks.c
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]qi_lb60_ecclayout_[12]gb[ ]=' arch/mips/jz4740/board-qi_lb60.c
     blobname 'qt602240\.fw' drivers/input/touchscreen/qt602240_ts.c
     blobname 'lgs8g75\.fw' drivers/media/dvb/frontends/lgs8gxx.c
@@ -2678,12 +2678,13 @@ set_except () {
     defsnc 'static[ ]const[ ]long[ ]frequency_list\[\][ ]=' drivers/staging/rtl8712/rtl871x_ioctl_linux.c
     defsnc 'static[ ]const[ ]unsigned[ ]short[ ]Sbox1\[2\]\[256\][ ]=' drivers/staging/rtl8712/rtl871x_security.c
     defsnc 'static[ ]const[ ]u8[ ]sbox_table\[256\][ ]=' drivers/staging/rtl8712/rtl871x_security.c
-    defsnc '[	]119,[ ]62,[ ]6,[\n][	]0,[ ]16,[ ]20,[ ]17,[ ]32,[ ]48,[ ]0,'"$sepx$blobpat*"',[\n][	]0,[ ]119' drivers/staging/speakup/speakupmap.h
+    accept '[	]119,[ ]62,[ ]6,[\n][	]0,[ ]16,[ ]20,[ ]17,[ ]32,[ ]48,[ ]0,\([\n][	][0-9]\+,\([ ][0-9]\+,\)*\)*[\n][	]0,[ ]119' drivers/staging/speakup/speakupmap.h
     defsnc 'static[ ]u32[ ]\(h_prescale\|v_gain\)\[64\][ ]=' drivers/staging/stradis/stradis.c
     accept '[/][*][ ]*\([ 1-4][0-9][ ][ ]\)*\(5[0-6][ ][ ]\)*[*][/]' drivers/staging/vt6656/channel.c
     blobname 'west[ ]bridge[ ]fw' drivers/staging/westbridge/astoria/device/cyasdevice.c
     defsnc 'static[ ]const[ ]u8[ ]gsm_fcs8\[256\][ ]=' drivers/tty/n_gsm.c
     defsnc '[	]static[ ]const[ ]struct[ ]dispc_v_coef[ ]coef_v\(up\|down\)_3tap\[8\][ ]=' drivers/video/omap2/dss/dispc.c
+    blobname 'c[bt]fw_\(fc\|cna\)\.bin' drivers/scsi/bfa/bfad_im.h
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -2804,12 +2805,13 @@ set_except () {
     defsnc 'static[ ]const[ ]long[ ]frequency_list\[\][ ]=' drivers/staging/rtl8712/rtl871x_ioctl_linux.c
     defsnc 'static[ ]const[ ]unsigned[ ]short[ ]Sbox1\[2\]\[256\][ ]=' drivers/staging/rtl8712/rtl871x_security.c
     defsnc 'static[ ]const[ ]u8[ ]sbox_table\[256\][ ]=' drivers/staging/rtl8712/rtl871x_security.c
-    defsnc '[	]119,[ ]62,[ ]6,[\n][	]0,[ ]16,[ ]20,[ ]17,[ ]32,[ ]48,[ ]0,'"$sepx$blobpat*"',[\n][	]0,[ ]119' drivers/staging/speakup/speakupmap.h
+    accept '[	]119,[ ]62,[ ]6,[\n][	]0,[ ]16,[ ]20,[ ]17,[ ]32,[ ]48,[ ]0,\([\n][	][0-9]\+,\([ ][0-9]\+,\)*\)*[\n][	]0,[ ]119' drivers/staging/speakup/speakupmap.h
     defsnc 'static[ ]u32[ ]\(h_prescale\|v_gain\)\[64\][ ]=' drivers/staging/stradis/stradis.c
     accept '[/][*][ ]*\([ 1-4][0-9][ ][ ]\)*\(5[0-6][ ][ ]\)*[*][/]' drivers/staging/vt6656/channel.c
     blobname 'west[ ]bridge[ ]fw' drivers/staging/westbridge/astoria/device/cyasdevice.c
     defsnc 'static[ ]const[ ]u8[ ]gsm_fcs8\[256\][ ]=' drivers/tty/n_gsm.c
     defsnc '[	]static[ ]const[ ]struct[ ]dispc_v_coef[ ]coef_v\(up\|down\)_3tap\[8\][ ]=' drivers/video/omap2/dss/dispc.c
+    blobname 'c[bt]fw_\(fc\|cna\)\.bin' drivers/scsi/bfa/bfad_im.h
     # Above is for patterns new in 2.6.37, below is for older patterns.
     defsnc 'static[ ]u32[ ]epll_div\[\]\[5\][ ]=' arch/arm/mach-s5p6440/clock.c
     defsnc 'static[ ]struct[ ]clk_pll_table[ ]tegra_pll_[pxm]_table\[\][ ]=' arch/arm/mach-tegra/tegra2_clocks.c
