@@ -862,11 +862,11 @@ clean_blob drivers/media/video/cx18/cx18-firmware.c
 clean_kconfig drivers/media/video/cx18/Kconfig 'VIDEO_CX18'
 clean_mk CONFIG_VIDEO_CX18 drivers/media/video/cx18/Makefile
 
-announce VIDEO_CX231xx - "Conexant cx231xx USB video capture support"
-reject_firmware drivers/media/video/cx231xx/cx23885-417.c
-clean_blob drivers/media/video/cx231xx/cx23885-417.c
-clean_kconfig drivers/media/video/cx231xx/Kconfig 'VIDEO_CX231xx'
-clean_mk CONFIG_VIDEO_CX231xx drivers/media/video/cx231xx/Makefile
+announce VIDEO_CX231XX - "Conexant cx231xx USB video capture support"
+reject_firmware drivers/media/video/cx231xx/cx231xx-417.c
+clean_blob drivers/media/video/cx231xx/cx231xx-417.c
+clean_kconfig drivers/media/video/cx231xx/Kconfig 'VIDEO_CX231XX'
+clean_mk CONFIG_VIDEO_CX231XX drivers/media/video/cx231xx/Makefile
 
 announce VIDEO_CX23885 - "Conexant cx23885 (2388x successor) support"
 reject_firmware drivers/media/video/cx23885/cx23885-417.c
@@ -1066,8 +1066,8 @@ clean_mk CONFIG_FT1000_PCMCIA drivers/staging/ft1000/Makefile
 
 announce FT1000_USB - "Driver for ft1000 USB devices."
 clean_file drivers/staging/ft1000/ft1000-usb/ft3000.img
-reject_firmware drivers/staging/ft1000/ft1000-usb/ft1000_hw.c
-clean_blob drivers/staging/ft1000/ft1000-usb/ft1000_hw.c
+reject_firmware drivers/staging/ft1000/ft1000-usb/ft1000_usb.c
+clean_blob drivers/staging/ft1000/ft1000-usb/ft1000_usb.c
 clean_kconfig drivers/staging/ft1000/Kconfig 'FT1000_USB'
 clean_mk CONFIG_FT1000_USB drivers/staging/ft1000/Makefile
 
@@ -1390,10 +1390,12 @@ announce LIBERTAS - "Marvell 8xxx Libertas WLAN driver support"
 reject_firmware drivers/net/wireless/libertas/main.c '
 /Try user-specified firmware first/{
   :end1
-  /request_firmware/! {N; b end1;};
+  /request_firmware(helper, user_helper/! {N; b end1;};
   :end2
-  /request_firmware.*request_firmware/! {N; b end2;};
-  /request_firmware(helper, user_helper.*request_firmware(nfw, user_mainfw/{p; d;};
+  /request_firmware(helper, user_helper.*request_firmware(mainfw, user_mainfw/! {N; b end2;};
+  /request_firmware(helper, user_helper.*request_firmware(mainfw, user_mainfw/{
+    /request_firmware.*request_firmware.*request_firmware/!{p; d;};
+  }
 }
 '
 clean_kconfig drivers/net/wireless/Kconfig 'LIBERTAS'
@@ -1555,7 +1557,7 @@ clean_sed '
   'disabling non-Free firmware loading machinery'
 clean_blob drivers/staging/rtl8712/hal_init.c
 clean_kconfig drivers/staging/rtl8712/Kconfig 'R8712U'
-clean_mk CONFIG_R8712U drivers/staging/rtl8712/Maekfile
+clean_mk CONFIG_R8712U drivers/staging/rtl8712/Makefile
 
 announce VT6656 - "VIA Technologies VT6656 support"
 clean_sed '
