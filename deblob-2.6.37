@@ -277,6 +277,42 @@ grep -q 'EXTRAVERSION.*-libre' Makefile ||
 clean_sed "s,^EXTRAVERSION.*,&-libre$extra,
 " Makefile 'added -libre to EXTRAVERSION'
 
+grep -q Linux-libre README ||
+clean_sed '
+1,3 s,Linux kernel release.*kernel\.org.*,Linux-libre <http://linux-libre.fsfla.org>,
+2,5 s,Linux version 2.6,Linux-libre,
+1,20 s,\(operating system \)\?Unix,Unix kernel,
+/WHAT IS LINUX/i\
+WHAT IS Linux-libre?\
+\
+  Linux-libre is a Free version of Linux (see below), suitable for\
+  use with the GNU Operating System in 100% Free System Distributions.\
+  http://www.gnu.org/distros/\
+\
+  It removes non-Free components from Linux, that are disguised as\
+  source code or distributed in separate files.  It also disables\
+  run-time requests for non-Free components, shipped separately or\
+  as part of Linux, and documentation pointing to them, so as to\
+  avoid (Free-)baiting users into the trap of non-Free Software.\
+  http://www.fsfla.org/anuncio/2010-11-Linux-2.6.36-libre-debait\
+\
+  Linux-libre started within the gNewSense GNU/Linux distribution.\
+  It was later adopted by Jeff Moe, who coined its name, and in 2008\
+  it became a project maintained by FSF Latin America.\
+\
+  Although the Linux-libre project takes a minimal-changes approach\
+  to cleaning up Linux, making no effort to substitute components\
+  that need to be removed with functionally equivalent Free ones,\
+  we encouraged and support efforts towards doing so.\
+\
+  Our mascot is Freedo, a light-blue penguin that has just come out\
+  of the the shower.  Although we like penguins, GNU is a much greater\
+  contribution to the entire system, so its mascot deserves more\
+  promotion.  See our web page for their images.\
+  http://linux-libre.fsfla.org/\
+
+' README 'added blurb about Linux-libre'
+
 # Add reject_firmware and maybe_reject_firmware
 grep -q _LINUX_LIBRE_FIRMWARE_H include/linux/firmware.h ||
 clean_sed '$i\
