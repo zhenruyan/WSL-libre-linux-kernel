@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-12-29
+# deblob-check version 2010-12-31
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -885,7 +885,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|cis\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\)["]'
+  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\)["]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
   # Software, but there are just too many URLs in Linux, and most are
   # fine, so we just blacklist when we find undesirable URLs.
@@ -1501,13 +1501,19 @@ set_except () {
     # accept '[	]    PCMCIA_\([PM]FC_\)\?DEVICE_CIS_\(MANF_CARD\|PROD_ID[1-4]*\)[(][^)]*, ["][/][*][(]DEBLOBBED[)][*][/]["][)]'
     # accept '#define PCMCIA_\([PM]FC_\)\?DEVICE_CIS_\(MANF_CARD\|PROD_ID[1-4]*\)[(]' include/pcmcia/device_id.h
 
-    blobname '\(cis[/]\)\?3CCFEM556\.cis' drivers/net/pcmcia/3c574_cs.c
+    # These are not software; they're Free, but GPLed without in-tree sources.
+    # blobname '\(cis[/]\)\?3CCFEM556\.cis' drivers/net/pcmcia/3c574_cs.c
+    # blobname '\(cis[/]\)\?3CXEM556\.cis' drivers/net/pcmcia/3c589_cs.c
+    # blobname '\(cis[/]\)\?\(PCMLM28\|DP83903\|LA-PCM\|PE520\|NE2K\|PE-200\|tamarack\)\.cis' drivers/net/pcmcia/pcnet_cs.c
+    # blobname '\(cis[/]\)\?\(PCMLM28\|DP83903\|3C\(CF\|X\)EM556\|MT5634ZLX\|COMpad[24]\|RS-COM-2P\|GLOBETROTTER\)\.cis' drivers/serial/serial_cs.c
+    # These are not software; they're Free, but GPLed without textual sources.
+    # It is safe to assume that these binaries *are* sources, since they
+    # can be trivially converted back to a textual form, without loss.
+    # blobname '\(cis[/]\)\?SW_\([78]xx\|555\)_SER\.cis' drivers/serial/serial_cs.c
 
-    blobname '\(cis[/]\)\?3CXEM556\.cis' drivers/net/pcmcia/3c589_cs.c
-
-    blobname '\(cis[/]\)\?\(PCMLM28\|DP83903\|LA-PCM\|PE520\|NE2K\|PE-200\|tamarack\)\.cis' drivers/net/pcmcia/pcnet_cs.c
-
-    blobname '\(cis[/]\)\?\(PCMLM28\|DP83903\|3C\(CF\|X\)EM556\|SW_\([78]xx\|555\)_SER\|MT5634ZLX\|COMpad[24]\|RS-COM-2P\|GLOBETROTTER\)\.cis' drivers/serial/serial_cs.c
+    accept '[	]dev_dbg[(][&]dev->dev,[ ]["]trying[ ]to[ ]load[ ]CIS[ ]file[ ]%s[\\]n["],[ ]filename[)][;][\n]*[	]if[ ][(]request_firmware[(]' drivers/pcmcia/ds.c
+    accept 'MODULE_FIRMWARE[(]["]\(cis[/]\)\?\(PCMLM28\|DP83903\|3C\(CF\|X\)EM556\|MT5634ZLX\|COMpad[24]\|RS-COM-2P\|GLOBETROTTER\|SW_\([78]xx\|555\)_SER\)\.cis["][)][;]\([\n]MODULE_FIRMWARE[(]["]\(cis[/]\)\?\(PCMLM28\|DP83903\|3C\(CF\|X\)EM556\|MT5634ZLX\|COMpad[24]\|RS-COM-2P\|GLOBETROTTER\|SW_\([78]xx\|555\)_SER\)\.cis["][)][;]\)*' drivers/serial/serial_cs.c
+    accept 'MODULE_FIRMWARE[(]["]\(cis[/]\)\?\(PCMLM28\|DP83903\|LA-PCM\|PE520\|NE2K\|PE-200\|tamarack\)\.cis["][)][;]\([\n]MODULE_FIRMWARE[(]["]\(cis[/]\)\?\(PCMLM28\|DP83903\|LA-PCM\|PE520\|NE2K\|PE-200\|tamarack\)\.cis["][)][;]\)*' drivers/net/pcnet_cs.c
 
     # This enables but does not encourage firmware updates.
     accept '[	]err[ ]=[ ]request_firmware[(][&]asd_ha->bios_image,[\n 	]*filename_ptr,[\n 	]*[&]asd_ha->pcidev->dev[)][;]' drivers/scsi/aic94xx/aic94xx_init.c
@@ -2251,7 +2257,7 @@ set_except () {
     blobna 'linux-firmware\.git' firmware/README.AddingFirmware
     blobname '\(ea[/]\)\?\(loader\|indigo_djx\)_dsp\.fw' sound/pci/echoaudio/indigodjx.c
     blobname '\(ea[/]\)\?\(loader\|indigo_iox\)_dsp\.fw' sound/pci/echoaudio/indigoiox.c
-    blobname 'cis[/]LA-PCM\.cis' drivers/net/pcmcia/pcnet_cs.c
+    # blobname 'cis[/]LA-PCM\.cis' drivers/net/pcmcia/pcnet_cs.c
     blobname 'ositech[/]Xilinx7OD\.bin' drivers/net/pcmcia/smc91c92_cs.c
     blobname 'tehuti[/]\(firmware\|bdx\)\.bin' drivers/net/tehuti.c
     accept '[ 	]*["]b43-open%s[/]%s\.fw["]' drivers/net/wireless/b43/main.c
