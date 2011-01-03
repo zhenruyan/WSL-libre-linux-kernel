@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2010-12-31
+# deblob-check version 2011-01-03
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008, 2009, 2010 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008, 2009, 2010, 2011 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1990,7 +1990,7 @@ set_except () {
     initnc 'static[ ]const[ ]u16[ ]rtl8225z2_rxgain\[\][ ]='
     defsnc 'static[ ]const[ ]u16[ ]stufftab\[5[ ][*][ ]256\][ ]=' drivers/isdn/gigaset/isocdata.c
     initnc 'static[ ]const[ ]u16[ ]tkip_sbox\[256\][ ]='
-    initnc 'static[ ]const[ ]u16[ ]wm8753_reg\[\][ ]='
+    defsnc 'static[ ]const[ ]u16[ ]wm8753_reg\[\][ ]=' sound/soc/codecs/wm8753.c
     initnc 'static[ ]const[ ]u32[ ]SS[0-3]\[256\][ ]='
     initnc 'static[ ]const[ ]u32[ ]S[1-8]\[64\][ ]='
     initnc 'static[ ]const[ ]u32[ ]T[0-5]\[256\][ ]='
@@ -2710,7 +2710,7 @@ set_except () {
     defsnc 'static[ ]u8[ ]sa2400_rf_rssi_map\[\][ ]=' drivers/net/wireless/rtl818x/rtl8180_sa2400.c
     ;;
 
-  */patch*-2.6.37-rc*) # up to -rc5
+  */patch*-2.6.37-rc*) # up to -rc8-git3
     defsnc 'static[ ]u32[ ]epll_div\[\]\[6\][ ]=' arch/arm/mach-s5pv210/clock.c
     defsnc 'static[ ]struct[ ]titan_gpio_cfg[ ]titan_gpio_table\[\][ ]=' arch/mips/ar7/gpio.c
     blobname 'sdma-%s-to%d\.bin' drivers/dma/imx-sdma.c
@@ -2884,6 +2884,7 @@ set_except () {
     initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u8[ ]\(gc0307\|po2030n\)_sensor_\(init\|param1\)\[\]\[8\][ ]\(=[ ][{]\)\?\([*][/][;]\)\?' drivers/media/video/gspca/sonixj.c
     accept '[*][ ]drivers[/]staging[/]ft1000[/]ft1000-\(pcmcia\|usb\)[/]ft[13]000\.img:[ ]Removed\.' 'patch-libre.*'
     initc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]struct[ ]ar9300_eeprom[ ]ar9300_default[ ]=\([ ][{][*][/][;]\)\?' drivers/net/wireless/ath/ath9k/ar9003_eeprom.c
+    defsnc 'static[ ]const[ ]u16[ ]wm8753_reg\[\][ ]=' sound/soc/codecs/wm8753.c
     ;;
 
   */patch*-2.6.36.*)
