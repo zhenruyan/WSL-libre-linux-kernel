@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.37 extra=--
+kver=2.6.37 extra=
 
 case $1 in
 --force)
