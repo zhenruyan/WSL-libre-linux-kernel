@@ -1155,12 +1155,7 @@ clean_kconfig drivers/net/Kconfig 'QLCNIC'
 clean_mk CONFIG_QLCNIC drivers/net/qlcnic/Makefile
 
 announce R8169 - "Realtek 8169 gigabit ethernet support"
-clean_sed '
-/^static void rtl_hw_phy_config(.*)$/,/^}$/{
-  /rtl8168d_[12]_hw_phy_config([^,)]*);$/i\
-		printk(KERN_ERR PFX "%s: Missing Free firmware\\n", dev->name);
-}
-' drivers/net/r8169.c 'report missing Free firmware'
+reject_firmware drivers/net/r8169.c
 clean_blob drivers/net/r8169.c
 clean_kconfig drivers/net/Kconfig R8169
 clean_mk CONFIG_R8169 drivers/net/Makefile
@@ -1290,6 +1285,7 @@ drop_fw_file firmware/cis/PE520.cis.ihex firmware/cis/PE520.cis
 
 announce 3C359 - "3Com 3C359 Token Link Velocity XL adapter"
 drop_fw_file firmware/3com/3C359.bin.ihex firmware/3com/3C359.bin
+reject_firmware drivers/net/tokenring/3c359.c
 clean_blob drivers/net/tokenring/3c359.c
 clean_kconfig drivers/net/tokenring/Kconfig '3C359'
 clean_mk CONFIG_3C359 drivers/net/tokenring/Makefile

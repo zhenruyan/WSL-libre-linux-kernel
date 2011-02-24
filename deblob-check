@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-02-24.
+# deblob-check version 2011-02-24.2
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -878,9 +878,10 @@ fi
 
 set_except () {
   blob "$blobseq"
-  blobna 'request_firmware_nowait'
-  blobna 'request_firmware'
-  blobna 'request_ihex_firmware'
+  # We leave out the initial and final letters of request_firmware so
+  # that deblobbing turns them into r/*DEBLOBBED*/e, a syntax error.
+  blobna 'equest_firmwar'
+  blobna 'equest_ihex_firmwar'
   blobna 'MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\([ 	\n]*MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\)*'
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
@@ -2738,6 +2739,9 @@ set_except () {
     defsnc '[	]static[ ]const[ ]uint8_t[ ]branch_table\[32\][ ]=' lib/xz/xz_dec_bcj.c
     defsnc 'static[ ]const[ ]struct[ ]_pll_div[ ]codec_master_pll_div\[\][ ]=' sound/soc/codecs/alc5623.c
     defsnc '[}][ ]coeff_div\[\][ ]=' sound/soc/codecs/wm8737.c
+    blobname 'rpm_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
+    blobname 'mwl8k[/]fmimage_8366_ap-["][ ][#]api[ ]["]\.fw' drivers/net/wireless/mwl8k.c
+    blobname 'rtl_nic[/]rtl8168d-[12]\.fw' drivers/net/r8169.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -2794,6 +2798,9 @@ set_except () {
     defsnc '[	]static[ ]const[ ]uint8_t[ ]branch_table\[32\][ ]=' lib/xz/xz_dec_bcj.c
     defsnc 'static[ ]const[ ]struct[ ]_pll_div[ ]codec_master_pll_div\[\][ ]=' sound/soc/codecs/alc5623.c
     defsnc '[}][ ]coeff_div\[\][ ]=' sound/soc/codecs/wm8737.c
+    blobname 'rpm_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
+    blobname 'mwl8k[/]fmimage_8366_ap-["][ ][#]api[ ]["]\.fw' drivers/net/wireless/mwl8k.c
+    blobname 'rtl_nic[/]rtl8168d-[12]\.fw' drivers/net/r8169.c
     # Above is for patterns new in 2.6.38, below is for older patterns.
     initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]__u8[ ]pac207_sensor_init\[\]\[8\(\][ ]=[ ][{]\)\?\([*][/][;]\)\?' drivers/media/video/gspca/pac207.c
     initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]__u8[ ]pas202_sensor_init\[\]\[8\(\][ ]=[ ][{]\)\?\([*][/][;]\)\?' drivers/media/video/gspca/sonixb.c
