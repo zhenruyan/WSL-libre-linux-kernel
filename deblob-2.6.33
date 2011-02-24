@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.33 extra=1
+kver=2.6.33 extra=1++
 
 case $1 in
 --force)
@@ -486,7 +486,7 @@ announce DRM_NOUVEAU - "Nouveau (nVidia) cards"
 reject_firmware drivers/gpu/drm/nouveau/nouveau_grctx.c
 clean_blob drivers/gpu/drm/nouveau/nouveau_grctx.c
 clean_blob drivers/gpu/drm/nouveau/nv50_graph.c
-clean_kconfig drivers/gpu/drk/nouveau/Kconfig 'DRM_NOUVEAU'
+clean_kconfig drivers/gpu/drm/nouveau/Kconfig 'DRM_NOUVEAU'
 clean_mk CONFIG_DRM_NOUVEAU drivers/gpu/drm/nouveau/Makefile
 
 announce DRM_MGA - "Matrox g200/g400"
