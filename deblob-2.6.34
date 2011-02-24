@@ -1214,6 +1214,7 @@ drop_fw_file firmware/cis/PE520.cis.ihex firmware/cis/PE520.cis
 
 announce 3C359 - "3Com 3C359 Token Link Velocity XL adapter"
 drop_fw_file firmware/3com/3C359.bin.ihex firmware/3com/3C359.bin
+reject_firmware drivers/net/tokenring/3c359.c
 clean_blob drivers/net/tokenring/3c359.c
 clean_kconfig drivers/net/tokenring/Kconfig '3C359'
 clean_mk CONFIG_3C359 drivers/net/tokenring/Makefile

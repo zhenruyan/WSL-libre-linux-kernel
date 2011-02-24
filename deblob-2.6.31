@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.31 extra=4
+kver=2.6.31 extra=5
 
 case $1 in
 --force)
@@ -1165,6 +1165,7 @@ drop_fw_file firmware/cis/LA-PCM.cis.ihex firmware/cis/LA-PCM.cis
 
 announce 3C359 - "3Com 3C359 Token Link Velocity XL adapter"
 drop_fw_file firmware/3com/3C359.bin.ihex firmware/3com/3C359.bin
+reject_firmware drivers/net/tokenring/3c359.c
 clean_blob drivers/net/tokenring/3c359.c
 clean_kconfig drivers/net/tokenring/Kconfig '3C359'
 clean_mk CONFIG_3C359 drivers/net/tokenring/Makefile
