@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-01-18
+# deblob-check version 2011-02-23
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1920,7 +1920,7 @@ set_except () {
     initnc '[	][}][ ]vm_devices\[\][ ]='
     initnc '[ ][ ][ ][ ]static[ ]const[ ]code[ ]distfix\[32\][ ]='
     initnc '[ ][ ][ ][ ]static[ ]const[ ]code[ ]lenfix\[512\][ ]='
-    initnc '[ ][ ]int[ ]poly\[\]='
+    defsnc '[ ][ ]int[ ]poly\[\]=' drivers/net/pcmcia/nmclan_cs.c
     defsnc '[ ][ ]static[ ]const[ ]unsigned[ ]char[ ]asso_values\[\][ ]=' scripts/genksyms/keywords.c_shipped
     defsnc '[ ][ ]static[ ]unsigned[ ]char[ ]asso_values\[\][ ]=' scripts/kconfig/zconf.hash.c_shipped
     initnc '[ ][ ][}][ ]cards_ds\[\][ ]='
@@ -2055,7 +2055,7 @@ set_except () {
     defsnc 'static[ ]const[ ]unsigned[ ]short[ ]x86_keycodes\[256\][ ]=' drivers/tty/vt/keyboard.c
     initnc 'static[ ]const[ ]unsigned[ ]table\[\][ ]='
     initnc 'static[ ]int[ ]MV300_reg_8bit\[256\][ ]\?=' drivers/video/atafb.c
-    initnc 'static[ ]int[ ]fifo_map\[\]\[MAX_TX_FIFOS\][ ]='
+    defsnc 'static[ ]int[ ]fifo_map\[\]\[MAX_TX_FIFOS\][ ]=' drivers/net/s2io.h
     initnc 'static[ ]int[ ]initial_lfsr\[\][ ]='
     initnc 'static[ ]int[ ]log_tbl\[129\][ ]='
     initnc 'static[ ]int[ ]miro_fmtuner\[\][ ][ ]=' drivers/media/video/bt8xx/bt-cards.c
@@ -2700,6 +2700,52 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]gsm_fcs8\[256\][ ]=' drivers/tty/n_gsm.c
     defsnc '[	]static[ ]const[ ]struct[ ]dispc_v_coef[ ]coef_v\(up\|down\)_3tap\[8\][ ]=' drivers/video/omap2/dss/dispc.c
     blobname 'c[bt]fw_\(fc\|cna\)\.bin' drivers/scsi/bfa/bfad_im.h
+
+    # New in 2.6.38
+    blobname '%s%04x%s["][,][ ]["]fw_sst_["][,][ 	\n]*sst_drv_ctx->pci_id[,][ ]["]\.bin' drivers/staging/intel_sst/intel_sst_common.h
+    accept '[*][ ]*0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1' arch/x86/crypto/aesni-intel_asm.S
+    defsnc 'static[ ]struct[ ]aead_testvec[ ]\(aes_gcm_rfc4106\)_\(enc\|dec\)_tv_template\[\][ ]=' 'crypto/testmgr.h'
+    defsnc 'const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\[256\][ ]=' drivers/staging/easycap/easycap_low.c
+    blobname '\(sep[/]\)\?\extapp\.image\.bin' drivers/staging/sep/sep_driver.c
+    blobname 'radeon[/]\(BARTS\|BTC\|TURKS\|CAICOS\)_\(pfp\|rlc\|m[ec]\)\.bin' drivers/gpu/drm/radeon/ni.c
+    defsnc 'static[ ]const[ ]u32[ ]\(barts\|turks\|caicos\)_io_mc_regs\[BTC_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/ni.c
+    defsnc 'static[ ]int[ ]types\[0x80\][ ]=' drivers/gpu/drm/nouveau/nv50_vram.c
+    blobname '\(nouveau[/]\)\?fuc4\(09\|1a\)[cd]' drivers/gpu/drm/nouveau/nvc0_graph.c
+    defsnc '[	][}][ ]v_table\[\][ ]=' drivers/gpu/drm/i915/i915_dma.c
+    defsnc '[}][ ]nec_8048_init_seq\[\][ ]=' drivers/video/omap2/displays/panel-nec-nl8048hl11-01b.c
+    defsnc 'static[ ]const[ ]int[ ]mc13892_sw1\?\[\][ ]=' drivers/regulator/mc13892-regulator.c
+    defsnc 'static[ ]const[ ]int[ ]dcdc[12]_voltages\[\][ ]=' drivers/regulator/tps6524x-regulator.c
+    defsnc '[	]\(static[ ]const[ ]\)\?u8[ ]init_hash_seed\[\][ ]=' drivers/net/qlge/qlge_main.c
+    blobname 'vxge[/]X3fw\(-pxe\)\.ncf' drivers/net/vxge/vxge-main.c
+    defsnc '[ ][ ]\(static[ ]const[ ]\)\?int[ ]poly\[\]=' drivers/net/pcmcia/nmclan_cs.c
+    defsnc 'static[ ]\(const[ ]\)\?int[ ]fifo_map\[\]\[MAX_TX_FIFOS\][ ]=' drivers/net/s2io.h
+    defsnc 'static[ ]const[ ]struct[ ]efuse_map[ ]RTL8712_SDIO_EFUSE_TABLE\[\][ ]=' drivers/net/wireless/rtlwifi/efuse.c
+    defsnc 'static[ ]const[ ]u32[ ]ofdmswing_table\[OFDM_TABLE_SIZE\][ ]=' drivers/net/wireless/rtlwifi/rtl8192ce/dm.c
+    defsnc 'static[ ]const[ ]u8[ ]cckswing_table_ch\(1ch13\|14\)\[CCK_TABLE_SIZE\]\[8\][ ]=' drivers/net/wireless/rtlwifi/rtl8192ce/dm.c
+    blobname 'rtlwifi[/]rtl8192cfw\.bin' drivers/net/wireless/rtlwifi/rtl8192ce/sw.c
+    # This looks like pure data.
+    defsnc 'static[ ]u8[ ]reserved_page_packet\[TOTAL_RESERVED_PKT_LEN\][ ]=' drivers/net/wireless/rtlwifi/rtl8192ce/fw.c
+    defsnc 'u32[ ]RTL8192CE\(PHY_REG\|_\?RADIO[AB]\|MAC\|AGCTAB\)_\([21]T_\?ARRAY\|ARRAY_PG\)\[\(PHY_REG\|RADIO[AB]\|MAC\|AGCTAB\)_\([21]T_\?ARRAY_\?\|ARRAY_PG\)LENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192ce/table.c
+    defsc 'static[ ]const[ ]struct[ ]ar9300_eeprom[ ]ar9300_[hx]11[236][ ]=' drivers/net/wireless/ath/ath9k/ar9003_eeprom.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9485_1_0_\(mac\|baseband\)_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485\(Common_\(wo_xlna_\)\?rx_gain\)\?_1_0\(_\(radio\|baseband\|mac\)_core\)\?\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485Modes_\(high\|low\)\(est\)\?_\(power\|ob_db\)_tx_gain_1_0\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]struct[ ]b43_nphy_channeltab_entry_rev3[ ]b43_nphy_channeltab_rev\([34568]\|7_9\)\[\][ ]=' drivers/net/wireless/b43/radio_2056.c
+    blobname '["]softing-4[.]6[/]["]' drivers/net/can/softing/softing_platform.h
+    blobname '\(softing-4[.]6[/]\)\?\(\(b\|ld\)card2\?\|can\(card\|sja\|crd2\)\)\.bin' drivers/net/can/softing/softing_cs.c
+    blobna 'which[ ]you[ ]can[ ]get[ ]at[\n][	][ ][ ]http:[/][/][^\n]*[/]socketcan[/][\n][^-]*firmware[ ]version' drivers/net/can/softing/Kconfig
+    defsnc 'static[ ]struct[ ]regdata[ ]mb86a20s_init\[\][ ]=' drivers/media/dvb/frontends/mb86a20s.c
+    defsnc 'static[ ]struct[ ]regdata[ ]s921_init\[\][ ]=' drivers/media/dvb/frontends/s921.c
+    defsnc 'static[ ]const[ ]struct[ ]regval_list[ ]ov2640_init_regs\[\][ ]=' drivers/media/video/ov2640.c
+    defsnc 'static[ ]const[ ]struct[ ]ov_i2c_regvals[ ]norm_7660\[\][ ]=' drivers/media/video/ov519.c
+    defsnc '[	]static[ ]const[ ]struct[ ]ov_regvals[ ]bridge_ov7660\[2\]\[10\][ ]=' drivers/media/video/gspca/ov519.c
+    defsnc '[	]static[ ]const[ ]u8[ ]fr_tb\[2\]\[6\]\[3\][ ]=' drivers/media/video/gspca/ov519.c
+    defsnc '[	]static[ ]const[ ]struct[ ]ov_i2c_regvals[ ]\(brit\|contrast\|colors\)_7660\[\]\[\(6\|7\|31\)\][ ]=' drivers/media/video/gspca/ov519.c
+    blobname 'radio-wl1273-fw\.bin' drivers/media/radio/radio-wl1273.c
+    defsnc '[}][ ]scrubrates\[\][ ]=' drivers/edac/amd64_edac.c
+    defsnc '[	]static[ ]const[ ]uint8_t[ ]branch_table\[32\][ ]=' lib/xz/xz_dec_bcj.c
+    defsnc 'static[ ]const[ ]struct[ ]_pll_div[ ]codec_master_pll_div\[\][ ]=' sound/soc/codecs/alc5623.c
+    defsnc '[}][ ]coeff_div\[\][ ]=' sound/soc/codecs/wm8737.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
