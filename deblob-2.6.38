@@ -1763,7 +1763,7 @@ clean_blob drivers/net/can/softing/softing_platform.h
 clean_sed '
 /^config CAN_SOFTING_CS$/,${
   /You need firmware/i\
-	/*(DEBLOBBED)*/
+	  /*(DEBLOBBED)*/
   /You need firmware/,/softing-fw.*tar\.gz/d
 }' drivers/net/can/softing/Kconfig 'removed firmware notes'
 clean_kconfig drivers/net/can/softing/Kconfig 'CAN_SOFTING_CS'
