@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-02-24.2
+# deblob-check version 2011-03-15
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1907,7 +1907,7 @@ set_except () {
     initnc '[	]static[ ]unsigned[ ]char[ ]static_pad\[\][ ]='
     initnc '[	]static[ ]unsigned[ ]char[ ]table_alaw2ulaw\[\][ ]='
     initnc '[	]static[ ]unsigned[ ]char[ ]table_ulaw2alaw\[\][ ]='
-    defsnc '[	]u32[ ]reg_boundaries\[\][ ]=' drivers/net/bnx2.c
+    defsnc '[	]\(static[ ]const[ ]\)\?u32[ ]reg_boundaries\[\][ ]=' drivers/net/bnx2.c
     initnc '[	]u8[ ]b\[\][ ]='
     initnc '[	]uint8_t[ ]tx\[\][ ]='
     initnc '[	]unsigned[ ]char[ ]saa7111_regs\[\][ ]='
@@ -2833,7 +2833,7 @@ set_except () {
     defsnc 'static[ ]u8[ ]\(init\|c\)_table\[\]=' drivers/media/dvb/frontends/s921_core.c
     defsnc 'static[ ]\(u16\|struct[ ]i2c_reg_u16\)[ ]\(bridge\|mt9\(v\(11[12]\|011\)\|m001\)\)_init\[\]\(\[2\]\)\?[ ]=' drivers/media/video/gspca/sn9c20x.c
     defsnc '[	]static[ ]const[ ]struct[ ]struct_initData[ ]initData\[\][ ]=' drivers/media/video/usbvideo/ibmcam.c
-    defsnc '[	]u32[ ]reg_boundaries\[\][ ]=' drivers/net/bnx2.c
+    defsnc '[	]\(static[ ]const[ ]\)\?u32[ ]reg_boundaries\[\][ ]=' drivers/net/bnx2.c
     initnc 'static[ ]const[ ]struct[ ]ath5k_ini_mode[ ]rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\][ ]=' drivers/net/wireless/ath5k/initvals.c
     defsnc 'static[ ]u32[ ]\(h_prescale\|v_gain\)\[64\][ ]=' drivers/staging/stradis/stradis.c
     ;;
