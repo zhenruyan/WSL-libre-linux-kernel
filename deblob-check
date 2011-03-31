@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-03-15
+# deblob-check version 2011-03-31
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3589,6 +3589,7 @@ set_except () {
     defsnc '\(static[ ]uint32_t\|[}]\)[ ]nv04_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv04_graph.c
     defsnc 'static[ ]int[ ]nv1[07]_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv10_graph.c
     defsnc '[	][}][ ]common_modes\[17\][ ]=' drivers/gpu/drm/radeon/radeon_connectors.c
+    defsnc 'static[ ]const[ ]u8[ ]types\[256\][ ]=' drivers/gpu/drm/nouveau/nvc0_vram.c
 
     # drm-upgrayedd.patch
     defsnc 'static[ ]const[ ]u16[ ]\(y\|uv\)_static_hcoeffs\[N_HORIZ_\(Y\|UV\)_TAPS[ ][*][ ]N_PHASES\][ ]=' drivers/gpu/drm/i915/intel_overlay.c
