@@ -1775,7 +1775,7 @@ clean_mk CONFIG_SERIAL_QE drivers/serial/Makefile
 announce TOUCHSCREEN_QT602240 - "QT602240 I2C Touchscreen"
 reject_firmware drivers/input/touchscreen/qt602240_ts.c
 clean_blob drivers/input/touchscreen/qt602240_ts.c
-clean_kconfig drivers/net/Kconfig 'TOUCHSCREEN_QT602240'
+clean_kconfig drivers/input/touchscreen/Kconfig 'TOUCHSCREEN_QT602240'
 clean_mk CONFIG_TOUCHSCREEN_QT602240 drivers/input/touchscreen/Makefile
 
 announce LIRC_ZILOG - "Zilog/Hauppauge IR Transmitter"
