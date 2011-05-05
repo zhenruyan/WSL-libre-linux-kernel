@@ -645,6 +645,7 @@ clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_CXUSB'
 clean_mk CONFIG_DVB_USB_CXUSB drivers/media/dvb/dvb-usb/Makefile
 
 announce DVB_USB_DIB0700 - "DiBcom DiB0700 USB DVB devices"
+reject_firmware drivers/media/dvb/dvb-usb/dib0700_devices.c
 clean_blob drivers/media/dvb/dvb-usb/dib0700_devices.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_DIB0700'
 clean_mk CONFIG_DVB_USB_DIB0700 drivers/media/dvb/dvb-usb/Makefile

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-05-05
+# deblob-check version 2011-05-05a
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1620,7 +1620,6 @@ set_except () {
     accept '[	 ]*["]request_firmware[ ]\(fatal[ ]error\|unable[ ]to[ ]locate\|:[ ]Failed[ ]to[ ]find\)' drivers/media/video/pvrusb2/pvrusb2-hdw.c
     accept '[ ][*][ ]NOTE[ ]:[ ]the[ ]pointer[ ]to[ ]the[ ]firmware[ ]data[ ]given[ ]by[ ]request_firmware[(][)]' drivers/media/video/pvrusb2-hdw.c
 
-    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]\(dw\(210[24]\|3101\)\|s6[3x]0\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/dw2102.c
     blobname 'dvb-usb-\(dw\(210[124]\|3101\)\|s630\)\.fw' drivers/media/dvb/dvb-usb/dw2102.c
 
     accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]gp8psk_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/gp8psk.c
@@ -2314,7 +2313,6 @@ set_except () {
 
     # New in or modified for 2.6.32
     blobname '\(cxgb3[/]\)\?ael20\(05_\(opt\|twx\)\|20_twx\)_edc\.bin' drivers/net/cxgb3/cxgb3_main.c
-    blobname 'wl1271-\(fw\|nvs\)\.bin' drivers/net/wireless/wl12xx/wl1271.h
     defsnc 'static[ ]const[ ]struct[ ]aper_size_info_32[ ]u3_sizes\[8\?\][ ]=' drivers/char/agp/uninorth-agp.c
     defsnc 'static[ ]const[ ]unsigned[ ]short[ ]atkbd_set[23]_keycode\[\(512\|ATKBD_KEYMAP_SIZE\)\][ ]=' drivers/input/keyboard/atkbd.c
     defsnc '[	][}][ ]common_modes\[17\][ ]=' drivers/gpu/drm/radeon/radeon_connectors.c
@@ -2442,7 +2440,7 @@ set_except () {
     accept '[	]p7500->firmware[ ]=' drivers/media/dvb/dvb-usb/dw2102.c
     blobname 'dvb-usb-p7500\.fw' drivers/media/dvb/dvb-usb/dw2102.c
     defsnc 'static[ ]u8[ ]ITUDecoderSetup\[4\]\[16\][ ]=' drivers/media/dvb/ngene/ngene-core.c
-    blobname 'ngene_1[567]\.fw' drivers/media/dvb/ngene/ngene-core.c
+    blobname 'ngene_1[5678]\.fw' drivers/media/dvb/ngene/ngene-core.c
     blobname 'sms1xxx-hcw-55xxx-i\?sdbt-02\.fw' drivers/media/dvb/siano/sms-cards.c
     defsnc 'static[ ]\(const[ ]\)\?u8[ ]samsung_smt_7020_inittab\[\][ ]=' drivers/media/video/cx88/cx88-dvb.c
     defsnc 'static[ ]const[ ]u8[ ]\(bridge\|sensor\)_init\(_2\)\?\[\]\[2\][ ]=' drivers/media/video/gspca/ov534_9.c
@@ -2742,7 +2740,13 @@ set_except () {
     initnc '\.irp[ ]idx' arch/x86/kernel/entry_64.S
     defsnc 'static[ ]const[ ]u8[ ]types\[256\][ ]=' drivers/gpu/drm/nouveau/nvc0_vram.c
     defsnc 'static[ ]__u8[ ]keytouch_fixed_rdesc\[\][ ]=' drivers/hid/hid-keytouch.c
-    blobname 'dvb-usb-SkyStar_SUB_HD_FW_v17_63\.HEX\.fw' drivers/media/dvb/dvb-usb/technisat-usb2.c
+    blobname 'dib9090\.fw' drivers/media/dvb/dvb-usb/dib0700_devices.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]\(dw\(210[24]\|3101\)\|s6[3x]0\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\|size_of_priv\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/dw2102.c
+    accept '[	]\(p1100\|s660\)->firmware[ ]=' drivers/media/dvb/dvb-usb/dw2102.c
+    blobname 'dvb-usb-\(p1100\|s660\)\.fw' drivers/media/dvb/dvb-usb/dw2102.c
+    blobname 'dvb-usb-lme2510c\?-s0194\.fw' drivers/media/dvb/dvb-usb/lmedm04.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]technisat_usb2_devices[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\|identify_state\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/technisat-usb2.c
+    blobname 'dvb-usb-SkyStar_USB_HD_FW_v17_63\.HEX\.fw' drivers/media/dvb/dvb-usb/technisat-usb2.c
     defsnc 'static[ ]const[ ]struct[ ]dib0090_pll[ ]dib0090_\(p1g_\)\?pll_table\[\][ ]=' drivers/media/dvb/frontends/dib0090.c
     defsnc '[	]static[ ]u8[ ]sine[ ]\?\[\][ ]=' drivers/media/dvb/frontends/dib7000p.c
     defsnc 'u32[ ]fe_info\[44\][ ]=' drivers/media/dvb/frontends/dib9000.c
@@ -2760,10 +2764,12 @@ set_except () {
     defsnc 'static[ ]const[ ]u32[ ]ar9485\(M\|_m\)odes_\(high\|low\|green\)\(est\)\?_\(power\|ob_db\)_tx_gain_1_[01]\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
     defsnc '\(static[ ]\)\?const[ ]u\(8\|16\|32\)[ ]b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\?\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\(_r3\)\?\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
     defsnc 'struct[ ]nphy_gain_ctl_workaround_entry[ ]nphy_gain_ctl_workaround\[2\]\[3\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    blobname '\(ti-connectivity[/]\)\?wl1271-\(fw\(-2\|-ap\)\?\|nvs\)\.bin' drivers/net/wireless/wl12xx/wl1271.h
     accept '#define\([ ]_\?IWL\(4965\|[156]000\(G2[AB]\)\?\|1[03]0\|5150\|6050\|20[03]\?0\)_MODULE_FIRMWARE[(]api[)]\)\+' 'drivers/net/iwlwifi/iwl-\([1256]000\|4965\)\.c'
     blobname 'rtlwifi[/]rtl8192cufw\.bin' drivers/net/wireless/rtlwifi/rtl8192cu.sw
     blobname 'rtlwifi[/]rtl8712u\.bin' drivers/staging/rtl8712/hal_init.c
     defsnc 'u32[ ]\(RTL\|Rtl\)8192CU\(PHY_REG\|_\?\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\[RTL8192CU\(PHY_REG\|\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)_\?\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\(LENGTH\|Length\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192cu/table.c
+    blobname 'rtl_nic[/]rtl8105e-1\.fw' drivers/net/r8169.c
     defsnc 'static[ ]const[ ]\(A_INT32\|s32\)[ ]wmi_rateTable\[\]\[2\][ ]=' drivers/staging/ath6kl/wmi/wmi.c
     defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\[256\][ ]=' drivers/staging/easycap/easycap_low.c
     defsnc 'static[ ]const[ ]ccktxbbgain_struct[ ]rtl8192_cck_txbbgain_\(ch14_\)\?table\[\][ ]=' drivers/staging/rtl8192e/r8192E_dm.c
@@ -2781,6 +2787,7 @@ set_except () {
     defsnc 'int[ ]process_sigma_firmware[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*request_firmware' drivers/firmware/sigma.c
     accept 'EXPORT_SYMBOL[(]process_sigma_firmware[)]' drivers/firmware/sigma.c
     accept 'extern[ ]int[ ]process_sigma_firmware[(][^)]*[)][;]' include/linux/sigma.h
+    blobname 'maxtouch\.fw' drivers/input/touchscreen/atmel_mxt_ts.c
     blobname 'fm\(c\|_[rt]x\)_ch8\(_[0-9a-f]*\.[0-9]*\.bts\)\?' drivers/media/radio/wl128x/fmdrv_common.h
     blobname '%s_%x\.%d\.bts' drivers/media/radio/wl128x/fmdrv_common.c
   ;;
@@ -2790,7 +2797,6 @@ set_except () {
     ;;
 
   */patch*-2.6.39-rc*)
-    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]\(dw\(210[24]\|3101\)\|s6[3x]0\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/dw2102.c
     accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]lme2510c\?_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*\([	]\.download_firmware[ ]=[ ]lme2510_download_firmware,[\n]\)\?[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/lmedm04.c
     defsnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]\(u8\|struct[ ]i2c_reg_u8\)[ ]\(soi968\|ov\(76[67]0\|965[05]\)\|hv7131r\)_init\[\]\(\[2\]\)\?[ ]=\([ ][{][*][/][;]\)\?' drivers/media/video/gspca/sn9c20x.c
     defsnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]\(const[ ]\)\?\(__\)\?u8[ ]\(mt9v111\|sp80708\|hv7131[rd]\|mi0360b\?\|mo4000\|ov76\([36]0\|48\)\|om6802\)_sensor_\(init\|param1\)\[\]\[8\][ ]=\([ ][{][*][/][;]\)\?' drivers/media/video/gspca/sonixj.c
@@ -2897,7 +2903,13 @@ set_except () {
     initnc '\.irp[ ]idx' arch/x86/kernel/entry_64.S
     defsnc 'static[ ]const[ ]u8[ ]types\[256\][ ]=' drivers/gpu/drm/nouveau/nvc0_vram.c
     defsnc 'static[ ]__u8[ ]keytouch_fixed_rdesc\[\][ ]=' drivers/hid/hid-keytouch.c
-    blobname 'dvb-usb-SkyStar_SUB_HD_FW_v17_63\.HEX\.fw' drivers/media/dvb/dvb-usb/technisat-usb2.c
+    blobname 'dib9090\.fw' drivers/media/dvb/dvb-usb/dib0700_devices.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]\(dw\(210[24]\|3101\)\|s6[3x]0\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\|size_of_priv\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/dw2102.c
+    accept '[	]\(p1100\|s660\)->firmware[ ]=' drivers/media/dvb/dvb-usb/dw2102.c
+    blobname 'dvb-usb-\(p1100\|s660\)\.fw' drivers/media/dvb/dvb-usb/dw2102.c
+    blobname 'dvb-usb-lme2510c\?-s0194\.fw' drivers/media/dvb/dvb-usb/lmedm04.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]technisat_usb2_devices[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\|identify_state\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/technisat-usb2.c
+    blobname 'dvb-usb-SkyStar_USB_HD_FW_v17_63\.HEX\.fw' drivers/media/dvb/dvb-usb/technisat-usb2.c
     defsnc 'static[ ]const[ ]struct[ ]dib0090_pll[ ]dib0090_\(p1g_\)\?pll_table\[\][ ]=' drivers/media/dvb/frontends/dib0090.c
     defsnc '[	]static[ ]u8[ ]sine[ ]\?\[\][ ]=' drivers/media/dvb/frontends/dib7000p.c
     defsnc 'u32[ ]fe_info\[44\][ ]=' drivers/media/dvb/frontends/dib9000.c
@@ -2915,10 +2927,12 @@ set_except () {
     defsnc 'static[ ]const[ ]u32[ ]ar9485\(M\|_m\)odes_\(high\|low\|green\)\(est\)\?_\(power\|ob_db\)_tx_gain_1_[01]\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
     defsnc '\(static[ ]\)\?const[ ]u\(8\|16\|32\)[ ]b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\?\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\(_r3\)\?\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
     defsnc 'struct[ ]nphy_gain_ctl_workaround_entry[ ]nphy_gain_ctl_workaround\[2\]\[3\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    blobname '\(ti-connectivity[/]\)\?wl1271-\(fw\(-2\|-ap\)\?\|nvs\)\.bin' drivers/net/wireless/wl12xx/wl1271.h
     accept '#define\([ ]_\?IWL\(4965\|[156]000\(G2[AB]\)\?\|1[03]0\|5150\|6050\|20[03]\?0\)_MODULE_FIRMWARE[(]api[)]\)\+' 'drivers/net/iwlwifi/iwl-\([1256]000\|4965\)\.c'
     blobname 'rtlwifi[/]rtl8192cufw\.bin' drivers/net/wireless/rtlwifi/rtl8192cu.sw
     blobname 'rtlwifi[/]rtl8712u\.bin' drivers/staging/rtl8712/hal_init.c
     defsnc 'u32[ ]\(RTL\|Rtl\)8192CU\(PHY_REG\|_\?\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\[RTL8192CU\(PHY_REG\|\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)_\?\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\(LENGTH\|Length\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192cu/table.c
+    blobname 'rtl_nic[/]rtl8105e-1\.fw' drivers/net/r8169.c
     defsnc 'static[ ]const[ ]\(A_INT32\|s32\)[ ]wmi_rateTable\[\]\[2\][ ]=' drivers/staging/ath6kl/wmi/wmi.c
     defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\[256\][ ]=' drivers/staging/easycap/easycap_low.c
     defsnc 'static[ ]const[ ]ccktxbbgain_struct[ ]rtl8192_cck_txbbgain_\(ch14_\)\?table\[\][ ]=' drivers/staging/rtl8192e/r8192E_dm.c
@@ -2936,6 +2950,7 @@ set_except () {
     defsnc 'int[ ]process_sigma_firmware[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*request_firmware' drivers/firmware/sigma.c
     accept 'EXPORT_SYMBOL[(]process_sigma_firmware[)]' drivers/firmware/sigma.c
     accept 'extern[ ]int[ ]process_sigma_firmware[(][^)]*[)][;]' include/linux/sigma.h
+    blobname 'maxtouch\.fw' drivers/input/touchscreen/atmel_mxt_ts.c
     blobname 'fm\(c\|_[rt]x\)_ch8\(_[0-9a-f]*\.[0-9]*\.bts\)\?' drivers/media/radio/wl128x/fmdrv_common.h
     blobname '%s_%x\.%d\.bts' drivers/media/radio/wl128x/fmdrv_common.c
     ;;
@@ -3458,7 +3473,7 @@ set_except () {
     defsnc '\([ ][ ][ ][ ]\|[	]\)u_int32_t[ ]ralinkrate\[256\][ ]=' 'drivers/staging/rt\(28[67]0\|3070\)/rt_linux\.c'
     defsnc '\(static[ ]uint32_t\|[}]\)[ ]nv04_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv04_graph.c
     defsnc 'static[ ]int[ ]nv10_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv10_graph.c
-    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]\(dw\(210[24]\|3101\)\|s6[3x]0\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/dw2102.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]\(dw\(210[24]\|3101\)\|s6[3x]0\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\|size_of_priv\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/dw2102.c
     defsnc 'static[ ]int[ ]zoom2_batt_table\[\][ ]=' arch/arm/mach-omap2/board-zoom2.c
     defsnc 'static[ ]u8[ ]af9015_ir_table_\(leadtek\|twinhan\|a_link\|msi\|mygictv\|kworld\)\[\][ ]=' drivers/media/dvb/dvb-usb/af9015.h
     defsnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]struct[ ]usb_action[ ]\(cs2102\|hdcs2020xx\|icm105axx\|ov7630c\|pb0330[3x]x\)_Initial\(Scale\)\?\[\][ ]=[ ][{]\([*][/][;]\)\?[\n]' drivers/media/video/gspca/zc3xx.c
