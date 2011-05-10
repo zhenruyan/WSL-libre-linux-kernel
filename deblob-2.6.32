@@ -1026,6 +1026,7 @@ announce NETXEN_NIC - "NetXen Multi port (1/10) Gigabit Ethernet NIC"
 reject_firmware drivers/net/netxen/netxen_nic.h
 reject_firmware drivers/net/netxen/netxen_nic_main.c
 reject_firmware drivers/net/netxen/netxen_nic_init.c
+grep ROMIMAGE_NAME drivers/net/netxen/netxen_nic_init.c > /dev/null ||
 clean_blob drivers/net/netxen/netxen_nic_init.c
 clean_kconfig drivers/net/Kconfig 'NETXEN_NIC'
 clean_mk CONFIG_NETXEN_NIC drivers/net/Makefile
