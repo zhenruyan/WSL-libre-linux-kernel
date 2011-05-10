@@ -421,6 +421,9 @@ clean_sed '
 s,\([" ]\)request_firmware(,\1reject_firmware(,
 ' arch/arm/mach-netx/xc.c 'disabled non-Free firmware-loading machinery'
 clean_blob arch/arm/mach-netx/xc.c
+if grep MODULE_FIRMWARE drivers/net/netx-eth.c > /dev/null; then
+  clean_blob drivers/net/netx-eth.c
+fi
 clean_kconfig arch/arm/Kconfig 'ARCH_NETX'
 clean_mk CONFIG_ARCH_NETX arch/arm/Makefile
 
@@ -1026,8 +1029,12 @@ announce NETXEN_NIC - "NetXen Multi port (1/10) Gigabit Ethernet NIC"
 reject_firmware drivers/net/netxen/netxen_nic.h
 reject_firmware drivers/net/netxen/netxen_nic_main.c
 reject_firmware drivers/net/netxen/netxen_nic_init.c
-grep ROMIMAGE_NAME drivers/net/netxen/netxen_nic_init.c > /dev/null ||
-clean_blob drivers/net/netxen/netxen_nic_init.c
+if grep ROMIMAGE_NAME drivers/net/netxen/netxen_nic_init.c > /dev/null; then
+  clean_blob drivers/net/netxen/netxen_nic.h
+  clean_blob drivers/net/netxen/netxen_nic_main.c
+else
+  clean_blob drivers/net/netxen/netxen_nic_init.c
+fi
 clean_kconfig drivers/net/Kconfig 'NETXEN_NIC'
 clean_mk CONFIG_NETXEN_NIC drivers/net/Makefile
 
@@ -1052,6 +1059,9 @@ announce SPIDER_NET - "Spider Gigabit Ethernet driver"
 reject_firmware drivers/net/spider_net.c
 clean_sed 's,spider_fw\.bin,DEBLOBBED.bin,g' \
   drivers/net/spider_net.c 'removed non-Free firmware notes'
+if grep MODULE_FIRMWARE drivers/net/spider_net.c > /dev/null; then
+  clean_blob drivers/net/spider_net.c
+fi
 clean_blob drivers/net/spider_net.h
 clean_kconfig drivers/net/Kconfig 'SPIDER_NET'
 clean_mk CONFIG_SPIDER_NET drivers/net/Makefile
