@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.39 extra=
+kver=2.6.39 extra=0++
 
 case $1 in
 --force)
@@ -1392,15 +1392,24 @@ clean_mk CONFIG_ORINOCO_USB drivers/net/wireless/orinoco/Makefile
 announce WLAGS49_H2 - 'Agere Systems HERMES II Wireless PC Card Model 0110'
 # Some pieces of the firmware images are most definitely data, but
 # others seem to be code.
-clean_file drivers/staging/wlags49_h2/ap_h2.c
-clean_file drivers/staging/wlags49_h2/sta_h2.c
+clean_blob drivers/staging/wlags49_h2/ap_h2.c
+clean_blob drivers/staging/wlags49_h2/sta_h2.c
+echo 'extern int deblobbed; /*(DEBLOBBED)*/' > drivers/staging/wlags49_h2/ap_h2.c
+echo 'extern int deblobbed; /*(DEBLOBBED)*/' > drivers/staging/wlags49_h2/sta_h2.c
 clean_blob drivers/staging/wlags49_h2/wl_profile.c
+clean_sed '
+  s,\(.*hcf_status = \)dhf_download_fw(.*&fw_image );,//& /*(DEBLOBBED)*/\n\1HCF_ERR_INCOMP_FW;,
+' drivers/staging/wlags49_h2/wl_main.c 'reject built-in non-Free firmware'
 clean_kconfig drivers/staging/wlags49_h2/Kconfig 'WLAGS49_H2'
 clean_mk CONFIG_WLAGS49_H2 drivers/staging/Makefile
 
 announce WLAGS49_H25 - 'Linksys Systems HERMES II.5 Wireless-G_CompactFlash_Card'
-clean_file drivers/staging/wlags49_h2/ap_h25.c
-clean_file drivers/staging/wlags49_h2/sta_h25.c
+# Some pieces of the firmware images are most definitely data, but
+# others seem to be code.
+clean_blob drivers/staging/wlags49_h2/ap_h25.c
+clean_blob drivers/staging/wlags49_h2/sta_h25.c
+echo 'extern int deblobbed; /*(DEBLOBBED)*/' > drivers/staging/wlags49_h2/ap_h25.c
+echo 'extern int deblobbed; /*(DEBLOBBED)*/' > drivers/staging/wlags49_h2/sta_h25.c
 clean_kconfig drivers/staging/wlags49_h25/Kconfig 'WLAGS49_H25'
 clean_mk CONFIG_WLAGS49_H25 drivers/staging/Makefile
 
@@ -1637,14 +1646,7 @@ clean_kconfig drivers/staging/rtl8712/Kconfig 'R8712U'
 clean_mk CONFIG_R8712U drivers/staging/rtl8712/Makefile
 
 announce VT6656 - "VIA Technologies VT6656 support"
-clean_sed '
-/^FIRMWAREbDownload($/,/^}$/ {
-  /PBYTE.*pBuffer/ i\
-    PBYTE abyFirmware[1] = { 0 };
-  /-->Download firmware/ i\
-    printk("vt6656: missing Free firmware\\n");\
-    return (FALSE);
-}' drivers/staging/vt6656/firmware.c 'report missing Free firmware'
+reject_firmware drivers/staging/vt6656/firmware.c
 clean_blob drivers/staging/vt6656/firmware.c
 clean_kconfig drivers/staging/vt6656/Kconfig 'VT6656'
 clean_mk CONFIG_VT6656 drivers/staging/vt6656/Makefile

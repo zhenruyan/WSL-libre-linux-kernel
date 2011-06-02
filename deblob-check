@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-05-05a
+# deblob-check version 2011-06-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2790,6 +2790,7 @@ set_except () {
     blobname 'maxtouch\.fw' drivers/input/touchscreen/atmel_mxt_ts.c
     blobname 'fm\(c\|_[rt]x\)_ch8\(_[0-9a-f]*\.[0-9]*\.bts\)\?' drivers/media/radio/wl128x/fmdrv_common.h
     blobname '%s_%x\.%d\.bts' drivers/media/radio/wl128x/fmdrv_common.c
+    blobname 'vntwusb\.fw' drivers/staging/vt6656/firmware.c
   ;;
 
   */*freedo*.patch | */*logo*.patch)
