@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-06-03
+# deblob-check version 2011-07-20
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -886,7 +886,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\)["]'
+  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\)["]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
   # Software, but there are just too many URLs in Linux, and most are
   # fine, so we just blacklist when we find undesirable URLs.
@@ -895,7 +895,7 @@ set_except () {
   # blobna '\(f\|ht\)tp:[/]\([/]\+[^/ \n ]\+\)\+'
 
   case $prefix$1 in
-  */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
+  */*linux*.tar* | */*kernel*.tar* | */*linux-*.*/*)
     # false alarms, contain source
     # drivers/net/wan/wanxlfw.inc_shipped -> wanxlfw.S
     accept 'static[ ]u8[ ]firmware\[\]=[{][\n]0x60,\(0x00,\)*0x16,\(0x00,\)*\([\n]\(0x[0-9A-F][0-9A-F],\)*\)*[\n]0x23,0xFC,0x00,0x00,0x00,0x01,0xFF,0xF9,0x00,0xD4,0x61,0x00,0x06,0x74,0x33,0xFC,\([\n]\(0x[0-9A-F][0-9A-F],\)*\)*0x00[\n][}][;]'
@@ -2322,7 +2322,7 @@ set_except () {
     blobna 'rtl8168d_[12]_hw_phy_config[(]ioaddr[)][;]' drivers/net/r8169.c
     blobna 'static[ ]\(const[ ]\)\?struct[ ]phy_reg_init_[12]\[\][ ]=[ ][{][\n 	{}0-9a-fx]*0x06,[ ]0xf8f9[\n 	{}0-9a-fx]*[}][;]' drivers/net/r8169.c
     # This loads firmware to be flashed from filename provided through ethtool.
-    accept 'int[ ]be_load_fw[(][^\n;{]*[)][ \n][{][^\n]*\([\n]\+[^\n}][^\n]*\)*ETHTOOL_FLASH_MAX_FILENAME[^\n]*\([\n]\+[^\n}][^\n]*\)*request_firmware[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' drivers/net/benet/be_main.c
+    accept 'int[ ]be_load_fw[(]struct[ ]be_adapter[ ][^\n;{]*[)][ \n][{]\([\n]\+[^\n}][^\n]*\)*request_firmware[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' drivers/net/benet/be_main.c
     defsnc '[	]u8[ ]init_hash_seed\[\][ ]=' drivers/net/qlge/qlge_main.c
     defsnc 'static[ ]const[ ]u_int32_t[ ]ar9287\(Common\|Modes\(_\([tr]x_gain\)\)\?\)_9287_1_[01]\[\]\[[236]\][ ]=' drivers/net/wireless/ath9k/initvals.h
     defsnc 'static[ ]const[ ]u_int32_t[ ]ar9271\(Common\|Modes\)_9271\(_1_0\)\?\[\]\[[26]\][ ]=' drivers/net/wireless/ath9k/initvals.h
@@ -2791,6 +2791,62 @@ set_except () {
     blobname 'fm\(c\|_[rt]x\)_ch8\(_[0-9a-f]*\.[0-9]*\.bts\)\?' drivers/media/radio/wl128x/fmdrv_common.h
     blobname '%s_%x\.%d\.bts' drivers/media/radio/wl128x/fmdrv_common.c
     blobname 'vntwusb\.fw' drivers/staging/vt6656/firmware.c
+    # New in 3.0.
+    accept 'resume[/]restore[,][ ]but[ ]they[ ]cannot[ ]do[ ]it[ ]by[ ]calling[ ]request_firmware[(][)]' Documentation/power/notifiers.txt
+    accept '[	][	][	]interrupts[ ]=[ ]<\([\n][	][	][	][	]0xe[0-7][ ]0[ ]0[ ]0\)*>[;]' arch/powerpc/boot/dts/p1022ds.dts
+    accept '[ ][ ][ ][ ]gzip[ ]-n[ ]--force[ ]-9[ ]--stdout[ ]["][$]ofile\.bin["][ ]>[ ]["][$]odir[/]otheros\.bld["]' arch/powerpc/boot/wrapper
+    defsnc 'uint32_t[ ]nva3_pcopy_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nva3_copy.fuc.h
+    defsnc 'uint32_t[ ]nvc0_pcopy_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_copy.fuc.h
+    accept '[	]struct[ ]nvc0_graph_fuc[ ]fuc4\(09\|1a\)[cd]' drivers/gpu/drm/nouveau/nvc0_graph.h
+    defsnc 'static[ ]const[ ]u8[ ]sht15_crc8_table\[\][ ]=' drivers/hwmon/sht15.c
+    defsnc 'static[ ]u8[ ]stv0288_bsbe1_d01a_inittab\[\][ ]=' drivers/media/dvb/frontends/bsbe1-d01a.h
+    defsnc '[	]struct[ ]reg_val_mask[ ]tab\[\][ ]=' 'drivers/media/dvb/frontends/cxd2820r_\(c\|t2\)\.c'
+    blobname 'drxd-a2-1\.1\.fw' drivers/media/dvb/frontends/drxd_hard.c
+    blobname 'drxd-b1-1\.1\.fw' drivers/media/dvb/frontends/drxd_hard.c
+    blob '[/][*][	]if[ ][(]\(reject\|request\)_firmware[(][&]state->fw[,][ ]["]drxd\.fw["][,][ ]state->dev[)]<0[)][ ][*][/]'
+    blobname 'drxd\.fw' drivers/media/dvb/frontends/drxd_hard.c
+    defsnc '[	]static[ ]char[ ]init_values\[38\]\[3\][ ]=' drivers/media/video/usbvision/usbvision-core.c
+    blobna 'www\.elandigitalsys[^\n]*download' drivers/mmc/host/Kconfig
+    blobname 'vub_\(default\.bin\|%04X%04X\)' drivers/mmc/host/vub300.c
+    blobna 'snprintf[(]vub300->vub_name[ ][+][^\n]*[,][ ]["]\.bin["][)][;]' drivers/mmc/host/vub300.c
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]flexonenand_oob_128[ ]=' drivers/mtd/onenand/onenand_base.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9340Modes_\(\(low\(est\)\?\|high\|mixed\)_ob_db\|high_power\|ub124\)_tx_gain_table_1p0\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9340_1p0_\(radio\|baseband\|mac\)_core\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9340_1p0_\(mac\|baseband\)_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9340Common_\(wo_xlna_\)\?rx_gain_table_1p0\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]u16[ ]mwifiex_data_rates\[MWIFIEX_SUPPORTED_RATES_EXT\][ ]=' drivers/net/wireless/mwifiex/cfp.c
+    accept '[	]\.helper[	][	]=[ ]NULL[,][\n][	]*\.firmware' drivers/bluetooth/btmrvl_sdio.c
+    blobname 'mrvl[/]sd8787_uapsta\(_w1\)\?\.bin' drivers/net/wireless/mwifiex/main.h
+    blobname 'sd8787\.bin' drivers/net/wireless/mwifiex/sdio.c
+    blobna 'Copy[ ]sd8787\.bin[ ]to[^.]*[.]' drivers/net/wireless/mwifiex/README
+    blobname 'rtlwifi[/]rtl8192sefw\.bin' drivers/net/wireless/rtlwifi/rtl8192se/sw.c
+    defsnc 'u32[ ]rtl8192sephy_reg_2t2rarray\[PHY_REG_2T2RARRAYLENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192se/table.c
+    defsnc 'u32[ ]rtl8192sephy_changeto_1t[12]rarray\[PHY_CHANGETO_1T[12]RARRAYLENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192se/table.c
+    defsnc 'u32[ ]rtl8192sephy_reg_array_pg\[PHY_REG_ARRAY_PGLENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192se/table.c
+    defsnc 'u32[ ]rtl8192seradioa_1t_array\[RADIOA_1T_ARRAYLENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192se/table.c
+    defsnc 'u32[ ]rtl8192semac_2t_array\[MAC_2T_ARRAYLENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192se/table.c
+    defsnc 'u32[ ]rtl8192seagctab_array\[AGCTAB_ARRAYLENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192se/table.c
+    accept 'Place[ ]isci_firmware\.bin[ ]in' drivers/scsi/isci/firmware/README
+    # This is not a code blob, it is just small data structures described in create_fw.[ch].
+    accept 'static[ ]const[ ]char[ ]blob_name\[\][ ]=[ ]["]isci_firmware\.bin["]' drivers/scsi/isci/create_fw.h
+    accept '[	][	]orom[ ]=[ ]isci_request_firmware' drivers/scsi/isci/init.c
+    accept 'MODULE_FIRMWARE[(]ISCI_FW_NAME[)][;]' drivers/scsi/isci/init.c
+    accept 'struct[ ]isci_orom[ ][*]isci_request_firmware[(]' 'drivers/scsi/isci/probe_roms\.[ch]'
+    accept '[	]if[ ][(]request_firmware[(][&]fw[,][ ]ISCI_FW_NAME[,]' drivers/scsi/isci/probe_roms.c
+    accept '#define[ ]ISCI_FW_NAME[	][	]["]isci[/]isci_firmware\.bin["]' drivers/scsi/isci/probe_roms.h
+    defsnc 'static[ ]struct[ ]XGI_ExtStruct[ ]XGI330_EModeIDTable\[\][ ]=' drivers/staging/xgifb/vb_table.h
+    defsnc 'static[ ]struct[ ]pll_limit[ ]\(cle266\|k800\|cx700\|vx855\)_pll_limits\[\][ ]=' drivers/video/via/hw.c
+    accept '[	][	]-e[ ]["][$]tmp_dir[/]lib[/]modules[/][$]KERNELRELEASE[/]modules\.dep\.bin["]' scripts/depmod.sh
+    blobname 'wm8958_\(enh_eq\|mbc\(_vss\)\?\)\.wfw' sound/soc/codecs/wm8958-dsp2.c
+    blobname 'htc_\(7010\|9271\)\.fw' drivers/net/wireless/ath/ath9k/hif_usb.c
+    blobname 'rtl_nic[/]rtl8168e-[12]\.fw' drivers/net/r8169.c
+    blobname 'ti-connectivity[/]wl128x-fw\(-ap\)\?\.bin' drivers/net/wireless/wl12xx/wl12xx.h
+    defsnc 'static[ ]const[ ]u8[ ]tg3_tso_header\[\][ ]=' drivers/net/tg3.c
+    blobname 'ath6k[/]AR6003[/]hw2\.1\.1[/]\(otp\|athwlan\|athtcmd_ram\|device\|data\.patch\|endpointping\|bdata\.\(SD3[12]\|WB31\|CUSTOM\)\)\.bin' drivers/staging/ath6kl/os/linux/include/ar6000_drv.h
+    accept '[	]nvc0_graph_init_fuc[(]dev[,][ ]0x4\(09\|1a\)000[,][ ][&]priv->fuc4\(09\|1a\)c[,][ ][&]priv->fuc4\(09\|1a\)d[)][;]' drivers/gpu/drm/nouveau/nvc0_graph.c
+    accept '[	]nvc0_graph_destroy_fw[(]&priv->fuc4\(09\|1a\)[cd][)][;]' drivers/gpu/drm/nouveau/nvc0_graph.c
+    accept '[	]\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvc0_graph.c
+    blobname 'nouveau[/]\(nv%02x_\)\?%s' drivers/gpu/drm/nouveau/nvc0_graph.c
   ;;
 
   */*freedo*.patch | */*logo*.patch)

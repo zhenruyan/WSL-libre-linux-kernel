@@ -106,6 +106,9 @@ for f in \
   linux-$kver-$libre.tar \
   linux-$kver-$libre.patch \
   linux-$kver-$libre.log \
+  linux-$kver-$libre.vcdiff \
+  linux-$kver-$libre.vcdiff.asc \
+  linux-$kver-$libre.vcdiff.sign \
   linux-$kver-$libre.xdelta \
   linux-$kver-$libre.xdelta.asc \
   linux-$kver-$libre.xdelta.sign \
@@ -211,16 +214,26 @@ xargs tar --append -f linux-$kver-$libre.tar
 echo Wiping out extracted trees
 rm -rf linux-$kver orig-linux-$kver
 
+echo Creating vcdiff between linux-$kver.tar and linux-$kver-$libre.tar
+xdelta3 -e -R -s linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || : # don't fail if xdelta3 is not present
+
 echo Creating xdelta between linux-$kver.tar and linux-$kver-$libre.tar
 xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || : # xdelta returns nonzero on success
 
-echo Compressing linux-$kver-$libre.tar and linux-$kver-$libre.xdelta
+echo Compressing linux-$kver-$libre.tar and binary deltas
 rm -f linux-$kver.tar
+bzip2 -k9 linux-$kver-$libre.tar
 lzip -k9 linux-$kver-$libre.tar
-bzip2 -9 linux-$kver-$libre.tar
+rm -f linux-$kver-$libre.tar
+if test -f linux-$kver-$libre.vcdiff; then
+  bzip2 -k9 linux-$kver-$libre.vcdiff
+  lzip -k9 linux-$kver-$libre.vcdiff
+  rm -f linux-$kver-$libre.vcdiff
+fi
 if test -f linux-$kver-$libre.xdelta; then
+  bzip2 -k9 linux-$kver-$libre.xdelta
   lzip -k9 linux-$kver-$libre.xdelta
-  bzip2 -9 linux-$kver-$libre.xdelta
+  rm -f linux-$kver-$libre.xdelta
 fi
 
 trap "status=$?; (exit $status); exit" 0 1 2 15
@@ -229,6 +242,8 @@ echo Done except for signing, feel free to interrupt
 for f in \
   linux-$kver-$libre.tar.bz2 \
   linux-$kver-$libre.tar.lz \
+  linux-$kver-$libre.vcdiff.bz2 \
+  linux-$kver-$libre.vcdiff.lz \
   linux-$kver-$libre.xdelta.bz2 \
   linux-$kver-$libre.xdelta.lz \
 ; do
