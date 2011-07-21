@@ -17,9 +17,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
 # USA
 
-# deblob.sh - prepare a linux-libre tarball out of a non-libre Linux
-# tarball.  It expects the Linux release (mver, say 2.6.25) as the
-# first argument, the libre sub-release (extra) as the second optional
+# deblob-main - prepare a linux-libre tarball out of a non-libre Linux
+# tarball.  It expects the Linux release (mver, say 3.0) as the first
+# argument, the libre sub-release (extra) as the second optional
 # argument, and the patch release (sver, say .13) as an optional third
 # argument.  mver and sver are pasted together to form kver.
 
@@ -36,10 +36,19 @@
 # yourself, because xdelta (unlike patches) is not reversible: the
 # removed bits are not present in it at all.
 
+# xdelta version 3 uses different command line syntax, and it switched
+# to the more standardized but less efficient vcdiff file format.
+# This script will also produce a vcdiff file if xdelta3 is present,
+# and it expects the xdelta program to use the version 1 syntax.
+
 # To enable you to check the differences between the tarballs, a patch
 # file is generated in linux-$kver-libre$extra.patch.  This patch file
 # contains the non-Free blobs, even though in reversed form, so its
 # distribution is discouraged.
+
+# The tar files and binary deltas are finally compressed with bzip2,
+# and optionally with lzip and xz too, if the compressors are
+# available.
 
 # At the end, the script attempts to generate a digital signature for
 # the newly-created tarball.  This is the last thing the script does,
@@ -99,6 +108,9 @@ for f in \
   linux-$kver-$libre.tar.bz2 \
   linux-$kver-$libre.tar.bz2.asc \
   linux-$kver-$libre.tar.bz2.sign \
+  linux-$kver-$libre.tar.xz \
+  linux-$kver-$libre.tar.xz.asc \
+  linux-$kver-$libre.tar.xz.sign \
   linux-$kver-$libre.tar.lz \
   linux-$kver-$libre.tar.lz.asc \
   linux-$kver-$libre.tar.lz.sign \
@@ -107,11 +119,25 @@ for f in \
   linux-$kver-$libre.patch \
   linux-$kver-$libre.log \
   linux-$kver-$libre.vcdiff \
-  linux-$kver-$libre.vcdiff.asc \
-  linux-$kver-$libre.vcdiff.sign \
+  linux-$kver-$libre.vcdiff.bz2 \
+  linux-$kver-$libre.vcdiff.bz2.asc \
+  linux-$kver-$libre.vcdiff.bz2.sign \
+  linux-$kver-$libre.vcdiff.xz \
+  linux-$kver-$libre.vcdiff.xz.asc \
+  linux-$kver-$libre.vcdiff.xz.sign \
+  linux-$kver-$libre.vcdiff.lz \
+  linux-$kver-$libre.vcdiff.lz.asc \
+  linux-$kver-$libre.vcdiff.lz.sign \
   linux-$kver-$libre.xdelta \
-  linux-$kver-$libre.xdelta.asc \
-  linux-$kver-$libre.xdelta.sign \
+  linux-$kver-$libre.xdelta.bz2 \
+  linux-$kver-$libre.xdelta.bz2.asc \
+  linux-$kver-$libre.xdelta.bz2.sign \
+  linux-$kver-$libre.xdelta.xz \
+  linux-$kver-$libre.xdelta.xz.asc \
+  linux-$kver-$libre.xdelta.xz.sign \
+  linux-$kver-$libre.xdelta.lz \
+  linux-$kver-$libre.xdelta.lz.asc \
+  linux-$kver-$libre.xdelta.lz.sign \
 ; do
   if test -f $f; then
     echo $f already exists >&2
@@ -215,36 +241,42 @@ echo Wiping out extracted trees
 rm -rf linux-$kver orig-linux-$kver
 
 echo Creating vcdiff between linux-$kver.tar and linux-$kver-$libre.tar
-xdelta3 -e -R -s linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || : # don't fail if xdelta3 is not present
+xdelta3 -e -9 -S djw -s linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.vcdiff || : # don't fail if xdelta3 is not present
 
 echo Creating xdelta between linux-$kver.tar and linux-$kver-$libre.tar
 xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || : # xdelta returns nonzero on success
 
-echo Compressing linux-$kver-$libre.tar and binary deltas
+echo Compressing binary deltas and linux-$kver-$libre.tar
 rm -f linux-$kver.tar
-bzip2 -k9 linux-$kver-$libre.tar
-lzip -k9 linux-$kver-$libre.tar
-rm -f linux-$kver-$libre.tar
 if test -f linux-$kver-$libre.vcdiff; then
   bzip2 -k9 linux-$kver-$libre.vcdiff
-  lzip -k9 linux-$kver-$libre.vcdiff
+  xz -k9 linux-$kver-$libre.vcdiff || :
+  lzip -k9 linux-$kver-$libre.vcdiff || :
   rm -f linux-$kver-$libre.vcdiff
 fi
 if test -f linux-$kver-$libre.xdelta; then
   bzip2 -k9 linux-$kver-$libre.xdelta
-  lzip -k9 linux-$kver-$libre.xdelta
+  xz -k9 linux-$kver-$libre.xdelta || :
+  lzip -k9 linux-$kver-$libre.xdelta || :
   rm -f linux-$kver-$libre.xdelta
 fi
+bzip2 -k9 linux-$kver-$libre.tar
+xz -k9 linux-$kver-$libre.tar || :
+lzip -k9 linux-$kver-$libre.tar || :
+rm -f linux-$kver-$libre.tar
 
 trap "status=$?; (exit $status); exit" 0 1 2 15
 
 echo Done except for signing, feel free to interrupt
 for f in \
   linux-$kver-$libre.tar.bz2 \
+  linux-$kver-$libre.tar.xz \
   linux-$kver-$libre.tar.lz \
   linux-$kver-$libre.vcdiff.bz2 \
+  linux-$kver-$libre.vcdiff.xz \
   linux-$kver-$libre.vcdiff.lz \
   linux-$kver-$libre.xdelta.bz2 \
+  linux-$kver-$libre.xdelta.xz \
   linux-$kver-$libre.xdelta.lz \
 ; do
   if test -f $f; then
