@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-07-20
+# deblob-check version 2011-07-21
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2840,6 +2840,7 @@ set_except () {
     blobname 'wm8958_\(enh_eq\|mbc\(_vss\)\?\)\.wfw' sound/soc/codecs/wm8958-dsp2.c
     blobname 'htc_\(7010\|9271\)\.fw' drivers/net/wireless/ath/ath9k/hif_usb.c
     blobname 'rtl_nic[/]rtl8168e-[12]\.fw' drivers/net/r8169.c
+    defsnc '[	]static[ ]const[ ]struct[ ]ephy_info[ ]e_info_8168e\[\][ ]=' drivers/net/r8169.c
     blobname 'ti-connectivity[/]wl128x-fw\(-ap\)\?\.bin' drivers/net/wireless/wl12xx/wl12xx.h
     defsnc 'static[ ]const[ ]u8[ ]tg3_tso_header\[\][ ]=' drivers/net/tg3.c
     blobname 'ath6k[/]AR6003[/]hw2\.1\.1[/]\(otp\|athwlan\|athtcmd_ram\|device\|data\.patch\|endpointping\|bdata\.\(SD3[12]\|WB31\|CUSTOM\)\)\.bin' drivers/staging/ath6kl/os/linux/include/ar6000_drv.h
@@ -2847,6 +2848,7 @@ set_except () {
     accept '[	]nvc0_graph_destroy_fw[(]&priv->fuc4\(09\|1a\)[cd][)][;]' drivers/gpu/drm/nouveau/nvc0_graph.c
     accept '[	]\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'nouveau[/]\(nv%02x_\)\?%s' drivers/gpu/drm/nouveau/nvc0_graph.c
+    blobname 'radeon[/]SUMO2\?_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
   ;;
 
   */*freedo*.patch | */*logo*.patch)
