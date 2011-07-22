@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-07-21
+# deblob-check version 2011-07-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4813,13 +4813,13 @@ for line in sys.stdin:
         continue
 
     if verbose:
-            print 'looking for matches'
+            print('looking for matches')
             sfilenames = filenames
             while filenames != None:
                 if filenames[1] is None:
-                    print filenames[0]
+                    print(filenames[0])
                 else:
-                    print filenames[0] + ' within'
+                    print(filenames[0] + ' within')
                 filenames = filenames[1]
             filenames = sfilenames
 
@@ -4834,25 +4834,25 @@ for line in sys.stdin:
         blobs = falses = 0
         while 1:
             if verbose:
-                print 'found match'
+                print('found match')
             what = match.lastgroup
 
             if what == 'cblob':
-                if verbose: print 'match is a blob context'
+                if verbose: print('match is a blob context')
                 pend = s.find ('\n', match.end()) + 1
                 if pend == 0:
                     pend = len(s)
                 p = match.start() + 1
-		blob_p = 2
+                blob_p = 2
             else:
                 blob_p = what == 'blob'
                 assert blob_p or what == 'falsepos'
 
                 if blob_p:
-                    if verbose: print 'match is a blob'
+                    if verbose: print('match is a blob')
                     blobs += 1
                 else:
-                    if verbose: print 'match is a false positive'
+                    if verbose: print('match is a false positive')
                     falses += 1
 
                 if blob_p and replace_blob or not blob_p and replace_falsepos:
@@ -4884,7 +4884,7 @@ for line in sys.stdin:
             if not print_nomatch:
                 sfilenames = filenames
                 while filenames != None:
-                    print '::: ' + filenames[0] + ' :::'
+                    print('::: ' + filenames[0] + ' :::')
                     filenames = filenames[1]
                 filenames = sfilenames
             sys.stdout.write (s[pp:pend])
@@ -4893,9 +4893,9 @@ for line in sys.stdin:
         if list_blob and blobs or list_falsepos and falses:
             while filenames != None:
                 if filenames[1] is None:
-                    print filenames[0]
+                    print(filenames[0])
                 else:
-                    print filenames[0] + ' within'
+                    print (filenames[0] + ' within')
                 filenames = filenames[1]
             exit (1)
 
@@ -4903,7 +4903,7 @@ for line in sys.stdin:
         sys.stdout.write(s[pp:])
 
     if verbose:
-        print 'no further matches'
+        print('no further matches')
 
     s = '\n'
     filenames = nextfilenames
