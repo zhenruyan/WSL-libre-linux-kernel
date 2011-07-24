@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-07-22
+# deblob-check version 2011-07-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2602,8 +2602,8 @@ set_except () {
     defsnc 'static[ ]DDR_SET_NODE[ ]asT3\(LP\)\?B\?_DDRSetting\(80\|100\|133\|160\)MHz\[\][ ]\?=' drivers/staging/bcm/DDRInit.c
     blobname '\([/]lib[/]firmware[/]\)\?macxvi200\.bin' drivers/staging/bcm/Macros.h
     accept '-[ ]On-chip[ ]firmware[ ]loaded[ ]using[ ]standard[ ]request_firmware[(][)]' 'drivers/staging/brcm80211\(/brcmfmac\)\?/README'
-    blobname 'brcm[/]bcm43xx\(_hdr\)-0[-0-9]*\.fw' drivers/staging/brcm80211/README
-    blobname 'brcm[/]bcm4329-fullmac-4[-0-9]*\.bin' drivers/staging/brcm80211/brcmfmac/README
+    blobname 'brcm[/]bcm43xx\(_hdr\)\?-0[-0-9]*\.fw' drivers/staging/brcm80211/README
+    blobname 'brcm[/]bcm4329-fullmac-4[-0-9]*\.\(bin\|txt\)' drivers/staging/brcm80211/brcmfmac/README
     blob 'Firmware[ ]installation[\n]=\+\([\n]\+[^\n=][^\n]*\)\+\([/]lib[/]firmware[/]brcm\|\.fw\)[^\n]*\([\n][^\n=][^\n]*\)*\([\n][\n][^=\n][^\n]*[\n][^=\n][^\n]*\([\n][^\n=][^\n]*\)*\)*' 'drivers/staging/brcm80211\(/brcmfmac\)\?/README'
     defsnc '[	]u16[ ]nrate_list\[4\]\[8\][ ]=' drivers/staging/brcm80211/brcmfmac/wl_iw.c
     defsnc 'static[ ]chan_info_basic_t[ ]chan_info_all\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_cmn.c
@@ -2849,6 +2849,8 @@ set_except () {
     accept '[	]\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'nouveau[/]\(nv%02x_\)\?%s' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'radeon[/]SUMO2\?_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
+    blobname 'iwlwifi-\(105\|20[03]0\)-' drivers/net/iwlwifi/iwl-2000.c
+    blobname '__stringify[(]api[)][ ]["]\.ucode["]' 'drivers/net/iwlwifi/iwl-\(3945.h\|\(4965\|[1256]000\)\.c\)'
   ;;
 
   */*freedo*.patch | */*logo*.patch)
