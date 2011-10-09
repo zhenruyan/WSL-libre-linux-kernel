@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.31 extra=5
+kver=2.6.31 extra=5++
 
 case $1 in
 --force)
@@ -1318,7 +1318,7 @@ clean_blob drivers/net/wireless/libertas_tf/if_usb.c
 clean_kconfig drivers/net/wireless/Kconfig 'LIBERTAS_THINFIRM_USB'
 clean_mk CONFIG_LIBERTAS_THINFIRM_USB drivers/net/wireless/libertas_tf/Makefile
 
-announce MWL8K - 'Marvell 88W8xxx PCI/PCIe Wireless support'
+announce MWL8K - "Marvell 88W8xxx PCI/PCIe Wireless support"
 reject_firmware drivers/net/wireless/mwl8k.c
 clean_blob drivers/net/wireless/mwl8k.c
 clean_kconfig drivers/net/wireless/Kconfig 'MWL8K'
@@ -1383,7 +1383,7 @@ clean_blob drivers/net/wireless/p54/p54usb.h
 clean_kconfig drivers/net/wireless/p54/Kconfig 'P54_USB'
 clean_mk CONFIG_P54_USB drivers/net/wireless/p54/Makefile
 
-announce PRISM54 - 'Intersil Prism GT/Duette/Indigo PCI/Cardbus'
+announce PRISM54 - "Intersil Prism GT/Duette/Indigo PCI/Cardbus"
 reject_firmware drivers/net/wireless/prism54/islpci_dev.c
 clean_blob drivers/net/wireless/prism54/islpci_dev.c
 clean_sed '

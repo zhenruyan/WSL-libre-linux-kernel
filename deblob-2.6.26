@@ -1232,7 +1232,7 @@ clean_blob drivers/net/wireless/p54/p54usb.h
 clean_kconfig drivers/net/wireless/p54/Kconfig 'P54_USB'
 clean_mk CONFIG_P54_USB drivers/net/wireless/p54/Makefile
 
-announce PRISM54 - 'Intersil Prism GT/Duette/Indigo PCI/Cardbus'
+announce PRISM54 - "Intersil Prism GT/Duette/Indigo PCI/Cardbus"
 reject_firmware drivers/net/wireless/prism54/islpci_dev.c
 clean_blob drivers/net/wireless/prism54/islpci_dev.c
 clean_sed '

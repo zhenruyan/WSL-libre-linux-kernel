@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=3.0 extra=
+kver=3.0 extra=0++
 
 case $1 in
 --force)
@@ -1043,7 +1043,7 @@ clean_blob drivers/net/starfire.c
 clean_kconfig drivers/net/Kconfig 'ADAPTEC_STARFIRE'
 clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
 
-announce CONFIG_BNA - "Brocade 1010/1020 10Gb Ethernet Driver support"
+announce BNA - "Brocade 1010/1020 10Gb Ethernet Driver support"
 clean_blob drivers/net/bna/bnad.c
 clean_blob drivers/net/bna/cna.h
 reject_firmware drivers/net/bna/cna_fwimg.c

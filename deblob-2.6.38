@@ -1026,7 +1026,7 @@ clean_blob drivers/net/starfire.c
 clean_kconfig drivers/net/Kconfig 'ADAPTEC_STARFIRE'
 clean_mk CONFIG_ADAPTEC_STARFIRE drivers/net/Makefile
 
-announce CONFIG_BNA - "Brocade 1010/1020 10Gb Ethernet Driver support"
+announce BNA - "Brocade 1010/1020 10Gb Ethernet Driver support"
 clean_blob drivers/net/bna/bnad.c
 clean_blob drivers/net/bna/cna.h
 reject_firmware drivers/net/bna/cna_fwimg.c
@@ -1378,7 +1378,7 @@ clean_blob drivers/net/wireless/orinoco/orinoco_usb.c
 clean_kconfig drivers/net/wireless/orinoco/Kconfig 'ORINOCO_USB'
 clean_mk CONFIG_ORINOCO_USB drivers/net/wireless/orinoco/Makefile
 
-announce WLAGS49_H2 - 'Agere Systems HERMES II Wireless PC Card Model 0110'
+announce WLAGS49_H2 - "Agere Systems HERMES II Wireless PC Card Model 0110"
 # Some pieces of the firmware images are most definitely data, but
 # others seem to be code.
 clean_blob drivers/staging/wlags49_h2/ap_h2.c
@@ -1392,7 +1392,7 @@ clean_sed '
 clean_kconfig drivers/staging/wlags49_h2/Kconfig 'WLAGS49_H2'
 clean_mk CONFIG_WLAGS49_H2 drivers/staging/Makefile
 
-announce WLAGS49_H25 - 'Linksys Systems HERMES II.5 Wireless-G_CompactFlash_Card'
+announce WLAGS49_H25 - "Linksys Systems HERMES II.5 Wireless-G_CompactFlash_Card"
 # Some pieces of the firmware images are most definitely data, but
 # others seem to be code.
 clean_blob drivers/staging/wlags49_h2/ap_h25.c
@@ -1502,7 +1502,7 @@ clean_blob drivers/net/wireless/libertas_tf/if_usb.c
 clean_kconfig drivers/net/wireless/Kconfig 'LIBERTAS_THINFIRM_USB'
 clean_mk CONFIG_LIBERTAS_THINFIRM_USB drivers/net/wireless/libertas_tf/Makefile
 
-announce MWL8K - 'Marvell 88W8xxx PCI/PCIe Wireless support'
+announce MWL8K - "Marvell 88W8xxx PCI/PCIe Wireless support"
 reject_firmware drivers/net/wireless/mwl8k.c
 clean_blob drivers/net/wireless/mwl8k.c
 clean_kconfig drivers/net/wireless/Kconfig 'MWL8K'
@@ -1555,7 +1555,7 @@ clean_blob drivers/net/wireless/p54/p54usb.h
 clean_kconfig drivers/net/wireless/p54/Kconfig 'P54_USB'
 clean_mk CONFIG_P54_USB drivers/net/wireless/p54/Makefile
 
-announce PRISM54 - 'Intersil Prism GT/Duette/Indigo PCI/Cardbus'
+announce PRISM54 - "Intersil Prism GT/Duette/Indigo PCI/Cardbus"
 reject_firmware drivers/net/wireless/prism54/islpci_dev.c
 clean_blob drivers/net/wireless/prism54/islpci_dev.c
 clean_kconfig drivers/net/wireless/Kconfig 'PRISM54'
@@ -1605,7 +1605,7 @@ clean_mk CONFIG_RT2870 drivers/staging/rt2870/Makefile
 announce RTL8192CE - "Realtek RTL8192CE/RTL8188SE Wireless Network Adapter"
 reject_firmware drivers/net/wireless/rtlwifi/rtl8192ce/fw.c
 clean_blob drivers/net/wireless/rtlwifi/rtl8192ce/sw.c
-clean_kconfig drivers/net/wireless/rtlwifi RTL8192CE
+clean_kconfig drivers/net/wireless/rtlwifi/Kconfig RTL8192CE
 clean_mk CONFIG_RTL8192CE drivers/net/wireless/rtlwifi/rtl8192ce/Makefile
 
 announce RTL8192E - "RealTek RTL8192E Wireless LAN NIC driver"
