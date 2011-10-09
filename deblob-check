@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-07-24
+# deblob-check version 2011-10-09
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1886,7 +1886,7 @@ set_except () {
     defsnc '[	]static[ ]const[ ]u8[ ]log10\[\][ ]=' drivers/net/wireless/zd1211rw/zd_chip.c
     initnc '[	]static[ ]const[ ]u8[ ]mpeg_hdr_data\[\][ ]='
     initnc '[	]static[ ]const[ ]u8[ ]sdramtype\[13\]\[5\][ ]='
-    initnc '[	]static[ ]const[ ]u8[ ]t\[\][ ]='
+    defsnc '[	]static[ ]const[ ]u8[ ]t\[\][ ]=' drivers/bcma/sprom.c
     initnc '[	]static[ ]const[ ]unsigned[ ]int[ ]avg_pkts\[NCCTRL_WIN\][ ]='
     initnc '[	]static[ ]const[ ]unsigned[ ]short[ ]ac97_defaults\[\][ ]='
     initnc '[	]static[ ]int[ ]exp_lut\[256\][ ]='
@@ -2335,7 +2335,7 @@ set_except () {
     defsnc '[	]struct[ ]jlj_command[ ]start_commands\[\][ ]=' drivers/media/video/gspca/jeilinj.c
     defsnc 'static[ ]u8[ ]init_code\[\]\[2\][ ]=' drivers/media/dvb/dvb-usb/friio-fe.c
     defsnc 'static[ ]const[ ]u8[ ]va1j5jf8007[ts]_\(2[05]mhz_\)\?prepare_bufs\[\]\[2\][ ]=' 'drivers/media/dvb/pt1/va1j5jf8007[st]\.c'
-    accept '[	]\+request_firmware[(][)][ ]will[ ]hit[ ]an[ ]OOPS' drivers/media/dvb/frontends/dib7000p.c
+    accept '[	 ]\+request_firmware[(][)][ ]will[ ]hit[ ]an[ ]OOPS' drivers/media/dvb/frontends/dib7000p.c
     defsnc 'static[ ]long[ ]limiter_times\[\][ ]=' drivers/media/radio/si4713-i2c.c
     blobname 'c[tb]fw\(_\(fc\|cna\)\)\?\.bin' drivers/scsi/bfa/bfad_fwimg.c
     defsnc 'static[ ]const[ ]u16[ ]\(VDCDC[1x]\|LDO[12]\)_VSEL_table\[\][ ]=' 'drivers/regulator/tps650\(23\|7x\)-regulator\.c'
@@ -2607,58 +2607,59 @@ set_except () {
     blob 'Firmware[ ]installation[\n]=\+\([\n]\+[^\n=][^\n]*\)\+\([/]lib[/]firmware[/]brcm\|\.fw\)[^\n]*\([\n][^\n=][^\n]*\)*\([\n][\n][^=\n][^\n]*[\n][^=\n][^\n]*\([\n][^\n=][^\n]*\)*\)*' 'drivers/staging/brcm80211\(/brcmfmac\)\?/README'
     defsnc '[	]u16[ ]nrate_list\[4\]\[8\][ ]=' drivers/staging/brcm80211/brcmfmac/wl_iw.c
     defsnc 'static[ ]chan_info_basic_t[ ]chan_info_all\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_cmn.c
-    defsnc 'u16[ ]ltrn_list\[PHY_LTRN_LIST_LEN\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_cmn.c
-    defsnc 's8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_cmn.c
-    defsnc 'lcnphy_rx_iqcomp_t[ ]lcnphy_rx_iqcomp_table_rev0\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_lcn.c
-    defsnc 'static[ ]const[ ]u32[ ]lcnphy_23bitgaincode_table\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_lcn.c
-    defsnc 'static[ ]const[ ]s8[ ]lcnphy_gain_table\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_lcn.c
-    defsnc 'static[ ]const[ ]s8[ ]lcnphy_gain_index_offset_for_rssi\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_lcn.c
-    defsnc 'static[ ]chan_info_2064_lcnphy_t[ ]chan_info_2064_lcnphy\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_lcn.c
-    defsnc 'lcnphy_radio_regs_t[ ]lcnphy_radio_regs_2064\[\][ ]='     defsnc 's8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_lcm.c
-    defsnc 'u16[ \n]*LCNPHY_txdigfiltcoeffs_\(cck\|ofdm\)\[LCNPHY_NUM_TX_DIG_FILTERS_\(CCK\|OFDM\)\][ \n]*\[LCNPHY_NUM_DIG_FILT_COEFFS[ ][+][ ]1\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_lcn.c
-    defsnc 'nphy_ipa_txrxgain_t[ ]nphy_ipa_rxcal_gaintbl_2GHz\(_rev7\)\?\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_n.c
-    defsnc 'static[ ]chan_info_nphy_\(radio\)\?205[5x7]\(_rev5\)\?_t[ ]chan_info_nphy\(rev[3-9]\(n6\)\?\)\?_205[5-7]\(_A1\|v\([5-8]\|11\)\|_rev[4-8]\(v1\)\?\)\?\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_n.c
-    defsnc 'radio_\(20xx_\)\?regs_t[ ]regs_\(SYN_\|[RT]X_\)\?205[5-7]\(_A1\|_rev\([4-8]\|11\)\(v1\)\?\)\?\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_n.c
-    defsnc 'static[ ]const[ ]u16[ ]tbl_iqcal_gainparams_nphy\[2\]\[NPHY_IQCAL_NUMGAINS\]\[8\][ ]=' drivers/staging/mrcm80211/phy/wlc_phy_n.c
-    defsnc 'static[ ]\(const[ ]\)\?u32[ ]nphy_tpc_\(5GHz_\)\?txgain\(_[ei]pa\)\?\(\(_[25]g\)\?\(_\(2057\)\?\(rev\([3-7]\|4n6\)\?\)\?\)\?\|_HiPwrEPA\)\?\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_n.c
-    defsnc 'static[ ]const[ ]u16[ ]nphy_tpc_loscale\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_n.c
-    defsnc 'static[ ]u8[ ]pad_all_gain_codes_2057\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_n.c
-    defsnc 'static[ ]u32[ ]nphy_papd_scaltbl\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_n.c
-    defsnc '[	]s32[ ]poll_results\[8\]\[4\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_n.c
-    defsnc '[	]nphy_txiqcal_ladder_t[ ]ladder_\(lo\|iq\)\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_n.c
-    defsnc 'const[ ]u32[ ]dot11lcn_gain_\(idx_\|val_\)\?tbl_\(rev[01]\|\(extlna_\)\?2G\|5G\)\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]u16[ ]dot11lcn_aux_gain_idx_tbl_\(rev0\|\(extlna_\)\?2G\)\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]u32[ ]dot11lcn_aux_gain_idx_tbl_5G\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]u8[ ]dot11lcn_gain_val_tbl_\(rev0\|\(extlna_\)\?2G\)\[\][ ]=' drivers/stagingg/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]u16[ ]dot11lcn_\(min_sig_sq\|noise_scale\)_tbl_rev0\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]u16[ ]dot11lcn_sw_ctrl_tbl_\(4313_\)\?\(bt_\)\?\(epa_\)\?\(p250_\)\?rev0\(_combo\)\?\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]u8[ ]dot11lcn_spur_tbl_rev0\[\][ ]=' drivers/stagingg/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]u16[ ]dot11lcn_\(unsup_mcs\|iq_local\)_tbl_rev0\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]lcnphy_tx_gain_tbl_entry[ ]dot11lcnphy_[25]GHz_\(extPA_\)\?gaintable_rev0\[128\][ ]='  drivers/staging/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]u32[ ]dot11lcn_papd_compdelta_tbl_rev0\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_lcn.c
-    defsnc 'const[ ]u32[ ]frame_struct_rev[03]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u8[ ]frame_lut_rev[03]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u32[ ]\(tmap\|tdtrn\)_tbl_rev[037]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u16[ ]pilot_tbl_rev[03]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u32[ ]tdi_tbl[24]0_ant[01]_rev[03]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u32[ ]chanest_tbl_rev[03]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u8[ ]mcs_tbl_rev0\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u32[ ]noise_var_tbl[01]\?_rev[037]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u8[ ]\(est\|adj\)_pwr_lut_core[01]_rev[03]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u32[ ]\(gainctrl\|iq\)_lut_core[01]_rev[03]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u16[ ]loft_lut_core[01]_rev[03]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u16[ ]ant_swctrl_tbl_rev3\(_[1-3]\)\?\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u16[ ]mcs_tbl_rev3\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u16[ ]papd_comp_rfpwr_tbl_core[01]_rev3\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
-    defsnc 'const[ ]u32[ ]papd_\(comp_epsilon\|cal_scalars\)_tbl_core[01]_rev[37]\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phytbl_n.c
+    defsnc 'u16[ ]ltrn_list\[PHY_LTRN_LIST_LEN\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_cmn\.c\|brcmsmac/phy/phy_cmn\.c\)'
+    defsnc 's8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_cmn\.c\|brcmsmac/phy/phy_cmn\.c\)'
+    defsnc 'lcnphy_rx_iqcomp_t[ ]lcnphy_rx_iqcomp_table_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'static[ ]const[ ]u32[ ]lcnphy_23bitgaincode_table\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'static[ ]const[ ]s8[ ]lcnphy_gain_table\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'static[ ]const[ ]s8[ ]lcnphy_gain_index_offset_for_rssi\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'static[ ]chan_info_2064_lcnphy_t[ ]chan_info_2064_lcnphy\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'lcnphy_radio_regs_t[ ]lcnphy_radio_regs_2064\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 's8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'u16[ \n]*LCNPHY_txdigfiltcoeffs_\(cck\|ofdm\)\[LCNPHY_NUM_TX_DIG_FILTERS_\(CCK\|OFDM\)\][ \n]*\[LCNPHY_NUM_DIG_FILT_COEFFS[ ][+][ ]1\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'nphy_ipa_txrxgain_t[ ]nphy_ipa_rxcal_gaintbl_2GHz\(_rev7\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]chan_info_nphy_\(radio\)\?205[5x7]\(_rev5\)\?_t[ ]chan_info_nphy\(rev[3-9]\(n6\)\?\)\?_205[5-7]\(_A1\|v\([5-8]\|11\)\|_rev[4-8]\(v1\)\?\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'radio_\(20xx_\)\?regs_t[ ]regs_\(SYN_\|[RT]X_\)\?205[5-7]\(_A1\|_rev\([4-8]\|11\)\(v1\)\?\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]const[ ]u16[ ]tbl_iqcal_gainparams_nphy\[2\]\[NPHY_IQCAL_NUMGAINS\]\[8\][ ]=' 'drivers/staging/mrcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]\(const[ ]\)\?u32[ ]nphy_tpc_\(5GHz_\)\?txgain\(_[ei]pa\)\?\(\(_[25]g\)\?\(_\(2057\)\?\(rev\([3-7]\|4n6\)\?\)\?\)\?\|_HiPwrEPA\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]const[ ]u16[ ]nphy_tpc_loscale\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]u8[ ]pad_all_gain_codes_2057\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]u32[ ]nphy_papd_scaltbl\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc '[	]s32[ ]poll_results\[8\]\[4\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc '[	]nphy_txiqcal_ladder_t[ ]ladder_\(lo\|iq\)\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'const[ ]u32[ ]dot11lcn_gain_\(idx_\|val_\)\?tbl_\(rev[01]\|\(extlna_\)\?2G\|5G\)\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u16[ ]dot11lcn_aux_gain_idx_tbl_\(rev0\|\(extlna_\)\?2G\)\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u32[ ]dot11lcn_aux_gain_idx_tbl_5G\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u8[ ]dot11lcn_gain_val_tbl_\(rev0\|\(extlna_\)\?2G\)\[\][ ]=' 'drivers/stagingg/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u16[ ]dot11lcn_\(min_sig_sq\|noise_scale\)_tbl_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u16[ ]dot11lcn_sw_ctrl_tbl_\(4313_\)\?\(bt_\)\?\(epa_\)\?\(p250_\)\?rev0\(_combo\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u8[ ]dot11lcn_spur_tbl_rev0\[\][ ]=' 'drivers/stagingg/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u16[ ]dot11lcn_\(unsup_mcs\|iq_local\)_tbl_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]lcnphy_tx_gain_tbl_entry[ ]dot11lcnphy_[25]GHz_\(extPA_\)\?gaintable_rev0\[128\][ ]='  'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u32[ ]dot11lcn_papd_compdelta_tbl_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u32[ ]frame_struct_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u8[ ]frame_lut_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]\(tmap\|tdtrn\)_tbl_rev[037]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]pilot_tbl_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]tdi_tbl[24]0_ant[01]_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]chanest_tbl_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u8[ ]mcs_tbl_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]noise_var_tbl[01]\?_rev[037]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u8[ ]\(est\|adj\)_pwr_lut_core[01]_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]\(gainctrl\|iq\)_lut_core[01]_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]loft_lut_core[01]_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]ant_swctrl_tbl_rev3\(_[1-3]\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]mcs_tbl_rev3\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]papd_comp_rfpwr_tbl_core[01]_rev3\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]papd_\(comp_epsilon\|cal_scalars\)_tbl_core[01]_rev[37]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
     blobname 'brcm[/]bcm43xx' drivers/staging/brcm80211/sys/wl_mac80211.c
     blobname '%s\(_hdr\)\?-%d\.fw' drivers/staging/brcm80211/sys/wl_mac80211.c
-    defsnc 'static[ ]const[ ]u8[ ]crc8_table\[256\][ ]=' drivers/staging/brcm80211/util/bcmutils.c
-    defsnc 'static[ ]const[ ]u16[ ]crc16_table\[256\][ ]=' drivers/staging/brcm80211/util/bcmutils.c
-    defsnc 'static[ ]const[ ]u32[ ]crc32_table\[256\][ ]=' drivers/staging/brcm80211/util/bcmutils.c
+    defsnc 'static[ ]const[ ]u8[ ]crc8_table\[256\][ ]=' 'drivers/staging/brcm80211/\(util/bcmutils\.c\|brcmutil/utils\.c\)'
+    defsnc 'static[ ]const[ ]u16[ ]crc16_table\[256\][ ]=' 'drivers/staging/brcm80211/\(util/bcmutils\.c\|brcmutil/utils\.c\)'
+    defsnc 'static[ ]const[ ]u32[ ]crc32_table\[256\][ ]=' 'drivers/staging/brcm80211/\(util/bcmutils\.c\|brcmutil/utils\.c\)'
     defsnc 'static[ ]const[ ]pmu0_xtaltab0_t[ ]pmu0_xtaltab0\[\][ ]=' drivers/staging/brcm80211/util/hndpmu.c
     defsnc 'static[ ]const[ ]pmu1_xtaltab0_t[ ]pmu1_xtaltab0\(_880\(_4329\)\?\|_1760\|_1440\|_960\)\[\][ ]=' drivers/staging/brcm80211/util/hndpmu.c
-    defsnc 'static[ ]const[ ]s16[ ]log_table\[\][ ]=' drivers/staging/brcm80211/util/qmath.c
+    defsnc 'static[ ]const[ ]s16[ ]log_table\[\][ ]=' 'drivers/staging/brcm80211/\(util/qmath\.c\|brcmsmac/phy/phy_qmath\.c\)'
     blobname 'ft[12]000\.img' drivers/staging/ft1000/ft1000-pcmcia/ft1000_hw.c
     blobname 'ft3000\.img' drivers/staging/ft1000/ft1000-usb/ft1000_usb.c
     defsnc '[ ][ ][ ][ ]u8[ ]ConnectionMsg\[\][ ]='  drivers/staging/ft1000/ft1000-usb/ft1000_chdev.c
@@ -2707,7 +2708,7 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]cckswing_table_ch\(1ch13\|14\)\[CCK_TABLE_SIZE\]\[8\][ ]=' drivers/net/wireless/rtlwifi/rtl8192ce/dm.c
     blobname 'rtlwifi[/]rtl8192cfw\.bin' drivers/net/wireless/rtlwifi/rtl8192ce/sw.c
     # This looks like pure data.
-    defsnc 'static[ ]u8[ ]reserved_page_packet\[TOTAL_RESERVED_PKT_LEN\][ ]=' drivers/net/wireless/rtlwifi/rtl8192ce/fw.c
+    defsnc 'static[ ]u8[ ]reserved_page_packet\[TOTAL_RESERVED_PKT_LEN\][ ]=' 'drivers/net/wireless/rtlwifi/rtl8192[cd]e/fw.c'
     defsnc 'u32[ ]RTL8192CE\(PHY_REG\|_\?RADIO[AB]\|MAC\|AGCTAB\)_\([21]T_\?ARRAY\|ARRAY_PG\)\[\(PHY_REG\|RADIO[AB]\|MAC\|AGCTAB\)_\([21]T_\?ARRAY_\?\|ARRAY_PG\)LENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192ce/table.c
     defsc 'static[ ]const[ ]struct[ ]ar9300_eeprom[ ]ar9300_[hx]11[236][ ]=' drivers/net/wireless/ath/ath9k/ar9003_eeprom.c
     defsnc 'static[ ]const[ ]struct[ ]b43_nphy_channeltab_entry_rev3[ ]b43_nphy_channeltab_rev\([34568]\|7_9\)\[\][ ]=' drivers/net/wireless/b43/radio_2056.c
@@ -2784,7 +2785,7 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]BIT_REVERSE_TABLE\[256\][ ]=' sound/usb/6fire/firmware.c
     initnc '[/][*][\n][ ][*][ ]\(cfa_coef\|gamma\|luma_enhance\|noise_filter\)_table\.h[\n][ ][*]\([^\n]*[\n][ ][*]\)*[/]' 'drivers/media/video/omap3isp/\(cfa_coef\|gamma\|luma_enhance\|noise_filter\)_table\.h'
     blobna 'rocess_sigma_firmwar'
-    defsnc 'int[ ]process_sigma_firmware[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*request_firmware' drivers/firmware/sigma.c
+    defsnc 'int[ ]process_sigma_firmware[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*\(request\|maybe_reject\)_firmware' drivers/firmware/sigma.c
     accept 'EXPORT_SYMBOL[(]process_sigma_firmware[)]' drivers/firmware/sigma.c
     accept 'extern[ ]int[ ]process_sigma_firmware[(][^)]*[)][;]' include/linux/sigma.h
     blobname 'maxtouch\.fw' drivers/input/touchscreen/atmel_mxt_ts.c
@@ -2845,16 +2846,240 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]tg3_tso_header\[\][ ]=' drivers/net/tg3.c
     blobname 'ath6k[/]AR6003[/]hw2\.1\.1[/]\(otp\|athwlan\|athtcmd_ram\|device\|data\.patch\|endpointping\|bdata\.\(SD3[12]\|WB31\|CUSTOM\)\)\.bin' drivers/staging/ath6kl/os/linux/include/ar6000_drv.h
     accept '[	]nvc0_graph_init_fuc[(]dev[,][ ]0x4\(09\|1a\)000[,][ ][&]priv->fuc4\(09\|1a\)c[,][ ][&]priv->fuc4\(09\|1a\)d[)][;]' drivers/gpu/drm/nouveau/nvc0_graph.c
-    accept '[	]nvc0_graph_destroy_fw[(]&priv->fuc4\(09\|1a\)[cd][)][;]' drivers/gpu/drm/nouveau/nvc0_graph.c
-    accept '[	]\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvc0_graph.c
+    accept '[	][	 ]*nvc0_graph_destroy_fw[(]&priv->fuc4\(09\|1a\)[cd][)][;]' drivers/gpu/drm/nouveau/nvc0_graph.c
+    accept '[	][	 ]*\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'nouveau[/]\(nv%02x_\)\?%s' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'radeon[/]SUMO2\?_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
     blobname 'iwlwifi-\(105\|20[03]0\)-' drivers/net/iwlwifi/iwl-2000.c
     blobname '__stringify[(]api[)][ ]["]\.ucode["]' 'drivers/net/iwlwifi/iwl-\(3945.h\|\(4965\|[1256]000\)\.c\)'
-  ;;
+    # New in 3.1
+    blobname 'sdma-imx25\.bin' arch/arm/mach-imx/mm-imx25.c
+    blobname 'sdma-imx31-to[12]\.bin' arch/arm/mach-imx/mm-imx31.c
+    blobname 'sdma-imx35-to[12]\.bin' arch/arm/mach-imx/mm-imx35.c
+    blobname 'sdma-imx5[13]\.bin' arch/arm/mach-mx5/mm.c
+    blobname 'brcm[/]bcm43xx' drivers/staging/brcm80211/brcmsmac/mac80211_if.c
+    blobname '%s\(_hdr\)\?-%d\.fw' drivers/staging/brcm80211/brcmsmac/mac80211_if.c
+    blobname 'brcm[/]bcm4329-fullmac-4\.\(bin\|txt\)' drivers/staging/brcm80211/brcmfmac/bcmchip.h
+    blobname 'mrvl[/]sd8787_uapsta\.bin' drivers/net/wireless/mwifiex/sdio.h
+    defsnc 'static[ ]int[ ]omap3_batt_table\[\][ ]=' arch/arm/mach-omap2/twl-common.c
+    defsnc '[	]static[ ]u8[ ]InitRegs\[\][ ]=' drivers/media/dvb/frontends/tda18271c2dd.c
+    defsnc 'static[ ]struct[ ]SMapI[ ]m_RF_Cal_Map\[\][ ]=' drivers/media/dvb/frontends/tda18271c2dd_maps.h
+    defsnc 'static[ ]struct[ ]SMap2[ ]m_\(Main\|Cal\)_PLL_Map\[\][ ]=' drivers/media/dvb/frontends/tda18271c2dd_maps.h
+    accept '[	][ ][ ]For[ ]example,[ ]you[ ]might[ ]set[ ]CONFIG_EXTRA_FIRMWARE=["]whatever\.bin["]' drivers/base/Kconfig
+    accept '[	][ ][ ]Then[ ]any[ ]request_firmware[(]\(["]whatever\.bin["]\)[)]' drivers/base/Kconfig
+    blobname 'dvb-fe-xc4000-1.4.fw' drivers/media/common/tuners/xc4000.c
+    defsnc 'static[ ]struct[ ]SMap2\?[ ]*m_\(GainTaper\|RF_Cal_DC_Over_DT\|CID_Target\)_Map\[\][ ]=' drivers/media/dvb/frontends/tda18271c2dd_maps.h
+    defsnc '[	][}][ ]regs\[\][ ]=' drivers/media/video/em28xx/em28xx-dvb.c
+    defsnc 'static[ ]struct[ ]regval_list[ ]ov5642_default_regs_\(init\|finalise\)\[\][ ]=' drivers/media/video/ov5642.c
+    defsnc 'static[ ]const[ ]u8[ ]hdmiphy_conf\(27\|74\(_175\|_25\)\|148_5\)\[32\][ ]=' drivers/media/video/s5p-tv/hdmiphy_drv.c
+    defsnc 'static[ ]const[ ]u8[ ]filter_y_vert_tap4\[\][ ]=' drivers/media/video/s5p-tv/mixer_reg.c
+    defsnc '[	]static[ ]const[ ]char[ ][*][ ]const[ ]vui_sar_idc\[\][ ]=' drivers/media/video/v4l2-ctrls.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9331_\(1p[12]_\(baseband\|mac\)_postamble\|modes_\(low\(est\)\?\|high\)_\(ob_db\|power\)_tx_gain_1p[12]\)\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9330_1p1_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9331_\(1p[12]_\(radio\|baseband\|mac\)_core\|common_\(wo_xlna_\)\?rx_gain_1p[12]\)\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9330_1p1_initvals.h
+    defsnc 'static[ ]const[ ]u\(16\|32\)[ ]b43_httab_0x\(1[2abcf]\(_0x\(1\?c\|[12]4\)0\)\?\|2[0-7]\)\[\][ ]=' drivers/net/wireless/b43/tables_phy_ht.c
+    defsnc 'static[ ]u32[ ]targetchnl_5g\[TARGET_CHNL_NUM_5G\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/phy.c
+    defsnc '[	]u8[ ]channel_\(5g\|all\|info\)\[\(45\|59\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/phy.c
+    blobname 'rtlwifi[/]rtl8192defw[.]bin' drivers/net/wireless/rtlwifi/rtl8192de/sw.c
+    defsnc 'u32[ ]rtl8192de_\(phy_reg\|radio[ab]\|mac\|agctab\)_\(\(2t\(_int_pa\)\?\|[25]g\)\?array\|array_pg\)\[\(PHY_REG\|RADIO[AB]\|MAC\|AGCTAB\)_\(\(2T\(_INT_PA\)\?_\|[25]G_\)\?ARRAY\|ARRAY_PG_\)LENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/table.c
+    defsnc 'static[ ]struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_cmn.c
+    defsnc 'struct[ ]lcnphy_rx_iqcomp[ ]lcnphy_rx_iqcomp_table_rev0\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_lcn.c
+    defsnc 'static[ ]struct[ ]chan_info_2064_lcnphy[ ]chan_info_2064_lcnphy\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_lcn.c
+    defsnc 'struct[ ]lcnphy_radio_regs[ ]lcnphy_radio_regs_2064\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_lcn.c
+    defsnc 'u16[]LCNPHY_txdigfiltcoeffs_\(cck\|ofdm\)\[LCNPHY_NUM_TX_DIG_FILTERS_\(CCK\|OFDM\)\][\n 	]*\[LCNPHY_NUM_DIG_FILT_COEFFS[ ][+][ ]1\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_lcn.c
+    defsnc 'struct[ ]nphy_ipa_txrxgain[ ]nphy_ipa_rxcal_gaintbl_2GHz\(_rev7\)\?\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'static[ ]struct[ ]chan_info_nphy_2055[ ]chan_info_nphy_2055\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'static[ ]struct[ ]chan_info_nphy_radio205x[ ]chan_info_nphyrev\(3_2056\|4_2056_A1\|5_2056v5\|6_2056v6\|5n6_2056v7\|6_2056v\(8\|11\)\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'static[ ]struct[ ]chan_info_nphy_radio2057[ ]chan_info_nphyrev\(7_2057_rev4\|8_2057_rev[78]\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'static[ ]struct[ ]chan_info_nphy_radio2057_rev5[ ]chan_info_nphyrev\(8_2057_rev5\|9_2057_rev5v1\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'struct[ ]radio_\(20xx_\)\?regs[ ]regs_\(2055\|\(SYN\|[TR]X\)_205\(6\(_A1\|_rev\([5678]\|11\)\)\?\)\|2057_rev\([4578]\|5v1\)\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc '[	]struct[ ]nphy_txiqcal_ladder[ ]ladder_\(lo\|iq\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'const[ ]struct[ ]lcnphy_tx_gain_tbl_entry[ \n]dot11lcnphy_[25]GHz_\(extPA_\)\?gaintable_rev0\[128\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phytbl_lcn.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]raw_edid\[\][ ]=' drivers/staging/gma500/mrst_hdmi.c
+    defsnc 'static[ ]const[ ]u8[ ]net2272_test_packet\[\][ ]=' drivers/usb/gadget/net2272.c
+    defsnc 'static[ ]const[ ]unsigned[ ]short[ ]seq_setting\[\][ ]=' drivers/video/backlight/ams369fg06.c
+    defsnc 'static[ ]u8[ ]adav80x_default_regs\[\][ ]=' sound/soc/codecs/adav80x.c
+    defsnc 'static[ ]const[ ]u8[ ]sta32x_regs\[STA32X_REGISTER_COUNT\][ ]=' sound/soc/codecs/sta32x.c
+    defsnc '[}][ ]mclk_ratios\[3\]\[7\][ ]=' sound/soc/codecs/sta32x.c
+    defsnc 'static[ ]const[ ]int[ ]vid_to_voltage\[32\][ ]=' tools/power/cpupower/debug/i386/dump_psb.c
+    blobname 'dvb-usb-terratec-h5-drxk\.fw' drivers/media/video/em28xx/em28xx-dvb.c
+    blobname 's5pc110-mfc\.fw' drivers/media/video/s5p-mfc/s5p_mfc_ctrl.c
+    blobname 'adau1701\.bin' sound/soc/codecs/adau1701.c
+    accept '[	]return[ ]process_sigma_firmware[(]codec->control_data[,][ ]ADAU1701_FIRMWARE[)]' sound/soc/codecs/adau1701.c
+    # Sources for these are in the corresponding .fuc files.
+    defsnc 'uint32_t[ ]nvc0_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_grgpc.fuc.h
+    defsnc 'uint32_t[ ]nvc0_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_grhub.fuc.h
+    defsnc '[	][	][	]interrupts[ ]=[ ]<\([\n][	]*0x[ef][0-9a-f][ ]0[ ]0[ ]0\)*>[;]' 'arch/powerpc/boot/dts/p\(2040\|3041\|4080\|5020\)si\.dtsi'
+    blobname 'dvb-netup-altera-04\.fw' drivers/media/video/cx23885/cx23885-cards.c
+    blobname 'rtl_nic[/]rtl8168e-3\.fw' drivers/net/r8169.c
+    defsnc '[	]static[ ]const[ ]struct[ ]ephy_info[ ]e_info_8168e_1\[\][ ]=' drivers/net/r8169.c
+    blobname 'iwlwifi-135-' drivers/net/iwlwifi/iwl-2000.c
+    blobname 'c[bt]2\?fw\(_\(fc\|cna\)\)\?\.bin' drivers/scsi/bfa/bfad.c
+    blobname 'ene-ub6250[/]\(ms_\(init\|rdwr\)\|msp_rdwr\)\.bin' drivers/usb/storage/ene_ub6250.c
+    accept '[	][	]*dsp_code->pvt->firmware[ ]=[ ]' sound/pci/asihpi/hpidspcd.c
+    ;;
 
   */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
+    ;;
+
+  */patch*-3.1-rc*)
+    defsnc '[	]static[ ]const[ ]u8[ ]t\[\][ ]=' drivers/bcma/sprom.c
+    accept '[	 ]\+request_firmware[(][)][ ]will[ ]hit[ ]an[ ]OOPS' drivers/media/dvb/frontends/dib7000p.c
+    defsnc 'static[ ]u8[ ]reserved_page_packet\[TOTAL_RESERVED_PKT_LEN\][ ]=' 'drivers/net/wireless/rtlwifi/rtl8192[cd]e/fw\.c'
+    defsnc 'u16[ ]ltrn_list\[PHY_LTRN_LIST_LEN\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_cmn\.c\|brcmsmac/phy/phy_cmn\.c\)'
+    defsnc 's8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_cmn\.c\|brcmsmac/phy/phy_cmn\.c\)'
+    defsnc 'lcnphy_rx_iqcomp_t[ ]lcnphy_rx_iqcomp_table_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'static[ ]const[ ]u32[ ]lcnphy_23bitgaincode_table\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'static[ ]const[ ]s8[ ]lcnphy_gain_table\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'static[ ]const[ ]s8[ ]lcnphy_gain_index_offset_for_rssi\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'static[ ]chan_info_2064_lcnphy_t[ ]chan_info_2064_lcnphy\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'lcnphy_radio_regs_t[ ]lcnphy_radio_regs_2064\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 's8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'u16[ \n]*LCNPHY_txdigfiltcoeffs_\(cck\|ofdm\)\[LCNPHY_NUM_TX_DIG_FILTERS_\(CCK\|OFDM\)\][ \n]*\[LCNPHY_NUM_DIG_FILT_COEFFS[ ][+][ ]1\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'lcnphy_radio_regs_t[ ]lcnphy_radio_regs_2064\[\][ ]='     defsnc 's8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'u16[ \n]*LCNPHY_txdigfiltcoeffs_\(cck\|ofdm\)\[LCNPHY_NUM_TX_DIG_FILTERS_\(CCK\|OFDM\)\][ \n]*\[LCNPHY_NUM_DIG_FILT_COEFFS[ ][+][ ]1\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
+    defsnc 'nphy_ipa_txrxgain_t[ ]nphy_ipa_rxcal_gaintbl_2GHz\(_rev7\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]chan_info_nphy_\(radio\)\?205[5x7]\(_rev5\)\?_t[ ]chan_info_nphy\(rev[3-9]\(n6\)\?\)\?_205[5-7]\(_A1\|v\([5-8]\|11\)\|_rev[4-8]\(v1\)\?\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'radio_\(20xx_\)\?regs_t[ ]regs_\(SYN_\|[RT]X_\)\?205[5-7]\(_A1\|_rev\([4-8]\|11\)\(v1\)\?\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]const[ ]u16[ ]tbl_iqcal_gainparams_nphy\[2\]\[NPHY_IQCAL_NUMGAINS\]\[8\][ ]=' 'drivers/staging/mrcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]\(const[ ]\)\?u32[ ]nphy_tpc_\(5GHz_\)\?txgain\(_[ei]pa\)\?\(\(_[25]g\)\?\(_\(2057\)\?\(rev\([3-7]\|4n6\)\?\)\?\)\?\|_HiPwrEPA\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]const[ ]u16[ ]nphy_tpc_loscale\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]u8[ ]pad_all_gain_codes_2057\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'static[ ]u32[ ]nphy_papd_scaltbl\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc '[	]s32[ ]poll_results\[8\]\[4\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc '[	]nphy_txiqcal_ladder_t[ ]ladder_\(lo\|iq\)\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc 'const[ ]u32[ ]dot11lcn_gain_\(idx_\|val_\)\?tbl_\(rev[01]\|\(extlna_\)\?2G\|5G\)\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u16[ ]dot11lcn_aux_gain_idx_tbl_\(rev0\|\(extlna_\)\?2G\)\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u32[ ]dot11lcn_aux_gain_idx_tbl_5G\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u8[ ]dot11lcn_gain_val_tbl_\(rev0\|\(extlna_\)\?2G\)\[\][ ]=' 'drivers/stagingg/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u16[ ]dot11lcn_\(min_sig_sq\|noise_scale\)_tbl_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u16[ ]dot11lcn_sw_ctrl_tbl_\(4313_\)\?\(bt_\)\?\(epa_\)\?\(p250_\)\?rev0\(_combo\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u8[ ]dot11lcn_spur_tbl_rev0\[\][ ]=' 'drivers/stagingg/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u16[ ]dot11lcn_\(unsup_mcs\|iq_local\)_tbl_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]lcnphy_tx_gain_tbl_entry[ ]dot11lcnphy_[25]GHz_\(extPA_\)\?gaintable_rev0\[128\][ ]='  'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u32[ ]dot11lcn_papd_compdelta_tbl_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'const[ ]u32[ ]frame_struct_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u8[ ]frame_lut_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]\(tmap\|tdtrn\)_tbl_rev[037]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]pilot_tbl_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]tdi_tbl[24]0_ant[01]_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]chanest_tbl_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u8[ ]mcs_tbl_rev0\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]noise_var_tbl[01]\?_rev[037]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u8[ ]\(est\|adj\)_pwr_lut_core[01]_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]\(gainctrl\|iq\)_lut_core[01]_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]loft_lut_core[01]_rev[03]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]ant_swctrl_tbl_rev3\(_[1-3]\)\?\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]mcs_tbl_rev3\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u16[ ]papd_comp_rfpwr_tbl_core[01]_rev3\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'const[ ]u32[ ]papd_\(comp_epsilon\|cal_scalars\)_tbl_core[01]_rev[37]\[\][ ]=' 'drivers/staging/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phytbl_n\.c\)'
+    defsnc 'static[ ]const[ ]u8[ ]crc8_table\[256\][ ]=' 'drivers/staging/brcm80211/\(util/bcmutils\.c\|brcmutil/utils\.c\)'
+    defsnc 'static[ ]const[ ]u16[ ]crc16_table\[256\][ ]=' 'drivers/staging/brcm80211/\(util/bcmutils\.c\|brcmutil/utils\.c\)'
+    defsnc 'static[ ]const[ ]u32[ ]crc32_table\[256\][ ]=' 'drivers/staging/brcm80211/\(util/bcmutils\.c\|brcmutil/utils\.c\)'
+    defsnc 'static[ ]const[ ]s16[ ]log_table\[\][ ]=' 'drivers/staging/brcm80211/\(util/qmath\.c\|brcmsmac/phy/phy_qmath\.c\)'
+    defsnc '[	]unsigned[ ]char[ ]data_ptr\[36\][ ]=' drivers/usb/storage/ene_ub6250.c
+    defsnc '[ ][ ]static[ ]\(const[ ]\)\?unsigned[ ]char[ ]asso_values\[\][ ]=' scripts/genksyms/keywords.c_shipped
+    defsnc 'static[ ]yyconst[ ]\(flex_int\(16\|32\)_t\|\(\(short[ ]\)\?int\)\)[ ]yy_[^[]*\[[][0-9]*\][ ]='
+    defsnc 'static[ ]const[ ]\(yytype_u\?int\(8\|16\)\|\(unsigned[ ]\)\?\(short\([ ]int\)\?\|char\)\)[ ]yy[^[]*\[\][ ]='
+    defsnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]struct[ ]cipher_testvec[ ]\(aes\|anubis\|bf\|camellia\|cts_mode\|des3_ede\|cast6\|salsa20_stream\|serpent\|tf\|tnepres\|xeta\|x\?tea\)\(_\(cbc\|ctr\|xts\)\)\?_\(enc\|dec\)_tv_template\[\][ ]=[ ][{][*][/][;]' 'crypto/\(tcrypt\|testmgr\).h'
+    accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]config[ ]FIRMWARE_IN_KERNEL[*][/][;].*let[ ]firmware[ ]be[ ]loaded[ ]from[ ]userspace\.' drivers/base/Kconfig
+    accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\(static[ ]int[\n ]\)\?_request_firmware[(]const[ ]struct[ ]firmware[ ][*][*]firmware_p,' drivers/base/firmware_class.c
+    accept '[	 ]*and[ ]request_firmware[(][)][ ]in[ ]the[ ]source' drivers/base/Kconfig
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]vp7045_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/vp7045.c
+    defsnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]struct[ ]ov9740_reg[ ]ov9740_defaults\[\][ ]=\([ ][{][*][/][;]\)\?' drivers/media/video/ov9740.c
+    defsnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u32[ ]ar9300_2p[02]_\(radio\|mac\|baseband\)_postamble\[\]\[5\][ ]=\([ ][{][*][/][;]\)\?' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
+    # for reverse patch
+    defsnc 'static[ ]int[ ]sdp3430_batt_table\[\][ ]=' arch/arm/mach-omap2/board-3430sdp.c
+    defsnc 'static[ ]int[ ]zoom_batt_table\[\][ ]=' arch/arm/mach-omap2/board-zoom-peripherals.c
+    accept '[	][ ][ ]So,[ ]for[ ]example,[ ]you[ ]might[ ]set[ ]CONFIG_EXTRA_FIRMWARE=["]whatever\.bin["]' drivers/base/Kconfig
+    accept '[	][ ][ ]kernel\.[ ]Then[ ]any[ ]request_firmware[(]\(["]whatever\.bin["]\)[)]' drivers/base/Kconfig
+    accept '[	]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,]' drivers/firmware/sigma.c
+    accept '[	][	]pr_debug[(]["]%s:[ ]request_firmware[(][)][ ]failed' drivers/firmware/sigma.c
+    defsnc '[	]u16[ ]nrate_list\[4\]\[8\][ ]=' drivers/staging/brcm80211/brcmfmac/wl_iw.c
+    defsnc 'static[ ]chan_info_basic_t[ ]chan_info_all\[\][ ]=' drivers/staging/brcm80211/phy/wlc_phy_cmn.c
+    defsnc 'static[ ]const[ ]pmu0_xtaltab0_t[ ]pmu0_xtaltab0\[\][ ]=' drivers/staging/brcm80211/util/hndpmu.c
+    defsnc 'static[ ]const[ ]pmu1_xtaltab0_t[ ]pmu1_xtaltab0\(_880\(_4329\)\?\|_1760\|_1440\|_960\)\[\][ ]=' drivers/staging/brcm80211/util/hndpmu.c
+    accept '[;]set[ ]executable[ ]["]2232\.bin["]' drivers/char/ser_a2232fw.ax
+    defsnc 'static[ ]unsigned[ ]char[ ]a2232_65EC02code\[\][ ]=' drivers/staging/generic_serial/ser_a2232fw.h
+    defsnc '[	]BYTE[ ]data_ptr\[36\][ ]=' 'drivers/staging/keucr/\(ms\|s[dm]\)scsi\.c'
+    defsnc 'static[ ]word[ ]convert_8_to_16_tbl\[256\][ ]=' drivers/staging/msm/ebi2_tmd20.c
+    defsnc 'static[ ]struct[ ]sharp_spi_data[ ]init_sequence\[\][ ]=' drivers/staging/msm/lcdc_sharp_wvga_pt.c
+    defsnc 'static[ ]uint32[ ]vg_qseed_table2\[\][ ]=' drivers/staging/msm/mdp4_util.c
+    defsnc 'char[ ]gc_lut\[\][ ]=' drivers/staging/msm/mdp4_util.c
+    defsnc 'uint32[ ]igc_\(video\|rgb\)_lut\[\][ ]=' drivers/staging/msm/mdp4_util.c
+    defsnc '\(static[ ]\)\?struct[ ]mdp_table_entry[ ]mdp_\(\(upscale\|gaussian_blur\)_table\|downscale_[xy]_table_PT[2468]TO\(PT[468]\|1\)\)\[\][ ]=' drivers/video/msm/mdp_scale_tables.c
+    defsnc 'static[ ]int16[ ]mdp_scale_\(pixel_repeat\|0p[2468]_to_[08]p[0468]\)_C[0123]\[MDP_SCALE_COEFF_NUM\][ ]=' drivers/staging/msm/mdp_ppp_v31.c
+    defsnc 'static[ ]unsigned[ ]short[ ]rc_ioport\[\][ ]=' drivers/staging/tty/riscom8.c
+    # this was a bug in an earlier deblob
+    accept '#define[ ]WL_4329_NVRAM_FILE[ ]["][^"]*["]' drivers/staging/brcm80211/brcmfmac/wl_cfg80211.c
+    # New in 3.1
+    blobname 'sdma-imx25\.bin' arch/arm/mach-imx/mm-imx25.c
+    blobname 'sdma-imx31-to[12]\.bin' arch/arm/mach-imx/mm-imx31.c
+    blobname 'sdma-imx35-to[12]\.bin' arch/arm/mach-imx/mm-imx35.c
+    blobname 'sdma-imx5[13]\.bin' arch/arm/mach-mx5/mm.c
+    blobname 'brcm[/]bcm43xx' drivers/staging/brcm80211/brcmsmac/mac80211_if.c
+    blobname '%s\(_hdr\)\?-%d\.fw' drivers/staging/brcm80211/brcmsmac/mac80211_if.c
+    blobname 'brcm[/]bcm4329-fullmac-4\.\(bin\|txt\)' drivers/staging/brcm80211/brcmfmac/bcmchip.h
+    blobname 'mrvl[/]sd8787_uapsta\.bin' drivers/net/wireless/mwifiex/sdio.h
+    defsnc 'static[ ]int[ ]omap3_batt_table\[\][ ]=' arch/arm/mach-omap2/twl-common.c
+    defsnc '[	]static[ ]u8[ ]InitRegs\[\][ ]=' drivers/media/dvb/frontends/tda18271c2dd.c
+    defsnc 'static[ ]struct[ ]SMapI[ ]m_RF_Cal_Map\[\][ ]=' drivers/media/dvb/frontends/tda18271c2dd_maps.h
+    defsnc 'static[ ]struct[ ]SMap2[ ]m_\(Main\|Cal\)_PLL_Map\[\][ ]=' drivers/media/dvb/frontends/tda18271c2dd_maps.h
+    accept '[	][ ][ ]For[ ]example,[ ]you[ ]might[ ]set[ ]CONFIG_EXTRA_FIRMWARE=["]whatever\.bin["]' drivers/base/Kconfig
+    accept '[	][ ][ ]Then[ ]any[ ]request_firmware[(]\(["]whatever\.bin["]\)[)]' drivers/base/Kconfig
+    blobname 'dvb-fe-xc4000-1.4.fw' drivers/media/common/tuners/xc4000.c
+    defsnc 'static[ ]struct[ ]SMap2\?[ ]*m_\(GainTaper\|RF_Cal_DC_Over_DT\|CID_Target\)_Map\[\][ ]=' drivers/media/dvb/frontends/tda18271c2dd_maps.h
+    defsnc '[	][}][ ]regs\[\][ ]=' drivers/media/video/em28xx/em28xx-dvb.c
+    defsnc 'static[ ]struct[ ]regval_list[ ]ov5642_default_regs_\(init\|finalise\)\[\][ ]=' drivers/media/video/ov5642.c
+    defsnc 'static[ ]const[ ]u8[ ]hdmiphy_conf\(27\|74\(_175\|_25\)\|148_5\)\[32\][ ]=' drivers/media/video/s5p-tv/hdmiphy_drv.c
+    defsnc 'static[ ]const[ ]u8[ ]filter_y_vert_tap4\[\][ ]=' drivers/media/video/s5p-tv/mixer_reg.c
+    defsnc '[	]static[ ]const[ ]char[ ][*][ ]const[ ]vui_sar_idc\[\][ ]=' drivers/media/video/v4l2-ctrls.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9331_\(1p[12]_\(baseband\|mac\)_postamble\|modes_\(low\(est\)\?\|high\)_\(ob_db\|power\)_tx_gain_1p[12]\)\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9330_1p1_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9331_\(1p[12]_\(radio\|baseband\|mac\)_core\|common_\(wo_xlna_\)\?rx_gain_1p[12]\)\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9330_1p1_initvals.h
+    defsnc 'static[ ]const[ ]u\(16\|32\)[ ]b43_httab_0x\(1[2abcf]\(_0x\(1\?c\|[12]4\)0\)\?\|2[0-7]\)\[\][ ]=' drivers/net/wireless/b43/tables_phy_ht.c
+    defsnc 'static[ ]u32[ ]targetchnl_5g\[TARGET_CHNL_NUM_5G\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/phy.c
+    defsnc '[	]u8[ ]channel_\(5g\|all\|info\)\[\(45\|59\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/phy.c
+    blobname 'rtlwifi[/]rtl8192defw[.]bin' drivers/net/wireless/rtlwifi/rtl8192de/sw.c
+    defsnc 'u32[ ]rtl8192de_\(phy_reg\|radio[ab]\|mac\|agctab\)_\(\(2t\(_int_pa\)\?\|[25]g\)\?array\|array_pg\)\[\(PHY_REG\|RADIO[AB]\|MAC\|AGCTAB\)_\(\(2T\(_INT_PA\)\?_\|[25]G_\)\?ARRAY\|ARRAY_PG_\)LENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/table.c
+    defsnc 'static[ ]struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_cmn.c
+    defsnc 'struct[ ]lcnphy_rx_iqcomp[ ]lcnphy_rx_iqcomp_table_rev0\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_lcn.c
+    defsnc 'static[ ]struct[ ]chan_info_2064_lcnphy[ ]chan_info_2064_lcnphy\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_lcn.c
+    defsnc 'struct[ ]lcnphy_radio_regs[ ]lcnphy_radio_regs_2064\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_lcn.c
+    defsnc 'u16[]LCNPHY_txdigfiltcoeffs_\(cck\|ofdm\)\[LCNPHY_NUM_TX_DIG_FILTERS_\(CCK\|OFDM\)\][\n 	]*\[LCNPHY_NUM_DIG_FILT_COEFFS[ ][+][ ]1\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_lcn.c
+    defsnc 'struct[ ]nphy_ipa_txrxgain[ ]nphy_ipa_rxcal_gaintbl_2GHz\(_rev7\)\?\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'static[ ]struct[ ]chan_info_nphy_2055[ ]chan_info_nphy_2055\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'static[ ]struct[ ]chan_info_nphy_radio205x[ ]chan_info_nphyrev\(3_2056\|4_2056_A1\|5_2056v5\|6_2056v6\|5n6_2056v7\|6_2056v\(8\|11\)\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'static[ ]struct[ ]chan_info_nphy_radio2057[ ]chan_info_nphyrev\(7_2057_rev4\|8_2057_rev[78]\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'static[ ]struct[ ]chan_info_nphy_radio2057_rev5[ ]chan_info_nphyrev\(8_2057_rev5\|9_2057_rev5v1\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'struct[ ]radio_\(20xx_\)\?regs[ ]regs_\(2055\|\(SYN\|[TR]X\)_205\(6\(_A1\|_rev\([5678]\|11\)\)\?\)\|2057_rev\([4578]\|5v1\)\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc '[	]struct[ ]nphy_txiqcal_ladder[ ]ladder_\(lo\|iq\)\[\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phy_n.c
+    defsnc 'const[ ]struct[ ]lcnphy_tx_gain_tbl_entry[ \n]dot11lcnphy_[25]GHz_\(extPA_\)\?gaintable_rev0\[128\][ ]=' drivers/staging/brcm80211/brcmsmac/phy/phytbl_lcn.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]raw_edid\[\][ ]=' drivers/staging/gma500/mrst_hdmi.c
+    defsnc 'static[ ]const[ ]u8[ ]net2272_test_packet\[\][ ]=' drivers/usb/gadget/net2272.c
+    defsnc 'static[ ]const[ ]unsigned[ ]short[ ]seq_setting\[\][ ]=' drivers/video/backlight/ams369fg06.c
+    defsnc 'static[ ]u8[ ]adav80x_default_regs\[\][ ]=' sound/soc/codecs/adav80x.c
+    defsnc 'static[ ]const[ ]u8[ ]sta32x_regs\[STA32X_REGISTER_COUNT\][ ]=' sound/soc/codecs/sta32x.c
+    defsnc '[}][ ]mclk_ratios\[3\]\[7\][ ]=' sound/soc/codecs/sta32x.c
+    defsnc 'static[ ]const[ ]int[ ]vid_to_voltage\[32\][ ]=' tools/power/cpupower/debug/i386/dump_psb.c
+    blobname 'dvb-usb-terratec-h5-drxk\.fw' drivers/media/video/em28xx/em28xx-dvb.c
+    blobname 's5pc110-mfc\.fw' drivers/media/video/s5p-mfc/s5p_mfc_ctrl.c
+    blobname 'adau1701\.bin' sound/soc/codecs/adau1701.c
+    accept '[	]return[ ]process_sigma_firmware[(]codec->control_data[,][ ]ADAU1701_FIRMWARE[)]' sound/soc/codecs/adau1701.c
+    # Sources for these are in the corresponding .fuc files.
+    defsnc 'uint32_t[ ]nvc0_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_grgpc.fuc.h
+    defsnc 'uint32_t[ ]nvc0_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_grhub.fuc.h
+    defsnc '[	][	][	]interrupts[ ]=[ ]<\([\n][	]*0x[ef][0-9a-f][ ]0[ ]0[ ]0\)*>[;]' 'arch/powerpc/boot/dts/p\(2040\|3041\|4080\|5020\)si\.dtsi'
+    blobname 'dvb-netup-altera-04\.fw' drivers/media/video/cx23885/cx23885-cards.c
+    blobname 'rtl_nic[/]rtl8168e-3\.fw' drivers/net/r8169.c
+    defsnc '[	]static[ ]const[ ]struct[ ]ephy_info[ ]e_info_8168e_1\[\][ ]=' drivers/net/r8169.c
+    blobname 'iwlwifi-135-' drivers/net/iwlwifi/iwl-2000.c
+    blobname 'c[bt]2\?fw\(_\(fc\|cna\)\)\?\.bin' drivers/scsi/bfa/bfad.c
+    blobname 'ene-ub6250[/]\(ms_\(init\|rdwr\)\|msp_rdwr\)\.bin' drivers/usb/storage/ene_ub6250.c
+    accept '[	][	]*dsp_code->pvt->firmware[ ]=[ ]' sound/pci/asihpi/hpidspcd.c
+    ;;
+
+  */patch*-3.0-rc*)
+    accept '[	][	]-e[ ]["][$]tmp_dir[/]lib[/]modules[/][$]KERNELRELEASE[/]modules\.dep\.bin["]' scripts/depmod.sh
     ;;
 
   */patch*-2.6.39-rc*)
