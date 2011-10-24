@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-10-09
+# deblob-check version 2011-10-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2920,6 +2920,10 @@ set_except () {
 
   */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
+    ;;
+
+  */media-DiBcom*.patch)
+    accept '[	 ]\+request_firmware[(][)][ ]will[ ]hit[ ]an[ ]OOPS' drivers/media/dvb/frontends/dib7000p.c
     ;;
 
   */patch*-3.1-rc*)
