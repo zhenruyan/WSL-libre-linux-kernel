@@ -78,8 +78,20 @@ mver=$1 extra=$2 sver=$3
 kver=$mver$sver gnu=gnu$extra
 deblob= dir=`echo "$0" | sed 's,[^/]*$,,;s,^$,.,;s,/*$,,'`
 
-if test ! -f linux-$kver.tar.bz2; then
-  echo linux-$kver.tar.bz2 does not exist >&2
+if test -f linux-$kver.tar; then
+  zext=tar     zcmd=
+elif test -f linux-$kver.tar.bz2; then
+  zext=tar.bz2 zcmd=bunzip2
+elif test -f linux-$kver.tar.xz; then
+  zext=tar.xz  zcmd=unxz
+elif test -f linux-$kver.tar.lz; then
+  zext=tar.lz  zcmd="lzip -d"
+elif test -f linux-$kver.tar.gz; then
+  zext=tar.gz  zcmd=gunzip
+elif test -f linux-$kver.tgz; then
+  zext=tgz     zcmd=gunzip
+else
+  echo linux-$kver.tar not found, tried .bz2, .xz, .lz, .gz and .tgz too >&2
   exit 1
 fi
 
@@ -118,8 +130,9 @@ for f in \
   linux-libre-$kver-$gnu.tar.lz \
   linux-libre-$kver-$gnu.tar.lz.asc \
   linux-libre-$kver-$gnu.tar.lz.sign \
-  linux-$kver.tar \
   linux-libre-$kver-$gnu.tar \
+  linux-libre-$kver-$gnu.tar.asc \
+  linux-libre-$kver-$gnu.tar.sign \
   linux-libre-$kver-$gnu.patch \
   linux-libre-$kver-$gnu.log \
   linux-libre-$kver-$gnu.vcdiff \
@@ -190,11 +203,15 @@ trap "status=$?; echo cleaning up...; rm -rf $cleanup; (exit $status); exit" 0 1
 
 set -e
 
-echo Uncompressing linux-$kver.tar.bz2 into linux-$kver.tar
-rm -rf linux-$kver linux-$kver.tar
-bunzip2 < linux-$kver.tar.bz2 > linux-$kver.tar
+if test -n "$zcmd"; then
+  echo Uncompressing linux-$kver.$zext into linux-$kver.tar
+  rm -rf linux-$kver.tar
+  cleanup="$cleanup linux-$kver.tar"
+  $zcmd < linux-$kver.$zext > linux-$kver.tar
+fi
 
 echo Extracting linux-$kver.tar into linux-$kver
+rm -rf linux-$kver
 tar -xf linux-$kver.tar
 rm -rf linux-libre-$kver-$gnu linux-libre-$kver-$gnu.tar
 
@@ -267,12 +284,12 @@ fi
 bzip2 -k9 linux-libre-$kver-$gnu.tar
 xz -k9 linux-libre-$kver-$gnu.tar || :
 lzip -k9 linux-libre-$kver-$gnu.tar || :
-rm -f linux-libre-$kver-$gnu.tar
 
-trap "status=$?; (exit $status); exit" 0 1 2 15
+cleanup=linux-libre-$kver-$gnu.tar
 
 echo Done except for signing, feel free to interrupt
 for f in \
+  linux-libre-$kver-$gnu.tar \
   linux-libre-$kver-$gnu.tar.bz2 \
   linux-libre-$kver-$gnu.tar.xz \
   linux-libre-$kver-$gnu.tar.lz \
@@ -288,6 +305,11 @@ for f in \
     mv $f.asc $f.sign
   fi
 done
+
+rm -f linux-libre-$kver-$gnu.tar
+
+cleanup=
+trap "status=$?; (exit $status); exit" 0 1 2 15
 
 echo All set, please review linux-libre-$kver-$gnu.patch
 
