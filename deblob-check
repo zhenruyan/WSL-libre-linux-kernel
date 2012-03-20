@@ -2625,7 +2625,7 @@ set_except () {
     defsnc '\(static[ ]const[ ]\)\?u16[ \n]*LCNPHY_txdigfiltcoeffs_\(cck\|ofdm\)\[LCNPHY_NUM_TX_DIG_FILTERS_\(CCK\|OFDM\)\][\n 	]*\[LCNPHY_NUM_DIG_FILT_COEFFS[ ][+][ ]1\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
     defsnc '\(static[ ]const[ ]\)\?nphy_ipa_txrxgain_t[ ]nphy_ipa_rxcal_gaintbl_2GHz\(_rev7\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
     defsnc 'static[ ]\(const[ ]\)\?chan_info_nphy_\(radio\)\?205[5x7]\(_rev5\)\?_t[ ]chan_info_nphy\(rev[3-9]\(n6\)\?\)\?_205[5-7]\(_A1\|v\([5-8]\|11\)\|_rev[4-8]\(v1\)\?\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
-    defsnc '\(static[ ]\)radio_\(20xx_\)\?regs_t[ ]regs_\(SYN_\|[RT]X_\)\?205[5-7]\(_A1\|_rev\([4-8]\|11\)\(v1\)\?\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc '\(static[ ]\)\?radio_\(20xx_\)\?regs_t[ ]regs_\(SYN_\|[RT]X_\)\?205[5-7]\(_A1\|_rev\([4-8]\|11\)\(v1\)\?\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
     defsnc 'static[ ]const[ ]u16[ ]tbl_iqcal_gainparams_nphy\[2\]\[NPHY_IQCAL_NUMGAINS\]\[8\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
     defsnc 'static[ ]\(const[ ]\)\?u32[ ]nphy_tpc_\(5GHz_\)\?txgain\(_[ei]pa\)\?\(\(_[25]g\)\?\(_\(2057\)\?\(rev\([3-7]\|4n6\)\?\)\?\)\?\|_HiPwrEPA\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
     defsnc 'static[ ]const[ ]u16[ ]nphy_tpc_loscale\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
