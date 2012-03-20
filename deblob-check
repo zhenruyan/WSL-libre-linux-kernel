@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-03-19
+# deblob-check version 2012-03-20
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2887,7 +2887,7 @@ set_except () {
     defsnc '[	]u8[ ]channel_\(5g\|all\|info\)\[\(45\|59\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/phy.c
     blobname 'rtlwifi[/]rtl8192defw[.]bin' drivers/net/wireless/rtlwifi/rtl8192de/sw.c
     defsnc 'u32[ ]rtl8192de_\(phy_reg\|radio[ab]\|mac\|agctab\)_\(\(2t\(_int_pa\)\?\|[25]g\)\?array\|array_pg\)\[\(PHY_REG\|RADIO[AB]\|MAC\|AGCTAB\)_\(\(2T\(_INT_PA\)\?_\|[25]G_\)\?ARRAY\|ARRAY_PG_\)LENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/table.c
-    defsnc 'static[ ]\(const[ ]\)struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_cmn\.c'
+    defsnc 'static[ ]\(const[ ]\)\?struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_cmn\.c'
     defsnc 'struct[ ]lcnphy_rx_iqcomp[ ]lcnphy_rx_iqcomp_table_rev0\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
     defsnc 'static[ ]\(const[ ]\)\?struct[ ]chan_info_2064_lcnphy[ ]chan_info_2064_lcnphy\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
     defsnc '\(static[ ]const[ ]\)\?struct[ ]lcnphy_radio_regs[ ]lcnphy_radio_regs_2064\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
@@ -3012,7 +3012,7 @@ set_except () {
     blobname 'brcm[/]bcm4329-fullmac-4\.\(bin\|txt\)' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmfmac/bcmchip\.h'
     blobname 'brcm[/]bcm43xx' 'drivers/\(staging\|net/wireless\)/brcm80211/sys/wl_mac80211\.c'
     blobname '%s\(_hdr\)\?-%d\.fw' 'drivers/\(staging\|net/wireless\)/brcm80211/sys/wl_mac80211\.c'
-    defsnc 'static[ ]\(const[ ]\)struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_cmn\.c'
+    defsnc 'static[ ]\(const[ ]\)\?struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_cmn\.c'
     defsnc 'static[ ]const[ ]s8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' drivers/net/wireless/brcm80211/brcmsmac/phy/phy_lcn.c
     defsnc '\(static[ ]const[ ]\)\?s8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
     defsnc 'static[ ]\(const[ ]\)\?struct[ ]chan_info_2064_lcnphy[ ]chan_info_2064_lcnphy\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
