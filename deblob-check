@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-03-23
+# deblob-check version 2012-03-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2856,7 +2856,7 @@ set_except () {
     accept '[	][	 ]*\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'nouveau[/]\(nv%02x_\)\?%s' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'radeon[/]SUMO2\?_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
-    blobname 'iwlwifi-\(105\|20[03]0\)-' drivers/net/iwlwifi/iwl-2000.c
+    blobname 'iwlwifi-\(105\|20[03]\?0\)-' drivers/net/iwlwifi/iwl-2000.c
     blobname '__stringify[(]api[)][ ]["]\.ucode["]' 'drivers/net/iwlwifi/iwl-\(3945.h\|\(4965\|[1256]000\)\.c\)'
     # New in 3.1
     blobname 'sdma-imx25\.bin' arch/arm/mach-imx/mm-imx25.c
