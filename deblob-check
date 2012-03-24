@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-03-20
+# deblob-check version 2012-03-23
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2778,7 +2778,7 @@ set_except () {
     defsnc 'u32[ ]\(RTL\|Rtl\)8192CU\(PHY_REG\|_\?\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\[RTL8192CU\(PHY_REG\|\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)_\?\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\(LENGTH\|Length\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192cu/table.c
     blobname 'rtl_nic[/]rtl8105e-1\.fw' drivers/net/r8169.c
     defsnc 'static[ ]const[ ]\(A_INT32\|s32\)[ ]wmi_rateTable\[\]\[2\][ ]=' drivers/staging/ath6kl/wmi/wmi.c
-    defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\[\(256\)\?\][ ]=' drivers/staging/easycap/easycap_low.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\?\[\(256\)\?\][ ]=' drivers/staging/easycap/easycap_low.c
     defsnc 'static[ ]const[ ]ccktxbbgain_struct[ ]rtl8192_cck_txbbgain_\(ch14_\)\?table\[\][ ]=' drivers/staging/rtl8192e/r8192E_dm.c
     defsnc '[	]unsigned[ ]char[ ]data_ptr\[36\][ ]=' drivers/usb/storage/ene_ub6250.c
     blobname 'ene-ub6250[/]sd_\(init[12]\|rdwr\)\.bin' drivers/usb/storage/ene_ub6250.c
@@ -3372,7 +3372,7 @@ set_except () {
     defsnc 'u32[ ]\(RTL\|Rtl\)8192CU\(PHY_REG\|_\?\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\[RTL8192CU\(PHY_REG\|\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)_\?\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\(LENGTH\|Length\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192cu/table.c
     blobname 'rtl_nic[/]rtl8105e-1\.fw' drivers/net/r8169.c
     defsnc 'static[ ]const[ ]\(A_INT32\|s32\)[ ]wmi_rateTable\[\]\[2\][ ]=' drivers/staging/ath6kl/wmi/wmi.c
-    defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\[256\][ ]=' drivers/staging/easycap/easycap_low.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\?\[256\][ ]=' drivers/staging/easycap/easycap_low.c
     defsnc 'static[ ]const[ ]ccktxbbgain_struct[ ]rtl8192_cck_txbbgain_\(ch14_\)\?table\[\][ ]=' drivers/staging/rtl8192e/r8192E_dm.c
     defsnc '[	]unsigned[ ]char[ ]data_ptr\[36\][ ]=' drivers/usb/storage/ene_ub6250.c
     blobname 'ene-ub6250[/]sd_\(init[12]\|rdwr\)\.bin' drivers/usb/storage/ene_ub6250.c
