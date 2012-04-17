@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-04-14
+# deblob-check version 2012-04-16
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1145,7 +1145,7 @@ set_except () {
     accept '[	]-[ ]move[ ]firmware[ ]loading[ ]to[ ]request_firmware[(][)]' drivers/staging/slicoss/README
     accept 'config[ ]FIRMWARE_IN_KERNEL.*let[ ]firmware[ ]be[ ]loaded[ ]from[ ]userspace\.' drivers/base/Kconfig
     accept '[	 ]*and[ ]request_firmware[(][)][ ]in[ ]the[ ]source' drivers/base/Kconfig
-    accept '\(static[ ]int[\n ]\)\?_request_firmware[(]const[ ]struct[ ]firmware[ ][*][*]firmware_p,[^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept '\(static[ ]\(int\|void\)[\n ]\)\?_request_firmware\(_prepare\|_cleanup\)\?[(]const[ ]struct[ ]firmware[ ][*][*]\?firmware\(_p\)\?[,)][^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept 'static[ ]int[\n ]request_firmware_work_func[(]void[ ][*]arg[)][\n][{]\([\n]\+[^\n}][^\n]*\)*ret[ ]=[ ]_request_firmware[(][^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept '[/][*][*][\n][ ][*][ ]request_firmware:[ ]-[ ]send[ ]firmware[ ][^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept '[/][*][*][\n][ ][*][ ]request_firmware_nowait\(:\|[ ]-\)[ ]asynchronous[ ]version[^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
@@ -3006,6 +3006,15 @@ set_except () {
 
   */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
+    ;;
+
+  */patch-3.3*gnu*)
+    # These patterns are *way* too broad for general use, but they're fine
+    # for patches between deblob-checked releases.
+    accept 'static[ ]\(int\|void\)[ ]_request_firmware' drivers/base/firmware_class.c
+    accept 'request_firmware[(]const' drivers/base/firmware_class.c
+    accept '[	]*ret[ ]=[ ]_request_firmware' drivers/base/firmware_class.c
+    accept '[	]*_request_firmware_cleanup' drivers/base/firmware_class.c
     ;;
 
   */drivers-media-update.patch)
