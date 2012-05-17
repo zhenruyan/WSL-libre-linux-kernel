@@ -1103,7 +1103,8 @@ set_except () {
     initnc 'static[ ]u8[ ]\([au]\|_4\)law_to_\([ua]law\|4bit\)\[256\][ ]=' drivers/isdn/mISDN/l1oip_codec.c
     initnc 'static[ ]unsigned[ ]char[ ]banner_table\[\][ ]=' arch/sh/boards/mach-microdev/led.c
     defsnc '[	]static[ ]const[ ]int[ ]desc_idx_table\[\][ ]=' arch/arm/include/asm/hardware/iop3xx-adma.h
-www
+    defsnc 'static[ ]\(const[ ]\)\?u32[ ]ar\(5416\|9280\)\(Modes\(_fast_clock\)\?\|Common\|BB_RfGain\|Bank6\(TPC\)\?\|Addac\)\(_91[06]0\(_\?1_1\)\?\|_9280\(_2\)\?\)\?\[\]\[[236]\][ ]=' 'drivers/net/wireless/ath9k/\(ar\(5008\|9001\)_\)\?initvals\.h'
+
     # new in 2.6.28
     accept '\(static[ ]\)\?const[ ]char[ ]\(inv\)\?parity\[256\][ ]=[ ][{][	 \n01,]*[}][;]' 'Documentation/mtd/nand_ecc\.txt\|drivers/mtd/nand/nand_ecc\.c'
     defsnc 'static[ ]const[ ]char[ ]\(bitsperbyte\|addressbits\)\[256\][ ]=' drivers/mtd/nand/nand_ecc.c
