@@ -1132,7 +1132,23 @@ clean_sed '
 	  -EINVAL)
 }' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c 'report missing Free firmware'
 clean_blob drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+clean_sed '
+/^bool bnx2x_test_firmware_version/,/^}$/{
+  /^	u32 my_fw = /i\
+	/*(DEBLOBBED)*/
+  /^	u32 my_fw = /,/<< 24);/d;
+  /^	u32 loaded_fw = /,/^$/{
+    /^$/i\
+\
+	u32 my_fw = ~loaded_fw;
+  }
+}' drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c 'fail already-loaded test'
 clean_blob drivers/net/ethernet/broadcom/bnx2x/bnx2x_hsi.h
+clean_sed '
+/static void bnx2x_init_wr_wb/{
+  i\
+extern void bnx2x_init_wr_wb(struct bnx2x *, u32, const u32 *, u32);
+}' drivers/net/ethernet/broadcom/bnx2x/bnx2x_init_ops.h 'declare removed function'
 clean_blob drivers/net/ethernet/broadcom/bnx2x/bnx2x_init_ops.h
 clean_kconfig drivers/net/ethernet/broadcom/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/ethernet/broadcom/bnx2x/Makefile
