@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-05-17
+# deblob-check version 2012-06-05
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3177,6 +3177,10 @@ set_except () {
     accept '[	]task[ ]=[ ]kthread_run[(]request_firmware_work_func' drivers/base/firmware_class.c
     accept '-3[,]-2[,]-2[,]-1[,]-1[,]0[,][0-9,\n]*[}][;]' drivers/hwmon/via686a.c
     accept '[	][{]0xa1[,][ ]0x6e[,][ ][0-9xa-f, ]*[,][ ]0x00[,][ ]0x10[}][,]\([\n][	][{]0x[ac]1[,][ ]0x6e[,][ ][0-9xa-f, ]*[,][ ]0x00[,][ ]0x10[}][,][}][,]\)*' drivers/media/video/gspca/sonixj.c
+    ;;
+
+  */3.4.1-stable-queue.patch* | */patch-3.4.*)
+    accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]void[ ]b43legacy_request_firmware[(]s[*][/][;]' drivers/net/wireless/b43legacy/main.c
     ;;
 
   */atl1c_net_next_update-3.[34].patch)
