@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-06-05
+# deblob-check version 2012-06-06
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3180,7 +3180,7 @@ set_except () {
     ;;
 
   */3.4.1-stable-queue.patch* | */patch-3.4.*)
-    accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]void[ ]b43legacy_request_firmware[(]s[*][/][;]' drivers/net/wireless/b43legacy/main.c
+    accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]void[ ]b43legacy_request_firmware[(]s[^\n]*[*][/][;]' drivers/net/wireless/b43legacy/main.c
     ;;
 
   */atl1c_net_next_update-3.[34].patch)
