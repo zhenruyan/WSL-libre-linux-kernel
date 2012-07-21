@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-06-06
+# deblob-check version 2012-07-20
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2854,7 +2854,7 @@ set_except () {
     accept '[	]nvc0_graph_init_fuc[(]dev[,][ ]0x4\(09\|1a\)000[,][ ][&]priv->fuc4\(09\|1a\)c[,][ ][&]priv->fuc4\(09\|1a\)d[)][;]' drivers/gpu/drm/nouveau/nvc0_graph.c
     accept '[	][	 ]*nvc0_graph_destroy_fw[(]&priv->fuc4\(09\|1a\)[cd][)][;]' drivers/gpu/drm/nouveau/nvc0_graph.c
     accept '[	][	 ]*\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvc0_graph.c
-    blobname 'nouveau[/]\(nv%02x_\)\?%s' drivers/gpu/drm/nouveau/nvc0_graph.c
+    blobname 'nouveau[/]\(nv%02x_\)\?%s' 'drivers/gpu/drm/nouveau/nv[ce]0_graph\.c'
     blobname 'radeon[/]SUMO2\?_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
     blobname 'iwlwifi-\(105\|20[03]\?0\)-' drivers/net/iwlwifi/iwl-2000.c
     blobname '__stringify[(]api[)][ ]["]\.ucode["]' 'drivers/net/iwlwifi/iwl-\(3945.h\|\(4965\|[1256]000\)\.c\)'
@@ -3009,7 +3009,7 @@ set_except () {
     accept '[	]*nvidia,emc-registers[ ]=[ ]<[ ]\(0[ 	\n]*\)*>' Documentation/devicetree/bindings/arm/tegra/emc.txt
     defsnc '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[345][0-9][ ]0x04[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/tegra20-apbdma.txt
     accept '[	]*nvidia,emc-registers[ ]=[ ]<[ ]\(0x[0-9a-f]*[ 	\n]*\)*>' arch/arm/boot/dts/tegra-seaboard.dts
-    defsnc '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[0-4][0-9][ ]0x04[ 	\n]*\)*>[;]' 'arch/arm/boot/dts/tegra[23]0\.dtsi'
+    accept '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[0-4][0-9][ ]0x04[ 	\n]*\)*>[;]' 'arch/arm/boot/dts/tegra[23]0\.dtsi'
     defsnc 'static[ ]struct[ ]clk_pll_freq_table[ ]tegra_pll_[cu]_freq_table\[\][ ]=' arch/arm/mach-tegra/tegra30_clocks.c
     defsnc '[	]static[ ]const[ ]u8[ ]snum_init_[74]6\[\][ ]=' arch/powerpc/sysdev/qe_lib/qe.c
     defsnc 'const[ ]u64[ ]camellia_sp\(10011110\|22000222\|03303033\|00444404\|02220222\|30333033\|44044404\|11101110\)\[256\][ ]=' arch/x86/crypto/camellia_glue.c
@@ -3061,6 +3061,51 @@ set_except () {
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8753_reg_defaults\[\][ ]=' sound/soc/codecs/wm8753.c
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8978_reg_defaults\[\][ ]=' sound/soc/codecs/wm8978.c
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8988_reg_defaults\[\][ ]=' sound/soc/codecs/wm8988.c
+
+    # New in 3.5:
+    accept '[	]*linux,keymap[ ]=[ ][<][ ]\(0x[0-9a-f]*[ 	\n]*\)*>[;]' 'arch/arm/boot/dts/spear\(13[14]\|30\)0-evb\.dts'
+    accept '[	]*nvidia,emc-registers[ ]=[ ]<\(0x[0-9a-f]*[ 	\n]*\)*>[;]' arch/arm/boot/dts/tegra-seaboard.dts
+    accept '[	]*interrupts[ ]=[ ]<\(0[ ]1[0-4][0-9][ ]0x04[ 	\n]*\)*>[;]' 'arch/arm/boot/dts/tegra[23]0\.dtsi'
+    defsnc 'static[ ]u8[ ]zero_message_\(hash\|hmac\)_sha256\[SHA256_DIGEST_SIZE\][ ]=' drivers/crypto/ux500/hash/hash_core.c
+    defsnc 'static[ ]const[ ]struct[ ]ast_dramstruct[ ]ast[12][01]00_dram_table_data\[\][ ]=' drivers/gpu/drm/ast/ast_dram_tables.h
+    defsc 'static[ ]struct[ ]ast_vbios_stdtable[ ]vbios_stdtable\[\][ ]=' drivers/gpu/drm/ast/ast_tables.h
+    defsc 'static[ ]const[ ]struct[ ]minimode[ ]est3_modes\[\][ ]=' drivers/gpu/drm/drm_edid_modes.h
+    defsnc 'static[ ]const[ ]u8[ ]hdmiphy_conf74_176\[32\][ ]=' drivers/gpu/drm/exynos/exynos_hdmi.c
+    defsnc 'static[ ]const[ ]struct[ ]wrpll_tmds_clock[ ]wrpll_tmds_clock_table\[\][ ]=' drivers/gpu/drm/i915/intel_ddi.c
+    blobname 'dvb-usb-af9035-02\.fw' drivers/media/dvb/dvb-usb/af9035.c
+    blobname 'dvb-usb-it9135-01\.fw' drivers/media/dvb/dvb-usb/af9035.c
+    defsnc 'static[ ]const[ ]struct[ ]coeff[ ]coeff_lut\[\][ ]=' drivers/media/dvb/frontends/af9033_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]val_snr[ ]\(qpsk\|qam\(16\|64\)\)_snr_lut\[\][ ]=' drivers/media/dvb/frontends/af9033_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_val[ ]\(ofsm_init\|tuner_init_\(tua9001\|fc0011\|mxl5007t\|tda18218\)\)\[\][ ]=' drivers/media/dvb/frontends/af9033_priv.h
+    defsnc '[	]*static[ ]u8[ ]color_tb\[\]\[6\][ ]=' drivers/media/video/gspca/ov534.c
+    defsnc 'static[ ]const[ ]u16[ ]bridge_init\[\]\[2\][ ]=' drivers/media/video/gspca/sn9c20x.c
+    defsnc 'static[ ]const[ ]struct[ ]i2c_reg_u8[ ]\(soi968\|ov\(7670\|965[05]\)\|hv7131r\)_init\[\][ ]=' drivers/media/video/gspca/sn9c20x.c
+    defsnc 'static[ ]const[ ]struct[ ]i2c_reg_u16[ ]\(mt9v[01]1[12]\)_init\[\][ ]=' drivers/media/video/gspca/sn9c20x.c
+    defsnc 'static[ ]const[ ]struct[ ]hdmiphy_conf[ ]hdmiphy_conf_\(s5pv210\|exynos4[24]1[02]\)\[\][ ]=' drivers/media/video/s5p-tv/hdmiphy_drv.c
+    defsnc 'static[ ]const[ ]int32_t[ ]tbat_lookup\[255\][ ]=' drivers/mfd/da9052-core.c
+    defsnc 'static[ ]const[ ]struct[ ]atl1c_platform_patch[ ]plats\[\][ ]__devinitdata[ ]=' drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+    defsnc '[	][}][ ]hw_config\[\][ ]=' drivers/nfc/pn544_hci.c
+    defsnc 'static[ ]const[ ]unsigned[ ]\(rgmii\|smii_0_1_2\|nand_8bit\|mcif\|pci_sata\|clcd\|arm_trace\|miphy_dbg\|emi\)_pins\[\][ ]=' drivers/pinctrl/spear/pinctrl-spear1310.c
+    defsnc 'static[ ]const[ ]long[ ]chan_freq_list\[\]\[2\][ ]=' drivers/staging/wlags49_h2/wl_util.c
+    defsnc 'static[ ]struct[ ]SiS_StandTable_S[ ]XGI330_StandTable[ ]=' drivers/staging/xgifb/vb_table.h
+    defsnc '[	]static[ ]const[ ]unsigned[ ]char[ ]data_to_send_panel_reverse\[\][ ]=' drivers/video/exynos/s6e8ax0.c
+    defsnc 'static[ ]const[ ]unsigned[ ]short[ ]__devinitconst[ ]SiS_DRAMType\[17\]\[5\][ ]=' drivers/video/sis/sis_main.c
+    defsnc 'static[ ]struct[ ]reg_default[ ]lm49453_reg_defs\[\][ ]=' sound/soc/codecs/lm49453.c
+    accept '-[ ]Replace[ ]hard-coded[ ]firmware[ ]paths[ ]with[ ]request_firmware' drivers/staging/gdm72xx/TODO
+    blobname '\([/]lib[/]firmware[/]\)\?gdm72xx[/]gdms\(krn\|rfs\)\.bin' drivers/staging/gdm72xx/sdio_boot.c
+    blobname '\([/]lib[/]firmware[/]\)\?gdm72xx[/]gdmuimg\.bin' drivers/staging/gdm72xx/usb_boot.c
+    blobname 'mrvl[/]usb8797_uapsta\.bin' 'drivers/net/wireless/mwifiex/usb\.[ch]'
+    # This is compiled and assembled out of actual sources as part of the build.
+    accept '[	]\.incbin[	]["]arch[/]x86[/]realmode[/]rm[/]realmode\.bin["]' arch/x86/realmode/rmpiggy.S
+    # Sources for these are in the corresponding .fuc files.
+    defsc 'uint32_t[ ]nv98_pcrypt_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nv98_crypt.fuc.h
+    accept '[	]nve0_graph_init_fuc[(]dev[,][ ]0x4\(09\|1a\)000[,][ ][&]priv->fuc4\(09\|1a\)c[,][ ][&]priv->fuc4\(09\|1a\)d[)][;]' drivers/gpu/drm/nouveau/nve0_graph.c
+    accept '[	][	 ]*nve0_graph_destroy_fw[(]&priv->fuc4\(09\|1a\)[cd][)][;]' drivers/gpu/drm/nouveau/nve0_graph.c
+    accept '[	][	 ]*\(if[ ][(]\|[ ][ ][ ][ ]\)nve0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nve0_graph.c
+    accept '[	]struct[ ]nve0_graph_fuc[ ]fuc4\(09\|1a\)[cd]' drivers/gpu/drm/nouveau/nve0_graph.h
+    accept '[	]memset[(][&]fw[,][ ]0[,][ ]sizeof[(]struct[ ]mwifiex_fw_image[)][)][;][\n][	]adapter->firmware[ ]=[ ]firmware[;]' drivers/net/wireless/mwifiex/main.c
+    # nouveau_vbios is a user-supplied parameter
+    accept '[	][	]snprintf[(]fname[,][ ]sizeof[(]fname[)][,][ ]["]nouveau[/]%s["][,][ ]nouveau_vbios[)][;][\n][	][	]ret[ ]=[ ]request_firmware[(]' drivers/gpu/drm/nouveau/nouveau_bios.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
