@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-07-20
+# deblob-check version 2012-07-21
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3106,6 +3106,12 @@ set_except () {
     accept '[	]memset[(][&]fw[,][ ]0[,][ ]sizeof[(]struct[ ]mwifiex_fw_image[)][)][;][\n][	]adapter->firmware[ ]=[ ]firmware[;]' drivers/net/wireless/mwifiex/main.c
     # nouveau_vbios is a user-supplied parameter
     accept '[	][	]snprintf[(]fname[,][ ]sizeof[(]fname[)][,][ ]["]nouveau[/]%s["][,][ ]nouveau_vbios[)][;][\n][	][	]ret[ ]=[ ]request_firmware[(]' drivers/gpu/drm/nouveau/nouveau_bios.c
+    accept '[	][	]\.download_firmware[ ]=[ ]af9035_download_firmware\(_it9135\)\?[,][\n][	][	]\.firmware[ ]=[ ]' drivers/media/dvb/dvb-usb/af9035.c
+    blobname 'rtl_nic[/]rtl8402-1\.fw' drivers/net/ethernet/realtek/r8169.c
+    blobname 'rtl_nic[/]rtl8411-1\.fw' drivers/net/ethernet/realtek/r8169.c
+    blobname 'bdata\(\.SD31\|\.DB132\)\?\.bin' drivers/net/wireless/ath/ath6kl/core.h
+    blobname 'mrvl[/]sd8786_uapsta\.bin' 'drivers/net/wireless/mwifiex/sdio\.[ch]'
+    accept '[	][ ][*][ ]the[ ]isl3886[+]net2280' drivers/net/wireless/p54/p54usb.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
