@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-07-21
+# deblob-check version 2012-07-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -253,7 +253,8 @@
 # This makes it much faster, and mostly immune to non-ASCII stuff, as
 # long as a 8-bit-safe sed is used.  Probably a safe assumption these
 # days.
-case ${LANG+set} in set) LANG=C; export LANG;; esac
+LC_ALL=C; export LC_ALL
+LANGUAGE=C; export LANGUAGE
 
 rm="rm -f"
 

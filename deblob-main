@@ -74,6 +74,10 @@ case $1 in
 *) force=;;
 esac
 
+# We don't want e.g. diff output translations to affect us.
+LC_ALL=C; export LC_ALL
+LANGUAGE=C; export LANGUAGE
+
 mver=$1 extra=$2 sver=$3
 kver=$mver$sver gnu=gnu$extra
 deblob= dir=`echo "$0" | sed 's,[^/]*$,,;s,^$,.,;s,/*$,,'`
