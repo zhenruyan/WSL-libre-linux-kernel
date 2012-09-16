@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-08-08
+# deblob-check version 2012-09-16
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3323,8 +3323,9 @@ set_except () {
     accept '[	][{]0xa1[,][ ]0x6e[,][ ][0-9xa-f, ]*[,][ ]0x00[,][ ]0x10[}][,]\([\n][	][{]0x[ac]1[,][ ]0x6e[,][ ][0-9xa-f, ]*[,][ ]0x00[,][ ]0x10[}][,][}][,]\)*' drivers/media/video/gspca/sonixj.c
     ;;
 
-  */3.4.1-stable-queue.patch* | */patch-3.4.*)
+  */3.4.1-stable-queue.patch* | */patch-3.4*)
     accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]void[ ]b43legacy_request_firmware[(]s[^\n]*[*][/][;]' drivers/net/wireless/b43legacy/main.c
+    accept '[ ][*][ ][ ][ ]3[ ]3[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[\n][ ][*][ ][ ][ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0' arch/arm/include/asm/pgtable.h
     ;;
 
   */atl1c_net_next_update-3.[34].patch)
