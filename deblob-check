@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-09-17
+# deblob-check version 2012-09-25
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3113,6 +3113,40 @@ set_except () {
     blobname 'bdata\(\.SD31\|\.DB132\)\?\.bin' drivers/net/wireless/ath/ath6kl/core.h
     blobname 'mrvl[/]sd8786_uapsta\.bin' 'drivers/net/wireless/mwifiex/sdio\.[ch]'
     accept '[	][ ][*][ ]the[ ]isl3886[+]net2280' drivers/net/wireless/p54/p54usb.c
+
+    # New in 3.6:
+    defsnc 'static[ ]unsigned[ ]char[ ]mcf_host_slot2sid\[32\][ ]=' arch/m68k/platform/coldfire/pci.c
+    defsnc 'static[ ]struct[ ]aead_testvec[ ]hmac_sha\(1\|256\|512\)_aes_cbc_enc_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]struct[ ]hash_testvec[ ]bfin_crc_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc '[	]static[ ]u8[ ]bw_params\[3\]\[32\][ ]=' drivers/media/dvb/frontends/rtl2832.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm51\(02\|10\)_reva_patch\[\][ ]=' drivers/mfd/wm5102-tables.c
+    defsnc 'static[ ]const[ ]u32[ ]ar955x_1p0_\(radio\|baseband\|mac\)_postamble\[\]\[5\][ ]' drivers/net/wireless/ath/ath9k/ar955x_1p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar955x_1p0_\(\(radio\|mac\|baseband\)_core\|common_\(wo_xlna_\)\?rx_gain_table\)\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/955x_1p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar955x_1p0_modes_\(no_\)\?xpa_tx_gain_table\[\]\[9\][ ]=' drivers/net/wireless/ath/ath9k/955x_1p0_initvals.h
+    blobname 'ti-connectivity[/]wl12[78]x-fw-5-\([ms]r\|plt\)\.bin' drivers/net/wireless/wl12xx/main.c
+    blobname 'ti-connectivity[/]wl18xx-\(fw\|conf\)\.bin' drivers/net/wireless/wl18xx/main.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(ldo5\|buck1\)_voltage_map\[\][ ]=' drivers/regulator/lp3972.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(lp872x_ldo\|lp8720_ldo4\|lp8725_\(lilo\|buck\)\)_vtbl\[\][ ]=' drivers/regulator/lp872x.c
+    defsnc 'const[ ]int[ ]lp8788_dldo1239_vtbl\[\][ ]=' drivers/regulator/lp8788-ldo.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]mc13892_sw1\?\[\][ ]=' drivers/regulator/mc13892-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]VCORE_VSEL_table\[\][ ]=' drivers/regulator/tps65023-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]VDCDCx_VSEL_table\[\][ ]=' drivers/regulator/tps6507x-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]dcdc[12]_voltages\[\][ ]=' drivers/regulator/tps6524x-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]tps6586x_\(ldo4\|sm2\|dvm\)_voltages\[\][ ]=' drivers/regulator/tps6586x-regulator.c
+    defsnc 'static[ ]struct[ ]bcm_ddr_setting[ ]asT3\(LP\)\?B\?_DDRSetting\(160\|133\|100\|80\)MHz\[\][ ]\?=' drivers/staging/bcm/DDRInit.c
+    defsnc '[ ]*static[ ]const[ ]u8[ ]arp_req\[36\][ ]=' drivers/staging/csr/sme_sys.c
+    defsnc 'omap4430_adc_to_temp\[OMAP4430_ADC_END_VALUE[ ]-[ ]OMAP4430_ADC_START_VALUE[ ][+][ ]1\][ ]=' drivers/staging/oma-thermal/omap4-thermal.c
+    defsnc 'omap4460_adc_to_temp\[OMAP4460_ADC_END_VALUE[ ]-[ ]OMAP4460_ADC_START_VALUE[ ][+][ ]1\][ ]=' drivers/staging/oma-thermal/omap4-thermal.c
+    defsnc 'omap5430_adc_to_temp\[OMAP5430_ADC_END_VALUE[ ]-[ ]OMAP5430_ADC_START_VALUE[ ][+][ ]1\][ ]=' drivers/staging/oma-thermal/omap5-thermal.c
+    defsnc 'static[ ]struct[ ]vesa_mode[ ]vesa_mode_table\[\][ ]=' drivers/staging/sm7xxfb/sm7xxfb.c
+    defsnc 'static[ ]struct[ ]SiS_\(LCD\|LVDS\)Data[ ][ ]*XGI_\(\(\(St\|Ext\)LCD\|LVDS\)\(1024x768\|1280x1024\|1400x1050\)\|NoScaling\)Data\(_[12]\)\?\[\][ ]=' drivers/staging/xgifb/vb_table.h
+    defsnc 'static[ ]unsigned[ ]char[ ]rdesc\[\][ ]=' samples/uhid/uhid-example.c
+    defsnc 'static[ ]struct[ ]reg_default[ ]isabelle_reg_defs\[\][ ]=' sound/soc/codecs/isabelle.c
+    blobname 'dvb-usb-terratec-htc-stick-drxk\.fw' drivers/media/video/em28xx/em28xx-dvb.c
+    blobname 'rtl_nic[/]rtl8106e-1\.fw' drivers/net/ethernet/realtek/r8169.c
+    blobname 'rtl_nic[/]rtl8168g-1\.fw' drivers/net/ethernet/realtek/r8169.c
+    defsnc '[	]static[ ]const[ ]u16[ ]mac_ocp_patch\[\][ ]=' in drivers/net/ethernet/realtek/r8169.c
+    blobname 'rt3290\.bin\(\.[\n][	][ ][*][/]\)\?' drivers/net/wireless/rt2x00/rt2800pci.h
     ;;
 
   */*freedo*.patch | */*logo*.patch)
