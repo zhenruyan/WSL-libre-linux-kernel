@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-09-25
+# deblob-check version 2012-09-26
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1947,8 +1947,8 @@ set_except () {
     initnc 'static[	]u_char[	]irq_to_siureg\[\][ ]='
     defsnc 'static[ ]Byte_t[ ]RData\[RDATASIZE\][ ]=' drivers/tty/rocket.c
     initnc 'static[ ]__const__[ ]__u16[ ]gx_coeff\[256\][ ]='
-    initnc 'static[ ]__u8[ ]init7121ntsc\[\][ ]='
-    initnc 'static[ ]__u8[ ]init7121pal\[\][ ]='
+    defsnc 'static[ ]__u8[ ]init7121ntsc\[\][ ]=' drivers/media/video/saa7121.h
+    defsnc 'static[ ]__u8[ ]init7121pal\[\][ ]=' drivers/media/video/saa7121.h
     defsnc 'static[ ]byte[ ]capidtmf_leading_zeroes_table\[0x100\][ ]=' drivers/isdn/hardware/eicon/capidtmf.c
     defsnc 'static[ ]char[ ]channel_map_madi_[sdq]s\[HDSPM_MAX_CHANNELS\][ ]=' sound/pci/rme9652/hdspm.c
     initnc 'static[ ]char[ ]coefficients\[NM_TOTAL_COEFF_COUNT[ ][*][ ]4\][ ]='
@@ -2163,7 +2163,7 @@ set_except () {
     initnc 'static[ ]unsigned[ ]int[ ]treble_volume_table\[\][ ]='
     initnc 'static[ ]unsigned[ ]int[ ]valid_mem\[\][ ]='
     initnc 'static[ ]unsigned[ ]long[ ]arthur_to_linux_signals\[32\][ ]='
-    initnc 'static[ ]unsigned[ ]long[ ]shmedia_opcode_table\[64\][ ]='
+    defsnc 'static[ ]unsigned[ ]long[ ]shmedia_opcode_table\[64\][ ]=' arch/sh/kernel/traps_64.c
     initnc 'static[ ]unsigned[ ]nv\([34]\|10\)TableP\(FIFO\|GRAPH\|RAMIN\)\[\]\[2\][ ]='
     initnc 'static[ ]unsigned[ ]short[ ]fcstab\[256\][ ]='
     initnc 'static[ ]unsigned[ ]short[ ]init[1234]\[128\][ ][/][*]__devinitdata[*][/][ ]='
@@ -3156,6 +3156,78 @@ set_except () {
   */patch-3.5*)
     accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]void[ ]b43_request_firmware[(]' drivers/net/wireless/b43/main.c
     accept '[ ][*][ ][ ][ ]3[ ]3[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[\n][ ][*][ ][ ][ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0' arch/arm/include/asm/pgtable.h
+    # Present in 3.5 and in patch to 3.6:
+    accept '[	]*nvidia,emc-registers[ ]=[ ]<[ ]\(0[ 	\n]*\)*>' Documentation/devicetree/bindings/arm/tegra/emc.txt
+    accept '[	]*nvidia,emc-registers[ ]=[ ]<\(0x[0-9a-f]*[ 	\n]*\)*>[;]' arch/arm/boot/dts/tegra-seaboard.dts
+    defsnc 'static[ ]unsigned[ ]long[ ]shmedia_opcode_table\[64\][ ]=' arch/sh/kernel/traps_64.c
+    initnc 'static[ ]const[ ]u32[ ]ar9340_1p0_baseband_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    initnc 'static[ ]const[ ]u32[ ]ar9340_1p0_baseband_core\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    initnc 'static[ ]const[ ]u32[ ]ar9340Modes_\(\(high\|low\|mixed\)_\(power\|ob_db\)\|ub124\)_tx_gain_table_1p0\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485\(Common_wo_xlna_rx_gain\)\?_1_1\(_\(baseband\|mac\)_core\)\?\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485_1_1_baseband_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    accept '[	]if[ ][(]ret[ ]<[ ]0[)][ ][{][\n][	][	]dev_err[(]dev[,][ ]["]request_firmware\(_nowait\)\?[ ]failed[^\n]*[\n][	]*complete_all[(][&]rproc->firmware_loading_complete' drivers/remoteproc/remoteproc_core.c
+    accept '[	]rproc->firmware[ ][=][ ]firmware[;]' drivers/remoteproc/remoteproc_core.c
+    defsnc 'static[ ]int[ ]sh_clk_div6_divisors\[64\][ ]=' '\(arch/sh/kernel/cpu/clock-\|drivers/sh/clk/\)cpg\.c'
+    defsnc 'struct[ ]ModeInit[ ]VGAMode\[\][ ]=' drivers/staging/sm7xx/smtcfb.h
+    accept '[/][*][ ]*\([ 1-4][0-9][ ][ ]\)*\(5[0-6][ ][ ]\)*[*][/]' drivers/staging/vt6656/channel.c
+    defsnc 'static[ ]const[ ]long[ ]frequency_list\[\][ ]=' drivers/staging/vt6655/iwctl.c
+    accept '[	][{]\(0x0000a288[,][ ]0x00000220\|0x0000a430[,][ ]0x1ce739ce\|0x0000a540[,][ ]0x\(49005e72\|4e02246c\)\|0x0000a5f4[,][ ]0x\(6f82bf16\|778a308c\)\|0x0000a50c[,][ ]0x10000023\|0x00009e04[,][ ]0x001c2020\|0x00009e44[,][ ]0x62321e27\)\([,][ ]0x[0-9a-f]*\)*[}][,]\([\n][	][{]0x[0-9a-f]*\([,][ ]0x[0-9a-f]*\)*[}][,]\)*' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    # For reversal of 3.5-to-3.6 patch only.
+    initnc '\.irp[ ]idx' arch/x86/include/asm/entry_arch.h
+    initnc 'uint32_t[ ]nva3_pcopy_data\[\][ ]=' drivers/gpu/drm/nouveau/nva3_copy.fuc.h
+    initnc 'uint32_t[ ]nvc0_pcopy_data\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_copy.fuc.h
+    initnc 'static[ ]__u8[ ]mode8420\(pro\|con\)\[\][ ]=' drivers/media/video/cs8420.h
+    defsnc 'static[ ]__u8[ ]init7121ntsc\[\][ ]=' drivers/media/video/saa7121.h
+    defsnc 'static[ ]__u8[ ]init7121pal\[\][ ]=' drivers/media/video/saa7121.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9331_\(1p[12]_\(baseband\|mac\)_postamble\|modes_\(low\(est\)\?\|high\)_\(ob_db\|power\)_tx_gain_1p[12]\)\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9330_1p1_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9331_\(1p[12]_\(radio\|baseband\|mac\)_core\|common_\(wo_xlna_\)\?rx_gain_1p[12]\)\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9330_1p1_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9340_1p0_\(mac\|baseband\)_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9340Common_\(wo_xlna_\)\?rx_gain_table_1p0\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485\(\(C\|_c\)ommon_\(wo_xlna_\)\?rx_gain\)\?_1_[01]\(_\(radio\|baseband\|mac\)_core\)\?\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485_1_[01]_\(mac\|baseband\)_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485\(M\|_m\)odes_\(high\|low\|green\)\(est\)\?_\(power\|ob_db\)_tx_gain_1_[01]\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]\(ar9\(462\|580\)_\([12]p0_\)\?\(\(baseband\|mac\|radio\)_core\(_emulation\)\?\|\(common_\)\?\(wo_xlna_\|mixed_\)\?rx_gain_table\(_ar9280\)\?\(_[12]p0\)*\)\|ar9200_ar9280_2p0_radio_core\(_1p0\)\?\)\[\]\[2\][ ]=' 'drivers/net/wireless/ath/ath9k/ar9\(462\|580\)_[12]p0_initvals\.h'
+    defsnc 'static[ ]const[ ]u32[ ]ar9\(462\|580\)_\([12]p0_\)\?\(\(tx_gain_table_\)\?\(baseband\|mac\|radio\)_postamble\(_emulation\)\?\|\(modes_\)\?\(high\|low\(est\)\?\|mixed\|green\)_\(ob_db\|power\)_tx_gain_table\(_[12]p0\)\?\)\[\]\[5\][ ]=' 'drivers/net/wireless/ath/ath9k/ar9\(462\|580\)_[12]p0_initvals\.h'
+    defsnc 'static[ ]int[ ]ath_max_4ms_framelen\[4\]\[32\][ ]=' drivers/net/wireless/ath/ath9k/xmit.c
+    defsnc 'static[ ]const[ ]int[ ]\(ldo5\|buck1\)_voltage_map\[\][ ]=' drivers/regulator/lp3972.c
+    defsnc 'static[ ]const[ ]u16[ ]VCORE_VSEL_table\[\][ ]=' drivers/regulator/tps65023-regulator.c
+    defsnc 'static[ ]const[ ]u16[ ]\(VDCDC[1x]\|LDO[12]\)_VSEL_table\[\][ ]=' 'drivers/regulator/tps650\(23\|7x\)-regulator\.c'
+    defsnc 'static[ ]int[ ]tps6586x_\(ldo4\|sm2\|dvm\)_voltages\[\][ ]=' drivers/regulator/tps6586x-regulator.c
+    defsnc 'static[ ]struct[ ]vesa_mode_table[ ]vesa_mode\[\][ ]=' drivers/staging/sm7xx/smtcfb.c
+    defsnc 'static[ ]const[ ]unsigned[ ]short[ ]XGINew_DDRDRAM_TYPE20\[12\]\[5\][ ]=' drivers/staging/xgifb/vb_init.c
+    # New in 3.6:
+    defsnc 'static[ ]unsigned[ ]char[ ]mcf_host_slot2sid\[32\][ ]=' arch/m68k/platform/coldfire/pci.c
+    defsnc 'static[ ]struct[ ]aead_testvec[ ]hmac_sha\(1\|256\|512\)_aes_cbc_enc_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]struct[ ]hash_testvec[ ]bfin_crc_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc '[	]static[ ]u8[ ]bw_params\[3\]\[32\][ ]=' drivers/media/dvb/frontends/rtl2832.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm51\(02\|10\)_reva_patch\[\][ ]=' drivers/mfd/wm5102-tables.c
+    defsnc 'static[ ]const[ ]u32[ ]ar955x_1p0_\(radio\|baseband\|mac\)_postamble\[\]\[5\][ ]' drivers/net/wireless/ath/ath9k/ar955x_1p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar955x_1p0_\(\(radio\|mac\|baseband\)_core\|common_\(wo_xlna_\)\?rx_gain_table\)\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/955x_1p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar955x_1p0_modes_\(no_\)\?xpa_tx_gain_table\[\]\[9\][ ]=' drivers/net/wireless/ath/ath9k/955x_1p0_initvals.h
+    blobname 'ti-connectivity[/]wl12[78]x-fw-5-\([ms]r\|plt\)\.bin' drivers/net/wireless/wl12xx/main.c
+    blobname 'ti-connectivity[/]wl18xx-\(fw\|conf\)\.bin' drivers/net/wireless/wl18xx/main.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(ldo5\|buck1\)_voltage_map\[\][ ]=' drivers/regulator/lp3972.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(lp872x_ldo\|lp8720_ldo4\|lp8725_\(lilo\|buck\)\)_vtbl\[\][ ]=' drivers/regulator/lp872x.c
+    defsnc 'const[ ]int[ ]lp8788_dldo1239_vtbl\[\][ ]=' drivers/regulator/lp8788-ldo.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]mc13892_sw1\?\[\][ ]=' drivers/regulator/mc13892-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]VCORE_VSEL_table\[\][ ]=' drivers/regulator/tps65023-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]VDCDCx_VSEL_table\[\][ ]=' drivers/regulator/tps6507x-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]dcdc[12]_voltages\[\][ ]=' drivers/regulator/tps6524x-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]tps6586x_\(ldo4\|sm2\|dvm\)_voltages\[\][ ]=' drivers/regulator/tps6586x-regulator.c
+    defsnc 'static[ ]struct[ ]bcm_ddr_setting[ ]asT3\(LP\)\?B\?_DDRSetting\(160\|133\|100\|80\)MHz\[\][ ]\?=' drivers/staging/bcm/DDRInit.c
+    defsnc '[ ]*static[ ]const[ ]u8[ ]arp_req\[36\][ ]=' drivers/staging/csr/sme_sys.c
+    defsnc 'omap4430_adc_to_temp\[OMAP4430_ADC_END_VALUE[ ]-[ ]OMAP4430_ADC_START_VALUE[ ][+][ ]1\][ ]=' drivers/staging/oma-thermal/omap4-thermal.c
+    defsnc 'omap4460_adc_to_temp\[OMAP4460_ADC_END_VALUE[ ]-[ ]OMAP4460_ADC_START_VALUE[ ][+][ ]1\][ ]=' drivers/staging/oma-thermal/omap4-thermal.c
+    defsnc 'omap5430_adc_to_temp\[OMAP5430_ADC_END_VALUE[ ]-[ ]OMAP5430_ADC_START_VALUE[ ][+][ ]1\][ ]=' drivers/staging/oma-thermal/omap5-thermal.c
+    defsnc 'static[ ]struct[ ]vesa_mode[ ]vesa_mode_table\[\][ ]=' drivers/staging/sm7xxfb/sm7xxfb.c
+    defsnc 'static[ ]struct[ ]SiS_\(LCD\|LVDS\)Data[ ][ ]*XGI_\(\(\(St\|Ext\)LCD\|LVDS\)\(1024x768\|1280x1024\|1400x1050\)\|NoScaling\)Data\(_[12]\)\?\[\][ ]=' drivers/staging/xgifb/vb_table.h
+    defsnc 'static[ ]unsigned[ ]char[ ]rdesc\[\][ ]=' samples/uhid/uhid-example.c
+    defsnc 'static[ ]struct[ ]reg_default[ ]isabelle_reg_defs\[\][ ]=' sound/soc/codecs/isabelle.c
+    blobname 'dvb-usb-terratec-htc-stick-drxk\.fw' drivers/media/video/em28xx/em28xx-dvb.c
+    blobname 'rtl_nic[/]rtl8106e-1\.fw' drivers/net/ethernet/realtek/r8169.c
+    blobname 'rtl_nic[/]rtl8168g-1\.fw' drivers/net/ethernet/realtek/r8169.c
+    defsnc '[	]static[ ]const[ ]u16[ ]mac_ocp_patch\[\][ ]=' in drivers/net/ethernet/realtek/r8169.c
+    blobname 'rt3290\.bin\(\.[\n][	][ ][*][/]\)\?' drivers/net/wireless/rt2x00/rt2800pci.h
     ;;
 
   */patch-3.4*gnu*3.5*)
