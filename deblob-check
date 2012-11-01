@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-10-29
+# deblob-check version 2012-10-31
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3156,6 +3156,8 @@ set_except () {
   */patch-3.6*)
     # Present in patch for 3.6.4.
     accept 'MODULE_FIRMWARE[(]["]keyspan_pda[/]\(keyspan_pda\|xircom_pgs\)\.fw["][)][;]' drivers/usb/serial/keyspan_pda.c
+    # Present in patch for 3.6.5.
+    defsnc 'static[ ]const[ ]u32[ ]ar9300Modes_high_power_tx_gain_table_2p2\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9003_2p2_initvals.h
     ;;
 
   */patch-3.5*)
