@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-10-31
+# deblob-check version 2012-11-25
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3147,6 +3147,87 @@ set_except () {
     blobname 'rtl_nic[/]rtl8168g-1\.fw' drivers/net/ethernet/realtek/r8169.c
     defsnc '[	]static[ ]const[ ]u16[ ]mac_ocp_patch\[\][ ]=' in drivers/net/ethernet/realtek/r8169.c
     blobname 'rt3290\.bin\(\.[\n][	][ ][*][/]\)\?' drivers/net/wireless/rt2x00/rt2800pci.h
+
+    # New in 3.7:
+    blobname 'imx[/]sdma[/]sdma-imx6q-to1\.bin' arch/arm/boot/dts/imx6q.dtsi
+    accept 'AES_T[ed]:\([\n]\.word[	]0x[0-9a-f]*\([,][ ]0x[0-9a-f]*\)*\)*[\n][@][ ]T[ed]4\[256\]\([\n]\.byte[	]0x[0-9a-f]*\([,][ ]0x[0-9a-f]*\)*\)*\([\n][@][ ]rcon\[\]\([\n]\.word[	]0x[0-9a-f]*\([,][ ]0x[0-9a-f]*\)*\)*\([,][ ]0\)*\)\?' arch/arm/crypto/aes-armv4.S
+    defsnc 'const[ ]u32[ ]cast5_s[1234]\[256\][ ]=' crypto/cast5_generic.c
+    defsnc 'const[ ]u32[ ]cast6_s[1234]\[256\][ ]=' crypto/cast6_generic.c
+    accept '[ ][*][ ]Once[ ]it[ ]returns[ ]successfully[,][ ]driver[ ]can[ ]use[ ]request_firmware' drivers/base/firmware_class.c
+    accept 'int[\n ]cache_firmware[(]const[ ]char[ ][*]fw_name[)][\n][{]\([\n]\+[^\n}][^\n]*\)*ret[ ]=[ ]request_firmware[(][^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept '[ ][*][ ]If[ ]one[ ]device[ ]called[ ]request_firmware' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]struct[ ]mV_pos[ ]__cpuinitconst[ ]\(vrm85\|mobilevrm\)_mV\[32\][ ]=' drivers/cpufreq/longhaul.h
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]__cpuinitconst[ ]mV_\(vrm85\|mobilevrm\)\[32\][ ]=' drivers/cpufreq/longhaul.h
+    # Sources for these are in the corresponding .fuc files.
+    defsnc 'static[ ]u32[ ]nva3_pcopy_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/copy/fuc/nva3.fuc.h
+    defsnc 'static[ ]u32[ ]nvc0_pcopy_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/copy/fuc/nvc0.fuc.h
+    defsnc 'static[ ]uint32_t[ ]nv98_pcrypt_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/crypt/fuc/nv98.fuc.h
+    defsnc 'uint32_t[ ]nve0_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/gpcnve0.fuc.h
+    defsnc 'uint32_t[ ]nve0_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubnve0.fuc.h
+    defsnc 'nv04_graph_ctx_regs\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nv04.c
+    accept '[	]*ret[ ]=[ ]request_firmware[(]&fw[,][ ]source[,][ ]&nv_device[(]bios[)]->pdev->dev[)][;]' drivers/gpu/drm/nouveau/core/subdev/bios/base.c
+    defsnc 'static[ ]u8[ ][*]edid_load[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*err[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,][ ][&]pdev' drivers/gpu/drm/drm_edid_load.c
+    defsnc 'static[ ]const[ ]RegInitializer[ ]initData\[\][ ]__initconst[ ]=' drivers/ide/ali14xx.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_val[ ]tuner_init_fc2580\[\][ ]=' drivers/media/dvb-frontends/af9033_priv.h
+    defsnc '[	]static[ ]const[ ]u8[ ]bw_params1\[3\]\[34\][ ]=' drivers/media/dvb-frontends/rtl2830.c
+    blobname 's5k4ecgx\.bin' drivers/media/i2c/s5k4ecgx.c
+    blobname 'v4l-coda\(dx6-imx27\|7541-imx53\)\.bin' drivers/media/platform/coda.c
+    blobname 's5p-mfc\(-v6\)\?\.fw' drivers/media/platform/s5p-mfc/s5p_mfc.c
+    defsnc 'static[ ]const[ ]struct[ ]e4000_lna_filter[ ]e400_lna_filter_lut\[\][ ]=' drivers/media/tuners/e4000_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]e4000_if_filter[ ]e4000_if_filter_lut\[\][ ]=' drivers/media/tuners/e4000_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]fc2580_reg_val[ ]fc2580_init_reg_vals\[\][ ]=' drivers/media/tuners/fc2580_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]fc2580_freq_regs[ ]fc2580_freq_regs_lut\[\][ ]=' drivers/media/tuners/fc2580_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5110_revb_patch\[\][ ]=' drivers/mfd/wm5110-tables.c
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]lpc32xx_nand_oob[ ]=' drivers/mtd/nand/lpc32xx_mlc.c
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]flctl_4secc_oob_64[ ]=' drivers/mtd/nand/sh_flctl.c
+    defsnc 'static[ ]const[ ]struct[ ]atl1c_platform_patch[ ]plats\[\][ ]__devinitconst[ ]=' drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9565_1p0_\(\(mac\|baseband\|radio\)_core\|[Cc]ommon_\(wo_xlna_\)\?rx_gain_table\)\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9565_1p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9565_1p0_\(\(mac\|baseband\)_postamble\|[Mm]odes_\(low\(est\)\?\|high\)_\(ob_db\|power\)_tx_gain_table\)\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9565_1p0_initvals.h
+    defsnc 'static[ ]u16[ ]r2057_rev[4578]a\?_init\[[45][245]\]\[2\][ ]=' drivers/net/wireless/b43/radio_2057.c
+    defsnc '[	]*tbl_rf_control_override_rev7_over[01]\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    defsnc 'static[ ]const[ ]unsigned[ ]pci_pins\[\][ ]=' drivers/pinctrl/spear/pinctrl-spear1310.c
+    defsnc 'static[ ]int[ ]array_soc\[\]\[2\][ ]=' drivers/power/88pm860x_battery.c
+    defsnc 'static[ ]const[ ]int[ ]mc13783_sw[12]x_val\[\][ ]=' drivers/regulator/mc13783-regulator.c
+    # remoteproc uses request_firmware, but it is generic and names
+    # no blobs of its own, so we change it to maybe_request_firmware.
+    accept '[	]ret[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]FW_ACTION_HOTPLUG[,][\n][	 ]*rproc->firmware[,][ ][&]rproc->dev[,][ ]GFP_KERNEL[,][\n][ 	]*rproc[,][ ]rproc_fw_config_virtio[)][;][\n][	]if[ ][(]ret[ ]<[ ]0[)][ ][{][\n][	][	]dev_err[(][&]rproc->dev[,][ ]["]request_firmware_nowait[ ]err' drivers/remoteproc/remoteproc_core.c
+    # This remoteproc client does name blobs, but we discard it
+    # with undefine_macro.
+    blob 'SPROC_MODEM_NAME[ ]["]-fw\.bin["]' drivers/remoteproc/ste_modem_rproc.c
+    accept '[	]if[ ][(]request_firmware[(]&fw_entry,[ ]fname,[ ]&ioa_cfg->pdev->dev[)][)]' drivers/scsi/ipr.c
+    blobname 'daqboard2000_firmware\.bin' drivers/staging/comedi/drivers/daqboard2000.c
+    blobname 'me2600_firmware\.bin' drivers/staging/comedi/drivers/me_daq.c
+    blobname 'ni6534a\.bin' drivers/staging/comedi/drivers/ni_pcidio.c
+    blobname 'niscrb0[12]\.bin' drivers/staging/comedi/drivers/ni_pcidio.c
+    defsnc 'static[ ]const[ ]struct[ ]SiS_TVData[ ]XGI_\(St\|Ext\)\(PAL\|NTSC\|YPbPr\(525\|750\)[ip]\)Data\[\][ ]=' drivers/staging/xgifb/vb_table.h
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]XGI330_\(NTSC\|PAL\|HiTV\(Ext\|St[12]\|Text\)\|YPbPr\(525\|750\)[ip]\)Timing\[\][ ]=' drivers/staging/xgifb/vb_table.h
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]XGI330_\(HiTV\|Ren\(525\|750\)p\)Group3\(Data\|Simu\|Text\)\?\[\][ ]=' drivers/staging/xgifb/vb_table.h
+    accept 'static[ ]inline[ ]int[\n]\(maybe_\)\?reject_ihex_firmware\(_nowait\)\?[(][^{;]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}]' include/linux/firmware.h
+    defsnc '[/][*][ ]callback[ ]from[ ]request_firmware_nowait' sound/pci/hda/hda_intel.c
+    defsnc 'static[ ]int[ ]__devinit[ ]azx_probe[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*request_firmware[^\n]*' sound/pci/hda/hda_intel.c
+    defsnc 'static[ ]struct[ ]reg_default[ ]da9055_reg_defaults\[\][ ]=' sound/soc/codecs/da9055.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]sta32x_regs\[\][ ]=' sound/soc/codecs/sta32x.c
+    blobname 'wm0010\(_stage2\.bin\|\.dfw\)' sound/soc/codecs/wm0010.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5102_sysclk_reva_patch\[\][ ]=' sound/soc/codecs/wm5102.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8510_reg_defaults\[\][ ]=' sound/soc/codecs/wm8510.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8580_reg_defaults\[\][ ]=' sound/soc/codecs/wm8580.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8776_reg_defaults\[\][ ]=' sound/soc/codecs/wm8776.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8900_reg_defaults\[\][ ]=' sound/soc/codecs/wm8900.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8960_reg_defaults\[\][ ]=' sound/soc/codecs/wm8960.c
+    accept '[	][	]priv->firmware[ ]=[ ]true[;]' drivers/gpu/drm/nouveau/core/engine/graph/nvc0.c
+    accept '[	][	 ]*\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_ctor_fw[(]priv[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' 'drivers/gpu/drm/nouveau/core/engine/graph/nv[ce]0\.c'
+    accept '[	][	 ]*nvc0_graph_dtor_fw[(]&priv->fuc4\(09\|1a\)[cd][)][;]' 'drivers/gpu/drm/nouveau/nv[ce]0\.c'
+    accept '[	][	]*nvc0_graph_init_fw[(]priv[,][ ]0x4\(09\|1a\)000[,][ ][&]priv->fuc4\(09\|1a\)c[,][ \n	]*[&]priv->fuc4\(09\|1a\)d[)][;]' 'drivers/gpu/drm/nouveau/core/engine/graph/nv[ce]0\.c'
+    blobname 'dvb-fe-xc5000c-4\.1\.30\.7\.fw' drivers/media/tuners/xc5000.c
+    accept '[	]\.firmware[ ]=[ ]AF9015_FIRMWARE' drivers/media/usb/dvb-usb-v2/af9015.c
+    accept '[	]\.firmware[ ]=[ ]AF9035_FIRMWARE' drivers/media/usb/dvb-usb-v2/af9035.c
+    accept '[	]\.firmware[ 	]*=[ ]AZ6007_FIRMWARE' drivers/media/usb/dvb-usb-v2/az6007.c
+    accept '[	]\.firmware[ ]=[ ]EC168_FIRMWARE' drivers/media/usb/dvb-usb-v2/ec168.c
+    blobname 'brcm[/]brcmfmac43\(143\|242a\)\.bin' drivers/net/wireless/brcm80211/brcmfmac/usb.c
+    accept '[	]priv->firmware[ ]=[ ]fw[;]' drivers/net/wireless/p54/p54pci.c
+    blobname 'c[bt]2\?fw-3\.1\.0\.0\.bin' drivers/scsi/bfa/bfad.c
+    blobname 'gdmuimg\.bin' drivers/staging/gdm72xx/usb_boot.c
+    blobname 'CMV4[pi]\.bin\(\.v2\)\?' drivers/usb/atm/ueagle-atm.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
