@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-11-26
+# deblob-check version 2012-11-27
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3228,6 +3228,8 @@ set_except () {
     blobname 'c[bt]2\?fw-3\.1\.0\.0\.bin' drivers/scsi/bfa/bfad.c
     blobname 'gdmuimg\.bin' drivers/staging/gdm72xx/usb_boot.c
     blobname 'CMV4[pi]\.bin\(\.v2\)\?' drivers/usb/atm/ueagle-atm.c
+    blobname 'dvb-fe-tda10071\.fw' drivers/media/dvb/frontends/tda10071_priv.h
+    accept '[	]st->it913x_config\.firmware[ ]=' drivers/media/usb/dvb-usb-v2/it913x.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -3552,6 +3554,8 @@ set_except () {
     blobname 'c[bt]2\?fw-3\.1\.0\.0\.bin' drivers/scsi/bfa/bfad.c
     blobname 'gdmuimg\.bin' drivers/staging/gdm72xx/usb_boot.c
     blobname 'CMV4[pi]\.bin\(\.v2\)\?' drivers/usb/atm/ueagle-atm.c
+    blobname 'dvb-fe-tda10071\.fw' drivers/media/dvb/frontends/tda10071_priv.h
+    accept '[	]st->it913x_config\.firmware[ ]=' drivers/media/usb/dvb-usb-v2/it913x.c
     # Present in 3.6 but removed in the patch:
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]__\(cpu\)\?initdata[ ]mV_vrm85\[32\][ ]=' arch/x86/kernel/cpu/cpufreq/longhaul.h
     accept '[	][	]snprintf[(]fname[,][ ]sizeof[(]fname[)][,][ ]["]nouveau[/]%s["][,][ ]nouveau_vbios[)][;][\n][	][	]ret[ ]=[ ]request_firmware[(]' drivers/gpu/drm/nouveau/nouveau_bios.c
