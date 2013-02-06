@@ -3263,7 +3263,44 @@ set_except () {
     ;;
 
   */patch-3.7*)
+    # Removed chunks matched by entries that don't appear in the patch context.
+    initnc '[	]0x019806b8[,][\n][	]0x1427f116[,]' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubnvc0.fuc.h
+    initnc '[	]0xf1160198[,][\n][	]0xb6041427[,]' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubnve0.fuc.h
+    # Present in 3.7 and removed in the patch (for --reverse-patch).
+    defsnc 'static[ ]struct[ ]pinmux_cfg_reg[ ]pinmux_config_regs\[\][ ]=' 'arch/sh/kernel/cpu/sh2a/pinmux-sh7203\.c\|arch/arm/mach-shmobile/pfc-sh73[67]7\.c'
+    defsnc 'const[ ]u32[ ]cast5_s[1234]\[256\][ ]=' crypto/cast5_generic.c
+    defsnc 'const[ ]u32[ ]cast6_s[1234]\[256\][ ]=' crypto/cast6_generic.c
+    defsnc 'unsigned[ ]char[ ]\(QUALITY\|STRENGTH\)_MAP\[\][ ]=' drivers/staging/rtl8187se/r8180_core.c
+    defsnc 'static[ ]const[ ]u16[ ]rtl8225\(bcd\|z2\)_rxgain\[\][ ]=' 'drivers/net/wireless/rtl818x/rtl818[07]/rtl8225\.c'
+    defsnc '\(static[ ]const[ ]\)\?u\(8\|16\|32\)[ ]\(rtl8225\(z2\)\?_\(threshold\|gain_\(a\|bg\)\|chan\|rxgain\|agc\|tx_\(gain_cck\|power\)_ofdm\|tx_power_cck\(_ch14\)\?\)\|ZEBRA2_CCK_OFDM_GAIN_SETTING\)\[\][ ]\?=' drivers/staging/rtl8187se/r8180_rtl8225z2.c
+    defsnc '[	]static[ ]unsigned[ ]char[ ]table_alaw2ulaw\[\][ ]=' drivers/staging/telephony/ixj.c
+    defsnc '[	]static[ ]unsigned[ ]char[ ]table_ulaw2alaw\[\][ ]=' drivers/staging/telephony/ixj.c
+    # Chunks matched by other entries that don't appear in the patch context.
+    initnc '[	][{][ ]19200000[,][ ]216000000[,]' arch/arm/mach-tegra/tegra20_clocks_data.c
+    initnc '[	]0x16019806[,][\n][	]0x041427f1[,]' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubnvc0.fuc.h
+    initnc '[	]0x98069221[,][\n][	]0x27f11601[,]' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubnve0.fuc.h
+    initnc '[	][{]0x0000a284\([,][ ]0x00000000\)*\([,][ ]0x00000150\)*[}][,]' drivers/net/wireless/ath/ath9k/ar9462_2p0_initvals.h
+    initnc '[	][{]0x0000a574\([,][ ]0x9c1fff0b\)*\([,][ ]0x5e001eeb\)*[}][,]' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    initnc '[	][{]0x0000a580[,][ ]0x00000000[}][,]' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    initnc '[	][{]0x0000a584\([,][ ]0x00000000\)*\([,][ ]0x00000150\)*[}][,]' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    initnc '[	][{]0x0000a0b4\([,][ ]0x00000000\)*\([,][ ]0x00000150\)*[}][,]' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    initnc '[	][{]0x0000982c\([,][ ]0x05eea6d4\)*[}][,]' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    accept '[	][	]err[ ]=[ ]request_firmware_nowait[(]THIS_MODULE,[ ]true,[ ]patch\[dev\],' sound/pci/hda/hda_intel.c
+    initnc '[	][{][ ]184[,][ ]0x00[ ][}][,]' sound/soc/codecs/lm49453.c
     # Already present in 3.7.
+    defsnc '\(static[ ]\)\?unsigned[ ]char[ ]\(__attribute__[ ][(][(]aligned[(]16[)][)][)][ ]\)\?bootlogo_bits\[\][ ]=' arch/m68k/platform/68328/bootlogo.h
+    accept '[	]-[ ]calls[ ]request_firmware[(]' Documentation/firmware_class/README
+    accept 'request_firmware\(_nowait\)\?[(]' drivers/base/firmware_class.c
+    defsnc '[	][}][ ]regs\[\][ ]=' drivers/media/video/em28xx/em28xx-dvb.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9300Modes_\(\(low\(est\)\?\|high\)_ob_db\|high_power\)_tx_gain_table_2p[02]\[\]\[5\][ ]=' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
+    defsnc 'static[ ]const[ ]u32[ ]ar9485\(M\|_m\)odes_\(high\|low\|green\)\(est\)\?_\(power\|ob_db\)_tx_gain_1_[01]\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485\(\(C\|_c\)ommon_\(wo_xlna_\)\?rx_gain\)\?_1_[01]\(_\(radio\|baseband\|mac\)_core\)\?\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc '\(static[ ]\)\?const[ ]u16[ ]dot11lcn_sw_ctrl_tbl_\(4313_\)\?\(bt_\)\?\(epa_\)\?\(p250_\)\?rev0\(_combo\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
+    defsnc 'static[ ]const[ ]u32[ ]ofdmswing_table\[OFDM_TABLE_SIZE\][ ]=' drivers/net/wireless/rtlwifi/rtl8192ce/dm.c
+    defsnc 'static[ ]const[ ]u8[ ]cckswing_table_ch\(1ch13\|14\)\[CCK_TABLE_SIZE\]\[8\][ ]=' drivers/net/wireless/rtlwifi/rtl8192ce/dm.c
+    defsnc 'static[ ]u8[ ]reserved_page_packet\[TOTAL_RESERVED_PKT_LEN\][ ]=' 'drivers/net/wireless/rtlwifi/rtl8192[cd]e/fw.c'
+    defsnc '[	][}][ ]hw_config\[\][ ]=' drivers/nfc/pn544_hci.c
+    accept 'FIRMWARE[ ]LOADER[ ][(]request_firmware[)]' MAINTAINERS
     blobname '\(comedi[/]\)\?jr3pci\.idm\(["]\.[\n][ ][*][/]\)\?' drivers/staging/comedi/drivers/jr3_pci.c
     blobname '\([/]lib[/]firmware[/]\)\?\(gdm72xx[/]\)\?gdms\(krn\|rfs\)\.bin' drivers/staging/gdm72xx/sdio_boot.c
     defsnc '[}][ ]sisfb_ddc[sf]modes\[\][ ]\(__devinitdata[ ]\)\?=' drivers/video/sis/sis_main.h
