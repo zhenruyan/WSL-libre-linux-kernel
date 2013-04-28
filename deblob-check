@@ -3253,6 +3253,16 @@ set_except () {
     blobname '%s-dsp%d\.\(wmfw\|bin\)' sound/soc/codecs/wm_adsp.c
     blobname 'fw-4\.bin' drivers/net/wireless/ath/ath6kl/core.h
     accept '[	]hdsp->firmware[ ]=[ ]fw' sound/pci/rme9652/hdsp.c
+
+    # ath9k firmware is now Free Software.
+    accept '[	]err[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]1[,][ ]name[,][ ]sc->dev[,][ ]GFP_KERNEL[,][\n][ 	]*[&]ec[,][ ]ath9k_eeprom_request_cb[)][;]' drivers/net/wireless/ath/ath9k/init.c
+    accept '[#]define[ ]FIRMWARE_AR7010_1_1[ 	]*["]htc_7010\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[#]define[ ]FIRMWARE_AR9271[ 	]*["]htc_9271\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept 'MODULE_FIRMWARE[(]FIRMWARE_AR7010_1_1[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept 'MODULE_FIRMWARE[(]FIRMWARE_AR9271[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[	]ret[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[,][ ]GFP_KERNEL[,][\n][ 	]*hif_dev[,][ ]ath9k_hif_usb_firmware_cb[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[	]ret[ ]=[ ]request_firmware[(][&]hif_dev->firmware[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[	][	]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
