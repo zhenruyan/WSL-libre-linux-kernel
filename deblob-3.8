@@ -1670,12 +1670,6 @@ reject_firmware drivers/net/wireless/ath/ath9k/init.c
 clean_kconfig drivers/net/wireless/ath/ath9k/Kconfig 'ATH9K'
 clean_mk CONFIG_ATH9K drivers/net/wireless/ath/ath9k/Makefile
 
-announce ATH9K_HTC - "Atheros HTC based wireless cards support"
-reject_firmware drivers/net/wireless/ath/ath9k/hif_usb.c
-clean_blob drivers/net/wireless/ath/ath9k/hif_usb.c
-clean_kconfig drivers/net/wireless/ath/ath9k/Kconfig 'ATH9K_HTC'
-clean_mk CONFIG_ATH9K_HTC drivers/net/wireless/ath/ath9k/Makefile
-
 announce PRISM2_USB - "Prism2.5/3 USB driver"
 reject_firmware drivers/staging/wlan-ng/prism2fw.c
 clean_blob drivers/staging/wlan-ng/prism2fw.c

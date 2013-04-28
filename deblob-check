@@ -2491,7 +2491,6 @@ set_except () {
     defsnc 'static[ ]struct[ ]v_table[ ]v_table\[\][ ]=' drivers/gpu/drm/i915/i915_dma.c
     blobname 'orinoco_ezusb_fw' drivers/net/wireless/orinoco/orinoco_usb.c
     defsc 'static[ ]const[ ]struct[ ]ar9300_eeprom[ ]ar9300_default[ ]=' drivers/net/wireless/ath/ath9k/ar9003_eeprom.c
-    blobname 'ar9271[.]fw' drivers/net/wireless/ath/ath9k/hif_usb.c
     accept '[	]hif_dev->firmware[ ]=[ ]NULL[;]' drivers/net/wireless/ath/ath9k/hif_usb.c
     defsnc 'static[ ]const[ ]u32[ ]ar9300_2p[02]_\(radio\|mac\|baseband\)_postamble\[\]\[5\][ ]=' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
     defsnc 'static[ ]const[ ]u32[ ]ar9300Modes_\(\(low\(est\)\?\|high\)_ob_db\|high_power\)_tx_gain_table_2p[02]\[\]\[5\][ ]=' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
@@ -2555,7 +2554,6 @@ set_except () {
     blobname 'lgs8g75\.fw' drivers/media/dvb/frontends/lgs8gxx.c
     defsnc 'static[ ]const[ ]struct[ ]ucbus_write_cmd[ ]\(icx098bq\|lz24bp\)_start_[012]\[\][ ]=' drivers/media/video/gspca/sq930x.c
     defsnc '[}][ ]capconfig\[4\]\[2\][ ]=' drivers/media/video/gspca/sq930x.c
-    blobname 'ar7010\(_1_1\)\?[.]fw' drivers/net/wireless/ath/ath9k/hif_usb.c
     defsnc 'static[ ]u8[ ]sa2400_rf_rssi_map\[\][ ]=' drivers/net/wireless/rtl818x/rtl8180_sa2400.c
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]pwm_lookup_table\[256\][ ]=' drivers/platform/x86/compal-laptop.c
     defsnc 'static[ ]int[ ]tps6586x_\(ldo4\|sm2\|dvm\)_voltages\[\][ ]=' drivers/regulator/tps6586x-regulator.c
@@ -2845,7 +2843,6 @@ set_except () {
     defsnc 'static[ ]struct[ ]pll_limit[ ]\(cle266\|k800\|cx700\|vx855\)_pll_limits\[\][ ]=' drivers/video/via/hw.c
     accept '[	][	]-e[ ]["][$]tmp_dir[/]lib[/]modules[/][$]KERNELRELEASE[/]modules\.dep\.bin["]' scripts/depmod.sh
     blobname 'wm8958_\(enh_eq\|mbc\(_vss\)\?\)\.wfw' sound/soc/codecs/wm8958-dsp2.c
-    blobname 'htc_\(7010\|9271\)\.fw' drivers/net/wireless/ath/ath9k/hif_usb.c
     blobname 'rtl_nic[/]rtl8168e-[12]\.fw' drivers/net/r8169.c
     defsnc '[	]static[ ]const[ ]struct[ ]ephy_info[ ]e_info_8168e\[\][ ]=' drivers/net/r8169.c
     blobname 'ti-connectivity[/]wl128x-fw\(-ap\)\?\.bin' drivers/net/wireless/wl12xx/wl12xx.h
@@ -4712,7 +4709,6 @@ set_except () {
     defsnc 'static[ ]const[ ]u32[ ]ar9300Modes_\(\(low\(est\)\?\|high\)_ob_db\|high_power\)_tx_gain_table_2p[02]\[\]\[5\][ ]=' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
     defsnc 'static[ ]const[ ]u32[ ]ar9\(300\|200_merlin\)_2p[02]_\(radio\|mac\|baseband\)_core\[\]\[2\][ ]=' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
     defsnc 'static[ ]const[ ]u32[ ]ar9300Common_\(wo_xlna_\)\?rx_gain_table_\(merlin_\)\?2p[02]\[\]\[2\][ ]=' 'drivers/net/wireless/ath/ath9k/ar9003_\(2p[02]_\)\?initvals\.h'
-    blobname 'ar9271[.]fw' drivers/net/wireless/ath/ath9k/hif_usb.c
     accept 'static[ ]int[ ]ipw2100_mod_firmware_load[(]' 'drivers/net/wireless/\(ipw2x00/\)\?ipw2100\.c'
     accept '[	]*card->firmware[ ]=[ ]\(if_sdio\|lbs_fw\|fw_name\)' drivers/net/wireless/libertas/if_sdio.c
     blobname 'rt\(28[67]0\|30[79][01]\)\.bin' drivers/staging/rt2860/common/rtmp_mcu.c
@@ -4753,7 +4749,6 @@ set_except () {
     blobname 'lgs8g75\.fw' drivers/media/dvb/frontends/lgs8gxx.c
     defsnc 'static[ ]const[ ]struct[ ]ucbus_write_cmd[ ]\(icx098bq\|lz24bp\)_start_[012]\[\][ ]=' drivers/media/video/gspca/sq930x.c
     defsnc '[}][ ]capconfig\[4\]\[2\][ ]=' drivers/media/video/gspca/sq930x.c
-    blobname 'ar7010\(_1_1\)\?[.]fw' drivers/net/wireless/ath/ath9k/hif_usb.c
     defsnc 'static[ ]u8[ ]sa2400_rf_rssi_map\[\][ ]=' drivers/net/wireless/rtl818x/rtl8180_sa2400.c
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]pwm_lookup_table\[256\][ ]=' drivers/platform/x86/compal-laptop.c
     defsnc 'static[ ]int[ ]tps6586x_\(ldo4\|sm2\|dvm\)_voltages\[\][ ]=' drivers/regulator/tps6586x-regulator.c
