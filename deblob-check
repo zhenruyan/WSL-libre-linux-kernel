@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2013-04-18
+# deblob-check version 2013-04-28
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3263,6 +3263,58 @@ set_except () {
     accept '[	]ret[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[,][ ]GFP_KERNEL[,][\n][ 	]*hif_dev[,][ ]ath9k_hif_usb_firmware_cb[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
     accept '[	]ret[ ]=[ ]request_firmware[(][&]hif_dev->firmware[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
     accept '[	][	]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+
+    # New in 3.9
+    blobname 'imx[/]sdma[/]sdma-imx6q\.bin' arch/arm/boot/dts/imx6qdl.dtsi
+    accept '[	]*nvidia,emc-registers[ ]=[ 	]*<\(0x[0-9a-f]*[ 	\n]*\)*>[;]' arch/arm/boot/dts/tegra20-colibri-512.dtsi
+    blobname 'kernel[/]x86[/]microcode[/]GenuineIntel\.bin' arch/x86/kernel/microcode_intel_early.c
+    accept '[0-9][0-9]*[	][0-3][	][0-3][	]0\([\n][0-9][0-9]*[	][0-3][	][0-3][	]0\)*' Documentation/thermal/intel_powerclamp.txt
+    accept '[	]return[ ]_request_firmware_load[(]fw_priv[,]' drivers/base/firmware_class.c
+    accept 'static[ ]int[\n]_request_firmware_prepare[(]struct[ ]firmware[ ][*][*]\?firmware_p' drivers/base/firmware_class.c
+    accept '[/][*][ ]called[ ]from[ ]request_firmware[(][)][ ]and[ ]request_firmware_work_func[(][)][ ][*][/]' drivers/base/firmware_class.c
+    accept '[	]_request_firmware[(][&]fw[,][ ]fw_work->name' drivers/base/firmware_class.c
+    accept '[	]put_device[(]fw_work->device[)][;][ ][/][*][ ]taken[ ]in[ ]request_firmware_nowait[(][)][ ][*][/]' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]u16[ ]x[48]_vectors\[\][ ]=' drivers/edac/amd64_edac.c
+    defsnc 'static[ ]const[ ]struct[ ]hdmiphy_config[ ]hdmiphy_v14_configs\[\][ ]=' drivers/gpu/drm/exynos/exynos_hdmi.c
+    defsnc 'static[ ]const[ ]u32[ ]oland_io_mc_regs\[TAHITI_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/si.c
+    defsnc 'static[ ]const[ ]u8[ ]sixaxis_rdesc_fixup2\?\[\][ ]=' drivers/hid/hid-sony.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_val[ ]tuner_init_fc0012\[\][ ]=' drivers/media/dvb-frontends/af9033_priv.h
+    defsnc '\(static[ ]\)\?struct[ ]linear_segments[ ]cnr_\(to_db\|\(64\|16\)qam\|qpsk\)_table\[\][ ]=' drivers/media/dvb-frontends/mb86a20s.c
+    blobname 'SlimISP_\(%\.2s\|..\)\.bin' drivers/media/i2c/s5c73m3/s5c73m3-core.c
+    defsc 'static[ ]const[ ]struct[ ]i2c_rv[ ]ov965x_init_regs\[\][ ]=' drivers/media/i2c/ov9650.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]vp7049_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/m920x.c
+    blobname 'dvb-usb-vp7049-0\.95\.fw' drivers/media/dvb/dvb-usb/m920x.c
+    # The blob name is just the chip name, so no point in deblobbing;
+    # more so considering the number of false positives this would
+    # bring about.
+    # blobname 'lp5521' drivers/leds/leds-lp5521.c
+    # blobname 'lp55231\?' drivers/leds/leds-lp5523.c
+    blobname 'lattice-ecp3\.bit' drivers/misc/lattice-ecp3-config.c
+    defsnc '[	]*static[ ]const[ ]uint8_t[ ]rss_key\[UPT1_RSS_MAX_KEY_SIZE\][ ]=' drivers/net/vmxnet3/vmxnet3_drv.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9300Modes_\(mixed_ob_db\|type5\)_tx_gain_table_2p2\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9003_2p2_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9340Modes_low_ob_db_and_spur_tx_gain_table_1p0\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485Modes_green_spur_ob_db_tx_gain_1_1\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9580_1p0_type6_tx_gain_table\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9580_1p0_initvals.h
+    blobname 'iwlwifi-\(7260\|3160\)-' drivers/net/wireless/iwlwifi/pcie/7000.c
+    blobname 'mrvl[/]pcie8897_uapsta\.bin' drivers/net/wireless/mwifiex/pcie.h
+    accept 'static[ ]const[ ]struct[ ]mwifiex_pcie_device[ ]mwifiex_pcie\(8766\|8897\)[ ]=[ ][{][\n][	]\.firmware[ 	]*=' drivers/net/wireless/mwifiex/pcie.h
+    accept '[	][	]card->pcie\.firmware[ ]=' drivers/net/wireless/mwifiex/pcie.c
+    accept '[	][	]\.per_chan_pwr_limit_arr_11abg[ 	]*=[ ][{][	 0xf,\n]*' drivers/net/wireless/ti/wl18xx/main.c
+    blobname 'ti-connectivity[/]wl18xx-fw-2\.bin' drivers/net/wireless/ti/wl18xx/main.c
+    blobname '%s-dsp%d-%s\.\(wmfw\|bin\)' sound/soc/codecs/wm_adsp.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_addr[ ]\(idle_\)\?reg_addrs\[\][ ]=' drivers/net/ethernet/broadcom/bnx2x/bnx2x_dump.h
+    blobname '83xx_fw\.bin' drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]dump_num_registers\[NUM_CHIPS\]\[NUM_PRESETS\][ ]=' drivers/net/ethernet/broadcom/bnx2x/bnx2x_dump.h
+    defsnc 'static[ ]int[ ]pm2xxx_charger_voltage_map\[\][ ]=' drivers/power/pm2301_charger.c
+    accept '[ ][*][ ]comedi[ ]drivers\.[ ]The[ ]request_firmware[(][)][ ]hotplug' drivers/staging/comedi/comedi.h
+    blobname 'rp2\.fw' drivers/tty/serial/rp2.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]seq_\(w\|rgb\)_gamma\[\][ ]=' drivers/video/backlight/lms501kf03.c
+    defsnc '[#]include[ ]<video[/]mmp_disp\.h>[\n]*static[ ]u16[ ]init\[\][ ]=' drivers/video/mmp/panel/tpo_tj032md01bw.c
+    defsnc 'static[ ]struct[ ]tegra_clk_pll_freq_table[ ]pll_[mpadcu]_freq_table\[\][ ]=' 'drivers/clk/tegra/clk-tegra[23]0\.c'
+    blobname 'ctefx\.bin' sound/pci/hda/patch_ca0132.c
+    defsnc 'static[ ]unsigned[ ]int[ ]\(voice_focus\|mic_svm\|equalizer\)_vals_lookup\[\][ ]=' sound/pci/hda/patch_ca0132.c
+    defsnc 'static[ ]struct[ ]hda_verb[ ]ca0132_init_verbs0\[\][ ]=' sound/pci/hda/patch_ca0132.c
+    defsnc 'static[ ]const[ ]int[ ]dmic_comp\[6\]\[6\][ ]=' sound/soc/codecs/max98090.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
