@@ -1878,7 +1878,7 @@ set_except () {
     initnc '[	][	]static[ ]unsigned[ ]char[ ]const[ ]data_bit\[64\][ ]='
     initnc '[	][	]static[ ]const[ ]u8[ ]data_sbit\[32\][ ]='
     initnc '[	]\.RightCoefs[ ]='
-    initnc '[	]#define[ ]WakeupSeq[ ][ ][ ][ ][{]'
+    defsnc '[	]#define[ ]WakeupSeq[ ][ ][ ][ ][{]' drivers/net/ethernet/i825xx/eepro.c
     initnc '[	]SetRate44100\[\][ ]='
     initnc '[	]const[ ]short[ ]period\[32\][ ]='
     defsnc '[	]\(const[ ]static\|static[ ]const\)[ ]int[ ]desc_idx_table\[\][ ]=' 'arch/arm/include/asm/hardware/iop3xx-adma.h|include/asm-arm/hardware/iop3xx-adma.h'
@@ -1901,7 +1901,7 @@ set_except () {
     defsnc '[	]static[ ]u16[ ]tables\[\][ ]=' drivers/media/pci/meye/meye.c
     initnc '[	]static[ ]u32[ ]logMagTable\[128\][ ]='
     defsnc '[	]static[ ]u8[ ]init_bufs\[13\]\[5\][ ]=' drivers/media/pci/cx88/cx88-cards.c
-    initnc '[	]static[ ]u_short[ ]geometry_table\[\]\[[45]\][ ]='
+    defsnc '[	]static[ ]u_short[ ]geometry_table\[\]\[[45]\][ ]=' drivers/block/xd.c
     initnc '[	]static[ ]unsigned[ ]char[ ]CRCTable1\[\][ ]='
     initnc '[	]static[ ]unsigned[ ]char[ ]CRCTable2\[\][ ]='
     initnc '[	]static[ ]unsigned[ ]char[ ]default_colors\[\][ ]='
@@ -3324,7 +3324,105 @@ set_except () {
   */patch-3.8*)
     # Present in 3.8 but patched in stable releases.
     defsnc '\(static[ ]\)\?const[ ]u16[ ]dot11lcn_sw_ctrl_tbl_\(4313_\)\?\(bt_\)\?\(epa_\)\?\(p250_\)\?rev0\(_combo\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phytbl_lcn\.c\)'
-   ;;
+    # ath9k firmware is now Free Software.
+    accept '[	]err[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]1[,][ ]name[,][ ]sc->dev[,][ ]GFP_KERNEL[,][\n][ 	]*[&]ec[,][ ]ath9k_eeprom_request_cb[)][;]' drivers/net/wireless/ath/ath9k/init.c
+    accept '[#]define[ ]FIRMWARE_AR7010_1_1[ 	]*["]htc_7010\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[#]define[ ]FIRMWARE_AR9271[ 	]*["]htc_9271\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept 'MODULE_FIRMWARE[(]FIRMWARE_AR7010_1_1[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept 'MODULE_FIRMWARE[(]FIRMWARE_AR9271[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[	]ret[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[,][ ]GFP_KERNEL[,][\n][ 	]*hif_dev[,][ ]ath9k_hif_usb_firmware_cb[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[	]ret[ ]=[ ]request_firmware[(][&]hif_dev->firmware[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[	][	]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    # Present in 3.8
+    accept '[	]-[ ]request_firmware[(][)][ ]hotplug[ ]interface[ ]info.' Documentation/00-INDEX
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]qi_lb60_ecclayout_[12]gb[ ]=' arch/mips/jz4740/board-qi_lb60.c
+    defsnc 'static[ ]struct[ ]comp_testvec[ ]\(deflate\|lzo\)_\(de\)\?comp_tv_template\[\][ ]=' 'crypto/\(tcrypt\|testmgr\).h'
+    defsc 'static[ ]const[ ]struct[ ]minimode[ ]est3_modes\[\][ ]=' drivers/gpu/drm/drm_edid_modes.h
+    defsnc 'static[ ]const[ ]u32[ ]ar955x_1p0_\(radio\|baseband\|mac\)_postamble\[\]\[5\][ ]' drivers/net/wireless/ath/ath9k/ar955x_1p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar955x_1p0_modes_\(no_\)\?xpa_tx_gain_table\[\]\[9\][ ]=' drivers/net/wireless/ath/ath9k/955x_1p0_initvals.h
+    defsnc 'static[ ]struct[ ]pinmux_cfg_reg[ ]pinmux_config_regs\[\][ ]=' 'arch/sh/kernel/cpu/sh2a/pinmux-sh7203\.c\|arch/arm/mach-shmobile/pfc-sh73[67]7\.c'
+    accept '#define[ ]CONFIG_PATH[ ]*["][/]etc[/]vntconfiguration[.]dat["]' drivers/staging/vt6655/device_cfg.h
+    # For 3.8-to-3.9 patch:
+    accept '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?\(static[ ]\(void\|int\)[ ]\)\?_\?request_firmware\(_load\|_work_func\)\?[(]' drivers/base/firmware_class.c
+    accept '[	]ret[ ]=[ ]_request_firmware_prepare[(]' drivers/base/firmware_class.c
+    accept '[ 	]*return[ ]_request_firmware[(]firmware_p,' drivers/base/firmware_class.c
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]struct[ ]reg_val[ ]tuner_init_f\(c0011\[\][ ]=\)\?\(\([ ][{]\)\?[*][/][;]\)\?' drivers/media/dvb/frontends/af9033_priv.h
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]struct[ ]regdata[ ]mb86a20s_init\[\][ ]=\([ ]\?[{]\?[*][/][;]\)\?' drivers/media/dvb/frontends/mb86a20s.c
+    accept '[	]\.firmware[ ]=[ ]\(DW210[24]\|DW3101\|S630\)_FIRMWARE' drivers/media/usb/dvb-usb/dw2102.c
+    accept '[	]\(p1100\|s660\|p7500\)->firmware[ ]=[ ]\(P1100\|S660\|P7500\)_FIRMWARE' drivers/media/usb/dvb-usb/dw2102.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9485Modes_green_ob_db_tx_gain_1_1\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u32[ ]ar955x_1p0_\(radio\|baseband\|mac\)_pos\(tamble\[\]\[5\][ ]=\)\?\([ ]\?[{]\?[*][/][;]\)\?' drivers/net/wireless/ath/ath9k/ar955x_1p0_initvals.h
+    defsnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u32[ ]ar955x_1p0_modes_\(no_\)\?xpa_tx\(_gain_table\[\]\[9\][ ]=\)\?\([ ]\?[{]\?[*][/][;]\)\?' drivers/net/wireless/ath/ath9k/955x_1p0_initvals.h
+    initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?u16[ ]MCS_DATA_RATE\[2\]\[2\]\[77\][ ]=\([*][/][;]\)\?' 'drivers/staging/\(rtl8192su/ieee80211/rtl819x_HTProc\.c\|rtl8192u/r819xU_firmware\.c\)'
+    accept '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]int[ ]do_mod_firmware_load[(]' sound/sound_firmware.c
+    # New in 3.9
+    blobname 'imx[/]sdma[/]sdma-imx6q\.bin' arch/arm/boot/dts/imx6qdl.dtsi
+    accept '[	]*nvidia,emc-registers[ ]=[ 	]*<\(0x[0-9a-f]*[ 	\n]*\)*>[;]' arch/arm/boot/dts/tegra20-colibri-512.dtsi
+    blobname 'kernel[/]x86[/]microcode[/]GenuineIntel\.bin' arch/x86/kernel/microcode_intel_early.c
+    accept '[0-9][0-9]*[	][0-3][	][0-3][	]0\([\n][0-9][0-9]*[	][0-3][	][0-3][	]0\)*' Documentation/thermal/intel_powerclamp.txt
+    accept '[	]return[ ]_request_firmware_load[(]fw_priv[,]' drivers/base/firmware_class.c
+    accept 'static[ ]int[\n]_request_firmware_prepare[(]struct[ ]firmware[ ][*][*]\?firmware_p' drivers/base/firmware_class.c
+    accept '[/][*][ ]called[ ]from[ ]request_firmware[(][)][ ]and[ ]request_firmware_work_func[(][)][ ][*][/]' drivers/base/firmware_class.c
+    accept '[	]_request_firmware[(][&]fw[,][ ]fw_work->name' drivers/base/firmware_class.c
+    accept '[	]put_device[(]fw_work->device[)][;][ ][/][*][ ]taken[ ]in[ ]request_firmware_nowait[(][)][ ][*][/]' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]u16[ ]x[48]_vectors\[\][ ]=' drivers/edac/amd64_edac.c
+    defsnc 'static[ ]const[ ]struct[ ]hdmiphy_config[ ]hdmiphy_v14_configs\[\][ ]=' drivers/gpu/drm/exynos/exynos_hdmi.c
+    defsnc 'static[ ]const[ ]u32[ ]oland_io_mc_regs\[TAHITI_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/si.c
+    defsnc 'static[ ]const[ ]u8[ ]sixaxis_rdesc_fixup2\?\[\][ ]=' drivers/hid/hid-sony.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_val[ ]tuner_init_fc0012\[\][ ]=' drivers/media/dvb-frontends/af9033_priv.h
+    defsnc '\(static[ ]\)\?struct[ ]linear_segments[ ]cnr_\(to_db\|\(64\|16\)qam\|qpsk\)_table\[\][ ]=' drivers/media/dvb-frontends/mb86a20s.c
+    blobname 'SlimISP_\(%\.2s\|..\)\.bin' drivers/media/i2c/s5c73m3/s5c73m3-core.c
+    defsc 'static[ ]const[ ]struct[ ]i2c_rv[ ]ov965x_init_regs\[\][ ]=' drivers/media/i2c/ov9650.c
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]vp7049_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/m920x.c
+    blobname 'dvb-usb-vp7049-0\.95\.fw' drivers/media/dvb/dvb-usb/m920x.c
+    # The blob name is just the chip name, so no point in deblobbing;
+    # more so considering the number of false positives this would
+    # bring about.
+    # blobname 'lp5521' drivers/leds/leds-lp5521.c
+    # blobname 'lp55231\?' drivers/leds/leds-lp5523.c
+    blobname 'lattice-ecp3\.bit' drivers/misc/lattice-ecp3-config.c
+    defsnc '[	]*static[ ]const[ ]uint8_t[ ]rss_key\[UPT1_RSS_MAX_KEY_SIZE\][ ]=' drivers/net/vmxnet3/vmxnet3_drv.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9300Modes_\(mixed_ob_db\|type5\)_tx_gain_table_2p2\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9003_2p2_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9340Modes_low_ob_db_and_spur_tx_gain_table_1p0\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485Modes_green_spur_ob_db_tx_gain_1_1\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9580_1p0_type6_tx_gain_table\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9580_1p0_initvals.h
+    blobname 'iwlwifi-\(7260\|3160\)-' drivers/net/wireless/iwlwifi/pcie/7000.c
+    blobname 'mrvl[/]pcie8897_uapsta\.bin' drivers/net/wireless/mwifiex/pcie.h
+    accept 'static[ ]const[ ]struct[ ]mwifiex_pcie_device[ ]mwifiex_pcie\(8766\|8897\)[ ]=[ ][{][\n][	]\.firmware[ 	]*=' drivers/net/wireless/mwifiex/pcie.h
+    accept '[	][	]card->pcie\.firmware[ ]=' drivers/net/wireless/mwifiex/pcie.c
+    accept '[	][	]\.per_chan_pwr_limit_arr_11abg[ 	]*=[ ][{][	 0xf,\n]*' drivers/net/wireless/ti/wl18xx/main.c
+    blobname 'ti-connectivity[/]wl18xx-fw-2\.bin' drivers/net/wireless/ti/wl18xx/main.c
+    blobname '%s-dsp%d-%s\.\(wmfw\|bin\)' sound/soc/codecs/wm_adsp.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_addr[ ]\(idle_\)\?reg_addrs\[\][ ]=' drivers/net/ethernet/broadcom/bnx2x/bnx2x_dump.h
+    blobname '83xx_fw\.bin' drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]dump_num_registers\[NUM_CHIPS\]\[NUM_PRESETS\][ ]=' drivers/net/ethernet/broadcom/bnx2x/bnx2x_dump.h
+    defsnc 'static[ ]int[ ]pm2xxx_charger_voltage_map\[\][ ]=' drivers/power/pm2301_charger.c
+    accept '[ ][*][ ]comedi[ ]drivers\.[ ]The[ ]request_firmware[(][)][ ]hotplug' drivers/staging/comedi/comedi.h
+    blobname 'rp2\.fw' drivers/tty/serial/rp2.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]seq_\(w\|rgb\)_gamma\[\][ ]=' drivers/video/backlight/lms501kf03.c
+    defsnc '[#]include[ ]<video[/]mmp_disp\.h>[\n]*static[ ]u16[ ]init\[\][ ]=' drivers/video/mmp/panel/tpo_tj032md01bw.c
+    defsnc 'static[ ]struct[ ]tegra_clk_pll_freq_table[ ]pll_[mpadcu]_freq_table\[\][ ]=' 'drivers/clk/tegra/clk-tegra[23]0\.c'
+    blobname 'ctefx\.bin' sound/pci/hda/patch_ca0132.c
+    defsnc 'static[ ]unsigned[ ]int[ ]\(voice_focus\|mic_svm\|equalizer\)_vals_lookup\[\][ ]=' sound/pci/hda/patch_ca0132.c
+    defsnc 'static[ ]struct[ ]hda_verb[ ]ca0132_init_verbs0\[\][ ]=' sound/pci/hda/patch_ca0132.c
+    defsnc 'static[ ]const[ ]int[ ]dmic_comp\[6\]\[6\][ ]=' sound/soc/codecs/max98090.c
+    # Reverse 3.8-to-3.9 patch:
+    accept '0x102c[ ][ ][ ][ ][ ]0x6151[\n]'"$blobpat*" Documentation/video4linux/et61x251.txt
+    accept '0x041e[ ][ ][ ][ ][ ]0x4017[\n]'"$blobpat*" Documentation/video4linux/zc0301.txt
+    defsnc 'static[ ]struct[ ]clk_pll_\(freq_\)\?table[ ]tegra_pll_[adpxm]_\(freq_\)\?table\[\][ ]=' arch/arm/mach-tegra/tegra2_clocks.c
+    defsnc 'static[ ]struct[ ]clk_pll_freq_table[ ]tegra_pll_[cu]_freq_table\[\][ ]=' arch/arm/mach-tegra/tegra30_clocks.c
+    accept '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?\(static[ ]\(void\|int\)[ ]\)\?_\?request_firmware\(_cleanup\|_prepare\)\?[(]' drivers/base/firmware_class.c
+    accept '[	]*\(\(fw_priv\|ret\)[ ]=[ ]\)\?_\?request_firmware_\(load\|prepare\|cleanup\)' drivers/base/firmware_class.c
+    defsnc '[	]static[ ]u_short[ ]geometry_table\[\]\[[45]\][ ]=' drivers/block/xd.c
+    defsnc 'static[ ]const[ ]u8[ ]hdmiphy_conf\(27\(_027\)\?\|74\(_175\|_25\)\|148_5\)\[32\][ ]=' drivers/media/video/s5p-tv/hdmiphy_drv.c
+    defsnc 'static[ ]const[ ]u8[ ]hdmiphy_conf74_176\[32\][ ]=' drivers/gpu/drm/exynos/exynos_hdmi.c
+    accept '[	]\.firmware[ ]=[ ]["][/][*][(]DEBLOBBED[)][*][/]["]' drivers/media/usb/dvb-usb/dw2102.c
+    accept '[	]\(p1100\|s660\)->firmware[ ]=' drivers/media/dvb/dvb-usb/dw2102.c
+    accept '[	]p7500->firmware[ ]=' drivers/media/dvb/dvb-usb/dw2102.c
+    defsnc '[	]#define[ ]WakeupSeq[ ][ ][ ][ ][{]' drivers/net/ethernet/i825xx/eepro.c
+    defsnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?\(static[ ]\)\?\(const[ ]\)\?\(struct[ ]\)\?\(SiS\|XGI\)_[ME]CLKData\(Struct\)\?[ ]XGI\(340\|27\)\(\(New\)\?_[ME]CLKData\[\][ ]*=\|N\)\?\([ ]\?[{]\?[*][/][;]\)\?' drivers/staging/xgifb/vb_table.h
+    defsnc '\(static[ ]\)\?\(const[ ]\)\?\(UCHAR\|unsigned[ ]char\)[ ]XGI340_CR6[BE]\[8\]\[4\][ ]*=' drivers/staging/xgifb/vb_table.h
+    ;;
 
   */patch-3.7*)
     # Removed chunks matched by entries that don't appear in the patch context.
