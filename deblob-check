@@ -3424,6 +3424,10 @@ set_except () {
     defsnc '\(static[ ]\)\?\(const[ ]\)\?\(UCHAR\|unsigned[ ]char\)[ ]XGI340_CR6[BE]\[8\]\[4\][ ]*=' drivers/staging/xgifb/vb_table.h
     ;;
 
+  */drm-qxl-driver.patch)
+    defsnc '[	][}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
+    ;;
+
   */patch-3.7*)
     # Removed chunks matched by entries that don't appear in the patch context.
     initnc '[	]0x019806b8[,][\n][	]0x1427f116[,]' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubnvc0.fuc.h
