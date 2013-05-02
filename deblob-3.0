@@ -245,8 +245,6 @@ undefault_firmware () {
 # corresponding sources are present.
 
 for f in \
-  drivers/char/ser_a2232fw.h \
-    drivers/char/ser_a2232fw.ax \
   drivers/gpu/drm/nouveau/nva3_copy.fuc.h \
     drivers/gpu/drm/nouveau/nva3_copy.fuc \
   drivers/gpu/drm/nouveau/nvc0_copy.fuc.h \
@@ -259,16 +257,14 @@ for f in \
     drivers/net/wan/wanxlfw.S \
   drivers/net/wireless/atmel.c \
     drivers/net/wireless/atmel.c \
-  drivers/scsi/53c700_d.h_shipped \
-    drivers/scsi/53c700.scr \
   drivers/scsi/aic7xxx/aic79xx_seq.h_shipped \
     drivers/scsi/aic7xxx/aic79xx.seq \
   drivers/scsi/aic7xxx/aic7xxx_seq.h_shipped \
     drivers/scsi/aic7xxx/aic7xxx.seq \
   drivers/scsi/aic7xxx_old/aic7xxx_seq.c \
     drivers/scsi/aic7xxx_old/aic7xxx.seq \
-  drivers/scsi/53c7xx_d.h_shipped \
-    drivers/scsi/53c7xx.scr \
+  drivers/scsi/53c700_d.h_shipped \
+    drivers/scsi/53c700.scr \
   drivers/scsi/sym53c8xx_2/sym_fw1.h \
     drivers/scsi/sym53c8xx_2/sym_fw1.h \
   drivers/scsi/sym53c8xx_2/sym_fw2.h \
@@ -1543,6 +1539,8 @@ clean_mk CONFIG_MWL8K drivers/net/wireless/Makefile
 announce ATH6K_LEGACY - "Atheros AR6003 support (non mac80211)"
 reject_firmware drivers/staging/ath6kl/os/linux/include/osapi_linux.h
 clean_blob drivers/staging/ath6kl/os/linux/include/ar6000_drv.h
+clean_sed '/File:/ s,bdata[^)]*\.bin,/*DEBLOBBED*/,' \
+  drivers/staging/ath6kl/Kconfig 'removed blob names'
 clean_kconfig drivers/staging/ath6kl/Kconfig 'ATH6K_LEGACY'
 clean_mk CONFIG_ATH6K_LEGACY drivers/staging/ath6kl/Makefile
 
