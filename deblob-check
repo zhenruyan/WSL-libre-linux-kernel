@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2013-04-28
+# deblob-check version 2013-05-03
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3104,7 +3104,7 @@ set_except () {
     accept '[	][	]\.download_firmware[ ]=[ ]af9035_download_firmware\(_it9135\)\?[,][\n][	][	]\.firmware[ ]=[ ]' drivers/media/dvb/dvb-usb/af9035.c
     blobname 'rtl_nic[/]rtl8402-1\.fw' drivers/net/ethernet/realtek/r8169.c
     blobname 'rtl_nic[/]rtl8411-1\.fw' drivers/net/ethernet/realtek/r8169.c
-    blobname 'bdata\(\.SD31\|\.DB132\)\?\.bin' drivers/net/wireless/ath/ath6kl/core.h
+    blobname 'bdata\(\.\(SD3[12]\|WB31\|CUSTOM\|DB132\)\)\?\.bin' drivers/net/wireless/ath/ath6kl/core.h
     blobname 'mrvl[/]sd8786_uapsta\.bin' 'drivers/net/wireless/mwifiex/sdio\.[ch]'
     accept '[	][ ][*][ ]the[ ]isl3886[+]net2280' drivers/net/wireless/p54/p54usb.c
 
@@ -3263,6 +3263,11 @@ set_except () {
     accept '[	]ret[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[,][ ]GFP_KERNEL[,][\n][ 	]*hif_dev[,][ ]ath9k_hif_usb_firmware_cb[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
     accept '[	]ret[ ]=[ ]request_firmware[(][&]hif_dev->firmware[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
     accept '[	][	]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]hif_dev->fw_name[,][\n][ 	]*[&]hif_dev->udev->dev[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    # as in 2.6.39
+    accept '[#]define[ ]FIRMWARE_AR7010[ 	]*["]ar7010\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[#]define[ ]FIRMWARE_AR7010_1_1[ 	]*["]ar7010_1_1\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[#]define[ ]FIRMWARE_AR9271[ 	]*["]ar9271\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept 'MODULE_FIRMWARE[(]FIRMWARE_AR7010[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
 
     # New in 3.9
     blobname 'imx[/]sdma[/]sdma-imx6q\.bin' arch/arm/boot/dts/imx6qdl.dtsi
