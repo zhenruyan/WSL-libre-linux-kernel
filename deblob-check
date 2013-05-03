@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2013-05-03
+# deblob-check version 2013-05-03a
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3268,6 +3268,10 @@ set_except () {
     accept '[#]define[ ]FIRMWARE_AR7010_1_1[ 	]*["]ar7010_1_1\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
     accept '[#]define[ ]FIRMWARE_AR9271[ 	]*["]ar9271\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
     accept 'MODULE_FIRMWARE[(]FIRMWARE_AR7010[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    # as in 2.6.35
+    accept '[	]ATH9K_FW_USB_DEV[(]0x\(9271\|1006\)[,][ ]["]ar9271\.fw["][)][,]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[	]dev_info[(][&]hif_dev->udev->dev[,][ ]["]ath9k_htc:[^\n"]*["][,][\n][	 ]*["]ar9271\.fw["][,]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[	]ret[ ]=[ ]request_firmware[(][&]hif_dev->firmware[,][ ]fw_name[,][ ][&]hif_dev->udev->dev[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
 
     # New in 3.9
     blobname 'imx[/]sdma[/]sdma-imx6q\.bin' arch/arm/boot/dts/imx6qdl.dtsi
