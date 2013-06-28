@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2013-06-10
+# deblob-check version 2013-06-27
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3332,6 +3332,7 @@ set_except () {
 
   */patch-3.9*)
     initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]const[ ]u32[ ]ar9485_1_1_baseband_pos\([*][/][;]\)\?' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    accept '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]int[ ]_request_firmware_load\(struct[*][/][;]\)\?' drivers/base/firmware_class.c
     ;;
 
   */patch-3.8*)
