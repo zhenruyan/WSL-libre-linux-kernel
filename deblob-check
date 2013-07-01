@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2013-06-27
+# deblob-check version 2013-06-30
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -891,7 +891,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\)["]'
+  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\)["]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
   # Software, but there are just too many URLs in Linux, and most are
   # fine, so we just blacklist when we find undesirable URLs.
@@ -3324,6 +3324,72 @@ set_except () {
     defsnc 'static[ ]unsigned[ ]int[ ]\(voice_focus\|mic_svm\|equalizer\)_vals_lookup\[\][ ]=' sound/pci/hda/patch_ca0132.c
     defsnc 'static[ ]struct[ ]hda_verb[ ]ca0132_init_verbs0\[\][ ]=' sound/pci/hda/patch_ca0132.c
     defsnc 'static[ ]const[ ]int[ ]dmic_comp\[6\]\[6\][ ]=' sound/soc/codecs/max98090.c
+
+    # New in 3.10
+    accept '[ \t]*edid[ ]=[ ]\[00[ ]FF[ 0-9A-F\n\t]*\]' arch/powerpc/boot/dts/ac14xx.dts
+    accept 'K256:[\n][\t]\.long[ ]0x428a2f98[,][0-9a-f0x,]*\([\n][\t]\.long[ ][0-9a-f0x,]*\)*' arch/x86/crypto/sha256-avx-asm.S
+    accept 'K256:[\n][\t]\.long[\t]0x428a2f98[,][0-9a-f0x,]*\([\n][\t]\.long[\t][0-9a-f0x,]*\)*' arch/x86/crypto/sha256-avx2-asm.S
+    accept 'K256:[\n][ ]*\.long[ ]0x428a2f98[,][0-9a-f0x,]*\([\n][ ]*\.long[ ][0-9a-f0x,]*\)*' arch/x86/crypto/sha256-ssse3-asm.S
+    accept 'K512:[\n][\t]\.quad[ ]0x428a2f98d728ae22[,][0-9a-f0x,]*\([\n][\t]\.quad[ ][0-9a-f0x,]*\)*' 'arch/x86/crypto/sha512-\(avx\|ssse3\)-asm\.S'
+    accept 'K512:[\n][\t]\.quad[\t]0x428a2f98d728ae22[,][0-9a-f0x,]*\([\n][\t]\.quad[\t][0-9a-f0x,]*\)*' 'arch/x86/crypto/sha512-avx2-asm.S'
+    defsnc 'static[ ]const[ ]uint32_t[ ]axi_clkgen_lock_table\[\][ ]=' drivers/clk/clk-axi-clkgen.c
+    defsnc 'static[ ]const[ ]int[ ]arizona_micd_levels\[\][ ]=' drivers/extcon/extcon-arizona.c
+    defsnc 'static[ ]const[ ]struct[ ]hdmiphy_config[ ]hdmiphy_v13_configs\[\][ ]=' drivers/gpu/drm/exynos/exynos_hdmi.c
+    defsnc '[	][}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
+    defsnc 'static[ ]const[ ]u32[ ]\(evergreen\|cedar\|supersumo\|wrestler\|barts\|turks\|caicos\)_golden_registers2\?\[\][ ]=' drivers/gpu/drm/radeon/evergreen.c
+    defsnc 'static[ ]const[ ]u32[ ]\(cypress\|redwood\|cedar\|juniper\)_mgcg_init\[\][ ]=' drivers/gpu/drm/radeon/evergreen.c
+    defsnc 'static[ ]const[ ]u32[ ]\(cayman\|dvst\|scrapper\)_golden_registers2\?\[\][ ]=' drivers/gpu/drm/radeon/ni.c
+    defsnc 'static[ ]const[ ]u32[ ]\(r7xx\|rv7[1347]0\)_\(golden_registers\|mgcg_init\)\[\][ ]=' drivers/gpu/drm/radeon/rv770.c
+    defsnc 'static[ ]const[ ]u32[ ]\(tahiti\|pitcairn\|verde\|oland\|hainan\)_\(golden_registers\|\(mgcg_cgcg\|pg\)_init\)\[\][ ]=' drivers/gpu/drm/radeon/si.c
+    defsnc 'static[ ]const[ ]u32[ ]hainan_io_mc_regs\[TAHTI_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/si.c
+    defsnc 'static[ ]const[ ]s16[ ]temp_lut\[\][ ]=' drivers/hwmon/via686a.c
+    defsnc 'static[ ]const[ ]u8[ ]via_lut\[\][ ]=' drivers/hwmon/via686a.c
+    defsnc 'static[ ]const[ ]uint64_t[ ]crc_table\[256\][ ]=' drivers/md/bcache/util.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_val[ ]ofsm_init_it9135_v[12]\[\][ ]=' drivers/media/dvb-frontends/af9033_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_val[ ]tuner_init_it9135_\(38\|51\|52\|60\|61\|62\)\[\][ ]=' drivers/media/dvb-frontends/af9033_priv.h
+    defsc 'static[ ]struct[ ]regdata[ ]mb86a20s_init2\[\][ ]=' drivers/media/dvb-frontends/mb86a20s.c
+    defsnc 'static[ ]const[ ]u8[ ]channel_registers\[\][ ]=' drivers/media/i2c/tw2804.c
+    defsnc '[\t]static[ ]const[ ]struct[ ]si476x_property_range[ ]valid_ranges\[\][ ]=' drivers/mfd/si476x-prop.c
+    defsnc '[\t]static[ ]const[ ]unsigned[ ]int[ ]t[45]_reg_ranges\[\][ ]=' drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+    defsnc 'static[ ]const[ ]u16[ ]b43_ntab_antswctl_r3\[4\]\[32\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    defsnc 'static[ ]struct[ ]nphy_gain_ctl_workaround_entry[ ]nphy_gain_ctl_wa_phy6_radio11_ghz2[ ]=' drivers/net/wireless/b43/tables_nphy.c
+    defsc 'static[ ]struct[ ]nphy_gain_ctl_workaround_entry[ ]nphy_gain_ctl_workaround\[2\]\[4\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    defsnc 'static[ ]const[ ]u16[ ]b43_lcntab_sw_ctl_4313_epa_rev0\[\][ ]=' drivers/net/wireless/b43/tables_phy_lcn.c
+    defsc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals_5592_xtal[24]0\[\][ ]=' drivers/net/wireless/rt2x00/rt2800lib.c
+    defsnc 'u32[ ]RTL8188EEPHY_REG_\(1TARRAY\|ARRAY_PG\)\[\][ ]=' drivers/net/wireless/rtlwifi/rtl8188ee/table.c
+    defsnc 'u32[ ]RTL8188EE_RADIOA_1TARRAY\[\][ ]=' drivers/net/wireless/rtlwifi/rtl8188ee/table.c
+    defsnc 'u32[ ]RTL8188EEMAC_1T_ARRAY\[\][ ]=' drivers/net/wireless/rtlwifi/rtl8188ee/table.c
+    defsnc 'u32[ ]RTL8188EEAGCTAB_1TARRAY\[\][ ]=' drivers/net/wireless/rtlwifi/rtl8188ee/table.c
+    defsc 'static[ ]const[ ]struct[ ]pinmux_cfg_reg[ ]pinmux_config_regs\[\][ ]=' 'drivers/pinctrl/sh-pfc/pfc-\(r8a77\(40\|79\)\|sh72\(03\|69\)\)\.c'
+    defsnc 'static[ ]const[ ]struct[ ]abx500_v_to_cap[ ]cap_tbl\(_[ab]_thermistor\)\?\[\][ ]=' drivers/power/ab8500_bmdata.c
+    defsnc 'static[ ]int[ ]ab8540_charge_\(output\|input\)_curr_map\[\][ ]=' drivers/power/ab8500_bmdata.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]ldo_vaux56_ab8540_voltages\[\][ ]=' drivers/regulator/ab8500.c
+    accept '[\t]rproc->firmware[ ]=[ ]p[;]' drivers/remoteproc/remoteproc_core.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]jpeg_header\[\][ ]=' drivers/staging/media/solo6x10/solo6x10-jpeg.h
+    defsnc 'const[ ]unsigned[ ]char[ ]jpeg_dqt\[4\]\[DQT_LEN\][ ]=' drivers/staging/media/solo6x10/solo6x10-jpeg.h
+    defsnc 'static[ ]unsigned[ ]char[ ]vop_6010_\(ntsc\|pal\)_\(d1\|cif\)\[\][ ]=' drivers/staging/media/solo6x10/solo6x10-v4l2-enc.c
+    defsnc 'u8[ ]\(sbox\|dot[23]\)_table\[256\][ ]=' drivers/staging/vt6656/aes_ccmp.c
+    defsnc 'static[ ]const[ ]u32[ ]s_adwCrc32Table\[256\][ ]=' drivers/staging/vt6656/tcrc.c
+    defsnc 'const[ ]u8[ ]TKIP_Sbox_\(Lower\|Upper\)\[256\][ ]=' drivers/staging/vt6656/tkip.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]tas5086_reg_defaults\[\][ ]=' sound/soc/codecs/tas5086.c
+    accept '[\t]\.firmware[\t]=[ ]' drivers/bluetooth/btmrvl_sdio.c
+    blobname 'mrvl[/]sd8688\(_helper\)\?\.bin' drivers/bluetooth/btmrvl_sdio.c
+    blobname 'mrvl[/]sd8897_uapsta\.bin' drivers/bluetooth/btmrvl_sdio.c
+    blobname '\(\(atsc\|tdmb\)_denver\|cmmb_\(ming_app\|venice_12mhz\)\|dvbh\?_rio\|fm_radio\(_rio\)\?\|isdbt_\(pele\|rio\)\)\.inp' drivers/media/common/siano/smscoreapi.h
+    blobname 'tigon[/]tg357766\.bin' drivers/net/ethernet/broadcom/tg3.c
+    blobname 'cxgb4[/]t5fw\.bin' drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+    blobname 'rtl_nic[/]rtl8106e-2\.fw' drivers/net/ethernet/realtek/r8169.c
+    blobname 'rtl_nic[/]rtl8168g-[23]\.fw' drivers/net/ethernet/realtek/r8169.c
+    blobname 'mwl8k[/]fmimage_8764_ap-["][ ][#]api[ ]["]\.fw' drivers/net/wireless/mwl8k.c
+    blobname 'go7007[/]go7007fw\.bin' drivers/staging/media/go7007/go7007-driver.c
+    blobname 'go7007[/]go7007tv\.bin' drivers/staging/media/go7007/go7007-fw.c
+    blobname 'go7007[/]\(s2250-1\|px-\(m\|tv\)402u\|lr192\|wis-startrek\)\.fw' drivers/staging/media/go7007/go7007-loader.c
+    blobname 'intel[/]ibt-hw-%x\.%x\(-fw-%x\.%x\.%x\.%x\.%x\)\?\.bseq' drivers/bluetooth/btusb.c
+    blobname 'radeon[/]\(RV710\|CYPRESS\|SUMO\|TAHITI\)_uvd\.bin' drivers/gpu/drm/radeon/radeon_uvd.c
+    blobname 'imspcu\.fw' drivers/input/misc/ims-pcu.c
+    blobname 'fimc_is_fw\.bin' drivers/media/platform/exynos4-is/fimc-is.h
+    blobname 'setfile\.bin' drivers/media/platform/exynos4-is/fimc-is.h
+    blobname 'rtlwifi[/]rtl8188efw\.bin' drivers/net/wireless/rtlwifi/rtl8188ee/sw.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
