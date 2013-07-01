@@ -3383,7 +3383,7 @@ set_except () {
     blobname 'mwl8k[/]fmimage_8764_ap-["][ ][#]api[ ]["]\.fw' drivers/net/wireless/mwl8k.c
     blobname 'go7007[/]go7007fw\.bin' drivers/staging/media/go7007/go7007-driver.c
     blobname 'go7007[/]go7007tv\.bin' drivers/staging/media/go7007/go7007-fw.c
-    blobname 'go7007[/]\(s2250-1\|px-\(m\|tv\)402u\|lr192\|wis-startrek\)\.fw' drivers/staging/media/go7007/go7007-loader.c
+    blobname 'go7007[/]\(s2250-[12]\|px-\(m\|tv\)402u\|lr192\|wis-startrek\)\.fw' drivers/staging/media/go7007/go7007-loader.c
     blobname 'intel[/]ibt-hw-%x\.%x\(-fw-%x\.%x\.%x\.%x\.%x\)\?\.bseq' drivers/bluetooth/btusb.c
     blobname 'radeon[/]\(RV710\|CYPRESS\|SUMO\|TAHITI\)_uvd\.bin' drivers/gpu/drm/radeon/radeon_uvd.c
     blobname 'imspcu\.fw' drivers/input/misc/ims-pcu.c
