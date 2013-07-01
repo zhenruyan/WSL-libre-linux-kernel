@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2013-06-30
+# deblob-check version 2013-07-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3339,9 +3339,11 @@ set_except () {
     defsnc 'static[ ]const[ ]u32[ ]\(evergreen\|cedar\|supersumo\|wrestler\|barts\|turks\|caicos\)_golden_registers2\?\[\][ ]=' drivers/gpu/drm/radeon/evergreen.c
     defsnc 'static[ ]const[ ]u32[ ]\(cypress\|redwood\|cedar\|juniper\)_mgcg_init\[\][ ]=' drivers/gpu/drm/radeon/evergreen.c
     defsnc 'static[ ]const[ ]u32[ ]\(cayman\|dvst\|scrapper\)_golden_registers2\?\[\][ ]=' drivers/gpu/drm/radeon/ni.c
+    defsnc 'static[ ]const[ ]u32[ ]cayman_io_mc_regs\[BTC_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/si.c
     defsnc 'static[ ]const[ ]u32[ ]\(r7xx\|rv7[1347]0\)_\(golden_registers\|mgcg_init\)\[\][ ]=' drivers/gpu/drm/radeon/rv770.c
-    defsnc 'static[ ]const[ ]u32[ ]\(tahiti\|pitcairn\|verde\|oland\|hainan\)_\(golden_registers\|\(mgcg_cgcg\|pg\)_init\)\[\][ ]=' drivers/gpu/drm/radeon/si.c
-    defsnc 'static[ ]const[ ]u32[ ]hainan_io_mc_regs\[TAHTI_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/si.c
+    defsnc 'static[ ]const[ ]u32[ ]\(tahiti\|pitcairn\|verde\|oland\|hainan\)_\(golden_registers\|mgcg_cgcg_init\)\[\][ ]=' drivers/gpu/drm/radeon/si.c
+    defsnc 'static[ ]\(const[ ]\)\?u32[ ]verde_pg_init\[\][ ]=' drivers/gpu/drm/radeon/si.c
+    defsnc 'static[ ]const[ ]u32[ ]hainan_io_mc_regs\[TAHITI_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/si.c
     defsnc 'static[ ]const[ ]s16[ ]temp_lut\[\][ ]=' drivers/hwmon/via686a.c
     defsnc 'static[ ]const[ ]u8[ ]via_lut\[\][ ]=' drivers/hwmon/via686a.c
     defsnc 'static[ ]const[ ]uint64_t[ ]crc_table\[256\][ ]=' drivers/md/bcache/util.c
@@ -3384,7 +3386,7 @@ set_except () {
     blobname 'go7007[/]go7007fw\.bin' drivers/staging/media/go7007/go7007-driver.c
     blobname 'go7007[/]go7007tv\.bin' drivers/staging/media/go7007/go7007-fw.c
     blobname 'go7007[/]\(s2250-[12]\|px-\(m\|tv\)402u\|lr192\|wis-startrek\)\.fw' drivers/staging/media/go7007/go7007-loader.c
-    blobname 'intel[/]ibt-hw-%x\.%x\(-fw-%x\.%x\.%x\.%x\.%x\)\?\.bseq' drivers/bluetooth/btusb.c
+    blobname 'intel[/]ibt-hw-%x\.%x\(\.%x-fw-%x\.%x\.%x\.%x\.%x\)\?\.bseq' drivers/bluetooth/btusb.c
     blobname 'radeon[/]\(RV710\|CYPRESS\|SUMO\|TAHITI\)_uvd\.bin' drivers/gpu/drm/radeon/radeon_uvd.c
     blobname 'imspcu\.fw' drivers/input/misc/ims-pcu.c
     blobname 'fimc_is_fw\.bin' drivers/media/platform/exynos4-is/fimc-is.h
