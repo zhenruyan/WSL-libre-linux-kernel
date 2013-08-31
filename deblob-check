@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2013-07-01
+# deblob-check version 2013-08-31
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3392,6 +3392,89 @@ set_except () {
     blobname 'fimc_is_fw\.bin' drivers/media/platform/exynos4-is/fimc-is.h
     blobname 'setfile\.bin' drivers/media/platform/exynos4-is/fimc-is.h
     blobname 'rtlwifi[/]rtl8188efw\.bin' drivers/net/wireless/rtlwifi/rtl8188ee/sw.c
+
+    # New in 3.11.
+    blobname 'imx[/]sdma[/]sdma-imx6sl\.bin' arch/arm/boot/dts/imx6sl.dtsi
+    initnc '[	]linux,keymap[ ]=[ ]<' 'arch/arm/boot/dts/nspire-\(clp\|cx\|tp\)\.dts'
+    blobname '\(kernel[/]x86[/]microcode[/]\)\?AuthenticAMD\.bin' arch/x86/kernel/microcode_amd_early.c
+    initnc '[	 ]*FMC:[ ]poor[ ]dump[ ]of[ ]sdb[ ]first[ ]level:' Documentation/fmc/parameters.txt
+    accept 'static[ ]int[\n ]cache_firmware[(]const[ ]char[ ][*]fw_name[)][\n][{]\([\n]\+[^\n}][^\n]*\)*ret[ ]=[ ]request_firmware[(][^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]int[ ]__initconst[ ]a370_\(nb\|h\|dram\)clk_ratios\[32\]\[2\][ ]=' drivers/clk/mvebu/armada-370.c
+    defsnc 'static[ ]const[ ]int[ ]__initconst[ ]axp_\(nb\|h\|dram\)clk_ratios\[32\]\[2\][ ]=' drivers/clk/mvebu/armada-xp.c
+    defsnc 'static[ ]const[ ]struct[ ]mV_pos[ ]\(vrm85\|mobilevrm\)_mV\[32\][ ]=' drivers/cpufreq/longhaul.h
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]mV_\(vrm85\|mobilevrm\)\[32\][ ]=' drivers/cpufreq/longhaul.h
+    accept '[][ 0-9.]*fake-fmc-carrier:[ ]Mezzanine[ ]0:[ ]eeprom[ ]["]fdelay-eeprom\.bin["]' Documentation/fmc/fmc-fakedev.txt
+    accept '[][ 0-9.]*spec[ ][024:.]*[ ]got[ ]file[ ]["]fmc[/]spec-init\.bin["]' Documentation/fmc/fmc-write-eeprom.txt
+    defsnc 'static[ ]char[ ]ff_eeimg\[FF_MAX_MEZZANINES\]\[FF_EEPROM_SIZE\][ ]=' drivers/fmc/fmc-fakedev.c
+    accept '[	]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]gw[,][ ][&]fmc->dev[)][;]' drivers/fmc/fmc-fakedev.c
+    accept '[	][	]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]ff_eeprom\[i\][,][ ][&]ff->dev[)][;]' drivers/fmc/fmc-fakedev.c
+    accept '[	]if[ ][(][!]strcmp[(]last4[,][ ]["]\.bin["][)][)]' drivers/fmc/fmc-write-eeprom.c
+    accept '[	]err[ ]=[ ]request_firmware[(][&]fw[,][ ]s[,][ ]dev[)][;]' drivers/fmc/fmc-write-eeprom.c
+    defsnc 'nvc0_grctx_init_\(icmd\|9097\|902d\|90c0\|unk40xx\|unk46xx\|unk78xx\|gpc_[01]\|tpc\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvc0.c
+    defsnc 'nvc1_grctx_init_\(icmd\|9097\|gpc_0\|tpc\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvc1.c
+    defsnc 'nvc3_grctx_init_tpc\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvc3.c
+    defsnc 'nvc8_grctx_init_\(icmd\|tpc\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvc8.c
+    defsnc 'nvd7_grctx_init_\(unk40xx\|unk58xx\|gpc_0\|tpc\|unk\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvd7.c
+    defsnc 'nvd9_grctx_init_\(icmd\|90c0\|unk40xx\|unk58xx\|gpc_0\|tpc\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvd9.c
+    defsnc 'nve4_grctx_init_\(icmd\|a097\|unk40xx\|unk46xx\|unk58xx\|unk64xx\|rop\|gpc_0\|tpc\|unk\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnve4.c
+    defsnc 'nvf0_grctx_init_\(unk40xx\|unk64xx\|unk88xx\|gpc_0\|tpc\|unk\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvf0.c
+    defsnc 'uint32_t[ ]nvd7_grgpc_code\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/gpcnvd7.fuc.h
+    defsnc 'uint32_t[ ]nvf0_grgpc_code\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/gpcnvf0.fuc.h
+    defsnc 'uint32_t[ ]nvd7_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubnvd7.fuc.h
+    defsnc 'uint32_t[ ]nvf0_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubnvf0.fuc.h
+    defsnc 'nvc0_graph_init_\(regs\|[gt]pc\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvc0.c
+    defsnc 'nvc1_graph_init_[gt]pc\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvc1.c
+    defsnc 'nvc3_graph_init_tpc\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvc3.c
+    defsnc 'nvc8_graph_init_[gt]pc\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvc8.c
+    defsnc 'nvd7_graph_init_[gt]pc\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvd7.c
+    defsnc 'nvd9_graph_init_[gt]pc\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvd9.c
+    defsnc 'nve4_graph_init_\(regs\|[gt]pc\|unk\|unk88xx\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nve4.c
+    defsnc 'nvf0_graph_init_[gt]pc\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvf0.c
+    defsnc '[	][}][ ]magic\[\][ ]=[ ][{][\n][	][	][{][ ]0x020520[,]' drivers/gpu/drm/nouveau/core/engine/graph/nvf0.c
+    blobname 'nouveau[/]nv84_xuc%03x' drivers/gpu/drm/nouveau/core/engine/graph/xtensa.c
+    defsnc 'nv50_fb_memtype\[0x80\][ ]=' drivers/gpu/drm/nouveau/core/subdev/fb/nv50.c
+    defsnc 'static[ ]const[ ]u32[ ]\(barts\|caicos\|turks\)_\(\(cgcg_cgls\|sysls\)_\(default\|disable\|enable\)\|mgcg_default\)\[\][ ]=' drivers/gpu/drm/radeon/btc_dpm.c
+    defsnc 'u32[ ]btc_valid_sclk\[40\][ ]=' drivers/gpu/drm/radeon/btc_dpm.c
+    defsnc 'static[ ]const[ ]u32[ ]\(bonaire\|spectre\|kalindi\)_\(golden_registers\|mgcg_cgcg_init\)\[\][ ]=' drivers/gpu/drm/radeon/cik.c
+    defsnc 'static[ ]const[ ]u32[ ]bonaire_io_mc_regs\[BONAIRE_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/cik.c
+    blobname 'radeon[/]\(BONAIRE\|KAVERI\|KABINI\|%s\)_\(pfp\|[mc]ec\?\|rlc\|s\?mc\|sdma\)\.bin' drivers/gpu/drm/radeon/cik.c
+    defsnc 'static[ ]u32[ ]sumo_rlc_save_restore_register_list\[\][ ]=' drivers/gpu/drm/radeon/evergreen.c
+    defsnc 'static[ ]u32[ ]tn_rlc_save_restore_register_list\[\][ ]=' drivers/gpu/drm/radeon/ni.c
+    blobname 'radeon[/]\(BARTS\|BTC\|TURKS\|CAICOS\|%s\)_\(pfp\|m[ec]\|rlc\|smc\)\.bin' 'drivers/gpu/drm/radeon/[ns]i\.c'
+    defsnc 'static[ ]const[ ]struct[ ]ni_cac_weights[ ]cac_weights_cayman_\(xt\|pro\|le\)[ ]=' drivers/gpu/drm/radeon/ni_dpm.c
+    blobname 'radeon[/]\(R\([67]0\|V6[1237]\|S7[1378]\)[05]\|CEDAR\|REDWOOD\|JUNIPER\|CYPRESS\|SUMO2\?\|%s\)_\(pfp\|[mc]e\|rlc\|s\?mc\)\.bin' drivers/gpu/drm/radeon/r600.c
+    defsnc 'static[ ]const[ ]u32[ ]cayman_\(\(cgcg_cgls\|sysls\)_\(default\|disable\|enable\)\|mgcg_default\)\[\][ ]=' drivers/gpu/drm/radeon/ni_dpm.c
+    blobname 'radeon[/]BONAIRE_uvd\.bin' drivers/gpu/drm/radeon/radeon_uvd.c
+    blobname 'radeon[/]\(TAHITI\|PITCARIN\|VERDE\|OLAND\|HAINAN\|%s\)_\(pfp\|[mc]e\|rlc\|s\?mc\)\.bin' drivers/gpu/drm/radeon/si.c
+    defsnc 'static[ ]struct[ ]dll_speed_setting[ ]dll_speed_table\[16\][ ]=' drivers/gpu/drm/radeon/rv740_dpm.c
+    defsnc 'static[ ]const[ ]u8[ ]\(rv7[7314]0\|cedar\|redwood\|juniper\|cypress\|barts\|turks\|caicos\|cayman\)_smc_int_vectors\[\][ ]=' drivers/gpu/drm/radeon/rv770_smc.c
+    defsnc 'static[ ]const[ ]struct[ ]si_dte_data[ ]dte_data_\(tahiti\(_le\|_pro\)\?\|new_zealand\|aruba_pro\|malta\|pitcairn\|curacao_\(xt\|pro\)\|neptune_xt\|cape_verde\|venus_\(xtx\?\|pro\)\|oland\|mars_pro\|sun_xt\)[ ]=' drivers/gpu/drm/radeon/si_dpm.c
+    defsnc 'static[ ]const[ ]u32[ ]trinity_\(mgcg_shls_default\|sysls_\(default\|disable\|enable\)\|override_mgpg_sequences\)\[\][ ]=' drivers/gpu/drm/radeon/trinity_dpm.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]hex_table\[256\][ ]=' drivers/md/dm-switch.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5102_revb_patch\[\][ ]=' drivers/mfd/wm5102-tables.c
+    blobname 'c\(b\|t2\?\)fw-3\.2\.1\.0\.bin' 'drivers/\(net/ethernet/brocade/bna/cna\.h\|scsi/bfa/bfad\.c\)'
+    blobname 'rtl_nic[/]rtl8411-2\.fw' drivers/net/ethernet/realtek/r8169.c
+    blobname 'ath10k[/]QCA988X[/]hw[12]\.0' drivers/net/wireless/ath/ath10k/hw.h
+    blobname '\(ath10k[/]QCA988X[/]hw[12]\.0[/]\)\?\(firmware\|otp\|board\)\.bin' drivers/net/wireless/ath/ath10k/hw.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9462_modes_mix_ob_db_tx_gain_table_2p0\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9462_2p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9462_2p0_5g_xlna_only_rxgain\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9462_2p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9462_2p1_\(\(mac\|baseband\|radio\)_core\|common_\(mixed_\|wo_xlna_\|5g_xlna_only_\)\?rx_gain\)\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9462_2p1_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9462_2p1_\(\(mac\|baseband\)_postamble\|modes_\(low\|high\|mix\)_ob_db_tx_gain\)\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9462_2p1_initvals.h
+    blobname '\(boot_cw1x60\|\(wsm\|sdd\)_\(cw1x60\|22\|20\|11\|10\)\)\.bin' drivers/net/wireless/cw1200/fwio.h
+    accept '[ ][*][ ]4\.[ ]save[ ]as[ ]["]iNVM_xxx\.bin["]' drivers/net/wireless/iwlwifi/mvm/nvm.c
+    accept 'static[ ]const[ ]struct[ ]mwifiex_sdio_device[ ]mwifiex_sdio_sd[^ ]*[ ]=[ ][{][\n][ 	]*\.firmware[ ]=' drivers/net/wireless/mwifiex/sdio.h
+    blobname 'sdd_sagrad_1091_1098\.bin' 'drivers/net/wireless/cw1200/cw1200_sdio\.c\|include/linux/platform_data/net-cw1200\.h'
+    accept '[/][*][ ]An[ ]example[^*]*[\n][	 ]*\.sdd_file[ ]=[ ]["]sdd_\(sagrad_1091_1098\|myplatform\)\.bin["][,]' include/linux/platform_data/net-cw1200.h
+    defsnc 'static[ ]unsigned[ ]const[ ]score_pins\[BYT_NGPIO_SCORE\][ ]=' drivers/pinctrl/pinctrl-baytrail.c
+    defsnc 'static[ ]unsigned[ ]const[ ]sus_pins\[BYT_NGPIO_SUS\][ ]=' drivers/pinctrl/pinctrl-baytrail.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]bsc_data32_pins\[\][ ]=' drivers/pinctrl/pinctrl-baytrail.c
+    blobname 'mt76\(50\|62\)\.bin' drivers/staging/btmtk_usb/btmtk_usb.c
+    accept '[	 ]*data->firmware[ ]=[ ]firmware[;]' drivers/staging/btmtk_usb/btmtk_usb.c
+    accept '[	]\[CODE_IMX\(27\|53\)\][ ]=[ ][{][\n][	][	]\.firmware[ ]*=' drivers/media/platform/coda.c
+    blobname 'exynos4_\(fimc_is_fw\|s5k6a3_setfile\)\?\.bin' drivers/media/platform/exynos4-is/fimc-is.h
+    accept '[ 	]*ret[ ]=[ ]process_sigma_firmware[(]client[,][ ]ADAU1701_FIRMWARE[)][;]' sound/soc/codecs/adau1701.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5640_reg\[RT5640_VENDOR_ID2[ ][+][ ]1\][ ]=' sound/soc/codecs/rt5640.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]ssm2518_reg_defaults\[\][ ]=' sound/soc/codecs/ssm2518.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
