@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2013-09-01
+# deblob-check version 2013-09-27
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3479,6 +3479,10 @@ set_except () {
 
   */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
+    ;;
+
+  */patch-3.11*)
+    accept '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]int[ ]_request_firmware_load[(]' drivers/base/firmware_class.c
     ;;
 
   */patch-3.10*)
