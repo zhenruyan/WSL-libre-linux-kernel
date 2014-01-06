@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2013-11-14
+# deblob-check version 2014-01-04
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2013 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2014 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -3528,6 +3528,45 @@ set_except () {
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]pcm1681_reg_defaults\[\][ ]=' sound/soc/codecs/pcm1681.c
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8997_sysclk_reva_patch\[\][ ]=' sound/soc/codecs/wm8997.c
     blob '[\t]0xE1[,][ ]0x88[,][ ]0x10[,][ ]0x00[,][ ]0x0B[,][ ]0x00[,][ ]0x01[,][ ]0x00[,]\([\n][\t][0-9xA-F, ]*\)*' drivers/staging/rtl8188eu/hal/Hal8188EFWImg_CE.c
+
+    # New in 3.14
+    defsnc 'static[ ]const[ ]u32[ ]hawaii_\(golden_registers\|mgcg_cgcg_init\)\[\][ ]=' drivers/gpu/drm/radeon/cik.c
+    defsnc 'static[ ]const[ ]u32[ ]hawaii_io_mc_regs\[HAWAII_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/cik.c
+    blobname 'dvb-demod-drxk-01\.fw' drivers/media/video/em28xx/em28xx-dvb.c
+    blobname '\(ath10k[/]QCA988X[/]hw[12]\.0[/]\)\?firmware-2\.bin' drivers/net/wireless/ath/ath10k/hw.h
+    blobname 'brcm[/]brcmfmac43\(143\|241b[04]\|29\|3[045]\)-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c
+    blobname 'iwlwifi-7265-' drivers/net/wireless/iwlwifi/pcie/7000.c
+    accept '[\t][\t]brightness-levels[ ][=][ ][<][0-9 \t\n]*[>][;]' arch/arm/boot/dts/imx28-tx28.dts
+    accept '[\t]echo[ ]["]mic[/]uos\.img["][ ]' Documentation/mic/mpssd/micctrl
+    accept '[\t]mdev->firmware[ ]=[ ]kmalloc' drivers/misc/mic/host/mic_sysfs.c
+    accept '[\t]rc[ ]=[ ]request_firmware[(][&]fw[,][ \t\n]*mdev->\(ramdisk\|firmware\)[,][ ]mdev->sdev->parent[)][;]' drivers/misc/mic/host/mic_x100.c
+    accept '[\t]*["]\(ramdisk\|firmware\)[ ]request_firmware[ ]failed' drivers/misc/mic/host/mic_x100.c
+    defsnc 'static[ ]const[ ]struct[ ]dsi_clock_table[ ]dsi_clk_tbl\[\][ ]=' drivers/gpu/drm/i915/intel_dsi_pll.c
+    defsnc 'uint32_t[ ]nv108_pwr_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/subdev/pwr/fuc/nv108.fuc.h
+    defsnc 'uint32_t[ ]nva3_pwr_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/subdev/pwr/fuc/nva3.fuc.h
+    defsnc 'uint32_t[ ]nvc0_pwr_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/subdev/pwr/fuc/nvc0.fuc.h
+    defsnc 'uint32_t[ ]nvd0_pwr_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/subdev/pwr/fuc/nvd0.fuc.h
+    defsnc 'static[ ]const[ ]struct[ ]ci_pt_defaults[ ]defaults_hawaii_\(xt\|pro\)[ ]=' drivers/gpu/drm/radeon/ci_dpm.c
+    accept '[\t]["]edid[/]\(1024x768\|1280x1024\|1600x1200\|1680x1050\|1920x1080\)\.bin["]' drivers/gpu/drm/drm_edid_load.c
+    defsnc 'static[ ]const[ ]u8[ ]generic_edid\[GENERIC_EDIDS\]\[128\][ ]=' drivers/gpu/drm/drm_edid_load.c
+    defsnc '[\t]unsigned[ ]char[ ]buf\[\][ ]=' drivers/hid/hid-sony.c
+    blobname 'dvb-fe-cx24117\.fw' drivers/media/dvb-frontends/cx24117.c
+    blobname 'vpdma-1b8\.bin' drivers/media/platform/ti-vpe/vpdma.c
+    defsnc 'static[ ]const[ ]u8[ ]ov361x_start_\(2048\|1600\|1024\|640\|320\|160\)\[\]\[2\][ ]=' drivers/media/usb/gspca/ov534_9.c
+    defsnc 'static[ ]const[ ]u8[ ]tuning_blk_pattern_[48]bit\[\][ ]=' drivers/mmc/host/dw_mmc.c
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]oob_8192_ecc[48][ ]=' drivers/mtd/nand/fsl_ifc_nand.c
+    defsnc '[\t]static[ ]u8[ ]PN9Data\[\][ ]=' drivers/net/wireless/ath/ath9k/main.c
+    blobname 'wlan[/]prima[/]WCNSS_qcom_wlan_nv\.bin' drivers/net/wireless/ath/wcn36xx/wcn36xx.h
+    defsnc 'static[ ]s32[ ]expected_tpt_\(siso\|mimo2\)_[248]0MHz\[4\]\[IWL_RATE_COUNT\][ ]=' drivers/net/wireless/iwlwifi/mvm/rs.c
+    blobname 'rtlwifi[/]rtl8188eufw\.bin' drivers/staging/rtl8188eu/hal/rtl8188e_hal_init.c
+    defsnc 'static[ ]unsigned[ ]char[ ]\(sbox\|dot[23]\)_table\[256\][ ]=' drivers/staging/vt6656/aes_ccmp.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]TKIP_Sbox_\(Lower\|Upper\)\[256\][ ]=' drivers/staging/vt6656/tkip.c
+    defsnc 'static[ ]u32[ ]\(al2230_txvga_data\|w89rf242_txvga_old_mapping\)\[\]\[2\][ ]=' drivers/staging/winbond/reg.c
+    defsnc '[}][ ]test2\[\][ ]=' lib/random32.c
+    defsnc 'static[ ]const[ ]struct[ ]hda_verb[ ]hp_bnb13_eq_verbs\[\][ ]=' sound/pci/hda/patch_sigmatel.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]aic3x_reg\[\][ ]=' sound/soc/codecs/tlv320aic3x.c
+    blobname 'radeon[/]HAWAII_\(pfp\|[mc]e\|me\?c\|rlc\|sdma\|smc\)\.bin' drivers/gpu/drm/radeon/cik.c
+    blobname 'ti-connectivity[/]wl1251-\(fw\|nvs\)\.bin' 'drivers/net/wireless/wl12\(51\|xx\)/wl1251.h'
     ;;
 
   */*freedo*.patch | */*logo*.patch)
