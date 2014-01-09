@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-01-04
+# deblob-check version 2014-01-09
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3529,7 +3529,7 @@ set_except () {
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8997_sysclk_reva_patch\[\][ ]=' sound/soc/codecs/wm8997.c
     blob '[\t]0xE1[,][ ]0x88[,][ ]0x10[,][ ]0x00[,][ ]0x0B[,][ ]0x00[,][ ]0x01[,][ ]0x00[,]\([\n][\t][0-9xA-F, ]*\)*' drivers/staging/rtl8188eu/hal/Hal8188EFWImg_CE.c
 
-    # New in 3.14
+    # New in 3.13
     defsnc 'static[ ]const[ ]u32[ ]hawaii_\(golden_registers\|mgcg_cgcg_init\)\[\][ ]=' drivers/gpu/drm/radeon/cik.c
     defsnc 'static[ ]const[ ]u32[ ]hawaii_io_mc_regs\[HAWAII_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/cik.c
     blobname 'dvb-demod-drxk-01\.fw' drivers/media/video/em28xx/em28xx-dvb.c
@@ -3571,6 +3571,74 @@ set_except () {
 
   */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
+    ;;
+
+  */patch-3.12*)
+    # New in 3.13
+    defsnc 'static[ ]const[ ]u32[ ]hawaii_\(golden_registers\|mgcg_cgcg_init\)\[\][ ]=' drivers/gpu/drm/radeon/cik.c
+    defsnc 'static[ ]const[ ]u32[ ]hawaii_io_mc_regs\[HAWAII_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/cik.c
+    blobname 'dvb-demod-drxk-01\.fw' drivers/media/video/em28xx/em28xx-dvb.c
+    blobname '\(ath10k[/]QCA988X[/]hw[12]\.0[/]\)\?firmware-2\.bin' drivers/net/wireless/ath/ath10k/hw.h
+    blobname 'brcm[/]brcmfmac43\(143\|241b[04]\|29\|3[045]\)-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c
+    blobname 'iwlwifi-7265-' drivers/net/wireless/iwlwifi/pcie/7000.c
+    accept '[\t][\t]brightness-levels[ ][=][ ][<][0-9 \t\n]*[>][;]' arch/arm/boot/dts/imx28-tx28.dts
+    accept '[\t]echo[ ]["]mic[/]uos\.img["][ ]' Documentation/mic/mpssd/micctrl
+    accept '[\t]mdev->firmware[ ]=[ ]kmalloc' drivers/misc/mic/host/mic_sysfs.c
+    accept '[\t]rc[ ]=[ ]request_firmware[(][&]fw[,][ \t\n]*mdev->\(ramdisk\|firmware\)[,][ ]mdev->sdev->parent[)][;]' drivers/misc/mic/host/mic_x100.c
+    accept '[\t]*["]\(ramdisk\|firmware\)[ ]request_firmware[ ]failed' drivers/misc/mic/host/mic_x100.c
+    defsnc 'static[ ]const[ ]struct[ ]dsi_clock_table[ ]dsi_clk_tbl\[\][ ]=' drivers/gpu/drm/i915/intel_dsi_pll.c
+    defsnc 'uint32_t[ ]nv108_pwr_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/subdev/pwr/fuc/nv108.fuc.h
+    defsnc 'uint32_t[ ]nva3_pwr_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/subdev/pwr/fuc/nva3.fuc.h
+    defsnc 'uint32_t[ ]nvc0_pwr_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/subdev/pwr/fuc/nvc0.fuc.h
+    defsnc 'uint32_t[ ]nvd0_pwr_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/subdev/pwr/fuc/nvd0.fuc.h
+    defsnc 'static[ ]const[ ]struct[ ]ci_pt_defaults[ ]defaults_hawaii_\(xt\|pro\)[ ]=' drivers/gpu/drm/radeon/ci_dpm.c
+    accept '[\t]["]edid[/]\(1024x768\|1280x1024\|1600x1200\|1680x1050\|1920x1080\)\.bin["]' drivers/gpu/drm/drm_edid_load.c
+    defsnc 'static[ ]const[ ]u8[ ]generic_edid\[GENERIC_EDIDS\]\[128\][ ]=' drivers/gpu/drm/drm_edid_load.c
+    defsnc '[\t]unsigned[ ]char[ ]buf\[\][ ]=' drivers/hid/hid-sony.c
+    blobname 'dvb-fe-cx24117\.fw' drivers/media/dvb-frontends/cx24117.c
+    blobname 'vpdma-1b8\.bin' drivers/media/platform/ti-vpe/vpdma.c
+    defsnc 'static[ ]const[ ]u8[ ]ov361x_start_\(2048\|1600\|1024\|640\|320\|160\)\[\]\[2\][ ]=' drivers/media/usb/gspca/ov534_9.c
+    defsnc 'static[ ]const[ ]u8[ ]tuning_blk_pattern_[48]bit\[\][ ]=' drivers/mmc/host/dw_mmc.c
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]oob_8192_ecc[48][ ]=' drivers/mtd/nand/fsl_ifc_nand.c
+    defsnc '[\t]static[ ]u8[ ]PN9Data\[\][ ]=' drivers/net/wireless/ath/ath9k/main.c
+    blobname 'wlan[/]prima[/]WCNSS_qcom_wlan_nv\.bin' drivers/net/wireless/ath/wcn36xx/wcn36xx.h
+    defsnc 'static[ ]s32[ ]expected_tpt_\(siso\|mimo2\)_[248]0MHz\[4\]\[IWL_RATE_COUNT\][ ]=' drivers/net/wireless/iwlwifi/mvm/rs.c
+    blobname 'rtlwifi[/]rtl8188eufw\.bin' drivers/staging/rtl8188eu/hal/rtl8188e_hal_init.c
+    defsnc 'static[ ]unsigned[ ]char[ ]\(sbox\|dot[23]\)_table\[256\][ ]=' drivers/staging/vt6656/aes_ccmp.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]TKIP_Sbox_\(Lower\|Upper\)\[256\][ ]=' drivers/staging/vt6656/tkip.c
+    defsnc 'static[ ]u32[ ]\(al2230_txvga_data\|w89rf242_txvga_old_mapping\)\[\]\[2\][ ]=' drivers/staging/winbond/reg.c
+    defsnc '[}][ ]test2\[\][ ]=' lib/random32.c
+    defsnc 'static[ ]const[ ]struct[ ]hda_verb[ ]hp_bnb13_eq_verbs\[\][ ]=' sound/pci/hda/patch_sigmatel.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]aic3x_reg\[\][ ]=' sound/soc/codecs/tlv320aic3x.c
+    blobname 'radeon[/]HAWAII_\(pfp\|[mc]e\|me\?c\|rlc\|sdma\|smc\)\.bin' drivers/gpu/drm/radeon/cik.c
+    blobname 'ti-connectivity[/]wl1251-\(fw\|nvs\)\.bin' 'drivers/net/wireless/wl12\(51\|xx\)/wl1251.h'
+    # Matches from earlier releases, for the patch from 3.12.
+    defsnc '[	]*interrupts[ ]=[ ]<[ ]*\(0[ ]2[012][0-9][ ]4[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/shdma.txt
+    accept '[	]ar->firmware[ ]=[ ]\(NULL\|ath10k_fetch_fw_file\)' drivers/net/wireless/ath/ath10k/core.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9485_1_[01]_\(mac\|baseband\)_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485\(M\|_m\)odes_\(high\|low\|green\)\(est\)\?_\(power\|ob_db\)_tx_gain_1_[01]\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9485Modes_green_spur_ob_db_tx_gain_1_1\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    accept '[ ][*][ ]4\.[ ]save[ ]as[ ]["]iNVM_xxx\.bin["]' drivers/net/wireless/iwlwifi/mvm/nvm.c
+    accept '[	 ]*data->firmware[ ]=[ ]firmware[;]' drivers/staging/btmtk_usb/btmtk_usb.c
+    defsnc 'static[ ]u8[ ][ ]*ZEBRA_AGC\[\][ 	]=' drivers/staging/rtl8187se/r8185b_init.c
+    defsnc '[}][ ]test\[\][ ]=' lib/crc32.c
+    accept '[\t]\.firmware[\t]=[ ]' drivers/bluetooth/btmrvl_sdio.c
+    accept '[	][	]card->firmware[ ]=[ ]data->firmware[;]'  drivers/bluetooth/btmrvl_sdio.c
+    # Matches specific for the patch from 3.12.
+    accept '[\t]*err[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,][ ][&]pdev' drivers/gpu/drm/drm_edid_load.c
+    accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]_request_firmware[(]const[ ]struct[ ]firmware' drivers/base/firmware_class.c
+    initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u32[ ]ar9462_2p1_baseband_pos[*][/][;]' drivers/net/wireless/ath/ath9k/ar9462_2p1_initvals.h
+    initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u32[ ]ar9485Modes_\(high_power_\|green_ob_db\|high_ob_db_\|green_spur_\)[*][/][;]' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u32[ ]ar9485_1_1_baseband_pos[*][/][;]' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
+    initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u32[ ]ar9565_1p0_baseband_pos[*][/][;]' drivers/net/wireless/ath/ath9k/ar9565_1p0_initvals.h
+    initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]u16[ ]bios_to_linux_keycode\[2[*][/][;]' drivers/platform/x86/dell-wmi.c
+    # Matches for the reversed patch present in earlier releases.
+    defsnc 'const[ ]char[ ]_[zs]b_findmap\[\][ ]=' arch/s390/kernel/bitmap.c
+    defsc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals_3053\[\][ ]=' drivers/net/wireless/rt2x00/rt2800lib.c
+    defsnc 'unsigned[ ]char[ ]\(sbox\|dot[23]\)_table\[256\][ ]=' drivers/staging/vt6655/aes_ccmp.c
+    defsnc 'static[ ]u8[ ]adav80x_default_regs\[\][ ]=' sound/soc/codecs/adav80x.c
+    # Matches specific for the reversed patch.
+    initc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]u8[ ]MAC_REG_TABLE\[\]\[2\][ ]=[\t][{][*][/][;]' drivers/staging/rtl8187se/r8185b_init.c
     ;;
 
   */patch-3.11*)
