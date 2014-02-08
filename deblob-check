@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-02-06
+# deblob-check version 2014-02-09
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3577,6 +3577,9 @@ set_except () {
     ;;
 
   */patch-3.12*)
+    # Introduced in 3.12.10.
+    accept '[\t][\t][\t]err[ ]=[ ]request_firmware[(][&]firmware[,][ \t\n]*rtlpriv->cfg' drivers/net/wireless/rtlwifi/core.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5110_sysclk_revd_patch\[\][ ]=' sound/soc/codecs/wm5110.c
     # New in 3.13
     defsnc 'static[ ]const[ ]u32[ ]hawaii_\(golden_registers\|mgcg_cgcg_init\)\[\][ ]=' drivers/gpu/drm/radeon/cik.c
     defsnc 'static[ ]const[ ]u32[ ]hawaii_io_mc_regs\[HAWAII_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/cik.c
