@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-02-13
+# deblob-check version 2014-03-10
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3570,6 +3570,17 @@ set_except () {
 
     # New in 3.13.2
     blobname 'rtlwifi[/]rtl8192cufw_\([AB]\|TMSC\)\.bin' drivers/net/wireless/rtlwifi/rtl8192cu.sw
+
+    # New in 3.14
+    blobname 'dvb-usb-technisat-cablestar-hdci-drxk\.fw' drivers/media/usb/dvb-usb-v2/az6007.c
+    blobname 'ctfw-3\.2\.3\.0\.bin' drivers/net/ethernet/brocade/bna/cna.h
+    blobname 'ct2fw-3\.2\.3\.0\.bin' drivers/net/ethernet/brocade/bna/cna.h
+    blobname 'brcm[/]brcmfmac43362-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c
+    blobname 'brcm[/]brcmfmac4339-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c
+    blobname 'mrvl[/]usb8897_uapsta\.bin' drivers/net/wireless/mwifiex/usb.h
+    blobname 'cbfw-3\.2\.3\.0\.bin' drivers/scsi/bfa/bfad.c
+    blobname 'ctfw-3\.2\.3\.0\.bin' drivers/scsi/bfa/bfad.c
+    blobname 'ct2fw-3\.2\.3\.0\.bin' drivers/scsi/bfa/bfad.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
