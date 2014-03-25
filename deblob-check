@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-03-10
+# deblob-check version 2014-03-25
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3592,6 +3592,8 @@ set_except () {
     accept '[\t][\t][\t]err[ ]=[ ]request_firmware[(][&]firmware[,][ \t\n]*rtlpriv->cfg' drivers/net/wireless/rtlwifi/core.c
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5110_sysclk_revd_patch\[\][ ]=' sound/soc/codecs/wm5110.c
     initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]struct[ ]reg_default[ ]wm5110_s[*][/][;]' sound/soc/codecs/wm5110.c
+    # New in 3.13.7.
+    accept '[\t][{]0x00009e[1234][048c]\([,][ ]0x[0-9a-f]*\)*[}]\([\n][\t][{]0x00009e[1234][048c]\([,][ ]0x[0-9a-f]*\)*[}]\)*' drivers/net/wireless/ath/ath9k/ar9462_2p0_initvals.h
     ;;
 
   */patch-3.12*)
