@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-06-07
+# deblob-check version 2014-06-08
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3584,6 +3584,14 @@ set_except () {
 
     # New in 3.14.6
     blobname 'radeon[/]\(%s\|BONAIRE\|HAWAII\|TAHITI\|PITCAIRN\|VERDE\|OLAND\|HAINAN\)_mc2\.bin' 'drivers/gpu/drm/radeon/\(cik\|si\)\.c'
+
+    # New in 3.15
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]nvc0_graph_init[\n]nvc0_graph_init_\(main\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvc0.c
+    defsnc 'static[ ]const[ ]u32[ ]godavari_golden_registers\[\][ ]=' drivers/gpu/drm/radeon/cik.c
+    blobname 'brcm[/]brcmfmac4354-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c
+    blobname '%s%s\.ucode' drivers/net/wireless/iwlwifi/iwl-drv.c
+    blobname 'ti-connectivity[/]wl18xx-fw-3\.bin' drivers/net/wireless/ti/wl18xx/main.c
+    blobname 'ql2700_fw\.bin' drivers/scsi/qla2xxx/qla_os.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
