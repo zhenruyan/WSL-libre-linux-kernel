@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-07-19
+# deblob-check version 2014-07-23
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7597,10 +7597,10 @@ BAD regular expression:
     cat >> $tarwrap <<EOF
 #! /bin/sh
 echo='$echo' &&
-$echo ";/*begin \$1*/;" &&
+\$echo ";/*begin \$1*/;" &&
 cat &&
 echo &&
-$echo ";/*end \$1*/;"
+\$echo ";/*end \$1*/;"
 EOF
     chmod +x $tarwrap
     cmd="tar -xf - --to-command='$tarwrap \"\$TAR_FILENAME\"'"
