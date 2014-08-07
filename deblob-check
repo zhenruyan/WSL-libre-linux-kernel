@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-07-23
+# deblob-check version 2014-08-07
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3485,8 +3485,8 @@ set_except () {
     defsnc '__visible[ ]const[ ]u64[ ]camellia_sp\(10011110\|22000222\|03303033\|00444404\|02220222\|30333033\|44044404\|11101110\)\[256\][ ]=' arch/x86/crypto/camellia_glue.c
     defsnc '__visible[ ]const[ ]u32[ ]crypto_[fi][tl]_tab\[4\]\[256\][ ]=' crypto/aes_generic.c
     defsnc '__visible[ ]const[ ]u32[ ]cast_s[1234]\[256\][ ]=' crypto/cast_common.c
-    defsnc '[	]*interrupts[ ]=[ ]<[ ]*\(0[ ]2[012][0-9][ ]4[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/shdma.txt
-    defsnc '[	][	]interrupts[ ]=[ ]<\([\n][	]*0x\([ef]\|1[01]\)[0-9a-f][ ]0[ ]0[ ]0\)*>[;]' Documentation/devicetree/bindings/powerpc/fsl/msi-pic.txt
+    accept '[	]*interrupts[ ]=[ ]<[ ]*\(0[ ]2[012][0-9][ ]4[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/shdma.txt
+    accept '[	][	]interrupts[ ]=[ ]<\([\n][	]*0x\([ef]\|1[01]\)[0-9a-f][ ]0[ ]0[ ]0\)*>[;]' Documentation/devicetree/bindings/powerpc/fsl/msi-pic.txt
     defsnc 'static[ ]const[ ]int[ ]a370_\(nb\|h\|dram\)clk_ratios\[32\]\[2\][ ]__initconst[ ]=' drivers/clk/mvebu/armada-370.c
     defsnc 'static[ ]const[ ]int[ ]axp_\(nb\|h\|dram\)clk_ratios\[32\]\[2\][ ]__initconst[ ]=' drivers/clk/mvebu/armada-xp.c
     defsnc 'static[ ]const[ ]int[ ]\(dove\|kirkwood\)_cpu_ddr_ratios\[16\]\[2\][ ]__initconst[ ]=' drivers/clk/mvebu/clk-core.c
@@ -3592,6 +3592,171 @@ set_except () {
     blobname '%s%s\.ucode' drivers/net/wireless/iwlwifi/iwl-drv.c
     blobname 'ti-connectivity[/]wl18xx-fw-3\.bin' drivers/net/wireless/ti/wl18xx/main.c
     blobname 'ql2700_fw\.bin' drivers/scsi/qla2xxx/qla_os.c
+
+    # New in 3.16
+    defsnc '[\t]*atmel[,]pll-clk-output-ranges[ ]=[ ]<' 'Documentation/devicetree/bindings/clock/at91-clock\.txt\|arch/arm/boot/dts/at91sam9x5\.dtsi'
+    blobname 'imx[/]sdma[/]sdma-imx25\.bin' arch/arm/boot/dts/imx25.dtsi
+    blobname 'imx[/]sdma[/]sdma-imx35\.bin' arch/arm/boot/dts/imx35.dtsi
+    blobname 'imx[/]sdma[/]sdma-imx50\.bin' arch/arm/boot/dts/imx50.dtsi
+    blobname 'sdma-imx53\.bin' arch/arm/boot/dts/imx53-tx53.dtsi
+    defsnc 'struct[ ]sock_filter[ ]code\[\][ ]=' Documentation/networking/filter.txt
+    initnc '\.L\(Forward\|Reverse\)_Sbox:[\n][\t]\.byte[\t]*' arch/arm64/crypto/aes-neon.S
+    initnc '\.Lsha2_rcon:[\n][\t]\.word[\t]*' arch/arm64/crypto/sha2-ce-core.S
+    defsnc 'static[ ]const[ ]u8[ ]sata_phy_config[12]\[\][ ]*=' arch/mips/netlogic/xlp/ahci-init-xlp2.c
+    accept '[	]*interrupts[ ]=[ ]<108[ ]0\([\n][	 ]*1[012][0-9][ ]0\)*>[;]' arch/powerpc/boot/dts/akebono.dts
+    defsnc '[\t]static[ ]int[ ]sysdiv_code_to_x2\[\][ ]=' arch/powerpc/platforms/512x/clock-commonclk.c
+    accept '[#][#][ ]*0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1' arch/x86/crypto/aesni-intel_avx-x86_64.S
+    defsc 'static[ ]struct[ ]aead_testvec[ ]hmac_sha\(1\|224\|256\|384\|512\)_\(aes\|des\|des3_ede\)_cbc_enc_tv_temp\[\][ ]=' crypto/testmgr.h
+    accept '#define[ \t]*ACPI_TABLE_FILE_SUFFIX[\t ]*["]\.dat["]' drivers/acpi/acpica/acapps.h
+    accept '[ ][*][ ]request_firmware\(_direct\)\?:[ ]-[ ]load[ ]firmware[ ]directly[ ]without[ ]usermode[ ]helper' drivers/base/firmware_class.c
+    accept '[ ][*][ ]This[ ]function[ ]works[ ]pretty[ ]much[ ]like[ ]request_firmware[(][)]' drivers/base/firmware_class.c
+    accept 'int[ ]request_firmware_direct[(]' 'drivers/base/firmware_class\.c\|include/linux/firmware\.h'
+    accept '[\t]ret[ ]=[ ]_request_firmware[(]firmware_p[,][ ]name[,][ ]device[,][ ]FW_OPT_UEVENT[)][;]' drivers/base/firmware_class.c
+    accept 'EXPORT_SYMBOL_GPL[(]request_firmware_direct[)][;]' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]int[ ]armada_375_cpu_\(l2\|ddr\)_ratios\[32\]\[2\][ ]__initconst[ ]=[ ]' drivers/clk/mvebu/armada-375.c
+    defsnc 'static[ ]const[ ]int[ ]armada_38x_cpu_\(l2\|ddr\)_ratios\[32\]\[2\][ ]__initconst[ ]=[ ]' drivers/clk/mvebu/armada-38x.c
+    defsnc 'static[ ]struct[ ]cpufreq_frequency_table[ ]s3c64xx_freq_table\[\][ ]=' drivers/cpufreq/s3c64xx-cpufreq.c
+    defsnc 'static[ ]const[ ]u8[ ]ccp_sha\(1\|224\|256\)_zero\[CCP_SHA_CTXSIZE\][ ]=' drivers/crpto/ccp/ccp-ops.c
+    blobname 'ast_dp501_fw\.bin' drivers/gpu/drm/ast/ast_dp501.c
+    accept '[\t]["]edid[/]\(800x600\)\.bin["]' drivers/gpu/drm/drm_edid_load.c
+    defsnc 'static[ ]void[ ][*]edid_load[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*err[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,][ ][&]pdev' drivers/gpu/drm/drm_edid_load.c
+    defsnc 'static[ ]const[ ]struct[ ]hdmiphy_config[ ]hdmiphy_5420_configs\[\][ ]=' drivers/gpu/drm/exynos/exynos_hdmi.c
+    # These seem too sparse to be code.
+    defsnc 'static[ ]const[ ]u32[ ]gen6_null_state_batch\[\][ ]=' drivers/gpu/drm/i915/intel_renderstate_gen6.c
+    defsnc 'static[ ]const[ ]u32[ ]gen7_null_state_batch\[\][ ]=' drivers/gpu/drm/i915/intel_renderstate_gen7.c
+    defsnc 'static[ ]const[ ]u32[ ]gen8_null_state_batch\[\][ ]=' drivers/gpu/drm/i915/intel_renderstate_gen8.c
+    defsnc 'nv50_disp_\(mast_mthd_head\|\(sync\|ovly\)_mthd_base\)[ ]=' drivers/gpu/drm/nouveau/core/engine/disp/nv50.c
+    defsnc 'nv84_disp_\(mast_mthd_head\|\(sync\|ovly\)_mthd_base\)[ ]=' drivers/gpu/drm/nouveau/core/engine/disp/nv84.c
+    defsnc 'nva0_disp_ovly_mthd_base[ ]=' drivers/gpu/drm/nouveau/core/engine/disp/nva0.c
+    defsnc 'nvd0_disp_\(mast_mthd_head\|\(sync\|ovly\)_mthd_base\)[ ]=' drivers/gpu/drm/nouveau/core/engine/disp/nvd0.c
+    defsnc 'nve0_disp_\(mast_mthd_head\|ovly_mthd_base\)[ ]=' drivers/gpu/drm/nouveau/core/engine/disp/nve0.c
+    defsnc 'gm107_grctx_init_\(\(icmd\|b097\|fe\|ds\|pd\|be\|setup\|tex\|mpc\|sm\|wwdx\)_0\|gpc_unk_2\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxgm107.c
+    defsnc 'nv108_grctx_init_\(icmd\|fe\|ds\|pd\|rstr2d\|be\|prop\|setup\|crstr\|tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnv108.c
+    defsnc 'nvc0_grctx_init_\(icmd\|9097\|902d\|90c0\|fe\|memfmt\|rstr2d\|prop\|setup\|crstr\|zcullr\|wwdx\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvc0.c
+    defsnc 'nvc1_grctx_init_\(icmd\|9097\|setup\|wwdx\|tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvc1.c
+    defsnc 'nvc4_grctx_init_\(tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvc4.c
+    defsnc 'nvc8_grctx_init_\(icmd\|setup\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvc8.c
+    defsnc 'nvd7_grctx_init_\(ds\|pd\|setup\|tex\|wwdx\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvd7.c
+    defsnc 'nvd9_grctx_init_\(icmd\|90c0\|fe\|ds\|prop\|setup\|crstr\|tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvd9.c
+    defsnc 'nve4_grctx_init_\(icmd\|a097\|fe\|memfmt\|ds\|pd\|be\|setup\|tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnve4.c
+    defsnc 'nvf0_grctx_init_\(icmd\|a197\|fe\|pd\|be\|setup\|tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/ctxnvf0.c
+    defsnc 'uint32_t[ ]gm107_grgpc_code\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/gpcgm107.fuc5.h
+    defsnc 'uint32_t[ ]nv108_grgpc_code\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/gpcnv108.fuc5.h
+    defsnc 'uint32_t[ ]gm107_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubgm107.fuc5.h
+    defsnc 'uint32_t[ ]nv108_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubnv108.fuc5.h
+    defsnc 'gm107_graph_init_\(main\|tpccs\|tex\|sm\|be\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/gm107.c
+    defsnc 'nv108_graph_init_\(main\|l1c\)_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nv108.c
+    defsnc 'nvc4_graph_init_sm_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvc4.c
+    defsnc 'nvc8_graph_init_sm_0\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvc8.c
+    defsnc 'nvd9_graph_init_\(gpc_unk_1\|sm_0\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvd9.c
+    defsnc 'nve4_graph_init_\(\(main\|l1c\|sm\|be\)_0\|gpc_unk_1\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nve4.c
+    defsnc 'nvf0_graph_init_\(\(l1c\|sm\)_0\|gpc_unk_1\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nvf0.c
+    defsnc 'static[ ]u8[ ]const[ ]ld9040_gammas\[25\]\[22\][ ]=' drivers/gpu/drm/panel/panel-ld9040.c
+    defsnc 'static[ ]void[ ]s6e8aa0_panel_cond_set[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*s6e8aa0_dcs_write_seq_static[(]ctx[,][\n\t0x0-9a-f, ]*[)][;]' drivers/gpu/drm/panel/panel-s6e8aa0.c
+    defsnc 'static[ ]const[ ]s6e8aa0_gamma_table[ ]s6e8aa0_gamma_tables_v\(142\|96\|32\)\[GAMMA_LEVEL_NUM\][ ]=' drivers/gpu/drm/panel/panel-s6e8aa0.c
+    blobname 'radeon[/]BONAIRE_vce\.bin' drivers/gpu/drm/radeon/radeon_vce.c
+    defsnc '[\t]static[ ]const[ ]__u8[ ]sixaxis_leds\[10\]\[4\][ ]=' drivers/hid/hid-sony.c
+    defsnc '[\t]union[ ]sixaxis_output_report_01[ ]report[ ]=' drivers/hid/hid-sony.c
+    defsnc 'static[ ]int[ ]twl4030_therm_tbl\[\][ ]=' drivers/iio/adc/twl4030-madc.c
+    defsnc 'static[ ]struct[ ]linear_segments[ ]strength_to_db_table\[\][ ]=' drivers/media/dvb-frontends/dib8000.c
+    blobname 'dvb-fe-drxj-mc-1\.0\.8\.fw' drivers/media/dvb-frontends/drx39xyj/drxj.c
+    defsnc 'static[ ]const[ ]u16[ ]nicam_presc_table_val\[43\][ ]=' drivers/media/dvb-frontends/drx39xyj/drxj.c
+    accept '[\t][\t]*demod->firmware[ ]=[ ]\(fw\|NULL\)[;]' drivers/media/dvb-frontends/drx39xyj/drxj.c
+    blobname 'dvb-demod-m88ds3103\.fw' drivers/media/dvb-frontends/m88ds3103_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]m88ds3103_reg_val[ ]m88ds3103_dvbs2\?_init_reg_vals\[\][ ]=' drivers/media/dvb-frontends/m88ds3103_priv.h
+    blobname 'dvb-demod-si2168-02\.fw' drivers/media/dvb-frontends/si2168_priv.h
+    blobname 's5k5baf-cfg\.bin' drivers/media/i2c/s5k5baf.c
+    defsnc 'static[ ]const[ ]u16[ ]scaler_[hv]s_coeffs\[1[35]\]\[SC_NUM_PHASES[ ][*][ ]2[ ][*][ ]SC_[HV]_NUM_TAPS\][ ]=' drivers/media/platform/ti-vpe/sc_coeff.h
+    defsnc 'static[ ]const[ ]struct[ ]si4713_start_seq_table[ ]start_seq\[\][ ]=' drivers/media/radio/si4713/radio-usb-si4713.c
+    defsnc 'static[ ]const[ ]struct[ ]e4000_if_gain[ ]e4000_if_gain_lut\[\][ ]=' drivers/media/tuners/e4000_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]dtcs033_usb_requests[ ]dtcs033_start_reqs\[\][ ]=' drivers/media/usb/gspca/dtcs033.c
+    defsnc 'static[ ]struct[ ]idxdata[ ]tbl_\(\(middle\|end\)_hvflip\(_\(low\|big\)\)\?\|init_post_alt_\(low[123]\|big\|3B\)\)\[\][ ]=' drivers/media/usb/gspca/gl860/gl860-mi2020.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5110_revd_patch\[\][ ]=' drivers/mfd/wm5110-tables.c
+    defsnc 'static[ ]const[ ]u32[ ]tuning_block_128\[\][ ]=' drivers/mmc/host/sdhci-msm.c
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]hwecc4_2048[ ]=' drivers/mtd/nand/davinci_nand.c
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]ecc_layout_[24]KB_bch[48]bit[ ]=' drivers/mtd/nand/pxa3xx_nand.c
+    defsnc '[\t]static[ ]char[ ]packet\[\][ ]=' drivers/net/ethernet/intel/i40e/i40e_txrx.c
+    defsnc 'u8[ ]netvsc_hash_key\[HASH_KEYLEN\][ ]=' drivers/net/hyperv/rndis_filter.c
+    defsnc 'static[ ]const[ ]u32[ ]ar9300Modes_high_power_tx_gain_table_buffalo\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9003_buffalo_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9340_cus227_tx_gain_table_1p0\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9340_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9462_2p0_common_\(mixed_\)\?rx_gain\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar9462_2p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]ar9462_2p0_modes_\(low\|mix\|high\)_ob_db_tx_gain\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9462_2p0_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]qca953x_1p[01]_\(\(mac\|baseband\|radio\)_core\|modes_\(no_\)\?xpa_tx_gain_table\)\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar953x_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]qca953x_1p0_\(baseband\|radio\)_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar953x_initvals.h
+    accept '[	]err[ ]=[ ]request_firmware_nowait[(][^\n]*,[ ]CARL9170FW_NAME,' drivers/net/wireless/carl9170/usb.c
+    defsnc 'static[ ]const[ ]struct[ ]b43_nphy_channeltab_entry_rev3[ ]b43_nphy_channeltab_\(phy\|radio\)_rev\([34568]\|7_9\|11\)\[\][ ]=' drivers/net/wireless/b43/radio_2056.c
+    defsnc 'static[ ]const[ ]u32[ ]b43_ntab_noisevar_r3\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    blobname 'iwlwifi-8000-' drivers/net/wireless/iwlwifi/iwl-8000.c
+    blobname 'iwl_nvm_8000\.bin' drivers/net/wireless/iwlwifi/iwl-8000.c
+    defsnc 'static[ ]const[ ]u8[ ]iwl_nvm_channels_family_8000\[\][ ]=' drivers/net/wireless/iwlwifi/iwl-nvm-parse.c
+    defsnc 'static[ ]const[ ]u16[ ]expected_tpt_\(siso\|mimo2\)_[248]0MHz\[4\]\[IWL_RATE_COUNT\][ ]=' drivers/net/wireless/iwlwifi/mvm/rs.c
+    blobname 'rsi_91x\.fw' drivers/net/wireless/rsi/rsi_common.h
+    defsnc 'static[ ]const[ ]u32[ ]RF_GAIN_TABLE\[\][ ]=' drivers/net/wireless/rtl818x/rtl8180/rtl8225se.c
+    defsnc 'static[ ]const[ ]u8[ ]\(cck_ofdm_gain_settings\|rtl8225se_tx_power_cck\(_ch14\)\?\|ZEBRA_AGC\|OFDM_CONFIG\)\[\][ ]=' drivers/net/wireless/rtl818x/rtl8180/rtl8225se.c
+    defsnc '[\t]u16[ ]toshiba_smid1\[\][ ]=' drivers/net/wireless/rtlwifi/rtl8723be/hw.c
+    blobname 'rtlwifi[/]rtl8723befw\.bin' drivers/net/wireless/rtlwifi/rtl8723be/sw.c
+    defsnc 'u32[ ]RTL8723BE\(PHY_REG\|_RADIOA\|MAC\|AGCTAB\)_\(1T_\?ARRAY\|ARRAY_PG\)\[\][ ]=' drivers/net/wireless/rtlwfi/rtl8723be/table.c
+    defsnc 'static[ ]\(const[ ]unsigned[ ]\)\?int[ ]tps65864[03]_sm2_voltages\[\][ ]=' drivers/regulator/tps6586x-regulator.c
+    defsnc 'static[ ]const[ ]uint32_t[ ]ql27xx_fwdt_default_template\[\][ ]=' drivers/scsi/qla2xxx/qla_tmpl.c
+    blobname 'dgap[/]\(sx\|cxp\|pci\|xr\)\(bios\|fep\)\.bin' drivers/staging/dgap/dgap.c
+    accept '[\t][ ]*kernel[ ]firmware[ ]framework[,][ ]request_firmware[(][)]' drivers/staging/gs_fpgaboot/README
+    defsnc 'static[ ]u8[ ]ecctable\[256\][ ]=' drivers/staging/keucr/smilecc.c
+    defsnc '[\t]u8[ ]data_ptr\[36\][ ]=' drivers/staging/keucr/smscsi.c
+    # This is a default for the user-supplied fpga configuration; it
+    # is overridable with a module parameter.
+    accept 'static[ ]char[ \t]*[*]file[ ]=[ ]["]xlinx_fpga_firmware\.bit["][;]' drivers/staging/gs_fpgaboot/gs_fpgaboot.c
+    accept '[\t]pr_info[(]["]load[ ]fpgaimage[ ]%s[\\]n["][,][ ]file[)][;][\n]*[\t]err[ ]=[ ]request_firmware[(][&]fimage->fw_entry[,]' drivers/staging/gs_fpgaboot/gs_fpgaboot.c
+    blobname '\(ti1273\(_\(pre\)\?le\)\?\|bc[m4]fw\)\.bin' drivers/staging/nokia_h4p/nokia_fw.c
+    defsnc '[\t]u8[ ]channel5g\[CHANNEL_MAX_NUMBER_5G\][ ]=' drivers/staging/rtl8192ee/rtl8192ee/hw.c
+    blobname 'rtlwifi[/]rtl8192eefw\.bin' drivers/staging/rtl8192ee/rtl8192ee/sw.c
+    defsnc 'u32[ ]RTL8192EE_\(PHY_REG\|RADIO[AB]\|MAC\|AGC_TAB\)_ARRAY\(_PG\)\?\[\][ ]=' drivers/staging/rtl8192ee/rtl8192ee/table.c
+    defsnc '[\t]u8[ ]Channel_5G\[45\][ ]=' drivers/staging/rtl8723au/core/rtw_mlme_ext.c
+    defsnc 'static[ ]const[ ]unsigned[ ]short[ ]Sbox1\[2\]\[256\]=' drivers/staging/rtl8723au/core/rtw_security.c
+    defsnc 'u32[ ]Rtl8723UPHY_REG_Array_PG\[Rtl8723UPHY_REG_Array_PGLength\][ ]=' drivers/staging/rtl8723au/hal/Hal8723UHWImg_CE.c
+    defsnc 'static[ ]u32[ ]Array_\(AGC_TAB\|PHY_REG\)_\(1T\|PG\)_8723A\[\][ ]=' drivers/staging/rtl8723au/hal/HalHWImg8723A_BB.c
+    defsnc 'static[ ]u32[ ]Array_MAC_REG_8723A\[\][ ]=' drivers/staging/rtl8723au/hal/HalHWImg8723A_MAC.c
+    defsnc 'static[ ]u32[ ]Array_RadioA_1T_8723A\[\][ ]=' drivers/staging/rtl8723au/hal/HalHWImg8723A_RF.c
+    blobname 'rtlwifi[/]rtl8723aufw_\(A\|B\(_NoBT\)\?\)\.bin' drivers/staging/rtl8723au/hal/rtl8723a_hal_init.c
+    defsnc 'u8[ ]rtl88\(12\|21\)ae_delta_swing_table_idx_5g[ab]_[np]_txpwrtrack\[\]\[DELTA_SWINGIDX_SIZE\][ ]=' drivers/staging/rtl8821ae/rtl8821ae/dm.c
+    defsnc 'static[ ]u8[ ]reserved_page_packet_8821\[TOTAL_RESERVED_PKT_LEN_8821\][ ]=' drivers/staging/rtl8821ae/rtl8821ae/fw.c
+    defsnc 'static[ ]u8[ ]reserved_page_packet_8812\[TOTAL_RESERVED_PKT_LEN_8812\][ ]=' drivers/staging/rtl8821ae/rtl8821ae/fw.c
+    defsnc '[\t]u8[ ]channel_5g\[CHANNEL_MAX_NUMBER_5G\][ ]=' 'drivers/staging/rtl8821ae/rtl8821ae/\(hw\|phy\)\.c'
+    defsnc '[\t]u8[ ]channel_all\[TARGET_CHNL_NUM_2G_5G_8812\][ ]=' drivers/staging/rtl8821ae/rtl8821ae/phy.c
+    blobname 'rtlwifi[/]rtl8821aefw\.bin' drivers/staging/rtl8821ae/rtl8821ae/sw.c
+    defsnc 'u32[ ]RTL88\(12\|21\)AE_\(\(PHY\|MAC\)_REG\|RADIO[AB]\|AGC_TAB\)_ARRAY\(_PG\)\?\[\][ ]=' drivers/staging/rtl8821ae/rtl8821ae/table.c
+    accept '#define[ ]CONFIG_PATH[\t]*["][/]etc[/]vntconfiguration[.]dat["]' drivers/staging/vt6656/device.h
+    defsnc 'static[ ]const[ ]u8[ ]TKIP_Sbox_\(Lower\|Upper\)\[256\][ ]=' drivers/staging/vt6656/tkip.c
+    blobname 'moxa[/]moxa-\(%04x\|[0-9a-f][0-9a-f][0-9a-f][0-9a-f]\)\.fw' drivers/usb/serial/mxuport.c
+    accept '#define[ \t]request_firmware_direct[ \t]request_firmware' include/linux/firmware.h
+    accept '[\t]report_missing_free_firmware[^\n]*[\n][\t]retval[ ]=[ ]request_firmware_direct[(]' include/linux/firmware.h
+    defsnc 'const[ ]u8[ ]crc7_be_syndrome_table\[256\][ ]=' lib/crc7.c
+    defsnc 'static[ ]struct[ ]bpf_test[ ]tests\[\][ ]=' lib/test_bpf.c
+    defsnc '[\t]static[ ]struct[ ]sock_filter[ ]ptp_filter\[\][ ]__initdata[ ]=' net/core/ptp_classifier.c
+    blobname 'adau1761\.bin' sound/soc/codecs/adau1761.c
+    accept '[\t][\t]ret[ ]=[ ]adau17x1_load_firmware[(]adau[,][ ]codec->dev[,][\n][\t ]*ADAU1761_FIRMWARE[)][;]' sound/soc/codecs/adau1761.c
+    blobname 'adau1[37]81\.bin' sound/soc/codecs/adau1781.c
+    accept '[\t][\t]firmware[ ]=[ ]ADAU1[37]81_FIRMWARE[;]\([\n][\n]*[\t][^\n]*\)*ret[ ]=[ ]adau17x1_load_firmware[(]adau[,][ ]codec->dev[,][ ]firmware[)][;]' sound/soc/codecs/adau1781.c
+    blobna 'adau17x1_load_firmware' sound/soc/codecs/adau17x1.c
+    accept 'int[ ]adau17x1_load_firmware[(]' 'sound/soc/codecs/adau17x1\.[ch]'
+    accept 'EXPORT_SYMBOL_GPL[(]adau17x1_load_firmware[)][;]' sound/soc/codecs/adau17x1.c
+    accept '[ 	]*ret[ ]=[ ]process_sigma_firmware_regmap[(]dev[,][ ]adau->regmap[,][ ]firmware[)][;]' sound/soc/codecs/adau17x1.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]adau1977_reg_defaults\[\][ ]=' sound/soc/codecs/adau1977.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]ak4641_reg_defaults\[\][ ]=' sound/soc/codecs/ak4641.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]ak464[28]_reg\[\][ ]=' sound/soc/codecs/ak4642.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5640_reg\[\][ ]=' sound/soc/codecs/rt5640.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5645_reg\[\][ ]=' sound/soc/codecs/rt5645.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5651_reg\[\][ ]=' sound/soc/codecs/rt5651.c
+    defsnc 'int[ ]_process_sigma_firmware[(]' sound/soc/codecs/sigmadsp.c
+    accept 'EXPORT_SYMBOL_GPL[(]_process_sigma_firmware[)]' sound/soc/codecs/sigmadsp.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]sta350_regs\[\][ ]=' sound/soc/codecs/sta350.c
+    defsnc 'static[ ]const[ ]struct[ ]aic31xx_rate_divs[ ]aic31xx_divs\[\][ ]=' sound/soc/codecs/tlv320aic31xx.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5110_sysclk_revd_patch\[\][ ]=' sound/soc/codecs/wm5110.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8974_reg_defaults\[\][ ]=' sound/soc/codecs/wm8974.c
+    blobname 'intel[/]IntcSST[12]\.bin' sound/soc/intel/sst-acpi.c
+    blobname 'intel[/]fw_sst_0f28\.bin-i2s_master' sound/soc/intel/sst-acpi.c
+    defsnc 'static[ ]unsigned[ ]char[ ]bcd2000_init_sequence\[\][ ]=' sound/usb/bcd2000/bcd2000.c
+    blobna '[ ][*][ ]xxd[ ]-r[ ]-p[ ]mXTXXX[^\n]*maxtouch\.fw[\n][ \t]*[*][/]' drivers/input/touchscreen/atmel_mxt_ts.c
+    blobname 's5p-mfc-v8\.fw' drivers/media/platform/s5p-mfc/s5p_mfc.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
