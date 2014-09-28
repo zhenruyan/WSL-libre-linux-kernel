@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-08-07
+# deblob-check version 2014-09-27
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -891,7 +891,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\)["]'
+  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\)["]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
   # Software, but there are just too many URLs in Linux, and most are
   # fine, so we just blacklist when we find undesirable URLs.
@@ -3470,7 +3470,7 @@ set_except () {
     defsnc 'static[ ]const[ ]unsigned[ ]int[ ]bsc_data32_pins\[\][ ]=' drivers/pinctrl/pinctrl-baytrail.c
     blobname 'mt76\(50\|62\)\.bin' drivers/staging/btmtk_usb/btmtk_usb.c
     accept '[	 ]*data->firmware[ ]=[ ]firmware[;]' drivers/staging/btmtk_usb/btmtk_usb.c
-    accept '[	]\[CODE_IMX\(27\|53\)\][ ]=[ ][{][\n][	][	]\.firmware[ ]*=' drivers/media/platform/coda.c
+    accept '[	]\[CODA_IMX\(27\|53\)\][ ]=[ ][{][\n][	][	]\.firmware[ ]*=' drivers/media/platform/coda.c
     blobname 'exynos4_\(fimc_is_fw\|s5k6a3_setfile\)\?\.bin' drivers/media/platform/exynos4-is/fimc-is.h
     accept '[ 	]*ret[ ]=[ ]process_sigma_firmware[(]client[,][ ]ADAU1701_FIRMWARE[)][;]' sound/soc/codecs/adau1701.c
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5640_reg\[RT5640_VENDOR_ID2[ ][+][ ]1\][ ]=' sound/soc/codecs/rt5640.c
@@ -3757,6 +3757,59 @@ set_except () {
     defsnc 'static[ ]unsigned[ ]char[ ]bcd2000_init_sequence\[\][ ]=' sound/usb/bcd2000/bcd2000.c
     blobna '[ ][*][ ]xxd[ ]-r[ ]-p[ ]mXTXXX[^\n]*maxtouch\.fw[\n][ \t]*[*][/]' drivers/input/touchscreen/atmel_mxt_ts.c
     blobname 's5p-mfc-v8\.fw' drivers/media/platform/s5p-mfc/s5p_mfc.c
+
+    # New in 3.17
+    blobname 'radeon[/]\(%s\|kaveri\|KAVERI\)_mec2\.bin' drivers/gpu/drm/radeon/cik.c
+    blobname 'dvb-demod-si2168-\(\(a[23]\|b4\)0-01\|-02\)\.fw' drivers/media/dvb-frontends/si2168_priv.h
+    accept '[	]\[CODA_IMX6\(Q\|DL\)\][ ]=[ ][{][\n][	][	]\.firmware[ ]*=' drivers/media/platform/coda.c
+    blobname 'v4l-coda960-imx6\(q\|dl\)\.bin' drivers/media/platform/coda.c
+    blobname 's5p-mfc-v6-v2\.fw' drivers/media/platform/s5p-mfc/s5p_mfc.c
+    blobname 'dvb-fe-xc4000-1\.4\(\.1\)\?\.fw' drivers/media/tuners/xc4000.c
+    blobname 'ti-connectivity[/]TIInit_\(\(%d\|[0-9]\+\)[.]\)\+bts' drivers/misc/ti-st/st_kim.c
+    blobname 'fw-5\.bin' drivers/net/wireless/ath/ath6kl/core.h
+    blobname 'brcm[/]brcmfmac43569\.bin' drivers/net/wireless/brcm80211/brcmfmac/usb.c
+    blobname '3826\.eeprom' drivers/net/wireless/p54/p54spi.c
+    defsnc 'static[ ]const[ ]u64[ ]sha512_k\[\][ ]=' arch/arm/crypto/sha512_neon_glue.c
+    accept 'K_table:\([\n][ 	]*\.long[ 	]*0x[0-9a-f]*[,][ ]0x[0-9a-f]*\)*' arch/x86/crypto/crc32c-pcl-intel-asm_64.S
+    accept '\.L_s[12345678]:\([\n][ 	]*\.quad[ 	]*0x[0-9a-f]*[,][ ]0x[0-9a-f]*\)*' arch/x86/crypto/des3_ede-asm_64.S
+    defsnc '[\t]const[ ]unsigned[ ]char[ ][*]K[ ]=[ ][(]unsigned[ ]char[ ][*][)]' crypto/drbg.c
+    accept '[\t]ret[ ]=[ ]_request_firmware[(]firmware_p[,][ ]name[,][ ]device[,]' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]uint64_t[ ]inst\[\][ ]=' drivers/crypto/qat/qat_common/qat_hal.c
+    defsnc 'gk110b_\(grctx\|graph\)_init_\(sm\|l1c\)_0\[\][ ]=' drivers/gpu/dm/nouveau/core/engine/graph/ctxgk110b.c
+    defsnc '[\t]const[ ]u16[ ]map\[\][ ]=' drivers/hwmon/asc7621.c
+    defsnc '[}][ ]samp_freq_table\[\][ ]=' drivers/iio/accel/kxcjk-1013.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]jpeg_dqt\[4\]\[DQT_LEN\][ ]=' drivers/media/pci/solo6x10/solo6x10-jpeg.h
+    defsnc 'static[ ]const[ ]u32[ ]qca953x_2p0_baseband_core\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar953x_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]qca953x_2p0_baseband_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar953x_initvals.h
+    defsnc 'static[ ]u16[ ]r2057_rev\(4\|5a\?\|[789]\|14\)_init\[\]\[2\][ ]=' drivers/net/wireless/b43/radio_2057.c
+    defsnc 'static[ ]const[ ]u32[ ]b43_ntab_\(\(tmap\|noisevar\)_r7\|tx_gain_\(epa\|ipa\(_2057\)\?\)_rev\([34569]\|14\)_\(hi_pwr_\)\?\(2g\|5g\)\)\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
+    accept '[	]ret[ ]=[ ]request_firmware[(][&]pm8001_ha->fw_image,' drivers/scsi/pm8001/pm8001_ctl.c
+    defsnc 'static[ ]unsigned[ ]char[ ]byVT3253InitTab_RFMD\[CB_VT3253_INIT_FOR_RFMD\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
+    defsnc 'static[ ]unsigned[ ]char[ ]byVT3253B0_RFMD\[CB_VT3253B0_INIT_FOR_RFMD\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
+    defsnc 'static[ ]unsigned[ ]char[ ]byVT3253B0_AGC4_RFMD2959\[CB_VT3253B0_AGC_FOR_RFMD2959\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
+    defsnc 'static[ ]unsigned[ ]char[ ]byVT3253B0_AIROHA2230\[CB_VT3253B0_INIT_FOR_AIROHA2230\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
+    defsnc 'static[ ]unsigned[ ]char[ ]byVT3253B0_UW2451\[CB_VT3253B0_INIT_FOR_UW2451\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
+    defsnc 'static[ ]unsigned[ ]char[ ]byVT3253B0_AGC\[CB_VT3253B0_AGC\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
+    defsnc 'static[ ]u8[ ]al2230_init_table\[CB_AL2230_INIT_SEQ\]\[3\][ ]=' drivers/staging/vt6656/rf.c
+    defsnc 'static[ ]u8[ ]\(al2230\|vt3226\)_channel_table[012]\[CB_MAX_CHANNEL_24G\]\[3\][ ]=' drivers/staging/vt6656/rf.c
+    defsnc 'static[ ]u8[ ]al7230_init_table\(_amode\)\?\[CB_AL7230_INIT_SEQ\]\[3\][ ]=' drivers/staging/vt6656/rf.c
+    defsnc 'static[ ]u8[ ]\(al7230\|vt3342\)_channel_table[012]\[CB_MAX_CHANNEL\]\[3\][ ]=' drivers/staging/vt6656/rf.c
+    defsnc 'static[ ]u8[ ]vt3226\(d0\)\?_init_table\[CB_VT3226_INIT_SEQ\]\[3\][ ]=' drivers/staging/vt6656/rf.c
+    defsnc 'static[ ]u8[ ]vt3342a0_init_table\[CB_VT3342_INIT_SEQ\]\[3\][ ]=' drivers/staging/vt6656/rf.c
+    defsnc 'static[ ]const[ ]u32[ ]al2230_power_table\[AL2230_PWR_IDX_LEN\][ ]=' drivers/staging/vt6656/rf.c
+    accept 'static[ ]inline[ ]int[ ]request_firmware_direct[(]const[ ]struct[ ]firmware[ ][*][*]fw[,]' include/linux/firmware.h
+    defsnc 'static[ ]u8[ ]const[ ]__aligned[(]8[)][ ]test_buf\[\][ ]__initconst[ ]=' lib/crc32.c
+    defsnc 'static[ ]struct[ ]crc_test[ ][{][^}]*[}][ ]const[ ]test\[\][ ]__initconst[ ]=' lib/crc32.c
+    accept '[\t]rc[ ]=[ ]request_firmware[(][&]test_firmware[,]' lib/test_firmware.c
+    defsnc 'static[ ]struct[ ]reg_default[ ]rt286_index_def\[\][ ]=' sound/soc/codecs/rt286.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt286_reg\[\][ ]=' sound/soc/codecs/rt286.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5670_reg\[\][ ]=' sound/soc/codecs/rt5670.c
+    accept 'FW=["][$]FWPATH[/]test-firmware\.bin["]' 'tools/testing/selftests/firmware/fw_\(filesystem\|userhelper\)\.sh'
+    blobname 'qat_895xcc\.bin' drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+    blobname 'dvb-demod-si2165\.fw' drivers/media/dvb-frontends/si2165_priv.h
+    blobname 'dvb-tuner-si2158-a20-01\.fw' drivers/media/tuners/si2157_priv.h
+    blobname 'brcm[/]brcmfmac43\(602\|5[46]\|570\)-pcie\.bin' drivers/net/wireless/brcm80211/brcmfmac/pcie.c
+    blobname 'r8a779x_usb3_v1\.dlmem' drivers/usb/host/xhci-rcar.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
