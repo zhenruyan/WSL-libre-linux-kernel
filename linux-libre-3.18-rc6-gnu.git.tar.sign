@@ -1,0 +1,19 @@
+-----BEGIN PGP SIGNATURE-----
+Comment: This signature is for the .tar version of the archive
+Comment: git archive --format tar --prefix=linux-libre-3.18-rc6-gnu/ v3.18-rc6-gnu
+Comment: git version 2.26.2
+
+iQIcBAABCgAGBQJevjRTAAoJEJ0NsxtUWjGYtCkP/jO2++2BsgkbiqlOsPJf5epv
+RUUqAmSRGparNChP73sxx15Vo2Ezp00EnuDMCz1Q+WVNUP0SfwLCw/JQne9W4Sa3
+3kEhv980PLVsFf3SuNtJg7N78bWRRmIp9FVevAm/hfXA/LcuvJ4GUPXcHTNPHsND
+sTRoKVZaG/u7ExZFXwIVLBOf0Ak7D3mWnN6uDEao9lG76R2c/JOtDZfzGr3cfGDL
+Lg/9zJwYaUhTYP47Vqcj65IyixZVBK9v2FQumDcXx6PYvGIUomYz+a1PE2ie7wPQ
+AGiyYl5d/dItYknidh0ERsjn3dsC3bKHDrd9bx0RmaUVl3TuwEUgpQ1o9zCTUJK8
+xWhO/3F9RnNj8ktcSdsfFjAYM3U8EtEVZQT3N5Y29MVy7/M0jTGK22lOKiXrl6eH
+pU8fD5zgKlxnv8c4IPVtabTTRTQl27vkDC6oO8oXTRci1WZ33OADV1FQmIM9xT4A
+C8jpbhHg4HyLMoH86KLP8c1oZHsBQArpfBDJH7vmjBLLIR3VQglAzqcIKoxS/FD/
+Qw9BHCKLhE79DNIR3C0qQ1d9+cPVfn3O5BQvsuuB8TlwIWsbL8VqCdjFWxJvndvv
+E9VDA5fkGgupCb6EhtWkuF0Mt2kxqd1BG2HqAC9IgGnj7tTI85ms8QUIfAvVkZ5d
+uIdXdkAZruWVt52i9dtr
+=SRJJ
+-----END PGP SIGNATURE-----
