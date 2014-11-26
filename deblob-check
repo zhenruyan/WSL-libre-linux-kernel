@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-10-30
+# deblob-check version 2014-11-25
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3811,6 +3811,160 @@ set_except () {
     blobname 'brcm[/]brcmfmac43\(602\|5[46]\|570\)-pcie\.bin' drivers/net/wireless/brcm80211/brcmfmac/pcie.c
     blobname 'r8a779x_usb3_v1\.dlmem' drivers/usb/host/xhci-rcar.c
     blobname 'iwlwifi-3165-' drivers/net/wireless/iwlwifi/iwl-7000.c
+
+    # New in 3.18.
+    accept '[\t	]*interrupts[ ]=[ ]<\([ \n\t]*0[ ][4567][0-9][ ]0xf04\)*>[;]' Documentation/devicetree/bindings/soc/ti/keystone-navigator-qmss.txt
+    accept '[\t ]*<\([ \t\n]*[ 1-9][0-9 ][0-9]\)*>[;]' arch/arm/boot/dts/tegra124-nyan-big.dts
+    blobname 'keystone[/]qmss_pdsp_acc48_k2_le_1_0_0_8\.fw' Documentation/devicetree/bindings/soc/ti/keystone-navigator-qmss.txt
+    defsnc 'static[ ]struct[ ]comp_testvec[ ]lz4\(hc\)\?_\(de\)\?comp_tv_template\[\][ ]=' crypto/testmgr.h
+    blobname 'mrvl[/]sd8887_uapsta\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/mwifiex/sdio.h\)'
+    blobname 'radeon[/]\(R600\|RS780\|RV770\)_uvd\.bin' drivers/gpu/drm/radeon/radeon_uvd.c
+    defsnc '[}][ ]wake_odr_data_rate_table\[\][ ]=' drivers/iio/accel/kxcjk-1013.c
+    defsnc 'static[ ]const[ ]struct[ ]linear_segments[ ]cnr_\(to_db\|\(64\|16\)qam\|qpsk\)_table\[\][ ]=' drivers/media/dvb-frontends/mb86a20s.c
+    defsnc 'static[ ]u8[ ]lgtdqcs001f_inittab\[\][ ]=' drivers/media/pci/mantis/mantis_vp1033.c
+    blobname 'go7007[/]go7007tv\.bin' drivers/media/pci/saa7134/saa7134-go7007.c
+    defsnc 'static[ ]const[ ]u8[ ]vivid_hdmi_edid\[256\][ ]=' drivers/media/platform/vivid/vivid-core.c
+    defsnc 'static[ ]const[ ]s8[ ]sin\[257\][ ]=' drivers/media/platform/vivid/vivid-tpg.c
+    defsnc 'static[ ]const[ ]struct[ ]shf[ ]shf_tab\[\][ ]=' drivers/media/tuners/mxl301rf.c
+    defsnc 'static[ ]const[ ]u8[ ]reg_initval\[QM1D1C0042_NUM_REGS\][ ]=' drivers/media/tuners/qm1d1c0042.c
+    accept '[\t]*priv->firmware[ ]=[ ]fw[;][\n][\t][}][ ]else[\n][\t]*fw[ ]=[ ]priv->firmware[;]' drivers/media/tuners/xc5000.c
+    blobname 'dvb-usb-it9303-01\.fw' drivers/media/usb/dvb-usb-v2/af9035.h
+    defsnc 'const[ ]u8[ ]tuning_blk_pattern_4bit\[MMC_TUNING_BLK_PATTERN_4BIT_SIZE\][ ]=' drivers/mmc/core/mmc.c
+    defsnc 'const[ ]u8[ ]tuning_blk_pattern_8bit\[MMC_TUNING_BLK_PATTERN_8BIT_SIZE\][ ]=' drivers/mmc/core/mmc.c
+    defsnc 'static[ ]const[ ]u16[ ]fm10k_crc_16b_table\[256\][ ]=' drivers/net/ethernet/intel/fm10k/fm10k_mbx.c
+    accept '[\t ]*[*][ ][ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0[ ]9[ ]8[ ]7[ ]6[ ]5[ ]4[ ]3[ ]2[ ]1[ ]0' drivers/net/ethernet/intel/fm10k/fm10k_mbx.h
+    blobname '83xx_post_fw\.bin' drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.h
+    blobname 'rtl_nic[/]rtl\(8168h\|8107e\)-[12]\.fw' drivers/net/ethernet/realtek/r8169.c
+    blobname 'firmware-3\.bin' drivers/net/wireless/ath/ath10k/hw.h
+    blobname 'utf\.bin' drivers/net/wireless/ath/ath10k/testmode.c
+    accept '[ ][*][ ]wil_request_firmware[ ]-[ ]Request[ ]firmware' drivers/net/wireless/ath/wil6210/fw_inc.c
+    accept 'int[ ]wil_request_firmware[(]' 'drivers/net/wireless/ath/wil6210/\(fw_inc\.c\|wil6210\.h\)'
+    accept '[\t]*rc[ ]=[ ]wil_request_firmware[(]wil[,][ ]WIL_FW_NAME[)][;]' drivers/net/wireless/ath/wil6210/fw_inc.c
+    blobname 'wil6210\.fw' drivers/net/wireless/ath/wil6210/wil6210.h
+    blobname 'FW[ ]Version:[ ]%d_%d_%d' drivers/net/wireless/broadcom/bnx2x/bnx2x_main.c
+    blobname '\([,][\n \t]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\)_VERSION\)\+' drivers/net/wireless/broadcom/bnx2x/bnx2x_main.c
+    blobname 'iwlwifi-8000' drivers/net/wireless/iwlwifi/iwl-8000.c
+    blobname '["]-["][ ]__stringify[(]api[)][ ]["]\.ucode["]' drivers/net/wireless/iwlwifi/iwl-8000.c
+    blobname '%s%s-%s\.ucode' drivers/net/wireless/iwlwifi/iwl-drv.c
+    blobname 'rtlwifi[/]rtl8723efw\.bin' drivers/net/wireless/rtlwifi/rtl8723ae/sw.c
+    defsnc 'u32[ ]RTL8723E_RADIOA_1TARRAY\[RTL8723ERADIOA_1TARRAYLENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8723ae/table.c
+    defsnc '[\t]u8[ ]channel_all\[TARGET_CHNL_NUM_2G_5G\][ ]=' drivers/net/wireless/rtlwifi/rtl8723be/phy.c
+    blobname 'rtlwifi[/]rtl88\(21\|12\)aefw\(_wowlan\)\?\.bin' drivers/net/wireless/rtlwifi/rtl8821ae/sw.c
+    defsnc 'static[ ]u8[ ]rtl88\(12\|21\)ae_delta_swing_table_idx_5g[ba]_[np]\[\]\[DEL_SW_IDX_SZ\][ ]=' drivers/net/wireless/rtlwifi/rtl8821ae/dm.c
+    defsnc '[\t]u8[ ]channel_all\[ODM_TARGET_CHNL_NUM_2G_5G\][ ]=' drivers/staging/rtl8188eu/hal/phy.c
+    # Present before 3.18, but changes to reject_firmware shell
+    # function to make it match request_firmware only require us to
+    # recognize these as false positives.
+    accept 'static[ ]int[ ]lp55xx_request_firmware[(]' drivers/leds/leds-lp55xx-common.c
+    accept '[\t]*ret[ ]=[ ]lp55xx_request_firmware[(]' drivers/leds/leds-lp55xx-common.c
+    accept 'static[ ]int[ ]flexcop_fe_request_firmware[(]' drivers/media/common/b2c2/flexcop-fe-tuner.c
+    accept '[\t]\.request_firmware[ ]=[ ]flexcop_fe_request_firmware[,]' drivers/media/common/b2c2/flexcop-fe-tuner.c
+    accept '[\t]if[ ][(][(]ret[ ]=[ ]st->config->request_firmware[(]' drivers/media/dvb-frontends/bcm3510.c
+    accept '[\t][\t]ret[ ]=[ ]config->request_firmware[(]' drivers/media/dvb-frontends/or51211.c
+    accept '[\t]if[ ][(]state->config->request_firmware[(]' drivers/media/dvb-frontends/sp8870.c
+    accept '[\t][\t]ret[ ]=[ ]state->config->request_firmware[(]' drivers/media/dvb-frontends/sp887x.c
+    accept '[\t]int[ ][(][*]request_firmware[)][(]' drivers/media/dvb-frontends/sp887x.h
+    accept '[\t]ret[ ]=[ ]state->config->request_firmware[(]' drivers/media/dvb-frontends/tda1004x.c
+    accept '[\t]if[ ][(]state->config->request_firmware[ ]' drivers/media/dvb-frontends/tda1004x.c
+    accept '[\t][\t][\t]*ret[ ]=[ ]state->config->request_firmware[(]' drivers/media/dvb-frontends/tda1004x.c
+    accept 'static[ ]int[ ]alps_tdhd1_204_request_firmware[(]' drivers/media/dvb-frontends/tdhd1.h
+    accept '[\t]\.request_firmware[ ]=[ ]alps_tdhd1_204_request_firmware' drivers/media/dvb-frontends/tdhd1.h
+    accept 'static[ ]int[ ]microtune_mt7202dtf_request_firmware[(]' drivers/media/pci/bt8xx/dvb-bt8xx.c
+    accept '[\t]\.request_firmware[ ]=[ ]microtune_mt7202dtf_request_firmware[,]' drivers/media/pci/bt8xx/dvb-bt8xx.c
+    accept 'static[ ]int[ ]or51211_request_firmware[(]' drivers/media/pci/bt8xx/dvb-bt8xx.c
+    accept '[\t]\.request_firmware[ ]=[ ]or51211_request_firmware[,]' drivers/media/pci/bt8xx/dvb-bt8xx.c
+    accept 'static[ ]int[ ]pluto2_request_firmware[(]' drivers/media/pci/pluto2/pluto2.c
+    accept '[\t]\.request_firmware[ ]=[ ]pluto2_request_firmware[,]' drivers/media/pci/pluto2/pluto2.c
+    accept 'static[ ]int[ ]philips_tda1004x_request_firmware[(]' drivers/media/pci/saa7134/saa7134-dvb.c
+    accept '[\t]\.request_firmware[ ]=[ ]philips_tda1004x_request_firmware' drivers/media/pci/saa7134/saa7134-dvb.c
+    accept 'static[ ]int[ ]alps_tdlb7_request_firmware[(]' drivers/media/pci/ttpci/av7110.c
+    accept '[\t]\.request_firmware[ ]=[ ]alps_tdlb7_request_firmware[,]' drivers/media/pci/ttpci/av7110.c
+    accept 'static[ ]int[ ]philips_tu1216_request_firmware[(]' drivers/media/pci/ttpci/budget-av.c
+    accept '[\t]\.request_firmware[ ]=[ ]philips_tu1216_request_firmware[,]' drivers/media/pci/ttpci/budget-av.c
+    accept 'static[ ]int[ ]philips_tdm1316l_request_firmware[(]' drivers/media/pci/ttpci/budget-ci.c
+    accept '[\t]\.request_firmware[ ]=[ ]philips_tdm1316l_request_firmware[,]' drivers/media/pci/ttpci/budget-ci.c
+    accept 'static[ ]int[ ]alps_tdhd1_204_request_firmware[(]' drivers/media/pci/ttpci/budget.c
+    accept 'static[ ]int[ ]fimc_is_request_firmware[(]' drivers/media/platform/exynos4-is/fimc-is.c
+    accept '[\t]ret[ ]=[ ]fimc_is_request_firmware[(]' drivers/media/platform/exynos4-is/fimc-is.c
+    accept 'static[ ]int[ ]philips_tdm1316l_request_firmware[(]' drivers/media/usb/ttusb-budget/dvb-ttusb-budget.c
+    accept '[\t]\.request_firmware[ ]=[ ]philips_tdm1316l_request_firmware[,]' drivers/media/usb/ttusb-budget/dvb-ttusb-budget.c
+    accept '[\t][\t]pr_err[(]["][ ]request_firmware[ ]failed' drivers/misc/ti-st/st_kim.c
+    accept 'typhoon_request_firmware[(]' drivers/net/ethernet/3com/typhoon.c
+    accept '[\t]err[ ]=[ ]typhoon_request_firmware[(]' drivers/net/ethernet/3com/typhoon.c
+    accept '[\t][\t]goto[ ]request_firmware_exit[;]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+    accept '[\t]BNX2X_ALLOC_AND_SET[(]init_data[,][ ]request_firmware_exit[,]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+    accept 'request_firmware_exit:' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+    accept 'static[ ]int[ ]bnx2_request_firmware[(]' drivers/net/ethernet/broadcom/bnx2.c
+    accept '[\t]rc[ ]=[ ]bnx2_request_firmware[(]' drivers/net/ethernet/broadcom/bnx2.c
+    accept 'static[ ]int[ ]tg3_request_firmware[(]' drivers/net/ethernet/broadcom/tg3.c
+    accept '[\t][\t]err[ ]=[ ]tg3_request_firmware[(]' drivers/net/ethernet/broadcom/tg3.c
+    accept 'static[ ]const[ ]struct[ ]firmware[ ][*]e100_request_firmware[(]' drivers/net/ethernet/intel/e100.c
+    accept '[\t]fw[ ]=[ ]e100_request_firmware[(]' drivers/net/ethernet/intel/e100.c
+    accept '[/][*][ ]Call[ ]this[]function[ ]from[ ]process[ ]context[,][ ]it[ ]will[ ]sleep[ ]in[ ]request_firmware[.]' drivers/net/wireless/ipw2x00/ipw2200.c
+    accept '[ ][*][ ]@request_firmware_complete:' drivers/net/wireless/iwlwifi/iwl-drv.c
+    accept '[\t][\t]lbs_deb_fw[(]["]request_firmware_nowait[ ]error' drivers/net/wireless/libertas/firmware.c
+    accept 'void[ ]netxen_request_firmware[(]' 'drivers/net/ethernet/qlogic/netxen/netxen_nic\(\.h\|_init\.c\)'
+    accept '[\t]netxen_request_firmware[(]' drivers/net/ethernet/qlogic/netxen/netxen_nic_main.c
+    accept 'void[ ]qlcnic_request_firmware[(]' 'drivers/net/ethernet/qlogic/qlcnic/qlcnic\(\.h\|_init\.c\)'
+    accept '[\t][\t]qlcnic_request_firmware[(]' drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
+    accept 'static[ ]void[ ]rtl_request_firmware[(]' drivers/net/ethernet/realtek/r8169.c
+    accept '[\t]rtl_request_firmware[(]' drivers/net/ethernet/realtek/r8169.c
+    accept 'static[ ]void[ ]b43_request_firmware[(]' drivers/net/wireless/b43/main.c
+    accept '[\t]INIT_WORK[(][&]wl->firmware_load[,][ ]b43_request_firmware[)]' drivers/net/wireless/b43/main.c
+    accept 'static[ ]void[ ]b43legacy_request_firmware[(]' drivers/net/wireless/b43legacy/main.c
+    accept '[\t]INIT_WORK[(][&]wl->firmware_load[,][ ]b43legacy_request_firmware[)]' drivers/net/wireless/b43legacy/main.c
+    accept 'il4965_request_firmware[(]' drivers/net/wireless/iwlegacy/4965-mac.c
+    accept '[\t]if[ ][(]il4965_request_firmware[(]' drivers/net/wireless/iwlegacy/4965-mac.c
+    accept '[\t]err[ ]=[ ]il4965_request_firmware[(]' drivers/net/wireless/iwlegacy/4965-mac.c
+    accept 'static[ ]int[ ]iwl_request_firmware[(]' drivers/net/wireless/iwlwifi/iwl-drv.c
+    accept '[\t]if[ ][(]iwl_request_firmware[(]' drivers/net/wireless/iwlwifi/iwl-drv.c
+    accept '[\t]ret[ ]=[ ]iwl_request_firmware[(]' drivers/net/wireless/iwlwifi/iwl-drv.c
+    accept '[ ][*][ ]@request_firmware_complete:' drivers/net/wireless/iwlwifi/iwl-drv.c
+    accept '[\t]struct[ ]completion[ ]request_firmware_complete[;]' drivers/net/wireless/iwlwifi/iwl-drv.c
+    accept '[\t]\(complete\|\(init\|wait_for\)_completion\)[(][&]drv->request_firmware_complete[)]' drivers/net/wireless/iwlwifi/iwl-drv.c
+    accept '[\t][ ][*][ ]Obtain[ ]NVM[ ]image[ ]via[ ]request_firmware[.]' drivers/net/wireless/iwlwifi/mvm/nvm.c
+    accept 'static[ ]int[ ]mwl8k_request_firmware[(]' drivers/net/wireless/mwl8k.c
+    accept '[\t]rc[ ]=[ ]mwl8k_request_firmware[(]' drivers/net/wireless/mwl8k.c
+    accept 'static[ ]int[ ]p54spi_request_firmware[(]' drivers/net/wireless/p54/p54spi.c
+    accept '[\t]ret[ ]=[ ]p54spi_request_firmware[(]' drivers/net/wireless/p54/p54spi.c
+    accept 'static[ ]int[ ]rt2x00lib_request_firmware[(]' drivers/net/wireless/rt2x00/rt2x00firwmare.c
+    accept '[\t][\t]retval[ ]=[ ]rt2x00lib_request_firmware[(]' drivers/net/wireless/rt2x00/rt2x00firmware.c
+    accept '[\t][\t]wl1271_error[(]["]request_firmware_nowait[ ]failed' drivers/net/wireless/ti/wlcore/main.c
+    accept '[\t][\t]nfc_err[(][&]drv->pdev->dev[,][ ]["]request_firmware[ ]failed' drivers/nfc/nfcwilink.c
+    accept '[\t][\t][\t]["]request_firmware[ ]returned' drivers/nfc/nfcwilink.c
+    accept '[\t][\t]dev_err[(][&]rproc->dev[,][ ]["]request_firmware_nowait[ ]err' drivers/remoteproc/remoteproc_core.c
+    accept '[\t][\t]dev_err[(]dev[,][ ]["]request_firmware[ ]failed' drivers/remoteproc/remoteproc_core.c
+    accept 'static[ ]int[ ]asd_request_firmware[(]' drivers/scsi/aic94xx/aic94xx_seq.c
+    accept '[\t]err[ ]=[ ]asd_request_firmware[(]' drivers/scsi/aic94xx/aic94xx_seq.c
+    accept '[\t]uint32_t[ ]cfg_request_firmware_upgrade[;]' drivers/scsi/lpfc/lpfc.h
+    accept '[ ][*][ ]lpfc_request_firmware_store[ ]-[ ]' drivers/scsi/lpfc/lpfc_attr.c
+    accept 'lpfc_request_firmware_upgrade_store[(]' drivers/scsi/lpfc/lpfc_attr.c
+    accept 'lpfc_param_show[(]request_firmware_upgrade[)]' drivers/scsi/lpfc/lpfc_attr.c
+    accept '[\t]rc[ ]=[ ]lpfc_sli4_request_firmware_update[(]' drivers/scsi/lpfc/lpfc_attr.c
+    accept '[ ][*][ ]lpfc_request_firmware_upgrade_init[ ]-[ ]' drivers/scsi/lpfc/lpfc_attr.c
+    accept 'lpfc_request_firmware_upgrade_init[(]' drivers/scsi/lpfc/lpfc_attr.c
+    accept '[\t][\t]phba->cfg_request_firmware_upgrade[ ]=' drivers/scsi/lpfc/lpfc_attr.c
+    accept '[\t][\t][ ]*lpfc_request_firmware_upgrade_\(show\|store\)[,)]' drivers/scsi/lpfc/lpfc_attr.c
+    accept '[\t]lpfc_request_firmware_upgrade_init[(]' drivers/scsi/lpfc/lpfc_attr.c
+    accept 'int[ ]lpfc_sli4_request_firmware_update[(]' drivers/scsi/lpfc/lpfc_crtn.h
+    accept '[ ][*][ ]@fw:[ ]pointer[ ]to[ ]firmware[ ]image[ ]returned[ ]from[ ]request_firmware[.]' drivers/scsi/lpfc/lpfc_init.c
+    accept '[ ][*][ ]lpfc_sli4_request_firmware_update[ ]-[ ]' drivers/scsi/lpfc/lpfc_init.c
+    accept 'lpfc_sli4_request_firmware_update[(]' drivers/scsi/lpfc/lpfc_init.c
+    accept '[\t]if[ ][(]phba->cfg_request_firmware_upgrade[)]' drivers/scsi/lpfc/lpfc_init.c
+    accept '[\t][\t]ret[ ]=[ ]lpfc_sli4_request_firmware_update[(]' drivers/scsi/lpfc/lpfc_init.c
+    accept '[ ][*][ ]qla1280_request_firmware' drivers/scsi/qla1280.c
+    accept 'qla1280_request_firmware[(]' drivers/scsi/qla1280.c
+    accept '[\t]fw[ ]=[ ]qla1280_request_firmware[(]' drivers/scsi/qla1280.c
+    accept 'extern[ ]struct[ ]fw_blob[ ][*]qla2x00_request_firmware[(]' drivers/scsi/qla2xxx/qla_gbl.h
+    accept '[\t]blob[ ]=[ ]qla2x00_request_firmware[(]' drivers/scsi/qla2xxx/qla_init.c
+    accept '[\t]blob[ ]=[ ]ha->hablob[ ]=[ ]qla2x00_request_firmware[(]' drivers/scsi/qla2xxx/qla_nx.c
+    accept 'qla2x00_request_firmware[(]' drivers/scsi/qla2xxx/qla_os.c
+    accept '[\t]-[ ]change[ ]firmware[ ]loading[ ]for[ ]usb[ ]driver[ ]to[ ]proper[ ]kernel[ ]method[ ][(]request_firmware[)]' drivers/staging/ft1000/TODO
+    accept '[\t][\t]pr_err[(]["]rtl8723au:[ ]request_firmware[ ]load' drivers/staging/rtl8723au/hal/rtl8723a_hal_init.c
+    accept '[\t ]*[*][ ]We[ ]call[ ]request_firmware_nowait[ ]instead[ ]of[ \t\n*]*request_firmware[ ]so[ ]that' drivers/tty/serial/ucc_uart.c
+    accept '[\t][\t]dev_err[(][&]dev->dev[,][ ]["]%d[,][ ]request_firmware[ ]failed' sound/pci/asihpi/hpidspcd.c
+    accept 'static[ ]int[ ]snd_ymfpci_request_firmware[(]' sound/pci/ymfpci/ymfpci_main.c
+    accept '[\t]err[ ]=[ ]snd_ymfpci_request_firmware[(]' sound/pci/ymfpci/ymfpci_main.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)

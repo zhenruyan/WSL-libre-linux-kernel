@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Copyright (C) 2008-2012 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright (C) 2008-2014 Alexandre Oliva <lxoliva@fsfla.org>
 
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -271,15 +271,10 @@ xdelta3 -e -9 -S djw -s linux-$kver.tar linux-libre-$kver-$gnu.tar linux-libre-$
 echo Creating xdelta between linux-$kver.tar and linux-libre-$kver-$gnu.tar
 xdelta delta -0 linux-$kver.tar linux-libre-$kver-$gnu.tar linux-libre-$kver-$gnu.xdelta || : # xdelta returns nonzero on success
 
-cleanup="linux-libre-$kver-$gnu.tar linux-libre-$kver-$gnu.vcdiff linux-libre-$kver-$gnu.xdelta"
+cleanup="linux-libre-$kver-$gnu.tar linux-libre-$kver-$gnu.xdelta"
 
 echo Compressing binary deltas and linux-libre-$kver-$gnu.tar
 rm -f linux-$kver.tar
-if test -f linux-libre-$kver-$gnu.vcdiff; then
-  bzip2 -k9 linux-libre-$kver-$gnu.vcdiff
-  xz -k9 linux-libre-$kver-$gnu.vcdiff || :
-  lzip -k9 linux-libre-$kver-$gnu.vcdiff || :
-fi
 if test -f linux-libre-$kver-$gnu.xdelta; then
   bzip2 -k9 linux-libre-$kver-$gnu.xdelta
   xz -k9 linux-libre-$kver-$gnu.xdelta || :
@@ -296,9 +291,6 @@ for f in \
   linux-libre-$kver-$gnu.tar.xz \
   linux-libre-$kver-$gnu.tar.lz \
   linux-libre-$kver-$gnu.vcdiff \
-  linux-libre-$kver-$gnu.vcdiff.bz2 \
-  linux-libre-$kver-$gnu.vcdiff.xz \
-  linux-libre-$kver-$gnu.vcdiff.lz \
   linux-libre-$kver-$gnu.xdelta \
   linux-libre-$kver-$gnu.xdelta.bz2 \
   linux-libre-$kver-$gnu.xdelta.xz \
