@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-12-07
+# deblob-check version 2014-12-08
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3979,6 +3979,8 @@ set_except () {
     # False positives in patch-3.17.2, 3.16.7, 3.14.23 and newer.
     accept '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]_request_firmware[(]const[ ]struct[ ]firmware' drivers/base/firmware_class.c
     accept '[	]ret[ ]=[ ]_request_firmware_prepare[(]' drivers/base/firmware_class.c
+    # False positive in patch-3.17.6 and newer.
+    initnc '[;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]static[ ]const[ ]struct[ ]reg_default[ ]rt5670_reg\[\][ ]=[ ][{][*][/][;]' sound/soc/codecs/rt5670.c
     ;;
 
   */patch-3.13*)
