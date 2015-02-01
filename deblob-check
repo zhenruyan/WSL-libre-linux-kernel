@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2014-12-08
+# deblob-check version 2015-02-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2014 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2015 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -3969,6 +3969,55 @@ set_except () {
     accept '[\t][\t]dev_err[(][&]dev->dev[,][ ]["]%d[,][ ]request_firmware[ ]failed' sound/pci/asihpi/hpidspcd.c
     accept 'static[ ]int[ ]snd_ymfpci_request_firmware[(]' sound/pci/ymfpci/ymfpci_main.c
     accept '[\t]err[ ]=[ ]snd_ymfpci_request_firmware[(]' sound/pci/ymfpci/ymfpci_main.c
+    # New in 3.19
+    blobname 'a420_p\(m4\|fp\)\.fw' drivers/gpu/drm/msm/adreno/adreno_device.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]a4xx_registers\[\][ ]=' drivers/gpu/drm/msm/adreno/a4xx_gpu.c
+    defsnc 'static[ ]const[ ]u32[ ]gen9_null_state_batch\[\][ ]=' drivers/gpu/drm/i915/intel_renderstate_gen9.c
+    defsnc 'nv50_disp_\(core_mthd_head\|base_mthd_base\)[ ]=[ ][{]\([\n][ \t]*\.\(mthd\|addr\)[ ]=[ ]0x00*\([04]0\|54\)0[,]\)*[\n][ \t]*\.data[ ]=' drivers/gpu/drm/nouveau/core/engine/disp/nv50.c
+    defsnc 'nv84_disp_\(core_mthd_head\|base_mthd_base\)[ ]=[ ][{]\([\n][ \t]*\.\(mthd\|addr\)[ ]=[ ]0x00*\([04]0\|54\)0[,]\)*[\n][ \t]*\.data[ ]=' drivers/gpu/drm/nouveau/core/engine/disp/nv84.c
+    defsnc 'nvd0_disp_\(core_mthd_head\|base_mthd_base\)[ ]=[ ][{]\([\n][ \t]*\.\(mthd\|addr\)[ ]=[ ]0x00*\(300\)\?[,]\)*[\n][ \t]*\.data[ ]=' drivers/gpu/drm/nouveau/core/engine/disp/nvd0.c
+    defsnc 'nve0_disp_\(core_mthd_head\|base_mthd_base\)[ ]=[ ][{]\([\n][ \t]*\.\(mthd\|addr\)[ ]=[ ]0x00*300[,]\)*[\n][ \t]*\.data[ ]=' drivers/gpu/drm/nouveau/core/engine/disp/nve0.c
+    # This reads from user-supplied filenames.
+    accept 'shadow_fw_init[(]struct[ ]nouveau_bios[ ][*]bios[,][ ]const[ ]char[ ][*]name[)][\n][{][\n]\(\([^}\n][^\n]*\)\?[\n]\)*[\t]int[ ]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,][ ]dev[)][;]' drivers/gpu/drm/nouveau/core/subdev/bios/shadow.c
+    defsnc 'static[ ]const[ ]u32[ ]coef_lut_\(a_legacy\|b\|[cdef]_[yc]_legacy\)\[NB_COEF\][ ]=' drivers/gpu/drm/sti/sti_hqvdp_lut.h
+    blobname 'hqvdp-stih407\.bin' drivers/gpu/drm/sti/sti_hqvdp.c
+    defsnc '[\t]static[ ]const[ ]union[ ]sixaxis_output_report_01[ ]default_report[ ]=' drivers/hid/hid-sony.c
+    blobname 'elan_i2c\.bin' drivers/input/mouse/elan_i2c_core.c
+    blobname 'elants_i2c\.bin' drivers/input/touchscreen/elants_i2c.c
+    defsnc '[}][ ]QAM256_mod_tab_zv_mode\[\][ ]=' drivers/media/dvb-frontends/au8522_dig.c
+    blobname 'dvb-demod-m88rs6000\.fw' drivers/media/dvb-frontends/m88ds3103_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]m88ds3103_reg_val[ ]m88rs6000_dvbs2\?_init_reg_vals\[\][ ]=' drivers/media/dvb-frontends/m88ds3103_priv.h
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]\(luma\|chroma\)_ac_value\[162[ ][+][ ]2\][ ]=' drivers/media/platform/coda/coda-jpeg.c
+    defsnc 'static[ ]unsigned[ ]char[ ]\(luma\|chroma\)_q\[64\][ ]=' drivers/media/platform/coda/coda-jpeg.c
+    defsnc 'static[ ]const[ ]struct[ ]vin_coeff[ ]vin_coeff_set\[\][ ]=' drivers/media/platform/soc_camera/rcar_vin.c
+    defsnc 'const[ ]unsigned[ ]short[ ]tpg_\(rec709_to_linear\|linear_to_rec709\)\[255[ ][*][ ]16[ ][+][ ]1\][ ]=' drivers/media/platform/vivid/vivid-tpg-colors.c
+    defsnc '[\t]static[ ]const[ ]struct[ ]m88rs6000t_reg_val[ ]reg_vals\[\][ ]=' drivers/media/tuners/m88rs6000t.c
+    blobna '[/][*][ ]cal-<bus>-<id>\.bin[ ][*][/]' drivers/net/wireless/ath/ath10k/core.c
+    blobname 'cal-%s-%s\.bin' drivers/net/wireless/ath/ath10k/core.c
+    defsnc 'static[ ]const[ ]u32[ ]qca953x_2p0_\(common_wo_xlna_rx\|modes_\(no_\)\?xpa_tx\)_gain_table\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar953x_initvals.h
+    blobname 'mrvl[/]usb8766_uapsta\.bin' drivers/net/wireless/mwifiex/usb.h
+    defsc 'static[ ]const[ ]unsigned[ ]char[ ]opcode_ind_arr\[256\][ ]=' drivers/scsi/scsi_debug.c
+    defsnc 'static[ ]const[ ]struct[ ]quark_spi_rate[ ]quark_spi_rate_table\[\][ ]=' drivers/spi/spi-pxa2xx.c
+    blobname 'me4000_firmware\.bin' drivers/staging/comedi/drivers/me4000.c
+    defsnc '[\t]u8[ ]ConnectionMsg\[\][ ]=' drivers/staging/ft1000/ft1000-usb/ft1000_debug.c
+    accept '[\t]pr_info[(]["]load[ ]fpgaimage[ ]%s[\\]n["][,][ ]fw_file[)][;][\n]*[\t]err[ ]=[ ]request_firmware[(][&]fimage->fw_entry[,]' drivers/staging/gs_fpgaboot/gs_fpgaboot.c
+    blobname 'dvb-demod-mn88472-02\.fw' drivers/staging/media/mn88472/mn88472_priv.h
+    blobname 'dvb-demod-mn88473-01\.fw' drivers/staging/media/mn88472/mn88472_priv.h
+    accept '[\t][\t]goto[ ]err_request_firmware[;]' drivers/staging/media/mn88473/mn88473.c
+    accept 'err_request_firmware[:]' drivers/staging/media/mn88473/mn88473.c
+    blob 'The[ ]card[ ]requires[ ]firmware.*[\n]rm[ ]wd7296a\.sys' Documentation/scsi/wd719x.txt
+    blobname 'wd719x-\(wcs\|risc\)\.bin' drivers/scsi/wd719x.c
+    defsnc 'static[ ]const[ ]struct[ ]tsadc_table[ ]v2_code_table\[\][ ]=' drivers/thermal/rockchip_thermal.c
+    defsnc 'static[ ]const[ ]u8[ ]debug_pk\[64\][ ]=' net/bluetooth/smp.c
+    defsnc 'static[ ]const[ ]u8[ ]debug_sk\[32\][ ]=' net/bluetooth/smp.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]ad1980_reg_defaults\[\][ ]=' sound/soc/codecs/ad1980.c
+    blobname 'rt5677_dsp_fw[12]\.bin' sound/soc/codecs/rt5677.c
+    accept 'int[ ]sst_request_firmware_async[(]' sound/soc/intel/sst/sst.h
+    blobname 'intel[/]fw_sst_0f28\.bin-48kHz_i2s_master' sound/soc/intel/sst-acpi.c
+    blobname '\(intel[/]\)\?fw_sst_\(0f28\|22a8\)\.bin' sound/soc/intel/sst/sst_acpi.c
+    blobname '%s%04x%s["][,][ ]["]fw_sst_["][,][\n][ \t]*sst_drv_ctx->dev_id[,][ ]["]\.bin' sound/soc/intel/sst/sst_pci.c
+    accept '[\t]\?\(evsel\|machine\|thread\|comm\(_thread\)\?\|dso\|symbol\|branch_type\|sample\|[\t]call\(_path\)\?\)_file[ \t]*=[ ]open_output_file[(]["]\(evsel\|machine\|thread\|comm\(_thread\)\?\|dso\|symbol\|branch_type\|sample\|call\(_path\)\?\)_table\.bin["][)]' tools/perf/scripts/python/export-to-postgresql.py
+    # accept '\([*]\.\(bin\|elf\|fw\)\|\(setup\|wakeup\)\.\(bin\|elf\)\|vmlinux\.bin\.all\|tftpboot\.img\)[\n]' Documentation/dontdiff
     ;;
 
   */*freedo*.patch | */*logo*.patch)
