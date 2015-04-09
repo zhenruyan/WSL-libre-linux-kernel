@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2015-02-01
+# deblob-check version 2015-04-09
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4002,7 +4002,7 @@ set_except () {
     defsnc '[\t]u8[ ]ConnectionMsg\[\][ ]=' drivers/staging/ft1000/ft1000-usb/ft1000_debug.c
     accept '[\t]pr_info[(]["]load[ ]fpgaimage[ ]%s[\\]n["][,][ ]fw_file[)][;][\n]*[\t]err[ ]=[ ]request_firmware[(][&]fimage->fw_entry[,]' drivers/staging/gs_fpgaboot/gs_fpgaboot.c
     blobname 'dvb-demod-mn88472-02\.fw' drivers/staging/media/mn88472/mn88472_priv.h
-    blobname 'dvb-demod-mn88473-01\.fw' drivers/staging/media/mn88472/mn88472_priv.h
+    blobname 'dvb-demod-mn88473-01\.fw' drivers/staging/media/mn88473/mn88473_priv.h
     accept '[\t][\t]goto[ ]err_request_firmware[;]' drivers/staging/media/mn88473/mn88473.c
     accept 'err_request_firmware[:]' drivers/staging/media/mn88473/mn88473.c
     blob 'The[ ]card[ ]requires[ ]firmware.*[\n]rm[ ]wd7296a\.sys' Documentation/scsi/wd719x.txt
@@ -4018,6 +4018,96 @@ set_except () {
     blobname '%s%04x%s["][,][ ]["]fw_sst_["][,][\n][ \t]*sst_drv_ctx->dev_id[,][ ]["]\.bin' sound/soc/intel/sst/sst_pci.c
     accept '[\t]\?\(evsel\|machine\|thread\|comm\(_thread\)\?\|dso\|symbol\|branch_type\|sample\|[\t]call\(_path\)\?\)_file[ \t]*=[ ]open_output_file[(]["]\(evsel\|machine\|thread\|comm\(_thread\)\?\|dso\|symbol\|branch_type\|sample\|call\(_path\)\?\)_table\.bin["][)]' tools/perf/scripts/python/export-to-postgresql.py
     # accept '\([*]\.\(bin\|elf\|fw\)\|\(setup\|wakeup\)\.\(bin\|elf\)\|vmlinux\.bin\.all\|tftpboot\.img\)[\n]' Documentation/dontdiff
+    # New in 4.0.
+    blobname 'intel[/]ibt-11-%u\.sfi' drivers/bluetooth/btusb.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf100_gr_init_\(main\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    accept '[	][	]*gf100_gr_init_fw[(]priv[,][ ]0x4\(09\|1a\)000[,][ ][&]priv->fuc4\(09\|1a\)c[,][ \n	]*[&]priv->fuc4\(09\|1a\)d[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    accept '[	][	 ]*gf100_gr_dtor_fw[(]&priv->fuc4\(09\|1a\)[cd][)][;]' drivers/gpu/drm/nouveua/nvkm/engine/gr/gf100.c
+    accept '[	][	 ]*\(if[ ][(]\|[ ][ ][ ][ ]\)gf100_gr_ctor_fw[(]priv[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveua/nvkm/engine/gr/gf100.c
+    blobname 'firmware-4\.bin' drivers/net/wireless/ath/ath10k/hw.h
+    blobname 'brcm[/]brcmfmac43340-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c
+    blobname 'iwlwifi-7260-' drivers/net/wireless/iwlwifi/pcie/7000.c
+    blobname 'iwlwifi-8000' drivers/net/wireless/iwlwifi/iwl-8000.c
+    blobname 'iwl_nvm_8000B\.bin' drivers/net/wireless/iwlwifi/iwl-8000.c
+    blobname 'mrvl[/]sd8801_uapsta\.bin' drivers/net/wireless/mwifiex/sdio.h
+    blobname 'mrvl[/]usb8801_uapsta\.bin' drivers/net/wireless/mwifiex/usb.h
+    blobname 'ti-connectivity[/]wl18xx-fw-4\.bin' drivers/net/wireless/ti/wl18xx/main.c
+    blobname 'intel[/]fw_sst_22a8\.bin' sound/soc/intel/sst_acpi.c
+    defsnc 'static[ ]const[ ]struct[ ]clk_div_table[ ]z_div_table\[\][ ]=' drivers/clk/shmobile/clk-sh73a0.c
+    defsnc 'uint32_t[ ]gf100_pce_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf100.fuc3.h
+    defsnc 'uint32_t[ ]gt215_pce_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gt215.fuc3.h
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]nv50_disp_mthd_list[\n]g84_disp_\(base\|core\|ovly\)_mthd_\(dac\|head\|base\)[ ]=' drivers/gpu/drm/nouveau/nvkm/engine/disp/g84.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]nv50_disp_mthd_list[\n]gf110_disp_\(base\|core\|ovly\)_mthd_\(dac\|head\|base\|sor\|pior\)[ ]=' drivers/gpu/drm/nouveau/nvkm/engine/disp/gf110.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]nv50_disp_mthd_list[\n]gk104_disp_\(core\|ovly\)_mthd_\(head\|base\)[ ]=' drivers/gpu/drm/nouveau/nvkm/engine/disp/gk104.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]nv50_disp_mthd_list[\n]gt200_disp_ovly_mthd_base[ ]=' drivers/gpu/drm/nouveau/nvkm/engine/disp/gt200.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf100_grctx_init_\(icmd\|9097\|902d\|90c0\|fe\|memfmt\|rstr2d\|prop\|setup\|crstr\|zcullr\|wwdx\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgf100.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf104_grctx_init_\(tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgf104.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf108_grctx_init_\(icmd\|9097\|setup\|wwdx\|tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgf108.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf110_grctx_init_\(icmd\|setup\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgf110.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf117_grctx_init_\(ds\|pd\|setup\|tex\|wwdx\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgf117.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf119_grctx_init_\(\(icmd\|90c0\|fe\|ds\|prop\|setup\|crstr\|tex\|sm\)_0\|gpc_unk_1\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgf119.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gk104_grctx_init_\(icmd\|a097\|fe\|memfmt\|ds\|pd\|be\|setup\|tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgk104.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gk110_grctx_init_\(icmd\|a197\|fe\|pd\|be\|setup\|tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgk110.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gk208_grctx_init_\(icmd\|fe\|ds\|pd\|rstr2d\|be\|prop\|setup\|crstr\|tex\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgk208.c
+    defsnc 'uint32_t[ ]gf100_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgf100.fuc3.h
+    defsnc 'uint32_t[ ]gf117_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgf117.fuc3.h
+    defsnc 'uint32_t[ ]gk104_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgk104.fuc3.h
+    defsnc 'uint32_t[ ]gk110_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgk110.fuc3.h
+    defsnc 'uint32_t[ ]gk208_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgk208.fuc5.h
+    defsnc 'uint32_t[ ]gf100_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgf100.fuc3.h
+    defsnc 'uint32_t[ ]gf117_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgf117.fuc3.h
+    defsnc 'uint32_t[ ]gk104_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgk104.fuc3.h
+    defsnc 'uint32_t[ ]gk110_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgk110.fuc3.h
+    defsnc 'uint32_t[ ]gk208_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgk208.fuc5.h
+    accept '[	]struct[ ]gf100_gr_fuc[ ]fuc4\(09\|1a\)[cd]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.h
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf104_gr_init_\(ds\|tex\|pe\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf104.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf110_gr_init_sm_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf110.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gf119_gr_init_\(\(pd\|ds\|prop\|gpm\|tex\|pe\|wwdx\|sm\)_0\|\(tpccs\|gpc_unk\|fe\)_1\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf119.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gk104_gr_init_\(\(main\|ds\|sked\|cwd\|tpccs\|pe\|l1c\|sm\|be\)_0\|gpc_unk_1\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/gk104.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gk110_gr_init_\(\(fe\|ds\|sked\|cwd\|tex\|l1c\|sm\)_0\|gpc_unk_1\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/gk110.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gk110b_gr_init_\(l1c\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/gk110b.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gk208_gr_init_\(\(main\|ds\|gpc_unk\|tex\|l1c\)_0\|setup_1\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/gk208.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]gf100_gr_init[\n ]gm107_gr_init_\(\(main\|ds\|scc\|sked\|prop\|zcull\|tpccs\|tex\|pe\|l1c\|sm\|pes\|wwdx\|cbm\|be\)_0\|\(setup\|gpc_unk\|l1c\|sm\)_1\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/gm107.c
+    defsnc 'static[ ]u32[ \n]nv04_gr_ctx_regs\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nv04.c
+    defsnc 'static[ ]int[ \n]nv10_gr_ctx_regs\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/nv10.c
+    defsnc 'uint32_t[ ]g98_psec_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s.h
+    accept 'shadow_fw_init[(]struct[ ]nvkm_bios[ ][*]bios[,][ ]const[ ]char[ ][*]name[)][\n][{][\n]\(\([^}\n][^\n]*\)\?[\n]\)*[\t]int[ ]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,][ ]dev[)][;]' drivers/gpu/drm/nouveau/nvkm/subdev/bios/shadow.c
+    defsnc 'uint32_t[ ]gf100_pmu_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/subdev/pmu/fuc/gf100.fuc3.h
+    defsnc 'uint32_t[ ]gf110_pmu_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/subdev/pmu/fuc/gf110.fuc4.h
+    defsnc 'uint32_t[ ]gk208_pmu_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/subdev/pmu/fuc/gk208.fuc5.h
+    defsnc 'uint32_t[ ]gt215_pmu_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/subdev/pmu/fuc/gt215.fuc3.h
+    defsnc 'static[ ]const[ ]struct[ ]dw_hdmi_mpll_config[ ]rockchip_mpll_cfg\[\][ ]=' drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
+    defsnc '[}][ ]kmx61_\(samp_freq\|wake_up_odr\)_table\[\][ ]=' drivers/iio/imu/kmx61.c
+    defsnc 'static[ ]const[ ]u8[ ]jpeg_header\[\][ ]=' drivers/staging/media/solo6x10/solo6x10-jpeg.h
+    defsnc 'static[ ]const[ ]u8[ ]jpeg_dqt\[4\]\[DQT_LEN\][ ]=' drivers/media/pci/solo6x10/solo6x10-jpeg.h
+    defsnc 'static[ ]u8[ ]vop_6010_\(ntsc\|pal\)_\(d1\|cif\)\[\][ ]=' drivers/staging/media/solo6x10/solo6x10-v4l2-enc.c
+    defsnc '[\t]static[ ]const[ ]struct[ ]rate_s[ ]rate_1\[\][ ]=' drivers/media/usb/gspca/ov534.c
+    defsnc 'static[ ]struct[ ]serdes_cfg[ ]cfg_phyb_10p3125g_\(156p25mhz_cmu1\|16bit_lane\|comlane\)\[\][ ]=' drivers/net/ethernet/ti/netcp_xgbepcsr.c
+    defsnc 'static[ ]const[ ]u32[ ]qca956x_1p0_\(baseband\|radio\)_core\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar956x_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]qca956x_1p0_\(baseband\|radio\)_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar956x_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]qca956x_1p0_modes_\(no_\)\?xpa_\(low_ob_db_\|green_\)\?tx_gain_table\[\]\[3\][ ]=' drivers/net/wireless/ath/ath9k/ar956x_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]qca956x_1p0_common_rx_gain_table\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar956x_initvals.h
+    defsnc 'static[ ]const[ ]u32[ ]qca956x_1p0_xlna_only\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar956x_initvals.h
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]smc0_nor_pins\[\][ ]=' drivers/pinctrl/pinctrl-zynq.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]gamma_correction_table\[\][ ]=' drivers/staging/fbtft/fb_agm1264k-fl.c
+    defsnc '[\t]write_reg[(]par[,][ ]0x2D[,]' drivers/staging/fbtft/fb_hx8353d.c
+    defsnc '[#]define[ ]DEFAULT_GAMMA' 'drivers/staging/fbtft/fb_ssd13[35]1\.c'
+    defsnc 'static[ ]struct[ ]fbtft_device_display[ ]displays\[\][ ]=' drivers/staging/fbtft/fbtft_device.c
+    defsnc 'struct[ ]ModeInit[ ]vgamode\[\][ ]=' drivers/staging/sm7xxfb/sm7xx.h
+    defsnc 'static[ ]const[ ]u8[ ]\(\(priv\|pub\)_[ab]\|dhkey\)_[123]\[\(32\|64\)\][ ]__initconst[ ]=' net/bluetooth/selftest.c
+    defsnc '[\t]const[ ]u8[ ][uvw]\[32\][ ]=' net/bluetooth/smp.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8995_reg_defaults\[\][ ]=' sound/soc/codecs/wm8995.c
+
+    # CYAPA_FW_NAME, defined to this string, is not used anywhere, and
+    # firmware requests are issued with user-supplied names.  So,
+    # deblob the unused name, but keep the request active.
+    blobname 'cyapa\.bin' drivers/input/mouse/cyapa.c
+    accept 'static[ ]int[ ]cyapa_firmware[(]struct[ ]cyapa[ ][*]cyapa[,][ ]const[ ]char[ ][*]fw_name[)][\n][{][\n]\(\([^}\n][^\n]*\)\?[\n]\)*[\t]error[ ]=[ ]request_firmware[(][&]fw[,][ ]fw_name[,][ ]dev[)][;]' drivers/input/mouse/cyapa.c
+
+    # There are blob names here, but no apparent load mechanism.
+    blobname 'ssp_B2\.fw' drivers/iio/common/ssp_sensors/ssp_dev.c
+    blobname 'ssp_crashed\.fw' drivers/iio/common/ssp_sensors/ssp_dev.c
+    blobname 'thermostat_B2\.fw' drivers/iio/common/ssp_sensors/ssp_dev.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
