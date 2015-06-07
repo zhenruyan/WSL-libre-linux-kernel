@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2015-04-09
+# deblob-check version 2015-06-06
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1527,7 +1527,7 @@ set_except () {
     accept '[	]res[ ]=[ ]request_firmware[(]&fw,[ ]["]sas_addr["],[ ]&shost->shost_gendev[)][;]' drivers/scsi/libsas/sas_scsi_host.c
 
     blobname 'ql\(2\([12345]00\|322\)\|8[12]00\)_fw\.bin' drivers/scsi/qla2xxx/qla_os.c
-    blobna 'By[ ]default,[ ]firmware[ ]for[ ]the[ ]ISP[ ]parts\([^\n]\|[\n]*[	]\)*ql2[12345]00_fw\.bin\([^\n]\|[\n]*[	]\)*ftp:[/][/][^\n]*firmware[/]' drivers/scsi/qla2xxx/Kconfig
+    blobna 'By[ ]default,[ ]firmware[ ]for[ ]the[ ]ISP[ ]parts\([^\n]\|[\n]*[	]\)*ql2[12345]00_fw\.bin\([^\n]\|[\n]*[	]\)*ftp:[/][/][^\n]*firmware[/]\(.*linux-firmware[ ]tree[ ]as[ ]well\.\)\?' drivers/scsi/qla2xxx/Kconfig
 
     blobname 'icom_\(asc\|res_dce\|call_setup\)\.bin' drivers/serial/icom.c
 
@@ -4108,6 +4108,40 @@ set_except () {
     blobname 'ssp_B2\.fw' drivers/iio/common/ssp_sensors/ssp_dev.c
     blobname 'ssp_crashed\.fw' drivers/iio/common/ssp_sensors/ssp_dev.c
     blobname 'thermostat_B2\.fw' drivers/iio/common/ssp_sensors/ssp_dev.c
+
+    # New in 4.1.
+    defsnc 'uint8_t[ ]default_tx\[\][ ]=' Documentation/spi/spidev_test.c
+    accept '[#][ ]cat[ ][/]sys[/]kernel[/]debug[/]zsmalloc[/]zram0[/]classes[\n][\n][ ]class[^\n]*\([\n][ ][0-9. \t]*\)*' Documentation/vm/zsmalloc.txt
+    accept '[\t]*nvidia[,]emc-configuration[ ]=[ ][<][\n][\t]*\(0x[0-9a-f]*[\n][\t]*\)*[>][;]' 'arch/arm/boot/dts/tegra124-\(jetson-tk1\|nyan-\(big\|blaze\)\)-emc.dtsi'
+    initnc '\.Lsha256_rcon:[\n][\t]\.word[\t]*' arch/arm64/crypto/sha2-ce-core.S
+    accept 'K256:[\n]\.word[\t]0x428a2f98[,][0-9a-f0x,]*\([\n]\.word[\t][0-9a-f0x,]*\)*' 'arch/arm/crypto/sha256-\(armv4\.pl\|core\.S_shipped\)'
+    initnc 'PPC_AES_4K_DECTAB2:[\n][/][*][ ]decryption[ ]table[,][ ]same[ ]as[ ]crypto_il_tab[ ]in[ ]crypto[/]aes-generic\.c[ ][*][/]' arch/powerpc/crypto/aes-tab-4k.S
+    initnc 'PPC_SPE_SHA256_K:' arch/powerpc/crypto/sha256-spe-asm.S
+    defsnc 'static[ ]const[ ]u8[ ]initial_parm_block\[32\][ ]__initconst[ ]=' arch/s390/crypto/prng.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]\(seed\|[VC]0\|random\)\[\][ ]__initconst[ ]=' arch/s390/crypto/prng.c
+    defsnc 'gm204_grctx_init_\(icmd\|b197\|fe\|ds\|pd\|be\|prop\|setup\|tex\|mpc\|sm\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgm204.c
+    defsnc 'gm204_gr_init_\(main\|tpccs\|pe\|sm\|be\)_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgm204.c
+    defsnc 'static[ ][ ]*\(const[ ]\)\?struct[ ]sensor_register[ ]ov2659_\(init_regs\|[us]\?xga\|[sq]\?vga\)\[\][ ]=' drivers/media/i2c/ov2659.c
+    defsnc 'static[ ]const[ ]struct[ ]pll_ctrl_reg[ ]ctrl1\[\][ ]=' drivers/media/i2c/ov2659.c
+    defsnc 'static[ ]const[ ]u16[ ]aic_lin_table\[ATH_AIC_MAX_AIC_LIN_TABLE\][ ]=' drivers/net/wireless/ath/ath9k/ar9003_aic.c
+    defsc 'static[ ]struct[ ]ModeInit[ ]vgamode\[\][ ]=' drivers/staging/sm7xxfb/sm7xx.h
+    defsnc 'static[ ]const[ ]s32[ ]sin_table\[\][ ]=' include/linux/fixp-arith.h
+    defsnc 'static[ ]int64_t[ ]__RH_LH_tbl\[128[*]2[+]2\][ ]=' net/ceph/crush/crush_ln_table.h
+    defsnc 'static[ ]int64_t[ ]__LL_tbl\[256\][ ]=' net/ceph/crush/crush_ln_table.h
+    blobname 'rtl_bt[/]rtl8723[ab]_fw\.bin' drivers/bluetooth/btusb.c
+    blobname 'rtl_bt[/]rtl8821a_fw\.bin' drivers/bluetooth/btusb.c
+    blobname 'rtl_bt[/]rtl8761a_fw\.bin' drivers/bluetooth/btusb.c
+    blobname 'brcm[/]\(%s\(-%4\.4x-%4\.4x\)\?[^ "\n]*\)\.hcd' drivers/bluetooth/btbcm.c
+    accept 'static[ ]int[ ]set_flash[(]struct[ ]net_device[ ][*]netdev[,][ ]struct[ ]ethtool_flash[ ][*]ef[)][\n][{]\([\n]\+[^\n}][^\n]*\)*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]ef->data[,][ ]adap->pdev_dev[)][;]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}][\n]' drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
+    blobname 'brcm[/]\(%s\|.*\)-\(%04x\|[0-9a-f]*\)-\(%04x\|[0-9a-f]*\)\.hcd' drivers/bluetooth/btusb.c
+    blobname 'qca[/]\(rampatch\|nvram\)_usb_\(%08x\|[0-9a-f]*\)\.bin' drivers/bluetooth/btusb.c
+    blobname 'elants_i2c_\(%04x\|[0-9a-f]*\)\.bin' drivers/input/touchscreen/elants_i2c.c
+    blobname 'ct2\?fw-3\.2\.5\.1\.bin' drivers/net/ethernet/brocade/bna/cna.h
+    blobname 'brcm[/]brcmfmac43\(4\(30\|55\)\|54\)-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/sdio.c
+    blobname 'iwlwifi-7265D-' drivers/net/wireless/iwlwifi/iwl-7000.c
+    blobname '%s%c-%s\.ucode' drivers/net/wireless/iwlwifi/iwl-drv.c
+    blobname 'intel[/]IntcPP01\.bin' sound/soc/intel/haswell/sst-haswell-ipc.c
+    accept '[\t]*rc[ ]=[ ]wil_request_firmware[(]wil[,][ ]WIL_FW2\?_NAME[)][;]' drivers/net/wireless/ath/wil6210/main.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
