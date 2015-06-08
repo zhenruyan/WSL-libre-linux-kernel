@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2015-06-07
+# deblob-check version 2015-06-08
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4134,7 +4134,7 @@ set_except () {
     blobname 'brcm[/]\(%s\(-%4\.4x-%4\.4x\)\?[^ "\n]*\)\.hcd' drivers/bluetooth/btbcm.c
     accept 'static[ ]int[ ]set_flash[(]struct[ ]net_device[ ][*]netdev[,][ ]struct[ ]ethtool_flash[ ][*]ef[)][\n][{]\([\n]\+[^\n}][^\n]*\)*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]ef->data[,][ ]adap->pdev_dev[)][;]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}][\n]' drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
     blobname 'brcm[/]\(%s\|.*\)-\(%04x\|[0-9a-f]*\)-\(%04x\|[0-9a-f]*\)\.hcd' drivers/bluetooth/btusb.c
-    blobname 'qca[/]\(rampatch\|nvram\)_usb_\(%08x\|[0-9a-f]*\)\.bin' drivers/bluetooth/btusb.c
+    blobname 'qca[/]\(rampatch\|nv\(ra\)\?m\)_usb_\(%08x\|[0-9a-f]*\)\.bin' drivers/bluetooth/btusb.c
     blobname 'elants_i2c_\(%04x\|[0-9a-f]*\)\.bin' drivers/input/touchscreen/elants_i2c.c
     blobname 'ct2\?fw-3\.2\.5\.1\.bin' drivers/net/ethernet/brocade/bna/cna.h
     blobname 'brcm[/]brcmfmac43\(4\(30\|55\)\|54\)-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/sdio.c
