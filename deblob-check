@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2015-06-14
+# deblob-check version 2015-08-15
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -891,7 +891,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\)["]'
+  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\)[\\]\?["]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
   # Software, but there are just too many URLs in Linux, and most are
   # fine, so we just blacklist when we find undesirable URLs.
@@ -1216,7 +1216,7 @@ set_except () {
     blob '\(#ifdef[ ]__\(LITTLE\|BIG\)_ENDIAN[\n]\)\?#define[ ]FW_EXT[ ]["]\(_ecd\)\?\.bin2\?["]\([\n]#else[\n]#define[ ]FW_EXT[ ]["]\(_ecd\)\?\.bin2\?["]\)*\([\n]#endif\)\?' drivers/atm/fore200e.c
     blobna 'sprintf[(][^;]*fore200[^;]*FW_EXT[^;]*[)][;]' drivers/atm/fore200e.c
     blobname '\(pc\|sb\)a200e\(_ecd\)\?\.bin[12]\?' drivers/atm/fore200e.c
-    blobna 'The[ ]supplied[ ]firmware[ ]images.*http:[/][/][^\n]*\(fore\|FORE_Systems\).*Rebuild[ ]and[ ]re-install[^.]*\.' Documentation/networking/fore200e.txt
+    blobna 'The[ ]supplied[ ]firmware[ ]images.*https\?:[/][/][^\n]*\(fore\|FORE_Systems\).*Rebuild[ ]and[ ]re-install[^.]*\.' Documentation/networking/fore200e.txt
 
     blobname 'intelliport2\.bin' drivers/char/ip2/ip2main.c
 
@@ -4132,6 +4132,7 @@ set_except () {
     blobname 'rtl_bt[/]rtl8821a_fw\.bin' drivers/bluetooth/btusb.c
     blobname 'rtl_bt[/]rtl8761a_fw\.bin' drivers/bluetooth/btusb.c
     blobname 'brcm[/]\(%s\(-%4\.4x-%4\.4x\)\?[^ "\n]*\)\.hcd' drivers/bluetooth/btbcm.c
+    blobname 'cxgb4[/]aq1202_fw\.cld' drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
     accept 'static[ ]int[ ]set_flash[(]struct[ ]net_device[ ][*]netdev[,][ ]struct[ ]ethtool_flash[ ][*]ef[)][\n][{]\([\n]\+[^\n}][^\n]*\)*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]ef->data[,][ ]adap->pdev_dev[)][;]\([\n]\+[^\n}][^\n]*\)*[\n]\+[}][\n]' drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
     blobname 'brcm[/]\(%s\|.*\)-\(%04x\|[0-9a-f]*\)-\(%04x\|[0-9a-f]*\)\.hcd' drivers/bluetooth/btusb.c
     blobname 'qca[/]\(rampatch\|nv\(ra\)\?m\)_usb_\(%08x\|[0-9a-f]*\)\.bin' drivers/bluetooth/btusb.c
@@ -4143,6 +4144,74 @@ set_except () {
     blobname 'intel[/]IntcPP01\.bin' sound/soc/intel/haswell/sst-haswell-ipc.c
     accept '[\t]*rc[ ]=[ ]wil_request_firmware[(]wil[,][ ]WIL_FW2\?_NAME[)][;]' drivers/net/wireless/ath/wil6210/main.c
     blobname 'nvmData-8000[BC]' drivers/net/wireless/iwlwifi/iwl-8000.c
+
+    # New in 4.2.
+    accept '[\t	]*interrupts[ ]=[ ]<\([ \n\t]*0x0[ ]0x1[0-9a-f][ ]0x4\)*>[;]' Documentation/devicetree/bindings/remoteproc/wkup_m3_rproc.txt
+    accept '[\t]*bool[ ]["]vmlinu[xz]\.bin["]' arch/mips/Kconfig
+    defsnc 'static[ ]struct[ ]hash_testvec[ ]\(ghash\|poly1305\|crc32\)_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]struct[ ]aead_testvec[ ]rfc7539\(esp\)\?_\(enc\|dec\)_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]struct[ ]cipher_testvec[ ]chacha20_enc_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]iproc_pll_vco_param[ ]mipipll_vco_params\[\][ ]=' drivers/clk/bcm/clk-cygnus.c
+    defsnc 'static[ ]const[ ]struct[ ]clk_div_table[ ]ahb_div_table\[\][ ]=' drivers/clk/clk-stm32f4.c
+    defsnc '[\t]static[ ]u8[ ]padded_hash\[64\][ ]=' drivers/crypto/talitos.c
+    defsnc 'static[ ]const[ ]int[ ]stk3310_it_table\[\]\[2\][ ]=' drivers/iio/light/stk3310.c
+    defsnc 'static[ ]const[ ]u8[ ]drv2665_sine_wave_form\[\][ ]=' drivers/input/misc/drv2665.c
+    defsnc 'static[ ]const[ ]char[ ]ipr_bit\[\][ ]=' drivers/irqchip/irq-renesas-h8300h.c
+    defsnc 'static[ ]const[ ]struct[ ]multiplier[ ]multipliers\[\][ ]=' drivers/media/pci/cobalt/cobalt-cpld.c
+    defsnc 'static[ ]u8[ ]edid\[256\][ ]=' drivers/media/pci/cobalt/cobalt-driver.c
+    defsnc 'static[ ]const[ ]struct[ ]bdisp_filter_[hv]_spec[ ]bdisp_[hv]_spec\[\][ ]=' drivers/media/platform/sti/bdisp/bdisp-filter.h
+    defsnc '[\t]struct[ ]init_command[ ]genius_vcam_live_start_commands\[\][ ]=' drivers/media/usb/gspca/sn9c2028.c
+    defsnc '[\t]static[ ]const[ ]unsigned[ ]int[ ]t6_reg_ranges\[\][ ]=' drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
+    defsnc 'static[ ]const[ ]struct[ ]mt76_reg_pair[ ]bbp_\(common\|chip\)_vals\[\][ ]=' drivers/net/wireless/mediatek/mt7601u/initvals.h
+    defsnc '[\t]static[ ]const[ ]u8[ ]freq_plan\[14\]\[FREQ_PLAN_REGS\][ ]=' drivers/net/wireless/mediatek/mt7601u/phy.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(lcd_vip_gpio\|visbus_dout\)_pins\[\][ ]=' drivers/pinctrl/sirf/pinctrl-atlas7.c
+    defsnc 'static[ ]const[ ]u32[ ]bq24257_vbat_map\[\][ ]=' drivers/power/bq24257_charger.c
+    defsnc 'static[ ]const[ ]int[ ]rt9455_\(voreg\|boost_voltage\)_values\[\][ ]=' drivers/power/rt9455_charger.c
+    defsnc '[\t]write_reg[(]par[,][ ]HX8357D_SETGAMMA[,][\n][\t][\t]' drivers/staging/fbtft/fb_hx8357d.c
+    defsnc '[}][ ]isl29018_scales\[4\]\[4\][ ]=' drivers/staging/iio/light/isl29018.c
+    defsnc 'const[ ]u32[ ]dm_tx_bb_gain\[TxBBGainTableLength\][ ]=' drivers/staging/rtl8192e/rtl8192e/rtl_dm.c
+    defsnc 'const[ ]u8[ ]dm_cck_tx_bb_gain\(_ch14\)\?\[CCKTxBBGainTableLength\]\[8\][ ]=' drivers/staging/rtl8192e/rtl8192e/rtl_dm.c
+    defsnc 'static[ ]const[ ]struct[ ]vesa_mode[ ]vesa_mode_table\[\][ ]=' drivers/staging/sm7xxfb/sm7xxfb.c
+    defsnc 'static[ ]const[ ]struct[ ]modeinit[ ]vgamode\[\][ ]=' drivers/staging/sm7xxfb/sm7xxfb.c
+    defsnc 'static[ ]const[ ]uint8_t[ ]crc7_syndrome_table\[256\][ ]=' drivers/staging/wilc1000/wilc_spi.c
+    defsnc 'static[ ]__s64[ ]__RH_LH_tbl\[128[*]2[+]2\][ ]=' net/ceph/crush/crush_ln_table.h
+    defsnc 'static[ ]__s64[ ]__LL_tbl\[256\][ ]=' net/ceph/crush/crush_ln_table.h
+    defsnc 'static[ ]const[ ]u8[ ]vol_quot_table\[\][ ]=' sound/soc/codecs/sgtl5000.c
+    blobname 'radeon[/]TAHITI_vce\.bin' drivers/gpu/drm/radeon/radeon_vce.c
+    blobname 'elan_i2c_["][ ]ETP_PRODUCT_ID_FORMAT_STRING[ ]["]\.bin' drivers/input/mouse/elan_i2c.h
+    # Is this too broad?
+    blobname '%s%s%s_%s%s' drivers/net/ethernet/cavium/liquidio/libquidio_main.c
+    accept '#define[ ]LIO_FW_NAME_SUFFIX[\t ]*["]\.bin["]' drivers/net/ethernet/cavium/liquidio/liquidio_image.h
+    blobname 'cxgb4[/]\(t6fw\|bcm8483\)\.bin' drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+    blobname 'board-%s-%s\.bin' drivers/net/wireless/ath/ath10k/core.c
+    accept '[\t][/][*][ ]Don.t[ ]trust[ ]error[ ]code[ ]from[ ]otp\.bin[ ][*][/]' drivers/net/wireless/ath/ath10k/core.h
+    blobname 'firmware-5\.bin' drivers/net/wireless/ath/ath10k/hw.h
+    blobname 'brcm[/]brcmfmac4358-pcie\.bin' drivers/net/wireless/brcm80211/brcmfmacpcie.c
+    blobname 'brcm[/]brcmfmac43241b5-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/sdio.c
+    blobname 'am335x-pm-firmware\.elf' Documentation/devicetree/bindings/remoteproc/wkup_m3_rproc.txt
+    blobname 'rtl_bt[/]rtl\(8723[ab]\|8821a\|8761a\)_fw\.bin' drivers/bluetooth/btrtl.c
+    blobname 'radeon[/]\(bonaire\|kabini\|kaveri\|hawaii\|mullins\)_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'amdgpu[/]\(tonga\|carrizo\)_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'radeon[/]\(bonaire\|kabini\|kaveri\|hawaii\|mullins\)_vce\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+    blobname 'amdgpu[/]\(tonga\|carrizo\)_vce\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+    blobname 'radeon[/]\(bonaire\|hawaii\|%s\)_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_dpm.c
+    blobname 'radeon[/]\(bonaire\|kabini\|kaveri\|hawaii\|mullins\|%s\)_sdma1\?\.bin' drivers/gpu/drm/amd/amdgpu/cik_sdma.c
+    accept '[\t][/][*][ ]request_firmware[ ][*][/]' drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.h
+    blobname 'amdgpu[/]\(bonaire\|kabini\|kaveri\|hawaii\|mullins\|%s\)_\(pfp\|me\|ce\|rlc\|mec2\?\|mc\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c
+    blobname 'amdgpu[/]\(tonga\|topaz\|%s\)_mc\.bin' drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c
+    blobname 'amdgpu[/]topaz_smc\.bin' drivers/gpu/drm/amd/amdgpu/iceland_dpm.c
+    blobname 'amdgpu[/]\(topaz\|%s\)_sdma1\?\.bin' drivers/gpu/drm/amd/amdgpu/sdma_v2_4.c
+    blobname 'amdgpu[/]\(tonga\|carrizo\|%s\)_sdma1\?\.bin' drivers/gpu/drm/amd/amdgpu/sdma_v3_0.c
+    blobname 'amdgpu[/]tonga_smc\.bin' drivers/gpu/drm/amd/amdgpu/tonga_dpm.c
+    blobname 'i915[/]skl_dmc_ver1\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'wdt87xx_\(fw\|cfg\)\.bin' drivers/input/touchscreen/wdt87xx_i2c.c
+    blobname 'dvb-fe-cx24120-1\.20\.58\.2\.fw' drivers/media/dvb-frontends/cx24120.c
+    # FIXME: LIO_... drivers/net/ethernet/cavium/liquidio/lio_main.c
+    blobname 'mt7601u\.bin' drivers/net/wireless/media/tek/mt7601u/usb.h
+    accept '[\t ]*["]request_firmware_nowait[ ]error' drivers/net/wireless/mwifiex/main.c
+    blobname 'atmel[/]wilc1000\(_ap\|_p2p\)\?_fw\.bin' drivers/staging/wilc1000/Makefile
+    blobname 'wifi_firmware\(_ap\|_p2p_concurrency\)\?\.bin' drivers/staging/wilc1000/linux_wlan.c
+    blob 'This[ ]directory[ ]is[ ]_NOT_[ ]for[ ]adding[ ]arbitrary[ ]new[ ]firmware[ ]images.*git[ ]pull[ ]request[ ]to:[\n][^\n]*linux-firmware\@kernel\.org[\n][^\n]*mailing[ ]lists\.' firmware/README.AddingFirmware
     ;;
 
   */*freedo*.patch | */*logo*.patch)
