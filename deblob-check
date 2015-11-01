@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2015-09-22a
+# deblob-check version 2015-11-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4188,6 +4188,12 @@ set_except () {
     blobname 'firmware-5\.bin' drivers/net/wireless/ath/ath10k/hw.h
     blobname 'brcm[/]brcmfmac4358-pcie\.bin' drivers/net/wireless/brcm80211/brcmfmacpcie.c
     blobname 'brcm[/]brcmfmac43241b5-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/sdio.c
+    # http://arago-project.org/git/projects/?p=am33x-cm3.git contains
+    # source code and the license even looks like a Free Software
+    # license, but there are provisions about trade secrets that might
+    # be contained in blobs therein.  Furthermore, the license hasn't
+    # been reviewed by the FSF.  So let's keep on assuming it's
+    # non-Free, until we get a definitive answer.
     blobname 'am335x-pm-firmware\.elf' Documentation/devicetree/bindings/remoteproc/wkup_m3_rproc.txt
     blobname 'rtl_bt[/]rtl\(8723[ab]\|8821a\|8761a\)_fw\.bin' drivers/bluetooth/btrtl.c
     blobname 'radeon[/]\(bonaire\|kabini\|kaveri\|hawaii\|mullins\)_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
@@ -4215,6 +4221,68 @@ set_except () {
 
     # New in 4.2.1 and 4.1.8.
     defsnc '[}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
+
+    # New in 4.3.
+    accept '[\t]*operating-points[ ]=[ ]<[\n\t 0-9]*>[;]' arch/arm/boot/dts/exynos5250.dtsi
+    defsnc 'static[ ]struct[ ]aead_testvec[ ]aes_ccm_rfc4309_\(enc\|dec\)_tv_template\[\][ \t]=' crypt/testmgr.h
+    defsnc 'static[ ]const[ ]u8[ ]const_tab\[1024\][ ]=' drivers/crypt/qat/qat_common/adf_admin.c
+    defsnc '[\t]static[ ]const[ ]int[ ]even_dividers\[\][ ]=' drivers/gpu/drm/i915/intel_ddi.c
+    defsnc 'static[ ]const[ ]struct[ ]bxt_clk_div[ ]bxt_dp_clk_val\[\][ ]=' drivers/gpu/drm/i915/intel_ddi.c
+    defsnc 'uint32_t[ ]gf100_ce_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf100.fuc3.h
+    defsnc 'uint32_t[ ]gt215_ce_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf215.fuc3.h
+    defsnc 'gf119_disp_\(base\|core\|ovly\)_mthd_\(base\|head\)[ ]=' drivers/gpu/drm/nouveau/nvkm/engine/disp/basegf119.c
+    defsnc 'uint32_t[ ]g98_sec_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf98.fuc0s.h
+    defsnc 'uint32_t[ ]gf119_pmu_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf119.fuc4.h
+    defsnc '[\t]static[ ]const[ ]u16[ ]\(display_mode\|gamma\)_settings\[\][ ]=' drivers/gpu/drm/panel/panel-lg-lg4573.c
+    defsnc 'static[ ]const[ ]struct[ ]cxd2841er_cnr_data[ ]s2\?_cn_data\[\][ ]=' drivers/media/dvb-frontends/cxd2841er.c
+    defsnc 'static[ ]const[ ]struct[ ]dvb_pll_desc[ ]dvb_pll_\(unknown_1\|opera1\|samsung_dtos403ih102a\)[ ]=' drivers/media/dvb-frontends/dvb-pll.c
+    defsnc 'static[ ]const[ ]u8[ ]zigzag\[\][ ]=' drivers/media/platform/rcar_jpu.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]qtbl_\(lum\|chr\)\[JPU_MAX_QUALITY\]\[QTBL_SIZE\][ ]=' drivers/media/platform/rcar_jpu.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]hactbl_\(lum\|chr\)\[HACTBL_SIZE\][ ]=' drivers/media/platform/rcar_jpu.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]wm5102_rev[ab]_patch\[\][ ]=' drivers/mfd/wm5102-tables.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]wm5110_rev[abd]_patch\[\][ ]=' drivers/mfd/wm5110-tables.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8998_rev_a_patch\[\][ ]=' drivers/mfd/wm8998-tables.c
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]hwecc4_4096[ ]=' drivers/mtd/nand/davinci_nand.c
+    defsnc 'static[ ]const[ ]unsigned[ ]adinter_\(pins\|muxvals\)\[\][ ]=' drivers/pinctrl/uniphier/pinctrl-ph1-ld6b.c
+    defsnc '[\t]write_csr[(]dd[,][ ]DCC_CFG_SC_VL_TABLE_\(15_0\|31_16\)' drivers/staging/rdma/hfi1/chip.c
+    defsnc '\(static[ ]\)\?const[ ]u8[ ]pcie_\(serdes\|pcs\)_addrs\[2\]\[NUM_PCIE_SERDES\][ ]=' drivers/staging/rdma/hfi1/firmware.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]ak4643_reg\[\][ ]=' sound/soc/codecs/ak4642.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]da7210_reg_defaults\[\][ ]=' sound/soc/codecs/da7210.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]da9055_reg_defaults\[\][ ]=' sound/soc/codecs/da9055.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]isabelle_reg_defs\[\][ ]=' sound/soc/codecs/isabelle.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]lm49453_reg_defs\[\][ ]=' sound/soc/codecs/lm49453.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt286_index_def\[\][ ]=' sound/soc/codecs/rt286.c
+    defsnc 'static[ ]\(const[ ]\)\?struct[ ]reg_default[ ]rt298_\(index_def\|reg\)\[\][ ]=' sound/soc/codecs/rt298.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]wm2200_reva_patch\[\][ ]=' sound/soc/codecs/wm2200.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5110_sysclk_reve_patch\[\][ ]=' sound/soc/codecs/wm5110.c
+    blobname 'qat_mmp\.bin' drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+    blobname 'amdgpu[/]fiji_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'amdgpu[/]fiji_vce\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+    blobname 'amdgpu[/]fiji_\(ce\|pfp\|me\(c2\?\)\?\|rlc\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v8_0.c
+    blobname 'amdgpu[/]fiji_mc\.bin' drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c
+    blobname 'amdgpu[/]fiji_sdma1\?\.bin' drivers/gpu/drm/amd/amdgpu/sdma_v3_0.c
+    accept '[	][	]*gf100_gr_init_fw[(]gr[,][ ]0x4\(09\|1a\)000[,][ ][&]gr->fuc4\(09\|1a\)c[,][ \n	]*[&]gr->fuc4\(09\|1a\)d[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    accept '[	][	 ]*gf100_gr_dtor_fw[(]&gr->fuc4\(09\|1a\)[cd][)][;]' drivers/gpu/drm/nouveua/nvkm/engine/gr/gf100.c
+    accept '[	][	 ]*\(if[ ][(]\|[ ][ ][ ][ ]\)gf100_gr_ctor_fw[(]gr[,][ ]["]\(fecs\|gpccs\)_\(inst\|data\)["][,][ ][&]gr->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveua/nvkm/engine/gr/gf100.c
+    blobname 'nvidia[/]%s[/]%s\.bin' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    accept '[\t]gr->firmware[ ]=[ ]nvkm_boolopt' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    blobname 'mrvl[/]pcie8997_uapsta\.bin' drivers/net/wireless/mwifiex/pcie.h
+    accept 'static[ ]const[ ]struct[ ]mwifiex_pcie_device[ ]mwifiex_pcie8997[ ]=[ ][{][\n][	]\.firmware[ 	]*=' drivers/net/wireless/mwifiex/pcie.h
+    blobname 'mrvl[/]sd8997_uapsta\.bin' drivers/net/wireless/mwifiex/sdio.h
+    blobname 'mrvl[/]usb8997_uapsta\.bin' drivers/net/wireless/mwifiex/usb.h
+    blobname 'intel[/]ibt-11-5\.\(sfi\|ddc\)' drivers/bluetooth/btintel.c
+    blobname 'qca[/]\(rampatch\|nvm\)_%08x\.bin' drivers/bluetooth/btqca.c
+    blobname 'intel[/]ibt-11-%u\.sfi' drivers/bluetooth/hci_intel.c
+    blobname 'amdgpu[/]fiji_smc\.bin' drivers/gpu/drm/adm/amdgpu/fiji_dpm.c
+    blobname 'pti_memdma_h407\.elf' drivers/media/platform/sti/c8sectpfe/c8sectpfe-core.c
+    blobname 'sec_s3fwrn5_\(firmware\|rfreg\)\.bin' drivers/nfc/s3fwrn5/core.c
+    blobname 'hfi_dc8051\.bin' drivers/staging/rdma/hfi1/firmware.c
+    blobname 'hfi1_\(dc8051\|fabric\|sbus\|pcie\)\.fw' drivers/staging/rdma/hfi1/firmware.c
+    blobname 'hfi1_platform\.dat' drivers/staging/rdma/hfi1/firmware.c
+    blobname 'dsp_fw_release\.bin' sound/soc/intel/skylake/skl-sst.c
+    accept '[\t]*dev_err[(]fei->dev[,][ ]["]request_firmware_nowait[ ]err:' drivers/media/platform/sti/c8sectpfe/c8sectpfe-core.c
+    accept 'static[ ]int[ ]s3fwrn5_fw_request_firmware[(]struct[ ]s3fwrn5_fw_info' drivers/nfc/s3fwrn5/firmware.c
+    accept '[\t]ret[ ]=[ ]s3fwrn5_fw_request_firmware[(]fw_info[)][;]' drivers/nfc/s3fwrn5/firmware.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
