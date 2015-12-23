@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2015-11-01
+# deblob-check version 2015-12-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -887,11 +887,15 @@ set_except () {
   # that deblobbing turns them into r/*DEBLOBBED*/e, a syntax error.
   blobna 'equest_firmwar'
   blobna 'equest_ihex_firmwar'
+  # Catch request_firmare misdeblobbed by the above.
+  blobname 'r[/][*][(]DEBLOBBED[)][*][/]e' 
   blobna 'MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\([ 	\n]*MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\)*'
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
   blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\)[\\]\?["]'
+  # Catch misdeblobbed fw extension.
+  blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
   # Software, but there are just too many URLs in Linux, and most are
   # fine, so we just blacklist when we find undesirable URLs.
@@ -1041,7 +1045,7 @@ set_except () {
 
     # new in 2.6.26
     initnc 'static[ ]u64[ ]vec2off\[68\][ ]=' arch/ia64/kvm/process.c
-    initnc "[	][	][	]interrupts[ ]=[ ]<\\(0x\\)\\?3[ ]\\(0x\\)\\?0[ ]\\(0x\\)\\?0[ ][ ]$blobpat*>[;]" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
+    accept "[	][	][	]interrupts[ ]=[ ]<\\(0x\\)\\?3[ ]\\(0x\\)\\?0[ ]\\(0x\\)\\?0[ ][ ]$blobpat*>[;]" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
     initnc 'static[ ]const[ ]u32[ ]crctab32\[\][ ]=' arch/x86/boot/tools/build.c
     defsnc 'static[ ]struct[ ]mse2snr_tab[ ]\(vsb\|qam\(64\|256\)\)_mse2snr_tab\[\][ ]=' drivers/media/dvb/frontends/au8522.c
     defsnc '[}][ ]\(VSB\|QAM\(64\|256\)\?\)_mod_tab\[\][ ]=' 'drivers/media/dvb/frontends/au8522\(_dig\)\?\.c'
@@ -2242,7 +2246,7 @@ set_except () {
     blobname 'mwl8k[/]\(helper\|fmimage\)_\(%u\|[0-9]\+\)\.fw' drivers/net/wireless/mwl8k.c
     blobname '3826\.arm' 'drivers/\(net/wireless/p54/p54spi\|staging/stlc45xx/stlc45xx\)\.c'
     defsnc 'static[ ]unsigned[ ]char[ ]p54spi_eeprom\[\][ ]=' drivers/net/wireless/p54/p54spi_eeprom.h
-    blobname '\(comedi[/]\)\?jr3pci\.idm\(["]\.[\n][ ][*][/]\)\?' drivers/staging/comedi/drivers/jr3_pci.c
+    blobname '\([/ ][*][ ]The[ ]DSP[ ]on[ ]the[ ]board[^"]*["]\)\?\(comedi[/]\)\?jr3pci\.idm\(["]\.[\n][ ][*][/]\)\?' drivers/staging/comedi/drivers/jr3_pci.c
     accept '#define[ ]USBDUX_FIRMWARE[ \t]*["]usbdux_firmware\.bin["]' drivers/staging/comedi/drivers/usbdux.c
     accept 'MODULE_FIRMWARE[(]USBDUX_FIRMWARE[)][;]' drivers/staging/comedi/drivers/usbdux.c
     accept '#define[ ]FIRMWARE[ \t]*["]usbduxfast_firmware\.bin["]' drivers/staging/comedi/drivers/usbduxfast.c
@@ -2913,7 +2917,7 @@ set_except () {
     # Sources for these are in the corresponding .fuc files.
     defsnc 'uint32_t[ ]nvc0_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_grgpc.fuc.h
     defsnc 'uint32_t[ ]nvc0_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_grhub.fuc.h
-    defsnc '[	][	][	]interrupts[ ]=[ ]<\([\n][	]*0x[ef][0-9a-f][ ]0[ ]0[ ]0\)*>[;]' 'arch/powerpc/boot/dts/p\(2040\|3041\|4080\|5020\)si\.dtsi'
+    accept '[	][	][	]interrupts[ ]=[ ]<\([\n][	]*0x[ef][0-9a-f][ ]0[ ]0[ ]0\)*>[;]' 'arch/powerpc/boot/dts/p\(2040\|3041\|4080\|5020\)si\.dtsi'
     blobname 'dvb-netup-altera-04\.fw' drivers/media/video/cx23885/cx23885-cards.c
     blobname 'rtl_nic[/]rtl8168e-3\.fw' drivers/net/r8169.c
     defsnc '[	]static[ ]const[ ]struct[ ]ephy_info[ ]e_info_8168e_1\[\][ ]=' drivers/net/r8169.c
@@ -2994,7 +2998,7 @@ set_except () {
     defsnc 'int[ ]process_sigma_firmware\(_regmap\)\?[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*_process_sigma_firmware' sound/soc/codecs/sigmadsp.c
     accept 'EXPORT_SYMBOL[(]process_sigma_firmware_regmap[)]' sound/soc/codecs/sigmadsp.c
     accept 'extern[ ]int[ ]process_sigma_firmware_regmap[(][^)]*[)][;]' sound/soc/codecs/sigmadsp.h
-    defsnc '[	]interrupts[ ]=[ ]<\([\n][	]*0x[ef][0-9a-f][ ]0[ ]0[ ]0\)*>[;]' 'arch/powerpc/boot/dts/fsl/\(pq3\|qoriq\)-mpic\.dtsi'
+    accept '[	]interrupts[ ]=[ ]<\([\n][	]*0x[ef][0-9a-f][ ]0[ ]0[ ]0\)*>[;]' 'arch/powerpc/boot/dts/fsl/\(pq3\|qoriq\)-mpic\.dtsi'
     # These appear to be identifiers within the device itself,
     # used to get information from it.
     accept '#define[ ]LANCER_\(FW_DUMP\|VPD_[PV]F\)_FILE[	]*["][/]\(dbg[/]dump\.bin\|vpd[/]ntr_[pv]f\.vpd\)["]' drivers/net/ethernet/emulex/benet/be_cmds.h
@@ -3008,7 +3012,7 @@ set_except () {
     blobname 'dvb-fe-xc5000-1\.6\.114\.fw' drivers/media/common/tuners/xc5000.c
     blobname 'dvb-fe-xc5000c-41\.024\.5\.fw' drivers/media/common/tuners/xc5000.c
     accept '[	]*nvidia,emc-registers[ ]=[ ]<[ ]\(0[ 	\n]*\)*>' Documentation/devicetree/bindings/arm/tegra/emc.txt
-    defsnc '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[345][0-9][ ]0x04[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/tegra20-apbdma.txt
+    accept '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[345][0-9][ ]0x04[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/tegra20-apbdma.txt
     accept '[	]*nvidia,emc-registers[ ]=[ ]<[ ]\(0x[0-9a-f]*[ 	\n]*\)*>' arch/arm/boot/dts/tegra-seaboard.dts
     accept '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[0-4][0-9][ ]0x04[ 	\n]*\)*>[;]' 'arch/arm/boot/dts/tegra[23]0\.dtsi'
     defsnc 'static[ ]struct[ ]clk_pll_freq_table[ ]tegra_pll_[cu]_freq_table\[\][ ]=' arch/arm/mach-tegra/tegra30_clocks.c
@@ -3485,7 +3489,7 @@ set_except () {
     blobname 'ct2\?fw-3\.2\.1\.1\.bin' drivers/net/ethernet/brocade/bna/cna.h
     blobname 'c[bt]2\?fw-3\.2\.1\.1\.bin' drivers/scsi/bfa/bfad.c
     blobname '84xx_fw\.bin' drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
-    defsnc '[	]interrupts[ ]=[ ]<\([\n][	]*0x\([ef]\|1[01]\)[0-9a-f][ ]0[ ]0[ ]0\)*>[;]' arch/powerpc/boot/dts/fsl/qoriq-mpic4\.3\.dtsi
+    accept '[	]interrupts[ ]=[ ]<\([\n][	]*0x\([ef]\|1[01]\)[0-9a-f][ ]0[ ]0[ ]0\)*>[;]' arch/powerpc/boot/dts/fsl/qoriq-mpic4\.3\.dtsi
     defsnc '__visible[ ]const[ ]u64[ ]camellia_sp\(10011110\|22000222\|03303033\|00444404\|02220222\|30333033\|44044404\|11101110\)\[256\][ ]=' arch/x86/crypto/camellia_glue.c
     defsnc '__visible[ ]const[ ]u32[ ]crypto_[fi][tl]_tab\[4\]\[256\][ ]=' crypto/aes_generic.c
     defsnc '__visible[ ]const[ ]u32[ ]cast_s[1234]\[256\][ ]=' crypto/cast_common.c
@@ -4283,6 +4287,61 @@ set_except () {
     accept '[\t]*dev_err[(]fei->dev[,][ ]["]request_firmware_nowait[ ]err:' drivers/media/platform/sti/c8sectpfe/c8sectpfe-core.c
     accept 'static[ ]int[ ]s3fwrn5_fw_request_firmware[(]struct[ ]s3fwrn5_fw_info' drivers/nfc/s3fwrn5/firmware.c
     accept '[\t]ret[ ]=[ ]s3fwrn5_fw_request_firmware[(]fw_info[)][;]' drivers/nfc/s3fwrn5/firmware.c
+
+    # New in 4.4.
+    blobna 'More[ ]description[ ]on[ ]the[ ]firmware.*make[ ]sure[ ]to[ ]copy[ ]firmware[\n]to[ ]file[ ]system[ ]before[ ]using[ ]these[ ]queue[ ]types[.]' Documentation/arm/keystone/knav-qmss.txt
+    accept '[\t	]*interrupts[ ]=[ ]<\([\n\t ]*\([0-9xa-f ]*\|[/][*]\([^*]\|[*]*[^*/]\)*[*][*]*[/]\)\)*>[;]' arch/arm64/boot/dts/hisilicon/hip05_hns.dtis
+    accept '[ ][ ][ ][ ]run_cmd[ ]dd[ ]if=["][$]ofile\.bin["][ ]of=["][$]ofile\.bin["]' arch/powerpc/boot/wrapper
+    accept '#define[ ]XCHAL_BYTE0_FORMAT_LENGTHS[ \t23,\\\n]*' arch/xtensa/variants/de212/include/variant/tie.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]wm8998_rev_a_patch\[\][ ]=' drivers/mfd/wm8998-tables.c
+    defsnc 'static[ ]struct[ ]nand_ecclayout[ ]vf610_nfc_ecc\(45\|60\)[ ]=' drivers/mtd/nand/vf610_nfc.c
+    defsnc 'static[ ]const[ ]struct[ ]iro[ ]iro_arr\[31\][ ]=' drivers/net/ethernet/qlogic/qed/qed_hsi.h
+    defsnc 'static[ ]struct[ ]rtl8xxxu_reg8val[ ]rtl8723a_mac_init_table\[\][ ]=' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    defsnc 'static[ ]struct[ ]rtl8xxxu_reg32val[ ]rtl\(\(8723a_phy_1t\|8192cu_phy_2t\)_init\|8188ru_phy_1t_highpa\|8xxx_agc_\(standard\|highpa\)\)_table\[\][ ]=' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    defsnc 'static[ ]struct[ ]rtl8xxxu_rfregval[ ]rtl\(\(8723au_radioa_1t\|8192cu_radio[ab]_[12]t\)_init\|8188ru_radioa_1t_highpa\)_table\[\][ ]=' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    defsnc 'static[ ]const[ ]int[ ]base_to_fuse_addr_mappings\[\]\[2\][ ]=' drivers/nvmem/vf610-ocotp.c
+    defsnc 'static[ ]const[ ]u8[ ]crc7_syndrome_table\[256\][ ]=' drivers/staging/wilc1000/wilc_spi.c
+    defsnc 'static[ ]const[ ]struct[ ]tsadc_table[ ]v3_code_table\[\][ ]=' drivers/thermal/rockchip_thermal.c
+    defsnc 'omap3[46]xx_adc_to_temp\[128\][ ]=' drivers/thermal/ti-soc-thermal/omap3-thermal-data.c
+    accept '[\t]*[ ][*][ ]*0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1' net/6lowpan/iphc.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]ak4613_reg\[\][ ]=' sound/soc/codecs/ak4613.c
+    accept '[	]\.helper[ 	]*=[ ]NULL[,][\n][	]*\.firmware' drivers/bluetooth/btmrvl_sdio.c
+    blobname 'amdgpu[/]stoney_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'amdgpu[/]stoney_vce\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+    blobname 'i915[/]bxt_dmc_ver1\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname '\(utf\|board\)\(-2\)\?\.bin' drivers/net/wireless/ath/ath10k/hw.h
+    blobname 'brcm[/]brcmfmac43\(50\|6[56]b\|71\)-pcie\.bin' drivers/net/wireless/brcm80211/brcmfmac/pcie.c
+    accept '[\t]g_linux_wlan->firmware[ ]=' drivers/staging/wilc1000/linux_wlan.c
+    accept '#define[ \t]*FILE_SUFFIX_BINARY_TABLE[\t ]*["]\.dat["]' drivers/acpi/acpica/acapps.h
+    blobname 'i915[/]skl_guc_ver4\.bin' drivers/gpu/drm/i915/intel_guc_loader.c
+    blobname 'bu21023\.bin' drivers/input/touchscreen/rohm_bu21023.c
+    # These are user-supplied.
+    accept '[\t]cdev->firmware[ ]=[ ]kmalloc' drivers/misc/mic/cosm/cosm_sysfs.c
+    accept '[\t]rc[ ]=[ ]request_firmware[(][&]fw[,][ ]mdev->cosm_dev->' drivers/misc/mic/host/mic_x100.c
+    accept '[\t]if[ ][(]bnxt_dir_type_is_executable[^\n]*[\n][\t]*return[ ]-EINVAL[;][\n][\n]*[\t]rc[ ]=[ ]request_firmware[(][&]' drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+    blobname 'qed[/]qed_init_values_zipped-["][ ]FW_FILE_VERSION[ ]["]\.bin' drivers/net/ethernet/qlogic/qed/qed_main.c
+    accept 'MODULE_FIRMWARE[(]HTC_7010_MODULE_FW[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept 'MODULE_FIRMWARE[(]HTC_9271_MODULE_FW[)][;]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '\(static[ ]int[ ]\|[\t]*ret[ ]=[ ]\)ath9k_hif_request_firmware[(]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '[\t ]*["]%s[/]htc_%s-%d\.%s\.0\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.c
+    accept '#define[ ]HTC_\(9271\|7010\)_MODULE_FW[ \t]*HTC_FW_PATH[ ]["][/]htc_\(9271\|7010\)-["][ ][\\][\n][ \t]*__stringify[(]MAJOR_VERSION_REQ[)][ ][\\][\n][ \t]*["]\.["][ ]__stringify[(]FIRMWARE_MINOR_IDX_MAX[)][ ]["]\.0\.fw["]' drivers/net/wireless/ath/ath9k/hif_usb.h
+    blobname 'rtlwifi[/]rtl8723aufw_\(A\|B\|B_NoBT\)\.bin' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    blobname 'rtlwifi[/]rtl8192cufw_\(A\|B\|TMSC\)\.bin' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    blobname '\(otp\|ram\)\.bin' drivers/nfc/fdp/fdp.c
+    accept '\(static[ ]int[ ]\|[\t]r[ ]=[ ]\)fdp_nci_request_firmware[(]' drivers/nfc/fdp/fdp.c
+    accept '[\t][\t]lpfc_sli4_request_firmware_update[(]' drivers/scsi/lpfc/lpfc_init.c
+    blobname 'ks2_qmss_pdsp_acc48\.bin' drivers/soc/ti/knav_qmss_queue.c
+    blobname 'dfw_sst\.bin' sound/soc/intel/skylake/skl-topology.c
+    # This seems to be designed to load a user-supplied fpga
+    # configuration file, but there aren't any callers to this
+    # function in the kernel tree.  Presumably users who program FPGAs
+    # are supposed to write their own drivers and call this function.
+    accept '[\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]image_name[,][ ]' drivers/fpga/fpga-mgr.c
+    blobname 'fpga_mgr_firmware_load' drivers/fpga/fpga-mgr.c
+    accept '[\t ]*\(int\|ret[ ]=\)[ ]fpga_mgr_firmware_load[(]' drivers/fpga/fpga-mgr.[ch]
+    accept '[ ][*][ ]fpga_mgr_firmware_load[ ]-' drivers/fpga/fpga-mgr.c
+    accept 'EXPORT_SYMBOL_GPL[(]fpga_mgr_firmware_load[)][;]' drivers/fpga/fpga-mgr.c
+    accept '[\t ]*CHIP_IS_E2[(]bp[)][ ][?][ ]["]everest2["][ ]:[ ]["]everest3["][/][*][(]DEBLOBBED[)][*][/][)][;]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -4359,7 +4418,7 @@ set_except () {
     blobname 'radeon[/]HAWAII_\(pfp\|[mc]e\|me\?c\|rlc\|sdma\|smc\)\.bin' drivers/gpu/drm/radeon/cik.c
     blobname 'ti-connectivity[/]wl1251-\(fw\|nvs\)\.bin' 'drivers/net/wireless/wl12\(51\|xx\)/wl1251.h'
     # Matches from earlier releases, for the patch from 3.12.
-    defsnc '[	]*interrupts[ ]=[ ]<[ ]*\(0[ ]2[012][0-9][ ]4[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/shdma.txt
+    accept '[	]*interrupts[ ]=[ ]<[ ]*\(0[ ]2[012][0-9][ ]4[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/shdma.txt
     accept '[	]ar->firmware[ ]=[ ]\(NULL\|ath10k_fetch_fw_file\)' drivers/net/wireless/ath/ath10k/core.c
     defsnc 'static[ ]const[ ]u32[ ]ar9485_1_[01]_\(mac\|baseband\)_postamble\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
     defsnc 'static[ ]const[ ]u32[ ]ar9485\(M\|_m\)odes_\(high\|low\|green\)\(est\)\?_\(power\|ob_db\)_tx_gain_1_[01]\[\]\[5\][ ]=' drivers/net/wireless/ath/ath9k/ar9485_initvals.h
@@ -4399,12 +4458,12 @@ set_except () {
     blobname 'ct2\?fw-3\.2\.1\.1\.bin' drivers/net/ethernet/brocade/bna/cna.h
     blobname 'c[bt]2\?fw-3\.2\.1\.1\.bin' drivers/scsi/bfa/bfad.c
     blobname '84xx_fw\.bin' drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
-    defsnc '[	]interrupts[ ]=[ ]<\([\n][	]*0x\([ef]\|1[01]\)[0-9a-f][ ]0[ ]0[ ]0\)*>[;]' arch/powerpc/boot/dts/fsl/qoriq-mpic4\.3\.dtsi
+    accept '[	]interrupts[ ]=[ ]<\([\n][	]*0x\([ef]\|1[01]\)[0-9a-f][ ]0[ ]0[ ]0\)*>[;]' arch/powerpc/boot/dts/fsl/qoriq-mpic4\.3\.dtsi
     defsnc '__visible[ ]const[ ]u64[ ]camellia_sp\(10011110\|22000222\|03303033\|00444404\|02220222\|30333033\|44044404\|11101110\)\[256\][ ]=' arch/x86/crypto/camellia_glue.c
     defsnc '__visible[ ]const[ ]u32[ ]crypto_[fi][tl]_tab\[4\]\[256\][ ]=' crypto/aes_generic.c
     defsnc '__visible[ ]const[ ]u32[ ]cast_s[1234]\[256\][ ]=' crypto/cast_common.c
-    defsnc '[	]*interrupts[ ]=[ ]<[ ]*\(0[ ]2[012][0-9][ ]4[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/shdma.txt
-    defsnc '[	][	]interrupts[ ]=[ ]<\([\n][	]*0x\([ef]\|1[01]\)[0-9a-f][ ]0[ ]0[ ]0\)*>[;]' Documentation/devicetree/bindings/powerpc/fsl/msi-pic.txt
+    accept '[	]*interrupts[ ]=[ ]<[ ]*\(0[ ]2[012][0-9][ ]4[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/shdma.txt
+    accept '[	][	]interrupts[ ]=[ ]<\([\n][	]*0x\([ef]\|1[01]\)[0-9a-f][ ]0[ ]0[ ]0\)*>[;]' Documentation/devicetree/bindings/powerpc/fsl/msi-pic.txt
     defsnc 'static[ ]const[ ]int[ ]a370_\(nb\|h\|dram\)clk_ratios\[32\]\[2\][ ]__initconst[ ]=' drivers/clk/mvebu/armada-370.c
     defsnc 'static[ ]const[ ]int[ ]axp_\(nb\|h\|dram\)clk_ratios\[32\]\[2\][ ]__initconst[ ]=' drivers/clk/mvebu/armada-xp.c
     defsnc 'static[ ]const[ ]int[ ]\(dove\|kirkwood\)_cpu_ddr_ratios\[16\]\[2\][ ]__initconst[ ]=' drivers/clk/mvebu/clk-core.c
@@ -5325,9 +5384,9 @@ set_except () {
     accept '[	]hif_dev->firmware[ ]=[ ]NULL[;]' drivers/net/wireless/ath/ath9k/hif_usb.c
     # New in 3.4.
     accept '[	]*nvidia,emc-registers[ ]=[ ]<[ ]\(0[ 	\n]*\)*>' Documentation/devicetree/bindings/arm/tegra/emc.txt
-    defsnc '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[345][0-9][ ]0x04[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/tegra20-apbdma.txt
+    accept '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[345][0-9][ ]0x04[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/dma/tegra20-apbdma.txt
     accept '[	]*nvidia,emc-registers[ ]=[ ]<[ ]\(0x[0-9a-f]*[ 	\n]*\)*>' arch/arm/boot/dts/tegra-seaboard.dts
-    defsnc '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[0-4][0-9][ ]0x04[ 	\n]*\)*>[;]' 'arch/arm/boot/dts/tegra[23]0\.dtsi'
+    accept '[	]*interrupts[ ]=[ ]<[ ]\(0[ ]1[0-4][0-9][ ]0x04[ 	\n]*\)*>[;]' 'arch/arm/boot/dts/tegra[23]0\.dtsi'
     defsnc 'static[ ]struct[ ]clk_pll_freq_table[ ]tegra_pll_[cu]_freq_table\[\][ ]=' arch/arm/mach-tegra/tegra30_clocks.c
     defsnc '[	]static[ ]const[ ]u8[ ]snum_init_[74]6\[\][ ]=' arch/powerpc/sysdev/qe_lib/qe.c
     defsnc 'const[ ]u64[ ]camellia_sp\(10011110\|22000222\|03303033\|00444404\|02220222\|30333033\|44044404\|11101110\)\[256\][ ]=' arch/x86/crypto/camellia_glue.c
@@ -5644,7 +5703,7 @@ set_except () {
     # Sources for these are in the corresponding .fuc files.
     defsnc 'uint32_t[ ]nvc0_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_grgpc.fuc.h
     defsnc 'uint32_t[ ]nvc0_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvc0_grhub.fuc.h
-    defsnc '[	][	][	]interrupts[ ]=[ ]<\([\n][	]*0x[ef][0-9a-f][ ]0[ ]0[ ]0\)*>[;]' 'arch/powerpc/boot/dts/p\(2040\|3041\|4080\|5020\)si\.dtsi'
+    accept '[	][	][	]interrupts[ ]=[ ]<\([\n][	]*0x[ef][0-9a-f][ ]0[ ]0[ ]0\)*>[;]' 'arch/powerpc/boot/dts/p\(2040\|3041\|4080\|5020\)si\.dtsi'
     blobname 'dvb-netup-altera-04\.fw' drivers/media/video/cx23885/cx23885-cards.c
     blobname 'rtl_nic[/]rtl8168e-3\.fw' drivers/net/r8169.c
     defsnc '[	]static[ ]const[ ]struct[ ]ephy_info[ ]e_info_8168e_1\[\][ ]=' drivers/net/r8169.c
@@ -5879,7 +5938,7 @@ set_except () {
     initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?\(static[ ]\)\?const[ ]u32[ ]b43_ntab_framestruct\[\][ ]=\([ ][{][*][/][;]\)\?' drivers/net/wireless/b43/tables_nphy.c
     initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?int[ ]tones\[2048\][ ]=\([ ][{][*][/][;]\)\?' drivers/staging/easycap/easycap_testcard.c
     initnc '\([;][/][*]@@[ ]-[0-9]*,[0-9]*[ ][+][0-9]*,[0-9]*[ ]@@[ ]\)\?static[ ]\(yy\)\?const[ ]\(yytype\|flex\)_u\?int\(8\|16\|32\)\(_t\)\?[ ]yy[^\n []*\[[0-9]*\][ ]=\([*][/][;]\)\?' '.*\.tab\.c_shipped'
-    initnc "[	][	][	]interrupts[ ]=[ ]<\\(0x\\)\\?3[ ]\\(0x\\)\\?0[ ]\\(0x\\)\\?0[ ][ ]$blobpat*>[;]" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
+    accept "[	][	][	]interrupts[ ]=[ ]<\\(0x\\)\\?3[ ]\\(0x\\)\\?0[ ]\\(0x\\)\\?0[ ][ ]$blobpat*>[;]" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
     accept '[	]p7500->firmware[ ]=' drivers/media/dvb/dvb-usb/dw2102.c
     defsnc 'static[ ]\(const[ ]\)\?\(__\)\?u8[ ]\(mt9v111\|sp80708\|hv7131[rd]\|mi0360b\?\|mo4000\|ov76\([36]0\|48\)\|om6802\)_sensor_\(init\|param1\)\[\]\[8\][ ]=' drivers/media/video/gspca/sonixj.c
     initnc '\(uint16_t\|u16\)[ ]e1000_igp_2_cable_length_table\[IGP02E1000_AGC_LENGTH_TABLE_SIZE\][ ]=' drivers/net/e1000/e1000_hw.c # u16 on 2.6.26
@@ -6568,7 +6627,7 @@ set_except () {
 
   */patch*-2.6.26-rc*)
     initnc 'static[ ]u64[ ]vec2off\[68\][ ]=' arch/ia64/kvm/process.c
-    initnc "[	][	][	]interrupts[ ]=[ ]<\\(0x\\)\\?3[ ]\\(0x\\)\\?0[ ]\\(0x\\)\\?0[ ][ ]$blobpat*>[;]" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
+    accept "[	][	][	]interrupts[ ]=[ ]<\\(0x\\)\\?3[ ]\\(0x\\)\\?0[ ]\\(0x\\)\\?0[ ][ ]$blobpat*>[;]" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
     initnc 'static[ ]const[ ]u32[ ]crctab32\[\][ ]=' arch/x86/boot/tools/build.c
     initnc 'static[ ]const[ ]u64[ ]sha512_K\[80\][ ]=' 'crypto/sha512\(_generic\)\?.c'
     initnc 'static[ ]struct[ ]hash_testvec[ ]\(hmac_sha\(224\|256\)\|aes_xcbc128\|crc32c\)_tv_template\[\][ ]=' crypto/tcrypt.h
