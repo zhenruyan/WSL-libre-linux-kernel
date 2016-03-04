@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Copyright (C) 2008-2014 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright (C) 2008-2016 Alexandre Oliva <lxoliva@fsfla.org>
 
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -278,11 +278,11 @@ rm -f linux-$kver.tar
 if test -f linux-libre-$kver-$gnu.xdelta; then
   bzip2 -k9 linux-libre-$kver-$gnu.xdelta
   xz -k9 linux-libre-$kver-$gnu.xdelta || :
-  lzip -k9 linux-libre-$kver-$gnu.xdelta || :
+  lzip -k9s64MiB linux-libre-$kver-$gnu.xdelta || :
 fi
 bzip2 -k9 linux-libre-$kver-$gnu.tar
 xz -k9 linux-libre-$kver-$gnu.tar || :
-lzip -k9 linux-libre-$kver-$gnu.tar || :
+lzip -k9s64MiB linux-libre-$kver-$gnu.tar || :
 
 echo Done except for signing, feel free to interrupt
 for f in \
