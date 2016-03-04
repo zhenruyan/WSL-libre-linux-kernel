@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2015-12-22
+# deblob-check version 2016-03-03
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2015 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2016 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -4342,6 +4342,49 @@ set_except () {
     accept '[ ][*][ ]fpga_mgr_firmware_load[ ]-' drivers/fpga/fpga-mgr.c
     accept 'EXPORT_SYMBOL_GPL[(]fpga_mgr_firmware_load[)][;]' drivers/fpga/fpga-mgr.c
     accept '[\t ]*CHIP_IS_E2[(]bp[)][ ][?][ ]["]everest2["][ ]:[ ]["]everest3["][/][*][(]DEBLOBBED[)][*][/][)][;]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+
+    # New in 4.5.
+    blobname 'qat_895xcc_mmp\.bin' drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+    # These could use some assembly comments, but they're so simple
+    # and regular that disassembly should suffice to make them transparent.
+    defsnc 'static[ ]const[ ]u32[ ][vs]gpr_init_compute_shader\[\][ ]=' drivers/gpu/drm/amd/amdgpu/gfx_v8_0.c
+    blobname 'brcmfmac43\(602\|50\(\|c2\)\|56\|570\|5[89]\|6[56]b\|71\)-pcie\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+    blobname 'brcmfmac43\(143\|241b[045]\|29\|3[0459]\|340\|362\|430\|455\|54\)-sdio\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+    blobname 'brcmfmac43\(143\|236b\|242a\|569\)\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+    blobname 'hfi1_\(dc8051\|fabric\|sbus\|pcie\)_d\.fw' drivers/staging/rdma/hfi1/firmware.c
+    blobname '%s%s%s["][,][\n \t]*["]intel[/]dsp_fw_["][,][ ]guid[,][ ]["]\.bin' sound/soc/intel/skylake/skl-sst.c
+    accept '[\t]*fsl[,]tmu-calibration[ ]=[ ][<][0-9a-fx \t\n]*>[;]' 'Documentation/devicetree/bindings/thermal/qoriq-thermal.txt\|arch/powerpc/boot/dts/fsl/t10\(23\|40\)si-post.dtsi'
+    defsnc 'const[ ]u8[ ]sha256_zero_message_hash\[SHA256_DIGEST_SIZE\][ ]=' crypto/sha256_generic.c
+    defsc 'static[ ]struct[ ]tegra_clk_pll_freq_table[ ]pll_e_freq_table\[\][ ]=' drivers/clk/tegra/clk-tegra210.c
+    blobname 'qat_c3xxx\(\|_mmp\)\.bin' drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h
+    blobname 'qat_c62x\(\|_mmp\)\.bin' drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h
+    defsnc 'uint32_t[ ]fiji_clock_stretcher_ddt_table\[2\]\[4\]\[4\][ ]=' drivers/gpu/drm/amd/powerplay/hwmgr/fiji_hwmgr.c
+    defsnc 'uint32_t[ ]PP_ClockStretcherDDTTable\[2\]\[4\]\[4\][ ]=' drivers/gpu/drm/amd/powerplay/hwmgr/tonga_hwmgr.c
+    defsc 'struct[ ]SMU73_Discrete_GraphicsLevel[ ]avfs_graphics_level\[8\][ ]=' drivers/gpu/drm/amd/poewrplay/smumgr/fiji_smumgr.c
+    defsnc 'static[ ]const[ ]struct[ ]dphy_pll_testdin_map[ ]dptdin_map\[\][ ]=' drivers/gpu/drm/rockchip/dw-mipi-dsi.c
+    defsnc 'static[ ]const[ ]u16[ ]iproc_msi_reg_paxb\[NR_HW_IRQS\]\[IPROC_MSI_REG_SIZE\][ ]=' drivers/pci/host/pcie-iproc-msi.c
+    defsnc 'static[ ]const[ ]int[ ]pv88090_buck1_limits\[\][ ]=' drivers/regulator/pv88090-regulator.c
+    accept '[\t]wilc->firmware[ ]=' drivers/staging/wilc1000/linux_wlan.c
+    defsnc 'static[ ]const[ ]struct[ ]tsadc_table[ ]v[14]_code_table\[\][ ]=' drivers/thermal/rockchip_thermal.c
+    defsnc 'static[ ]const[ ]u8[ ]degrade_factor\[CPU_LOAD_IDX_MAX\]\[DEGRADE_SHIFT[ ][+][ ]1\][ ]=' kernel/sched/fair.c
+    accept '[\t ]*rm[ ]-f[ ]["][/]boot[/]initramfs-[$]f\.img["]' scripts/prune-kernel
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5616_reg\[\][ ]=' sound/soc/codecs/rt5616.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5650_reg\[\][ ]=' sound/soc/codecs/rt5645.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5659_reg\[\][ ]=' sound/soc/codecs/rt5659.c
+    accept '[\t ]*["][ ]*-i[ ]--input[ \t]*input[ ]data[ ]from[ ]a[ ]file[ ][(]e\.g\.[ ][\\]["]test\.bin[\\]["]' tools/spi/spidev_test.c
+    accept '[\t ]*["][ ]*-o[ ]--output[ \t]*output[ ]data[ ]to[ ]a[ ]file[ ][(]e\.g\.[ ][\\]["]results\.bin[\\]["]' tools/spi/spidev_test.c
+    accept '[ ][*][ ]directly[ ]from[ ]probe[ ]or[ ]from[ ]request_firmware_\(no\)\?wait[ ]callback\.' drivers/input/touchscreen/goodix.c
+    accept '[ ][*][ ]request_firmware_wait[ ]callback' drivers/input/touchscreen/goodix.c
+    blobname 'goodix_\(%d\|[0-9]*\)_cfg\.bin' drivers/input/touchscreen/goodix.c
+    blobname 'adf7242_firmware\.bin' drivers/net/ieee802154/adf7242.c
+    blobna '[/][*][ ]get[ ]ADF7242[ ]addon[^*]*\([*]\+[^/*][^*]*\)*[*][*]*[/]' drivers/net/ieee802154/adf7242.c
+    blobname 'iwlwifi-9000-\?' drivers/net/wireless/intel/iwlwifi/iwl-9000.c
+    blobname 'wlan[/]prima[/]WCNSS_qcom_wlan_nv\.bin' drivers/soc/qcom/wcnss_ctrl.c
+    blobname 'r8a779x_usb3_v[12]\.dlmem' drivers/usb/host/xhci-rcar.h
+    blobname 'moxa[/]moxa-\(%04x\|11[135][01]\|[0-9a-f]*\)\.fw' drivers/usb/serial/mxu11x0.c
+    blobname 'intel[/]dsp_fw_release\.bin' sound/soc/intel/skylake/skl.c
+    accept '[\t]rc[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]1[,][ ]name[,][ ]dev[,][ ]GFP_KERNEL[,][\n][ \t]*NULL[,][ ]trigger_async_request_cb[)][;]' lib/test_firmware.c
+    blobname 'nvidia[/]gk\(100\|20a\)[/]\(\(fecs\|gpccs\)_\(data\|inst\)\|sw_\(\(bundle\|method\)_init\|\(\|non\)ctx\)\)\.bin' drivers/gpu/drm/nouveau/nouveau_platform.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
