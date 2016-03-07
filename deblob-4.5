@@ -2743,11 +2743,13 @@ clean_blob drivers/usb/serial/mxuport.c
 clean_kconfig drivers/usb/serial/Kconfig USB_SERIAL_MXUPORT
 clean_mk CONFIG_USB_SERIAL_MXUPORT drivers/usb/serial/Makefile
 
-announce USB_SERIAL_MXUPORT11 - "USB Moxa UPORT 11x0 Serial Driver"
-reject_firmware drivers/usb/serial/mxu11x0.c
-clean_blob drivers/usb/serial/mxu11x0.c
-clean_kconfig drivers/usb/serial/Kconfig USB_SERIAL_MXUPORT11
-clean_mk CONFIG_USB_SERIAL_MXUPORT11 drivers/usb/serial/Makefile
+# This was removed in 4.5-rc7, but it will likely be back in some
+# future release, so let's keep the code commented out here.
+# announce USB_SERIAL_MXUPORT11 - "USB Moxa UPORT 11x0 Serial Driver"
+# reject_firmware drivers/usb/serial/mxu11x0.c
+# clean_blob drivers/usb/serial/mxu11x0.c
+# clean_kconfig drivers/usb/serial/Kconfig USB_SERIAL_MXUPORT11
+# clean_mk CONFIG_USB_SERIAL_MXUPORT11 drivers/usb/serial/Makefile
 
 announce USB_SERIAL_TI - "USB TI 3410/5052 Serial Driver"
 drop_fw_file firmware/ti_3410.fw.ihex firmware/ti_3410.fw
