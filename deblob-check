@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2016-03-03
+# deblob-check version 2016-05-08
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4385,6 +4385,43 @@ set_except () {
     blobname 'intel[/]dsp_fw_release\.bin' sound/soc/intel/skylake/skl.c
     accept '[\t]rc[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]1[,][ ]name[,][ ]dev[,][ ]GFP_KERNEL[,][\n][ \t]*NULL[,][ ]trigger_async_request_cb[)][;]' lib/test_firmware.c
     blobname 'nvidia[/]gk\(100\|20a\)[/]\(\(fecs\|gpccs\)_\(data\|inst\)\|sw_\(\(bundle\|method\)_init\|\(\|non\)ctx\)\)\.bin' drivers/gpu/drm/nouveau/nouveau_platform.c
+
+    # New in 4.6.
+    blobname 'atmel[/]wilc100[23]_firmware\.bin' drivers/staging/wilc1000/Makefile
+    accept '[\t]*dev->firmware[ ]=[ ]1[;]' drivers/media/platform/coda/coda-common.c
+    blobname 'vpu_fw_imx\(27_TO2\|53\|6[qd]\)\.bin' drivers/media/platform/coda/coda-common.c
+    blobname 'brcmfmac4366c-pcie\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+    defsnc 'static[ ]struct[ ]rtl8xxxu_reg8val[ ]rtl8723b_mac_init_table\[\][ ]=' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    defsnc 'static[ ]struct[ ]rtl8xxxu_reg32val[ ]rtl8723b_phy_1t_init_table\[\][ ]=' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    defsnc 'static[ ]struct[ ]rtl8xxxu_reg32val[ ]rtl8xxx_agc_8723bu_table\[\][ ]=' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    defsnc 'static[ ]struct[ ]rtl8xxxu_rfregval[ ]rtl8723bu_radioa_1t_init_table\[\][ ]=' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    blobname 'rtlwifi[/]rtl8723bu_\(bt\|nic\)\.bin' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    blobname 'rtlwifi[/]rtl8192eu_nic\.bin' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
+    blobname 'intel[/]dsp_fw_bxtn\.bin' sound/soc/intel/skylake/skl.c
+    accept 'CONFIG_EXTRA_FIRMWARE=["][/][*][(]DEBLOBBED' Documentation/x86/early-microcode.txt
+    blob '[/]lib[/]firmware[/]\([\n][^\n][^\n]*\)*\.\.\.' Documentation/x86/early-microcode.txt
+    blobname 'https[:][/][/]01\.org[/]linuxgraphics[/]intel-[^"\n]*' drivers/gpu/drm/i915/intel_csr.c
+    accept '[\t ]*["]genroms[/]kvmvapic\.bin' Documentation/ABI/testing/sysfs-firmware-qemu_fw_cfg
+    accept '[#]define[ ]XCHAL_BYTE0_FORMAT_LENGTHS[ \t\n,238\\]*' arch/xtensa/variants/test_kc705_hifi/include/variant/tie.h
+    defsnc 'static[ ]const[ ]int[ ]supported_data_lane_swaps\[\]\[4\][ ]=' drivers/gpu/drm/msm/dsi/dsi_host.c
+    accept '[\t ]*\(if[ ][(]\)\?[(]ret[ ]=[ ]gf100_gr_ctor_fw[(]gr[,][ ]["]gr[/]\(fecs\|gpccs\)_\(data\|inst\)["][,][ ][&]gr->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gm200.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]sixaxis_leds\[10\]\[4\][ ]=' drivers/hid/hid-sony.c
+    defsnc 'static[ ]const[ ]struct[ ]afe440x_val_table[ ]afe4403_cap_table\[\][ ]=' drivers/iio/health/afe4403.c
+    defsnc 'static[ ]const[ ]u16[ ]sunxi_nfc_randomizer_\(page\|ecc\(512\|1024\)\)_seeds\[\][ ]=' drivers/mtd/nand/sunxi_nand.c
+    defsnc 'static[ ]const[ ]struct[ ]iro[ ]iro_arr\[44\][ ]=' drivers/net/ethernet/qlogic/qed/qed_hsi.h
+    defsnc 'static[ ]const[ ]u32[ ]qca953x_1p1_modes_no_xpa_low_power_tx_gain_table\[\]\[2\][ ]=' drivers/net/wireless/ath/ath9k/ar953x_initvals.h
+    defsnc '[\t]write_reg[(]par[,][ ]MIPI_DCS_WRITE_LUT[,]' drivers/staging/fbtft/fb_hx8353d.c
+    defsnc 'static[ ]const[ ]struct[ ]tsadc_table[ ]rk3\(\(2[28]\|36\)8\|399\)_code_table\[\][ ]=' drivers/thermal/rockchip_thermal.c
+    accept 'echo[ ]["]new-kernel-pkg[ ]--remove[ ][$]KERNELRELEASE[ ]--rminitrd[ ]--initrdfile=[/]boot[/]initramfs-[$]KERNELRELEASE\.img["]' scripts/package/mkspec
+    defsnc '[}][ ]ni_div\[\][ ]=' sound/soc/codecs/max9867.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]max9867_reg\[\][ ]=' sound/soc/codecs/max9867.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]rt5514_i2c_patch\[\][ ]=' sound/soc/codecs/rt5514.c
+    defsnc '__thread[ ]vector[ ]int[ ]varray\[\][ ]=' 'tools/testing/selftests/poewrpc/math/vmx_\(preempt\|signal\)\.c'
+    defsnc 'vector[ ]int[ ]varray\[\][ ]=' tools/testing/selftests/poewrpc/math/vmx_syscall.c
+    blobname '%x-%\.6s-%\.8s-%d%s[^;]*-tplg\.bin' sound/soc/intel/skylake/skl-nhlt.c
+    blobname 'intel[/]ibt-hw-%x\.%x\.bddata' drivers/bluetooth/hci_ag6xx.c
+    blobname 'intel[/]ibt-hw-%x\.%x\.%x-fw-%x\.%x\.%x\.%x\.%x\.pbn' drivers/bluetooth/hci_ag6xx.c
+    blobname 'melfas_mip4\.fw' drivers/input/touchscreen/melfas_mip4.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
