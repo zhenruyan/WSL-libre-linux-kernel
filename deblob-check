@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2016-07-24
+# deblob-check version 2016-09-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4476,6 +4476,50 @@ set_except () {
     accept '[\t]*ath10k_info[(]ar[,][ ]["][/][*][(]DEBLOBBED[)][*][/][ ]didn.t' drivers/net/wireless/ath/ath10k/testmode.c
     accept 'static[ ]const[ ]struct[ ]tegra_xusb_soc[ ]tegra\(124\|210\)_soc[ ]=[ ][{][\n][\t][.]firmware[ ]=' drivers/usb/host/xhci-tegra.c
     blobname 'i915[/]kbl_dmc_ver1\.bin' drivers/gpu/drm/i915/intel_csr.c
+
+    # New in 4.8.
+    blobname 'intel[/]dsp_fw_kbl\.bin' sound/soc/intel/skylake/skl.c
+    blobname 'brcmfmac4365c-pcie\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+    blobname 'radeon[/]\(%s\|tahiti\|pitcairn\|verde\|oland\|hainan\)_\(pfp\|me\|ce\|mc\|rlc\|smc\|k_smc\)\.bin' drivers/gpu/drm/radeon/si.c
+    blobname 'radeon[/]\(%s\|bonaire\|hawaii\|kaveri\|kabini\|mullins\)_\(pfp\|me\|ce\|mec\|mec2\|mc\|rlc\|sdma\|smc\|k_smc\)\.bin' 'drivers/gpu/drm/radeon/ci\(k\|_dpm\).c'
+    blobname 'i915[/]skl_guc_ver6_1\.bin' drivers/gpu/drm/i915/intel_guc_loader.c
+    blobname 'i915[/]bxt_guc_ver8_7\.bin' drivers/gpu/drm/i915/intel_guc_loader.c
+    blobname 'i915[/]kbl_guc_ver9_14\.bin' drivers/gpu/drm/i915/intel_guc_loader.c
+    blobname 'i915[/]kbl_dmc_ver1_01\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'i915[/]skl_dmc_ver1_26\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'i915[/]bxt_dmc_ver1_07\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'intel[/]ibt-%u-%u\.sfi' drivers/bluetooth/btusb.c
+    accept '[\t]*ranges[ ]=[ ]<[ \t\n0-9xa-f]*>[;]' arch/arm/boot/dts/ep7209.dtsi
+    accept '[\t]*nvidia[,]emc-configuration[ ]=[ ]<[ \t\n0-9xa-f]*>[;]' arch/arm/boot/dts/tegra124-apalis-emc.dtsi
+    accept '[\t]*bool[ ]["]vmlinux\.bin[ ]or[ ]vmlinuz\.bin["]' arch/mips/Kconfig
+    accept 'K256_8:\([\n][ 	]*\.octa[ 	]*0x[0-9a-f]*\)*' arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+    accept 'K256:\([\n][ 	]*\.int[ 	]*0x[0-9a-f,x]*\)*' arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+    accept 'K512_4:\([\n][ 	]*\.octa[ 	]*0[x0-9a-f,\\\t\n]*\)*' arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+    accept '[ ][*][ ]request_firmware_into_buf[ ]-' drivers/base/firmware_class.c
+    accept 'request_firmware_into_buf[(]const[ ]struct[ ]firmware[ ]' drivers/base/firmware_class.c
+    accept 'EXPORT_SYMBOL[(]request_firmware_into_buf[)]' drivers/base/firmware_class.c
+    defsc 'static[ ]const[ ]int[ ]mma8452_hp_filter_cutoff\[4\]\[8\]\[4\]\[2\][ ]=' drivers/iio/accel/mma8452.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]cmd\[7\]\[6\][ ]=' drivers/input/touchscreen/raydium_i2c_ts.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]cmd\[5\]\[11\][ ]=' drivers/input/touchscreen/raydium_i2c_ts.c
+    blobname 'raydium\.fw' drivers/input/touchscreen/raydium_i2c_ts.c
+    blobname '%s\.fw' drivers/input/touchscreen/silead.c
+    blobna 'snprintf[(]data->fw_name[,][ ]sizeof[(]data->fw_name[)][,][ ]["]%s["][,][ ]str[)]' drivers/input/touchscreen/silead.c
+    blobname 'vpu_[pd]\.bin' drivers/media/platform/mtk-vpu/mtk_vpu.c
+    accept '[\t]if[ ][(]dir_type[ ]!=[ ]BNX_DIR_TYPE_UPDATE[ ][&][&][\n\t ]*bnxt_dir_type_is_executable[^\n]*[\n][\t]*return[ ]-EINVAL[;][\n][\n]*[\t]rc[ ]=[ ]request_firmware[(][&]' drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+    defsnc 'static[ ]const[ ]struct[ ]iro[ ]iro_arr\[46\][ ]=' drivers/net/ethernet/qlogic/qed/qed_hsi.h
+    blobname 'iwlwifi-Qu-a0-jf-b0-' drivers/net/wireless/intel/iwlwifi/iwl-a000.c
+    blobname 'ks7010sd\.rom' drivers/staging/ks7010/ks7010_sdio.h
+    defsnc 'static[ ]const[ ]u16[ ]expected_tpt_\(siso\|mimo2\)_160MHz\[4\]\[IWL_RATE_COUNT\][ ]=' drivers/net/wireless/intel/iwlwifi/mvm/rs.c
+    defsnc 'static[ ]const[ ]int[ ]adinter_muxvals\[\][ ]=' drivers/pinctrl/uniphier/pinctrl-uniphier-ld6b.c
+    accept '\(static[ ]inline[ ]\)\?int[ ]request_firmware_into_buf[(]const[ ]struct[ ]firmware[ ]' include/linux/firmware.h
+    accept 'static[ ]inline[ ]int[ ]mod_firmware_load[(]const[ ]char[ ][*]fn[,]' sound/oss/sound_firmware.h
+    defsnc 'static[ ]const[ ]struct[ ]pll_macro_entry[ ]pll_predef_mclk\[\][ ]=' sound/soc/bcm/cygnus-ssp.c
+    defsnc 'static[ ]const[ ]struct[ ]_ssp_clk_coeff[ ]ssp_clk_coeff\[\][ ]=' sound/soc/bcm/cygnus-ssp.c
+    defsnc 'static[ ]const[ ]struct[ ]cs35l33_mclk_div[ ]cs35l33_mclk_coeffs\[\][ ]=' sound/soc/codecs/cs35l33.c
+    defsnc 'static[ ]struct[ ]reg_default[ ]max98504_reg_defaults\[\][ ]=' sound/soc/codecs/max98504.c
+    blobname 'rt5514_dsp_fw[12]\.bin' sound/soc/codecs/rt5514.h
+    blobname 'modem\.mdt' drivers/remoteproc/qcom_q6v5_pil.c
+    blobname 'mba\.b00' drivers/remoteproc/qcom_q6v5_pil.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
