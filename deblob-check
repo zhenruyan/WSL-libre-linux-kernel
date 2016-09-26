@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2016-09-22
+# deblob-check version 2016-09-25
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4502,8 +4502,8 @@ set_except () {
     defsnc '[\t]static[ ]const[ ]u8[ ]cmd\[7\]\[6\][ ]=' drivers/input/touchscreen/raydium_i2c_ts.c
     defsnc '[\t]static[ ]const[ ]u8[ ]cmd\[5\]\[11\][ ]=' drivers/input/touchscreen/raydium_i2c_ts.c
     blobname 'raydium\.fw' drivers/input/touchscreen/raydium_i2c_ts.c
-    blobname '%s\.fw' drivers/input/touchscreen/silead.c
-    blobna 'snprintf[(]data->fw_name[,][ ]sizeof[(]data->fw_name[)][,][ ]["]%s["][,][ ]str[)]' drivers/input/touchscreen/silead.c
+    blobname '\(silead[/]\)\?%s\.fw' drivers/input/touchscreen/silead.c
+    blobna 'snprintf[(]data->fw_name[,][ ]sizeof[(]data->fw_name[)][,][ \n\t]*["]\(silead[/]\)\?%s["][,][ ]str[)]' drivers/input/touchscreen/silead.c
     blobname 'vpu_[pd]\.bin' drivers/media/platform/mtk-vpu/mtk_vpu.c
     accept '[\t]if[ ][(]dir_type[ ]!=[ ]BNX_DIR_TYPE_UPDATE[ ][&][&][\n\t ]*bnxt_dir_type_is_executable[^\n]*[\n][\t]*return[ ]-EINVAL[;][\n][\n]*[\t]rc[ ]=[ ]request_firmware[(][&]' drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
     defsnc 'static[ ]const[ ]struct[ ]iro[ ]iro_arr\[46\][ ]=' drivers/net/ethernet/qlogic/qed/qed_hsi.h
