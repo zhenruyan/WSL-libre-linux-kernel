@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2016-09-25
+# deblob-check version 2016-11-29
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -893,7 +893,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\)[\\]\?["]'
+  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\)[\\]\?["]'
   # Catch misdeblobbed fw extension.
   blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
@@ -3937,7 +3937,7 @@ set_except () {
     accept '[\t]ret[ ]=[ ]p54spi_request_firmware[(]' drivers/net/wireless/p54/p54spi.c
     accept 'static[ ]int[ ]rt2x00lib_request_firmware[(]' drivers/net/wireless/rt2x00/rt2x00firwmare.c
     accept '[\t][\t]retval[ ]=[ ]rt2x00lib_request_firmware[(]' drivers/net/wireless/rt2x00/rt2x00firmware.c
-    accept '[\t][\t]wl1271_error[(]["]request_firmware_nowait[ ]failed' drivers/net/wireless/ti/wlcore/main.c
+    accept '[\t][\t]*wl1271_error[(]["]request_firmware_nowait[ ]failed' drivers/net/wireless/ti/wlcore/main.c
     accept '[\t][\t]nfc_err[(][&]drv->pdev->dev[,][ ]["]request_firmware[ ]failed' drivers/nfc/nfcwilink.c
     accept '[\t][\t][\t]["]request_firmware[ ]returned' drivers/nfc/nfcwilink.c
     accept '[\t][\t]dev_err[(][&]rproc->dev[,][ ]["]request_firmware_nowait[ ]err' drivers/remoteproc/remoteproc_core.c
@@ -4435,7 +4435,7 @@ set_except () {
     blobname 'pre-cal-%s-%s\.bin' drivers/net/wireless/ath/ath10k/core.c
     accept '[\t]fw_file->firmware[ ]=[ ]ath10k_fetch_fw_file' drivers/net/wireless/ath/ath10k/core.c
     blobname 'brcmfmac4356-sdio\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-    blobname 'iwlwifi-9000\(-pu-a0-lc-a0-\|-\|\)' drivers/net/wireless/intel/iwlwifi/iwl-9000.c
+    blobname 'iwlwifi-9000\(-pu-a0-\(jf\|lc\)-a0-\|-\|\)' drivers/net/wireless/intel/iwlwifi/iwl-9000.c
     blobname 'iwlwifi-9260-th-a0-\(jf\|lc\)-a0-' drivers/net/wireless/intel/iwlwifi/iwl-9000.c
     blobname 'mrvl[/]pcie8897_uapsta_a0\.bin' drivers/net/wireless/marvell/mwifiex/pcie.h
     blobname 'mrvl[/]pcieuart8997_combo\(_v2\)\?\.bin' drivers/net/wireless/marvell/mwifiex/pcie.h
@@ -4520,7 +4520,61 @@ set_except () {
     blobname 'rt5514_dsp_fw[12]\.bin' sound/soc/codecs/rt5514.h
     blobname 'modem\.mdt' drivers/remoteproc/qcom_q6v5_pil.c
     blobname 'mba\.b00' drivers/remoteproc/qcom_q6v5_pil.c
-    ;;
+
+    # New in 4.9.
+    blobname 'rtl_bt[/]rtl\(8723b\|8821a\|8761a\|8822b\)_\(config\|fw\)\.bin' drivers/bluetooth/btrtl.c
+    blobname 'amdgpu[/]\(topaz\|tonga\)_k_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
+    blobname 'i915[/]["][^"]*["]_guc_ver["][^"]*["]_["][^"]*["]\.bin' drivers/gpu/drm/i915/intel_guc_loader.c
+    blobname 'mrvl[/]pcie\(uart\|usb\)8997_combo_v4\.bin' drivers/net/wireless/marvell/mwifiex/pcie.h
+    blobname 'mrvl[/]pcie8997_wlan_v4\.bin' drivers/net/wireless/marvell/mwifiex/pcie.h
+    blobname 'mrvl[/]usbusb8997_combo_v4\.bin' drivers/net/wireless/marvell/mwifiex/usb.h
+    accept '[ ]*[/]Widths[ ]\[[0-9 ]*\]' Documentation/media/media_api_files/typical_media_device.pdf
+    accept '[ ]*:widths:[0-9 ]*' Documentation/media/uapi/v4l/subdev-formats.rst
+    defsc 'static[ ]const[ ]struct[ ]iceland_pt_defaults[ ]defaults_iceland\(xt\|pro\)\?[ ]=' drivers/gpu/drm/amd/powerplay/smumgr/iceland_smc.c
+    defsc 'static[ ]const[ ]struct[ ]tonga_pt_defaults[ ]tonga_power_tune_data_set_array\[POWERTUNE_DEFAULT_SET_MAX\][ ]=' drivers/gpu/drm/amd/poewrplay/smumgr/tonga_smc.c
+    defsnc 'static[ ]const[ ]uint32_t[ ]tonga_clock_stretcher_ddt_table\[2\]\[4\]\[4\][ ]=' drivers/gpu/drm/amd/powerplay/smumgr/tonga_smc.c
+    defsnc 'static[ ]const[ ]u16[ ]\(forward\|inverse\)_quantization_table\[QUANTIZATION_TABLE_LEN\][ ]=' drivers/media/pci/tw5864/tw5864-video.c
+    defsnc 'static[ ]const[ ]u16[ ]encoder_vlc_lookup_table\[VLC_LOOKUP_TABLE_LEN\][ ]=' drivers/media/pci/tw5864/tw5864-video.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(lambda_lookup_table\|intra4x4_lambda3\)\[\][ ]=' drivers/media/pci/tw5864/tw5864-video.c
+    defsnc 'static[ ]const[ ]struct[ ]iro[ ]iro_arr\[47\][ ]=' drivers/net/ethernet/qlogic/qed/qed_hsi.h
+    defsnc 'static[ ]const[ ]u8[ ]netvsc_hash_key\[\][ ]=' drivers/net/hyperv/rndis_filter.c
+    defsc 'static[ ]const[ ]struct[ ]cs42l73_mclk_div[ ]cs42l73_mclk_coeffs\[\][ ]=' sound/soc/codecs/cs42l73.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5660_reg\[\][ ]=' sound/soc/codecs/rt5660.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt566[38]_reg\[\][ ]=' sound/soc/codecs/rt5663.c
+    defsnc '__thread[ ]vector[ ]int[ ]varray\[24\][ ]=' tools/testing/selftests/powerpc/math/vsx_preempt.c
+    defsnc 'vector[ ]int[ ]vms\[\][ ]=' tools/testing/selftests/powerpc/tm/tm-signal-context-chk-vmx.c
+    defsnc 'vector[ ]int[ ]vss\[\][ ]=' tools/testing/selftests/powerpc/tm/tm-signal-context-chk-vsx.c
+    blobname 'imx[/]sdma[/]sdma-imx7d\.bin' arch/arm/boot/dts/imx7s.dtsi
+    blobname 'gsl3675-gt90h\.fw' arch/arm/boot/dts/sun8i-a23-gt90h-v4.dts
+    blobname 'gsl1680-inet86dz\.fw' arch/arm/boot/dts/sun8i-a23-inet86dz.dts
+    blobname 'gsl1680-polaroid-mid2407pxe03\.fw' arch/arm/boot/dts/sun8i-a23-polaroid-mid2407pxe03.dts
+    blobname 'gsl3670-polaroid-mid2809pxe04\.fw' arch/arm/boot/dts/sun8i-a23-polaroid-mid2809pxe04.dts
+    blobname 'gsl3675-ga10h\.fw' arch/arm/boot/dts/sun8i-a33-ga10h-v1.1.dts
+    blobname 'mrvl[/]helper_uart_3000000\.bin' drivers/bluetooth/hci_mrvl.c
+    blobname 'mrvl[/]uart8897_bt\.bin' drivers/bluetooth/hci_mrvl.c
+    accept 'static[ ]int[ ]bnxt_flash_\(firmware\|package\)_from_file[(][ \t\na-z0-9_,*]*[)][\n][{][\n][\t]\([^\n]*[\n]\+[\t]\)*rc[ ]=[ ]request_firmware[(][&]fw' drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+    accept '[\t]*\(rc[ ]=[ ]\)\?wil_request_firmware[(]wil[,][ ]WIL_FW2\?_NAME[,][ ]\(true\|false\)[)][;]' drivers/net/wireless/ath/wil6210/main.c
+    blobname 'mwifiex_mfg\.bin' drivers/net/wireless/marvell/mwifiex/main.c
+    accept '[\t]*mwifiex_dbg[(]adapter[,][ ]ERROR[,][\n][\t ]*["]request_firmware[ ]error' drivers/net/wireless/marvell/mwifiex/main.c
+    blobname 'ti-connectivity[/]wl12[78]x-nvs\.bin' 'drivers/net/wireless/ti/wlcore/\(sdio\|spi\)\.c'
+    blobname 'ti-connectivity[/]wl18xx-conf\.bin' 'drivers/net/wireless/ti/wlcore/\(sdio\|spi\)\.c'
+    blobname 'ziirave_wdt\.fw' drivers/watchdog/wiirave_wdt.c
+    blobna '["]gmp_["]' drivers/staging/greybus/firmware.h
+    blobna '["]FW_NAME_PREFIX["]["]%08x_%08x_%08x_%08x_%s\.tftf["][\n][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/staging/greybus/firmware.h
+    blobname '\(gmp_\)\?%08x_%08x_%08x_%08x_s2l\.tftf' drivers/staging/greybus/bootrom.c
+    blobname '\(gmp_\)\?%08x_%08x_%08x_%08x_\(%s\|[^"]*\)\.tftf' drivers/staging/greybus/fw-download.c
+    # Long-needed b43 cleanup.  These are actually cleaned up with
+    # custom code in deblob-<kver>.  Only ucode5, b0g0initvals5 and
+    # b0g0bsinitvals5 are provided by openfwwf, and only b43 (not
+    # b43legacy) can use the openfwwf files, so anything else in b43
+    # and b43legacy ought to be cleaned up.
+    accept '[\t]*filename[ ]=[ ]["]\(ucode\|b0g0\(bs\)\?initvals\)5["][;]' drivers/net/wireless/broadcom/b43.c
+    blobna '["]\(ucode\|[^ "\n]*initvals\)[0-9][^" .\n]*["]' 'drivers/net/wireless/broadcom/b43\(legacy\)\?\.c'
+    # We want to be more specific than deblob0-<kver> in the pcm
+    # matches, to avoid numerous false positives in sound pcm drivers.
+    blobna '["]pcm[45]["]' 'drivers/net/wireless/broadcom/b43\(legacy\)\?\.c'
+    blobna '[/][*][ ]What[ ]about[ ][^ \n]*initvals22[?][ ][*][/]' drivers/net/wireless/broadcom/b43.c
+   ;;
 
   */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
