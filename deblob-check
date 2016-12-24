@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2016-11-29
+# deblob-check version 2016-12-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -47,27 +47,38 @@
 #    --reverse-patch: Test the removed parts of a patch, rather than
 #		the added ones.
 
+#    --use-python: Choose the internal python script for the bulk of
+#		the work.  This is the fastest for cleaning up,
+#		because of the fast startup time of the regular
+#		expression engine.  This option is the default if
+#		python is found.  Set PYTHON to override the python
+#		interpreter.  The internal script works in both Python
+#		2 and 3.
+
 #    --use-awk: Choose the internal GNU awk script for the bulk of the
-#		work.  This is the default option, if GNU awk is found.
-#		The awk interpreter is named gawk, unless AWK is set.
-
-#    --use-sed: Choose the internal GNU sed script for the bulk of the
-#		work.  This is the default option, if GNU awk is not
-#		found.
-
-#    --use-python: Choose the internal python script.  This is not
-#		recommended, because the regular expressions we use
-#		invoke exponential behavior in the python engine.
+#		work.  This is the recommended option to check entire
+#		tarballs, because its regular expression engine offers
+#		the best speed/memory use.  This is the default option
+#		if python is not found.  Set AWK to specify GNU awk's
+#		name.
 
 #    --use-perl: Choose the internal perl script.  This is not
 #		recommended, because our regular expressions exceed
-#		some limits hard-coded into perl.
+#		some limits hard-coded into perl.  Set PERL to specify
+#		which perl implementation to use.  This is the default
+#		option if neither python nor GNU awk are found, AND if
+#		PERL is set.
+
+#    --use-sed: Choose the internal GNU sed script for the bulk of the
+#		work.  This is the default option, if no other
+#		alternative is found.  Use SED to specify which sed
+#		program to use.
 
 #    --save-script-input: Save the input that would have been fed to
 #		any of the engines above.
 
 #    --gen-flex: Generate a flex input file with all known blob and
-#		false positive patterns.  It would have been a fast
+#		false positive patterns.  It might have been a fast
 #		regular expression processor if only the flex program
 #		completed in reasonable time.
 
