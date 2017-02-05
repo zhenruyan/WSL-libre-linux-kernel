@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2017-01-09
+# deblob-check version 2017-02-05
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4589,6 +4589,72 @@ set_except () {
     # New in 4.9.2 and 4.8.17.
     accept '[\t]*fwname[ ]=[ ]["]fuc4\(09\|1a\)[cd]["][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
     accept '[\t]*snprintf[(]f[,][ ]sizeof[(]f[)][,][ ]["]nouveau[/]nv%02x_%s["][,][ ]device->chipset[,][ ]fwname[)][;][\n][\t]*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]f[,][ ]device->dev[)][;][\n][\t]*if[ ][(]ret[)][ ][{][\n][\t]*snprintf[(]f[,][ ]sizeof[(]f[)][,][ ]["]nouveau[/]%s["][,][ ]fwname[)][;][\n][\t]*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]f[,][ ]device->dev[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+
+    # New in 4.10-rc*.
+    accept '[ ]*d=["]m[ ]0[,]0[ ][^z\n]*z["]' Documentation/media/uapi/v4l/crop.svg
+    accept '[ ]*Kernel[ ]driver[ ]in[ ]use:[ ]serial\([\n][ ]*[0-3]0:[ 0-9a-f]*\)*' Documentation/media/v4l-drivers/ivtv.rst
+    accept 'tbl_shf_table:[\n]\([/][/][^\n]*[\n]\)*[\n]*\([\n][\t]\.byte[ \t0-9xa-f]*\)*' arch/arm/crypto/crct10dif-ce-core.S
+    accept '\.LK256:\([\n][ 	]*\.long[ 	]*0\(x[0-9a-f]*\([,]0x[0-9a-f]*\)*\)\?\)*[ \t]*[/][/][ ]*terminator' arch/arm64/crypto/sha256-core.S_shipped
+    accept '\.LK[$]BITS:\([\n]___[\n][$]code\.=<<___[ ]if[^\n]*\([\n][ 	]*\.\(long\|quad\)[ 	]*0\(x[0-9a-f]*\([,]0x[0-9a-f]*\)*\)\?\)*[ \t]*[/][/][ ]*terminator\)*' arch/arm64/crypto/sha512-armv8.pl
+    accept '\.LK512:\([\n][ 	]*\.quad[ 	]*0\(x[0-9a-f]*\([,]0x[0-9a-f]*\)*\)\?\)*[ \t]*[/][/][ ]*terminator' arch/arm64/crypto/sha512-core.S_shipped
+    accept '[ ][*][ ]Concurrent[ ]request_firmware[(][)][ ]for[ ]the[ ]same' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]struct[ ]rcar_gen2_cpg_pll_config[ ]cpg_pll_configs\[8\][ ]__initconst[ ]=' drivers/clk/renesas/r8a7745-cpg-mssr.c
+    defsnc 'static[ ]unsigned[ ]int[ ]eotf_33_linear_mapping\[OSD_EOTF_LUT_SIZE\][ ]=' drivers/gpu/drm/meson/meson_viu.c
+    defsnc 'static[ ]unsigned[ ]int[ ]oetf_41_linear_mapping\[OSD_OETF_LUT_SIZE\][ ]=' drivers/gpu/drm/meson/meson_viu.c
+    defsnc 'static[ ]unsigned[ ]int[ ]vpp_filter_coefs_4point_bspline\[\][ ]=' drivers/gpu/drm/meson/meson_vpp.c
+    defsnc 'static[ ]const[ ]u32[ ]a5xx_registers\[\][ ]=' drivers/gpu/drm/msm/adreno/a5xx_gpu.c
+    defsnc '[}][ ]a5xx_sequence_regs\[\][ ]=' drivers/gpu/drm/msm/adreno/a5dxx_power.c
+    defsnc 'static[ ]uint32_t[ ]gf100_ce_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf100.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gt215_ce_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf215.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gf100_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgf100.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gf117_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgf117.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gk104_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgk104.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gk110_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgk110.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gk208_grgpc_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/gpcgk208.fuc5.h
+    defsnc 'static[ ]uint32_t[ ]gm107_grgpc_code\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/gpcgm107.fuc5.h
+    defsnc 'static[ ]uint32_t[ ]gf100_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgf100.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gf117_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgf117.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gk104_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgk104.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gk110_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgk110.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gk208_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/fuc/hubgk208.fuc5.h
+    defsnc 'static[ ]uint32_t[ ]gm107_grhub_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/core/engine/graph/fuc/hubgm107.fuc5.h
+    defsnc 'static[ ]uint32_t[ ]g98_psec_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s.h
+    defsnc 'static[ ]uint32_t[ ]gf100_pmu_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/subdev/pmu/fuc/gf100.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]gf119_pmu_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf119.fuc4.h
+    defsnc 'static[ ]uint32_t[ ]gk208_pmu_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/subdev/pmu/fuc/gk208.fuc5.h
+    defsnc 'static[ ]uint32_t[ ]gt215_pmu_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/subdev/pmu/fuc/gt215.fuc3.h
+    defsnc 'static[ ]uint32_t[ ]g98_sec_\(data\|code\)\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf98.fuc0s.h
+    defsnc 'static[ ]const[ ]u16[ ]lmp91000_temp_lut\[\][ ]=' drivers/iio/potentiostat/lmp91000.c
+    defsnc 'static[ ]const[ ]u8[ ]fdp1_mdet\[\][ ]=' drivers/media/platform/rcar_fdp1.c
+    defsnc 'static[ ]struct[ ]cs35l34_mclk_div[ ]cs35l34_mclk_coeffs\[\][ ]=' sound/soc/codecs/cs35l34.c
+    defsnc 'static[ ]const[ ]struct[ ]cs42l42_pll_params[ ]pll_ratio_table\[\][ ]=' sound/soc/codecs/cs42l42.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5663_v2_reg\[\][ ]=' sound/soc/codecs/rt5663.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5665_reg\[\][ ]=' sound/soc/codecs/rt5665.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]stac9766_reg_defaults\[\][ ]=' sound/soc/codecs/stac9766.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm9705_reg_defaults\[\][ ]=' sound/soc/codecs/wm9705.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm9712_reg_defaults\[\][ ]=' sound/soc/codecs/wm9712.c
+    blobname 'fdma_\(%s_%d\|[^\." ,;_]*_[0-9][0-9]*\)\.elf' drivers/dma/st_fdma.c
+    blobname 'amdgpu[/]polaris12_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
+    blobname 'amdgpu[/]polaris12_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'amdgpu[/]polaris12_vce\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+    blobname 'amdgpu[/]polaris12_\(ce\|pfp\|me\|mec\|mec2\|rlc\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v8_0.c
+    blobname 'amdgpu[/]polaris12_mc\.bin' drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c
+    blobname 'amdgpu[/]polaris12_sdma1\?\.bin' drivers/gpu/drm/amd/amdgpu/sdma_v3_0.c
+    blobname 'amdgpu[/]polaris12_smc\.bin' drivers/gpu/drm/amd/amdgpu/vi.c
+    blobname 'radeon[/]si58_mc\.bin' 'drivers/gpu/drm/amd/amdgpu/gmc_v6_0\.c\|drivers/gpu/drm/radeon/si\.c'
+    blobname 'a530_p\(m4\|fp\)\.fw' drivers/gpu/drm/msm/adreno/adreno_device.c
+    blobname 'radeon[/]banks_k_2_smc\.bin' 'drivers/gpu/drm/amd/amdgpu/si_dpm\.c\|drivers/gpu/drm/radeon/si\.c'
+    blobname 'melfas_mip4_%04X\.fw' drivers/input/touchscreen/melfas_mip4.c
+    blobname 'cbfw-3\.2\.5\.1\.bin' drivers/scsi/bfa/bfad.c
+    blobname 'r8a779x_usb3_v3\.dlmem' drivers/usb/host/xhci-rcar.h
+    blob 'https\?:[/][/]linuxtv\.org[/][^" >]*firmware[/][^" \t\n>\\)]*' 'Documentation/media/v4l-drivers/ivtv\.rst\|drivers/media/pci/ttpci/av7110\.c\|firmware/WHENCE'
+    # The firmware file name is supplied by the user.
+    accept '[\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]fw_name[,]\([^\n]*[\n]\+[^\n}]\)*ret[ ]=[ ]rmi_firmware_update[(]data[,][ ]fw[)]' drivers/input/rmi4/rmi_f34.c
+    # This seems to be an example file name of something to be
+    # supplied by the user in the DTS file, not the name of an actual
+    # firmware file.
+    accept '[\t ]*firmware-name[ ]=[ ]["]zynq-gpio\.bin["][;]' Documentation/devicetree/bindings/fpga/fpga-region.txt
+    accept '[\t]if[ ][(]of_property_read_bool[(]np[,][ ]["]qca[,]no-eeprom["][)][)][ ][{][\n][\t]*[/][*][ ]ath9k-eeprom-<bus>-<id>\.bin[ ][*][/][\n][\t]*scnprintf[(]eeprom_name[,][ ]sizeof[(]eeprom_name[)][,][\n][\t ]*["]ath9k-eeprom-%s-%s\.bin["][,]' drivers/net/wireless/ath/ath9k/init.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
