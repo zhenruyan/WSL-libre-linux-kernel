@@ -4655,6 +4655,9 @@ set_except () {
     # firmware file.
     accept '[\t ]*firmware-name[ ]=[ ]["]zynq-gpio\.bin["][;]' Documentation/devicetree/bindings/fpga/fpga-region.txt
     accept '[\t]if[ ][(]of_property_read_bool[(]np[,][ ]["]qca[,]no-eeprom["][)][)][ ][{][\n][\t]*[/][*][ ]ath9k-eeprom-<bus>-<id>\.bin[ ][*][/][\n][\t]*scnprintf[(]eeprom_name[,][ ]sizeof[(]eeprom_name[)][,][\n][\t ]*["]ath9k-eeprom-%s-%s\.bin["][,]' drivers/net/wireless/ath/ath9k/init.c
+    blobname 'iwlwifi-3168-' drivers/net/wireless/intel/iwlwifi/iwl-7000.c
+    blobname 'iwlwifi-8265-' drivers/net/wireless/intel/iwlwifi/iwl-8000.c
+    blobname 'iwlwifi-[0-9][^"\n\t ]*-' drivers/net/wireless/intel/iwlwifi/iwl-8000.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
