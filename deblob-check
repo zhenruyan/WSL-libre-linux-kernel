@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2017-02-05
+# deblob-check version 2017-02-06
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -904,7 +904,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(fw\|bin[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\)[\\]\?["]'
+  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\)[\\]\?["]'
   # Catch misdeblobbed fw extension.
   blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
@@ -4658,6 +4658,7 @@ set_except () {
     blobname 'iwlwifi-3168-' drivers/net/wireless/intel/iwlwifi/iwl-7000.c
     blobname 'iwlwifi-8265-' drivers/net/wireless/intel/iwlwifi/iwl-8000.c
     blobname 'iwlwifi-[0-9][^"\n\t ]*-' drivers/net/wireless/intel/iwlwifi/iwl-8000.c
+    blobname 'a530v3_gpmu\.fw2' drivers/gpu/drm/msm/adreno/adreno_device.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
