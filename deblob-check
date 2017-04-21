@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2017-02-06
+# deblob-check version 2017-04-21
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -904,7 +904,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\)[\\]\?["]'
+  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\)[\\]\?["]'
   # Catch misdeblobbed fw extension.
   blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
@@ -4659,6 +4659,77 @@ set_except () {
     blobname 'iwlwifi-8265-' drivers/net/wireless/intel/iwlwifi/iwl-8000.c
     blobname 'iwlwifi-[0-9][^"\n\t ]*-' drivers/net/wireless/intel/iwlwifi/iwl-8000.c
     blobname 'a530v3_gpmu\.fw2' drivers/gpu/drm/msm/adreno/adreno_device.c
+
+    # New in 4.11.
+    blobname 'amdgpu[/]polaris1[01]_k_smc\.bin' drivers/gpu/drm/amdgpu/amdgpu_cgs.c
+    blobname 'i915[/]\(glk\|kbl\)_dmc_ver1_01\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'vpu[/]vpu_fw_imx\(27_TO2\|53\|6[qd]\)\.bin' drivers/media/platform/coda/coda-common.c
+    blobname '%s-%d\.bin' drivers/net/wireless/ath/ath10k/core.c
+    blobname 'wil6210_sparrow_plus\.fw' drivers/net/wireless/ath/wil6210/wil6210.h
+    blobname 'iwlwifi-Qu-a0-hr-a0-' drivers/net/wireless/intel/iwlwifi/iwl-a000.c
+    blobname 'intel[/]dsp_fw_glk\.bin' sound/soc/intel/skylake/skl.c
+    defsnc 'unsigned[ ]char[ ]__aligned[(]16[)][ ]bootlogo_bits\[\][ ]=' 'arch/m68k/68000/bootlogo\(-vz\)\?\.h'
+    defsnc 'static[ ]volatile[ ]const[ ]u8[ ]__cacheline_aligned[ ]__aesti_\(inv_\)\?sbox\[\][ ]=' crypto/aes_ti.c
+    defsc 'static[ ]const[ ]struct[ ]ast_vbios_stdtable[ ]vbios_stdtable\[\][ ]=' drivers/gpu/drm/ast/ast_tables.h
+    defsnc 'static[ ]const[ ]struct[ ]vadc_map_pt[ ]adcmap_100k_104ef_104fb\[\][ ]=' drivers/iio/adc/qcom-spmi-vadc.c
+    defsnc 'static[ ]const[ ]int[ ]srf08_sensitivity\[\][ ]=' drivers/iio/proximity/srf80.c
+    defsnc '[\t]static[ ]u8[ ]rss_key\[40\][ ]=' drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+    defsnc '[\t]static[ ]u32[ ]\(itr_imr_\(rxr\|txt\)\(en\)\?\|rpo_lro_ldes_max\)_\(adr\|msk\|shift\)\[32\][ ]=' drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.c
+    defsnc 'static[ ]const[ ]u32[ ]hw_atl_utils_hw_mac_regs\[\][ ]=' drivers/net/ethernet/aquantia/atlantic/hw_tl/hw_atl_utils.c
+    defsnc 'static[ ]const[ ]u8[ ]netvsc_hash_key\[NETVSC_HASH_KEYLEN\][ ]=' drivers/net/hyperv/rndis_filter.c
+    defsnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals_3x_xtal20\[\][ ]=' drivers/net/wireless/ralink/rt2x00/rt2800lib.c
+    defsnc 'unsigned[ ]long[ ]long[ ]lpfc_enable_nvmet\[LPFC_NVMET_MAX_PORTS\][ ]=' drivers/scsi/lpfc/lpfc_attr.c
+    defsnc 'static[ ]const[ ]u64[ ]test_vectors_siphash\[64\][ ]=' lib/test_siphash.c
+    defsnc 'static[ ]const[ ]u32[ ]test_vectors_hsiphash\[64\][ ]=' lib/test_siphash.c
+    defsnc 'static[ ]yyconst[ ]YY_CHAR[ ]yy_ec\[256\][ ]=' scripts/dtc/dtc-lexer.lex.c_shipped
+    defsnc 'static[ ]yyconst[ ]YY_CHAR[ ]yy_meta\[48\][ ]=' scripts/dtc/dtc-lexer.lex.c_shipped
+    defsnc 'static[ ]yyconst[ ]flex_uint16_t[ ]yy_base\[180\][ ]=' scripts/dtc/dtc-lexer.lex.c_shipped
+    defsnc 'static[ ]yyconst[ ]flex_uint16_t[ ]yy_nxt\[449\][ ]=' scripts/dtc/dtc-lexer.lex.c_shipped
+    accept '0x1B[,][ ]0x5E[,][ ]0x78[,][ ]0x3D[,][ ]0x00[,][ ]0x00[,][ ]0x00[,][ ]0x18[,][ ][0x1-9A-F, ]*' security/apparmor/nulldfa.in
+    defsnc '[\t]struct[ ]sock_filter[ ]bpf_filter\[\][ ]=' tools/testing/selftests/net/psock_lib.h
+    blobname 'cpt8x-mc-[as]e\.out' drivers/crypto/cavium/cpt/cptpf_main.c
+    blobname 'i915[/]["][ ]__stringify[(]platform[)][ ]["]_huc_ver["][ ]__stringify[(]major[)][ ]["]_["][ \\\n\t]*__stringify[(]minor[)][ ]["]_["][ ]__stringify[(]bld_num[)][ ]["]\.bin' drivers/gpu/drm/i915/intel_huc.c
+    accept '[	][	]*gf100_gr_init_fw[(]gr->fecs[,][ ][&]gr->fuc409c[,][ ][&]gr->fuc409d[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    accept '[	][	]*gf100_gr_init_fw[(]gr->gpccs[,][ ][&]gr->fuc41ac[,][ ][&]gr->fuc41ad[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    blobname 'rockchip[/]dptx\.bin' drivers/gpu/drm/rockchip/cdn-dp-core.c
+    accept 'static[ ]int[ ]cdn_dp_request_firmware[(]' drivers/gpu/drm/rockchip/cdn-dp-core.c
+    accept '[\t]ret[ ]=[ ]cdn_dp_request_firmware[(]dp[)]' drivers/gpu/drm/rockchip/cdn-cp-core.c
+    blobname 'netronome[/]nic_%s' drivers/net/ethernet/netronome/nfp/nfp_main.c
+    blobname 'spc[ ]-=[ ]snprintf[(][&]fw_name\[ARRAY_SIZE[(]fw_name[)][ ]-[ ]spc\][,][^;]*[)]' drivers/net/ethernet/netronome/nfp/nfp_main.c
+    blobname 'netronome[/]nic_AMDA00\(81-0001_\(1x40\|4x10\)\|96-0001_2x10\|97-0001_\(2x40\|4x10_1x40\|8x10\)\|99-0001_2x\(10\|25\)\)\.nffw' drivers/net/ethernet/netronome/nfp/nfp_main.c
+    accept '#define[ ]NFP_RESOURCE_NFP_NFFW[ \t]*["]nfp\.nffw["]' drivers/net/ethernet/netronome/nfp/nfp.h
+    accept '[\t]*\(rc[ ]=[ ]\)\?wil_request_firmware[(]wil[,][ ]\(wil->wil_fw_name\|WIL_BOARD_FILE_NAME\)[,][ ]\(true\|false\)[)][;]' drivers/net/wireless/ath/wil6210/main.c
+    blobname 'gsl3670-cube-iwork8-air\.fw' drivers/platform/x86/silead_dmi.c
+    blobname 'gsl3676-jumper-ezpad-mini3\.fw' drivers/platform/x86/silead_dmi.c
+    accept '[\t]*\(rc[ ]=[ ]\)\?request_firmware_nowait[(]THIS_MODULE[,][ ]FW_ACTION_NOHOTPLUG[,][ ]name[,]' lib/test_firmware.c
+    accept '[ ]*mechanism[ ]is[ ]available[ ]and[ ]for[ ]the[ ]request_firmware_nowait[(][)][ ]call' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*except[ ]request_firmware_direct[(][)]' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*today[.][ ]The[ ]call[ ]request_firmware_nowait[(][)]' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*argument[ ]to[ ]request_firmware_nowait[(][)]' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*for[ ]request_firmware_nowait[(][)][ ]when[ ]uevent' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*supported[ ]for[ ]request_firmware_into_buf[(][)]' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*For[ ]details[ ]of[ ]implementation[ ]refer[ ]to[ ]_request_firmware_load[(][)]' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*Users[ ]of[ ]the[ ]request_firmware_nowait[(][)][ ]call' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*rely[ ]on[ ]the[ ]uevent[ ]flag[ ]which[ ]can[ ]be[ ]disabled[ ]by[ ]request_firmware_nowait[(][)]' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*Although[ ]this[ ]can[ ]disable[ ]the[ ]firmware[ ]cache[ ]for[ ]request_firmware_nowait[(][)]' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ]*uses[ ]all[ ]synchronous[ ]call[ ]except[ ]:c:func:[`]request_firmware_into_buf[`]' Documentation/driver-api/firmware/firmware_cache.rst
+    accept '[ \t]*if[(]request_firmware[(][&]fw_entry[,][ ][$]FIRMWARE[,]' Documentation/driver-api/firmware/firmware_cache.rst
+    accept '[ ]*device[ ]\(if[ ]\)*the[ ]second[ ]argument[ ][(]uevent[)][ ]to[ ]request_firmware_nowait[(][)]' Documentation/driver-api/firmware/firmware_cache.rst
+    accept '[ ]*introduction[\n][ ]*core[\n][ ]*request_firmware[\n]' Documentation/driver-api/firmware/index.rst
+    accept '\([ ]*:functions:[ ]\)\?request_firmware\([ ]API\|\|_direct\|_into_buf\|_nowait\|\)[\n]' Documentation/driver-api/firmware/request_firmware.rst
+    accept 'informed[ ]through[ ]the[ ]callback[.][ ]request_firmware_nowait[(][)][ ]cannot' Documentation/driver-api/firmware/request_firmware.rst
+    accept 'firmware[.][ ]For[ ]example[ ]if[ ]you[ ]used[ ]request_firmware[(][)][ ]and[ ]it[ ]returns' Documentation/driver-api/firmware/request_firmware.rst
+    accept 'If[ ]something[ ]went[ ]wrong[ ]request_firmware[(][)][ ]returns[ ]non-zero' Documentation/driver-api/firmware/request_firmware.rst
+    accept 'resume[/]restore[,][ ]but[ ]they[ ]cannot[ ]do[ ]it[ ]by[ ]calling[ ]:c:func:[`]request_firmware[(][)][`]' Documentation/driver-api/pm/notifiers.rst
+    accept 'In[ ]this[ ]example[,][ ]the[ ][^\n]*["]ts\.out["]' tools/power/x86/turbostat/turbostat.8
+    accept '[\t]if[ ][(][!]snd_card_proc_new[(]hdspm->card[,][ ]["]ports\.\(in\|out\)["][,]' sound/pci/rme9652/hdspm.c
+    accept '[ \t]*print[ ]["]cat[ ]["][ ]rd[ ]cfr\[j\][ ][ ]["][/]kvm-test-1-run\.sh\.out["]' tools/testing/selftests/rcutorture/bin/kvm.sh
+    # If this actually requests any firmware, it will do so using
+    # disabled request_firmware calls elsewhere, but it seems to me
+    # that this would just pin and unpin firmware that might have
+    # already been requested before.
+    accept 'static[ ]int[ ]smu7_request_firmware[(]' drivers/gpu/drm/amd/powerplay/hwmgr/smu7_hwmgr.c
+    accept '[\t]\.request_firmware[ ]=[ ]smu7_request_firmware[,]' drivers/gpu/drm/amd/powerplay/hwmgr/smu7_hwmgr.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
