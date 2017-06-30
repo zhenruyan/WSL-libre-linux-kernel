@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2017-04-21
+# deblob-check version 2017-06-30
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4730,6 +4730,84 @@ set_except () {
     # already been requested before.
     accept 'static[ ]int[ ]smu7_request_firmware[(]' drivers/gpu/drm/amd/powerplay/hwmgr/smu7_hwmgr.c
     accept '[\t]\.request_firmware[ ]=[ ]smu7_request_firmware[,]' drivers/gpu/drm/amd/powerplay/hwmgr/smu7_hwmgr.c
+
+    # New in 4.12.
+    accept '[ ]*Bit\([ ]*[0-7]\)*' Documentation/input/devices/sentelic.rst
+    defsnc 'static[ ]const[ ]struct[ ]hash_testvec[ ]\(ghash\|hmac_sha\(224\|256\)\|aes_xcbc128\|poly1305\|crc32\|crc32c\|bfin_crc\)_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]cipher_testvec[ ]\(\(des3_ede\|bf\)_cbc\|\(tf\|cast6\|aes\)_xts\|serpent\(_xts\)\?\|tnepres\|aes\(_cbc\|_ctr_rfc3686\)\?\|x\?tea\|anubis\(_cbc\)\?\|xeta\|camellia_\(cbc\|xts\)\|salsa20_stream\|chacha20\|cts_mode\)_\(enc\|dec\)_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]aead_testvec[ ]hmac_sha\(1\|256\|512\|224\|384\)_\(aes\|des3\?\(_ede\)\?\)_cbc_enc_tv_temp\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]aead_testvec[ ]\(aes_\(gcm_rfc4106\|ccm_rfc4309\)\|rfc7539\(esp\)\?\)_\(enc\|dec\)_tv_template\[\][ \t]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]comp_testvec[ ]\(lzo\|lz4\(hc\)\?\)_\(de\)\?comp_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc '[}][ ]segments\[MALIDP_COEFFTAB_NUM_COEFFS\][ ]=' drivers/gpu/drm/arm/malidp_crtc.c
+    defsnc 'static[ ]const[ ]u16[ ]dp500_se_scaling_coeffs\[\]\[SE_N_SCALING_COEFFS\][ ]=' drivers/gpu/drm/arm/malidp_hw.c
+    defsnc 'static[ ]const[ ]u8[ ]gamma_tbl\[S6E3HA2_NUM_GAMMA_STEPS\]\[S6E3HA2_GAMMA_CMD_CNT\][ ]=' drivers/gpu/drm/panel/panel-samsung-s6e3ha2.c
+    defsnc 'static[ ]const[ ]struct[ ]rcar_hdmi_phy_params[ ]rcar_hdmi_phy_params\[\][ ]=' drivers/gpu/drm/rcar-du/rcar_dw_hdmi.c
+    defsnc 'static[ ]const[ ]int[ ]temp_map\[CPCAP_MAX_TEMP_LVL\]\[2\][ ]=' drivers/iio/adc/cpcap-adc.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_value[ ]ov5645_\(global_init_setting\|setting_\(sxga\|1080p\|full\)\)\[\][ ]=' drivers/media/i2c/ov5645.c
+    defsnc 'static[ ]struct[ ]regval_list[ ]ov5647_640x480\[\][ ]=' drivers/media/i2c/ov5647.c
+    defsc 'static[ ]const[ ]u32[ ]isc_gamma_table\[GAMMA_MAX[ ][+][ ]1\]\[GAMMA_ENTRIES\][ ]=' drivers/media/platform/atmel/atmel-isc.c
+    defsnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals_7620\[\][ ]=' drivers/net/wireless/ralink/rt2x00/rt2800lib.c
+    defsnc 'static[ ]const[ ]u8[ ]zero_buff\[\][ ]=' drivers/staging/ccree/ssi_cipher.c
+    oprepline '#define[ ]NIST_\(AES\([CG]CM\)\?\|SHA\|HMAC\)_\(SHA\)\?\(256\|512\|192\|128\|1\)_\(XTS_\|CMAC_\)\?\(KEY\|PLAIN\(_DATA\)\?\|CIPHER\|MD\|MSG\|ADATA\)' drivers/staging/ccree/ssi_fips_data.h
+    defsnc 'static[ ]struct[ ]atomisp_css_macc_table[ ]\(skin_\(low\|medium\|high\)\|blue\|green\)_macc_table[ ]=' drivers/staging/media/atomisp/pci/atomisp2/atomisp_tables.h
+    defsnc 'static[ ]struct[ ]atomisp_css_ctc_table[ ]vivid_ctc_table[ ]=' drivers/staging/media/atomisp/pci/atomisp2/atomisp_tables.h
+    defsnc '#define[ ]S_1W_\(6X6\|9X9\|7X7\)_MATRIX_DEFAULT[ ][(][(]s_1w_.x._matrix[)][\\]' drivers/staging/media/atomisp/pci/atomisp2/css2400/hive_isp_css_include/host/ref_vector_func_types.h
+    defsnc 'const[ ]struct[ ]ia_css_anr_config[ ]default_anr_config[ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/anr/anr_1.0/ia_css_anr.host.c
+    defsnc 'const[ ]struct[ ]ia_css_anr_thres[ ]default_anr_thres[ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/anr/anr_2/ia_css_anr2_table.host.c
+    defsnc 'default_ctc_table_data\[IA_CSS_VAMEM_[21]_CTC_TABLE_SIZE\][ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/ctc/ctc_1.0/ia_css_ctc_table.host.c
+    defsnc 'default_gamma_table_data\[IA_CSS_VAMEM_[21]_GAMMA_TABLE_SIZE\][ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/gc/gc_1.0/ia_css_gc_table.host.c
+    defsnc 'default_gamma_table_data\[IA_CSS_VAMEM_[21]_RGB_GAMMA_TABLE_SIZE\][ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/gc/gc_2/ia_css_gc2_table.host.c
+    defsnc 'const[ ]struct[ ]ia_css_macc1_5_table[ ]default_macc1_5_table[ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/macc/macc1_5/ia_css_macc1_5_table.host.c
+    defsnc 'const[ ]struct[ ]ia_css_macc_table[ ]default_macc2\?_table[ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/macc/macc_1.0/ia_css_macc_table.host.c
+    defsc '#define[ ]DEFAULT_DVS_GRID_INFO[ ]' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/sdis/common/ia_css_sdis_common_types.h
+    defsnc 'const[ ]int16_t[ ]g_pyramid\[8\]\[8\][ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/tdf/tdf_1.0/ia_css_tdf.host.c
+    defsnc 'static[ ]const[ ]int[ ]zoom_table\[4\]\[HRT_GDC_N\][ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/sh_css_params.c
+    defsnc '[\t]static[ ]\+u8[ ]sbox_table\[256\][ ]=' drivers/staging/rtl8723bs/core/rtw_security.c
+    defsnc 'static[ ]u32[ ]Array_MP_8723B_\(AGC_TAB\|PHY_REG\(_PG\)\?\)\[\][ ]=' drivers/staging/rtl8723bs/hal/HalHWImg8723B_BB.c
+    defsnc 'static[ ]u32[ ]Array_MP_8723B_MAC_REG\[\][ ]=' drivers/staging/rtl8723bs/hal/HalHWImg8723B_MAC.c
+    defsnc 'static[ ]u32[ ]Array_MP_8723B_RadioA\[\][ ]=' drivers/staging/rtl8723bs/hal/HalHWImg8723B_RF.c
+    defsnc 'static[ ]u8[ ]gDeltaSwingTableIdx_MP_5G[BA]_[NP]_TxPowerTrack_SDIO_8723B\[\]\[DELTA_SWINGIDX_SIZE\][ ]=' drivers/staging/rtl8723bs/hal/HalHWImg8723B_RF.c
+    defsnc '[\t]u8[ ]channel5G\[CHANNEL_MAX_NUMBER_5G\][ ]=' drivers/staging/rtl8723bs/hal/hal_com_phycfg.c
+    defsc 'static[ ]struct[ ]cs35l35_sysclk_config[ ]cs35l35_clk_ctl\[\][ ]=' sound/soc/codecs/cs35l35.c
+    blobname 'amdgpu[/]vega10_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
+    blobname 'amdgpu[/]vega10_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'amdgpu[/]vega10_vce\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+    blobname 'amdgpu[/]vega10_\(ce\|pfp\|me\(c2\?\)\?\|rlc\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
+    blobname 'amdgpu[/]\(vega10\|%s\)_\(sos\|asd\)\.bin' drivers/gpu/drm/amd/amdgpu/psp_v3_1.c
+    blobname 'amdgpu[/]vega10_sdma1\?\.bin' drivers/gpu/drm/amd/amdgpu/sdma_v4_0.c
+    blobname 'amdgpu[/]vega10_smc\.bin' drivers/gpu/drm/amd/amdgpu/soc15.c
+    blobname 'i915[/]glk_dmc_ver1_04\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'https[:][/][/]01\.org[/]linuxgraphics[/]downloads[/][^"\n]*' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'dvb-demod-si2168-d60-01\.fw' drivers/media/dvb-frontends/si2168_priv.h
+    blobname 'dvb-tuner-si2141-a10-01\.fw' drivers/media/tuners/si2157_priv.h
+    blobname 'firmware-6\.bin' drivers/net/wireless/ath/ath10k/hw.h
+    blobname '[/][*][ ]the[ ]firmware-6\.bin[ ]blob[ ][*][/]' drivers/net/wireless/ath/ath10k/hw.h
+    blobname 'iwlwifi-9260-th-b0-\(jf\|lc\)-b0-' drivers/net/wireless/intel/iwlwifi/iwl-9000.c
+    blobname 'iwlwifi-QuIcp-a0-hrcdb-a0-' drivers/net/wireless/intel/iwlwifi/iwl-a000.c
+    blobname 'git:[/][/]git\.kernel\.org[/][^"\n]*firmware\.git' drivers/net/wireless/intel/iwlwifi/iwl-drv.c
+    blobname 'rtlwifi[/]rtl8723befw_36\.bin' drivers/net/wireless/realtek/rtlwifi/rtl8723be/sw.c
+    blobname 'rtlwifi[/]rtl8821aefw_29\.bin' drivers/net/wireless/realtek/rtlwifi/rtl8821ae/sw.c
+    blobname 'gsl1686-dexp-ursus-7w\.fw' drivers/platform/x86/silead_dmi.c
+    blobname 'gsl1686-surftab-wintron70-st70416-6\.fw' drivers/platform/x86/silead_dmi.c
+    blobname 'ti-connectivity[/]TIInit_\(\(%d\|[0-9]\+\)[.]\)\+bts' drivers/bluetooth/hci_ll.c
+    accept '[\t]*bt_dev_err[(]lldev->hu\.hdev[,][ ]["]request_firmware[ ]failed' drivers/bluetooth/hci_ll.c
+    blobname 'nokia[/]\(bcmfw\|ti1273\)\.bin' drivers/bluetooth/hci_nokia.c
+    accept '[\t ]*falcon->firmware\.\(bin_data\|firmware\)' drivers/gpu/drm/tegra/falcon.c
+    accept '[\t][/][*][ ]request_firmware[ ]prints' drivers/gpu/drm/tegra/falcon.c
+    accept 'static[ ]const[ ]struct[ ]vic_config[ ]vic_t\(124\|210\)_config[ ]=[ ][{][\n][	]\.firmware[ ]*=[ ]' drivers/gpu/drm/tegra/vic.c
+    blobname 'nvidia[/]tegra124[/]vic03_ucode\.bin' drivers/gpu/drm/tegra/vic.c
+    blobname 'nvidia[/]tegra210[/]vic04_ucode\.bin' drivers/gpu/drm/tegra/vic.c
+    accept 'static[ ]int[ ]ap1302_request_firmware[(]' drivers/staging/media/atomisp/i2c/ap1302.c
+    accept '[\t ]*["]ap1302_request_firmware[ ]failed' drivers/staging/media/atomisp/i2c/ap1302.c
+    accept '[\t]ret[ ]=[ ]ap1302_request_firmware[(]' drivers/staging/media/atomisp/i2c/ap1302.c
+    blobname 'ap1302_fw\.bin' drivers/staging/media/atomisp/i2c/ap1302.c
+    blobname 'shisp_2401a0_\(legacy_\)\?v21\.bin' drivers/staging/media/atomisp/pci/atomisp2/atomisp_v4l2.c
+    blobname 'shisp_2400b0_v21\.bin' drivers/staging/media/atomisp/pci/atomisp2/atomisp_v4l2.c
+    accept '[\t]*isp->firmware[ ]=[ ]\(atomisp_load_firmware[(]\|NULL\)' 'drivers/staging/media/atomisp/pci/atomisp2/atomisp_\(fops\|v4l2\)\.c'
+    accept '[\t]stage_desc->firmware[ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/camera/pipe/src/pipe_stagedesc.c
+    accept '[\t]stage->firmware[ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/runtime/pipeline/src/pipeline.c
+    blobname 'rtlwifi[/]rtl8723bs_\(wowlan\|nic\)\.bin' drivers/staging/rtl8723bs/hal/rtl8723b_hal_init.c
+    blobname 'rtl8723b[/]FW_\(NIC\|WoWLAN\)\.bin' drivers/staging/rtl8723bs/include/rtl8723b_hal.h
     ;;
 
   */*freedo*.patch | */*logo*.patch)
