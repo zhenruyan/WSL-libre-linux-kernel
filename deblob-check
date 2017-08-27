@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2017-06-30
+# deblob-check version 2017-08-26
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -904,7 +904,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\)[\\]\?["]'
+  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\)[\\]\?["]'
   # Catch misdeblobbed fw extension.
   blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
@@ -4446,7 +4446,7 @@ set_except () {
     blobname 'pre-cal-%s-%s\.bin' drivers/net/wireless/ath/ath10k/core.c
     accept '[\t]fw_file->firmware[ ]=[ ]ath10k_fetch_fw_file' drivers/net/wireless/ath/ath10k/core.c
     blobname 'brcmfmac4356-sdio\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-    blobname 'iwlwifi-9000\(-pu-a0-\(jf\|lc\)-a0-\|-\|\)' drivers/net/wireless/intel/iwlwifi/iwl-9000.c
+    blobname 'iwlwifi-9000\(-pu-a0-\(jf\|lc\)-[ab]0-\|-\|\)' drivers/net/wireless/intel/iwlwifi/iwl-9000.c
     blobname 'iwlwifi-9260-th-a0-\(jf\|lc\)-a0-' drivers/net/wireless/intel/iwlwifi/iwl-9000.c
     blobname 'mrvl[/]pcie8897_uapsta_a0\.bin' drivers/net/wireless/marvell/mwifiex/pcie.h
     blobname 'mrvl[/]pcieuart8997_combo\(_v2\)\?\.bin' drivers/net/wireless/marvell/mwifiex/pcie.h
@@ -4808,6 +4808,57 @@ set_except () {
     accept '[\t]stage->firmware[ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/runtime/pipeline/src/pipeline.c
     blobname 'rtlwifi[/]rtl8723bs_\(wowlan\|nic\)\.bin' drivers/staging/rtl8723bs/hal/rtl8723b_hal_init.c
     blobname 'rtl8723b[/]FW_\(NIC\|WoWLAN\)\.bin' drivers/staging/rtl8723bs/include/rtl8723b_hal.h
+
+    # New in 4.13
+    accept '[ ]*This[ ]driver[ ]requires[ ]a[ ]patch[ ]for[ ]firmware_class\.c[^\n]*[\n][ ]*request_firmware_nowait[ ]function' Documentation/dell_rbu.txt
+    accept '[\t][ ]d=["]m[ ]0[,]0[ ]0[,]1895[ ]4118[,]0[ ][-0-9, LZm]*z["]' Documentation/media/uapi/v4l/crop.svg
+    defsnc 'static[ ]const[ ]struct[ ]akcipher_testvec[ ]pkcs1pad_rsa_tv_template\[\][ ]=' crypto/testmgr.h
+    accept '[\t]ret[ ]=[ ]_request_firmware_load[(]fw_priv[,][ ]opt_flags[,][ ]timeout[)][;]' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]struct[ ]cpg_pll_config[ ]cpg_pll_configs\[8\][ ]__initconst[ ]=' drivers/clk/renesas/clk-rcar-gen2.c
+    blobname 'cnn55xx_se.fw' drivers/crypto/cavium/nitrox/nitrox_main.c
+    defsnc 'unsigned[ ]int[ ]dsgl_ent_len\[\][ ]=' drivers/crypto/chelsio/chcr_algo.h
+    blobname '\(ifpp\|ipue\)\.bin' drivers/crypto/inside-secure/safexcel.c
+    blobname 'amdgpu[/]\(%s\|vega10\|raven\)_gpu_info\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
+    blobname 'amdgpu[/]raven_vcn\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
+    blobname 'amdgpu[/]raven_\(ce\|pfp\|me\(c2\?\)\?\|rlc\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
+    blobname 'amdgpu[/]\(vega10\|raven\)_sdma1\?\.bin' drivers/gpu/drm/amdgpu/sdma_v4_0.c
+    defsnc 'const[ ]struct[ ]pctl_data[ ]pctl[01]_data\[\][ ]=' drivers/gpu/drm/amd/amdgpu/mmhub_v1_0.c
+    blobname 'i915[/]cnl_dmc_ver1_04\.bin' drivers/gpu/drm/i915/intel_csr.c
+    defsnc '[\t]static[ ]const[ ]int[ ]dividers\[\][ ]=' drivers/gpu/drm/i915/intel_dpll_mgr.c
+    defsnc 'const[ ]struct[ ]stm32h7_adc_ck_spec[ ]stm32h7_adc_ckmodes_spec\[\][ ]=' drivers/iio/adc/stm32-adc-core.c
+    defsnc 'static[ ]const[ ]u8[ ]full_fm_\(eu\|na\)_1p0\[\][ ]=' drivers/media/i2c/max2175.c
+    defsnc 'static[ ]const[ ]struct[ ]max2175_reg_map[ ]\(dab12\|fmeu1p2\|fmna[12]p0\)_map\[\][ ]=' drivers/media/i2c/max2175.c
+    defsnc 'static[ ]const[ ]u8[ ]adc_presets\[2\]\[23\][ ]=' drivers/media/i2c/max2175.c
+    defsnc 'static[ ]const[ ]struct[ ]ov13858_reg[ ]mode_\(4224x3136\|2112x\(1568\|1188\)\|1056x784\)_regs\[\][ ]=' drivers/media/i2c/ov13858.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_value[ ]ov5640_\(init_\)\?setting_\(30\|15\)fps_\(VGA\(_640_480\)\?\|XGA_1024_768\|QVGA_320_240\|QCIF_176_144\|NTSC_720_480\|PAL_720_576\|720P_1280_720\|1080P_1920_1080\|QSXGA_2592_1944\)\[\][ ]=' drivers/media/i2c/ov5640.c
+    blobname 'qcom[/]venus-\(1\.8\|4\.2\)[/]venus\.mdt' drivers/media/platform/qcom/venus/core.c
+    # The firmware file name is supplied by the user.
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]flash->data[,]\([^\n]*[\n]\+[^\n}]\)*err[ ]=[ ]mlx5_firmware_flash[(]mdev[,][ ]fw[)]' drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+    blobname 'mellanox[/]mlxsw_spectrum-\([0-9.]*\|["]\([ \t]*\|[\\][\n]\|__stringify[(]MLXSW_FWREV_\(MAJOR\|MINOR\|SUBMINOR\)[)]\|["].["]\)*["]\)\.mfa2' drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+    # This firmware file name is supplied by the user,
+    # but there's another in the same source file (above) that is hardcoded.
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]firmware[,][ ]flash->data[,]\([^\n]*[\n]\+[^\n}]\)*err[ ]=[ ]mlxsw_sp_firmware_flash[(]mlxsw_sp[,][ ]firmware[)]' drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+    defsnc 'static[ ]const[ ]struct[ ]iro[ ]iro_arr\[49\][ ]=' drivers/net/ethernet/qlogic/qed/qed_hsi.h
+    defsc 'static[ ]const[ ]u8[ ]iwl_ext_nvm_channels\[\][ ]=' drivers/net/wireless/intel/iwlwifi/iwl-nvm-parse.c
+    blobname '\(rsi[/]\)\?rs9113_wlan_qspi\.rps' drivers/net/wireless/rsi/rsi_common.h
+    defsnc '[}][ ]hsfreq_map\[\][ ]=' drivers/staging/media/imx/imx6-mipi-csi2.c
+    defsnc 'static[ ]const[ ]u16[ ]avc_thr_db2reg\[97\][ ]=' sound/soc/codecs/sgtl5000.c
+    blob 'SD8688[ ]firmware[\n]=*[\n]*Images:[\n]*\(-[ ][/]lib[/]firmware[^\n]*[\n]*\)*The[ ]images[^:]*:[\n]*[^\n]*[/]linux-firmware[^\n]*' Documentation/btmrvl.txt
+    blobname '%s-%s-%d\.bin' drivers/net/wireless/ath/ath10k/core.c
+    blobname 'wil6210_\(sparrow_plus_\)\?ftm\.fw' drivers/net/wireless/ath/wil6210/wil6210.h
+    blobname 'brcmfmac43430a0-sdio\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+    blobname 'iwlwifi-9000-pu-a0-jf-b0-' drivers/net/wireless/intel/iwlwifi/cfg/9000.c
+    blobname 'iwlwifi-QuIcp-z0-hrcdb-a0-' drivers/net/wireless/intel/iwlwifi/iwl-a000.c
+    blobname 'qtn[/]fmac_qsr10g\.img' drivers/net/wireless/quantenna/qtnfmac/qtn_hw_ids.h
+    blobname 'gsl1680-\(gp-electronic-t701\|pipo-w2s\)\.fw' drivers/platform/x86/silead_dmi.c
+    blobname 'gsl3692-pov-mobii-wintab-p800w\.fw' drivers/platform/x86/silead_dmi.c
+    blobname 'gsl3670-itworks-tw891\.fw' drivers/platform/x86/silead_dmi.c
+    defsnc 'struct[ ]phm_fuses_default[ ]vega10_fuses_default\[\][ ]=' drivers/gpu/drm/amd/powerplay/hwmgr/pp_overdriver.c
+    blobname 'a530_zap\.mdt' drivers/gpu/drm/msm/adreno/adreno_device.c
+    accept '[\t]\(complete\|init_completion\|[\t]wait_for_completion\)[(][&]bus->request_firmware_complete[)]' drivers/net/wireless/quantenna/qtnfmac/pearl/pcie.c
+    accept '[\t]ret[ ]=[ ]reject_firmware_nowait[(][^)]*[,][ ]qtnf_firmware_load[)][;][\n][\t]*if[ ][(]ret[ ][<][ ]0[)][\n][\t]*pr_err[(]["]request_firmware_nowait[ ]error' drivers/net/wireless/quantenna/qtnfmac/pearl/pcie.c
+    blobname '\(adsp\|slpi\)\.mdt' drivers/remoteproc/qcom_adsp_pil.c
+    blobname 'wcnss\.mdt' drivers/remoteproc/qcom_wcnss.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
