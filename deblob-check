@@ -4914,7 +4914,7 @@ set_except () {
     blobname 'lantiq[/]xrx[23]00_phy\(22f\|11g\)_a\(14\|2[21]\)\.bin' drivers/soc/lantiq/gphy.c
     blobname 'rtlwifi[/]rtl8822befw\.bin' drivers/staging/rtlwifi/rtl8822be/sw.c
     # This loads a file named by the user.
-    accept '[\t]const[ ]char[ ][*]name[ ]=[ ]i915\.vbt_firmware[;]\n][\t]int[ ]ret[;][\n][\n][\t]if[ ][(]!name[ ][|][|][ ][!][*]name[)][\n][\t][\t]return[ ]-ENOENT[;][\n][\n][\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,]' drivers/gpu/drm/i915/intel_opregion.c
+    accept '[\t]const[ ]char[ ][*]name[ ]=[ ]i915\.vbt_firmware[;][\n][\t]int[ ]ret[;][\n][\n][\t]if[ ][(]!name[ ][|][|][ ][!][*]name[)][\n][\t][\t]return[ ]-ENOENT[;][\n][\n][\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,]' drivers/gpu/drm/i915/intel_opregion.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
