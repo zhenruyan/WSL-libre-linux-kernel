@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2017-08-26
+# deblob-check version 2017-10-23
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4859,6 +4859,62 @@ set_except () {
     accept '[\t]ret[ ]=[ ]reject_firmware_nowait[(][^)]*[,][ ]qtnf_firmware_load[)][;][\n][\t]*if[ ][(]ret[ ][<][ ]0[)][\n][\t]*pr_err[(]["]request_firmware_nowait[ ]error' drivers/net/wireless/quantenna/qtnfmac/pearl/pcie.c
     blobname '\(adsp\|slpi\)\.mdt' drivers/remoteproc/qcom_adsp_pil.c
     blobname 'wcnss\.mdt' drivers/remoteproc/qcom_wcnss.c
+
+    # New in 4.14.
+    blobname 'amdgpu[/]vega10_acg_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
+    blobname 'netronome[/]\(serial-%pMF-%02hhx-%02hhx\|pci-%s\)\.nffw' drivers/net/ethernet/netronome/nfp/nfp_main.c
+    blobname 'brcmfmac4373-sdio\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+    blobname 'brcmfmac4373\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+    blobname 'iwlwifi-QuQnj-\([af]0-hr-a0\|a0-jf-b0\)-' drivers/net/wireless/intel/iwlwifi/cfg/a000.c
+    blobname 'rt5514_dsp_fw3\.bin' sound/soc/codecs/rt5514.h
+    blobname 'intel[/]dsp_fw_cnl\.bin' sound/soc/intel/skylake/skl.c
+    initnc '__aes_arm\(64\)\?_inverse_sbox:[\n][\t]\.byte[ \t]*' arch/arm/crypto/aes-cipher-core.S
+    defsnc 'static[ ]const[ ]struct[ ]hsdk_pll_cfg[ ]asdt_pll_cfg\[\][ ]=' drivers/clk/clk-hsdk-pll.c
+    defsnc 'static[ ]const[ ]struct[ ]clk_div_table[ ]d1cpre_div_table\[\][ ]=' drivers/clk/clk-stm32h7.c
+    defsnc 'static[ ]const[ ]struct[ ]pctl_data[ ]pctl[01]_data\[\][ ]=' drivers/gpu/drm/amd/amdgpu/mmhub_v1_0.c
+    defsnc '[\t]static[ ]const[ ]u16[ ]map\[\][ ]=' drivers/hwmon/asc7621.c
+    defsc 'static[ ]const[ ]struct[ ]stm32h7_adc_ck_spec[ ]stm32h7_adc_ckmodes_spec\[\][ ]=' drivers/iio/adc/stm32-adc-core.c
+    defsnc 'static[ ]const[ ]int[ ]srf08_sensitivity_avail\[\][ ]=' drivers/iio/proximity/srf08.c
+    defsc 'static[ ]const[ ]struct[ ]slookup[ ]\(lnagain_\(nf\|iip3\)\|gain_\(rfagc\|channel_agc_\(nf\|iip3\)\)\)_lookup\[\][ ]=' drivers/media/dvb-frontends/stv6111.c
+    defsnc 'static[ ]const[ ]struct[ ]ov5670_reg[ ]mode_\(2592x1944\|1296x972\|648x486\|2560x1440\|1280x720\|640x360\)_regs\[\][ ]=' drivers/media/i2c/ov5670.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(gnd\|dram\|pci\|pflash\)_351[26]_pins\[\][ ]=' drivers/pinctrl/pinctrl-gemini.c
+    defsc 'static[ ]const[ ]unsigned[ ]int[ ]pflash_351[26]_pins_extended\[\][ ]=' drivers/pinctrl/pinctrl-gemini.c
+    defsnc 'static[ ]const[ ]u16[ ]db_invert_table\[12\]\[8\][ ]=' drivers/staging/rtlwifi/phydm/phydm.c
+    defsc 'u32[ ]cck_swing_table_ch1_ch14_8723d\[CCK_TABLE_SIZE_8723D\][ ]=' drivers/staging/rtlwifi/phydm/phydm_powertracking_ce.c
+    defsc 'u32[ ]cck_swing_table_ch1_ch14_8710b\[CCK_TABLE_SIZE_8710B\][ ]=' drivers/staging/rtlwifi/phydm/phydm_powertracking_ce.c
+    defsnc 'static[ ]u32[ ]array_mp_8822b_\(agc_tab\|phy_reg\(_pg\)\?\|mac_reg\|radio[ab]\)\[\][ ]=' drivers/staging/rtlwifi/phydm/rtl8822b/halhwimg8822b_bb.c
+    defsnc 'static[ ]u8[ ]delta_swing_index_mp_5g[ba]_[np]_txpwrtrack_\(type[01246789]_\|type3_type5_\)\?8822b[\n\t ]*\[\]\[DELTA_SWINGIDX_SIZE\][ ]=' drivers/staging/rtlwifi/phydm/rtl8822b/halhwimg8822b_rf.c
+    defsnc 'static[ ]const[ ]struct[ ]tsadc_table[ ]rk3328_code_table\[\][ ]=' drivers/thermal/rockchip_thermal.c
+    defsnc 'static[ ]const[ ]BYTE[ ]LL_Code\[64\][ ]=' lib/zstd/compress.c
+    defsnc 'static[ ]const[ ]BYTE[ ]ML_Code\[128\][ ]=' lib/zstd/compress.c
+    defsc 'static[ ]const[ ]FSE_decode_t4[ ]LL_defaultDTable\[[(]1[ ][<][<][ ]LL_DEFAULTNORMLOG[)][ ][+][ ]1\][ ]=' lib/zstd/decompress.c
+    defsc 'static[ ]const[ ]FSE_decode_t4[ ]ML_defaultDTable\[[(]1[ ][<][<][ ]ML_DEFAULTNORMLOG[)][ ][+][ ]1\][ ]=' lib/zstd/decompress.c
+    defsc 'static[ ]const[ ]FSE_decode_t4[ ]OF_defaultDTable\[[(]1[ ][<][<][ ]OF_DEFAULTNORMLOG[)][ ][+][ ]1\][ ]=' lib/zstd/decompress.c
+    defsnc '[\t]static[ ]const[ ]U32[ ][LM]L_base\[Max[LM]L[ ][+][ ]1\][ ]=' lib/zstd/decompress.c
+    defsnc 'static[ ]const[ ]U32[ ][LM]L_bits\[Max[LM]L[ ][+][ ]1\][ ]=' lib/zstd/zstd_internal.h
+    defsnc 'static[ ]const[ ]S16[ ][LM]L_defaultNorm\[Max[LM]L[ ][+][ ]1\][ ]=' lib/zstd/zstd_internal.h
+    defsnc 'static[ ]const[ ]struct[ ]cs43130_pll_params[ ]pll_ratio_table\[\][ ]=' sound/soc/codecs/cs43130.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]pcm_ch_\(en\|dis\)_seq\[\][ ]=' sound/soc/codecs/cs43130.c
+    defsnc 'static[ ]const[ ]struct[ ]cs43130_clk_gen[ ]cs43130_\(16\|32\|48\|64\)_clk_gen\[\][ ]=' sound/soc/codecs/cs43130.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt274_\(index_def\|reg\)\[\][ ]=' sound/soc/codecs/rt274.c
+    accept '[\t]report_missing_free_firmware[^\n]*[\n][\t]retval[ ]=[ ]request_firmware_into_buf[(][&]xfw[,][ ]NONFREE_FIRMWARE' include/linux/firmware.h
+    accept '[\t]if[ ][(]is_nonfree_firmware[^\n]*[\n][\t][\t]return[ ]reject_firmware_into_buf[^\n]*[\n][\t]else[\n][\t][\t]return[ ]request_firmware_into_buf[(]firmware_p[,][ ]name[,]' include/linux/firmware.h
+    accept '[#]define[ ]TEST_FIRMWARE_NAME[\t]["]test-firmware\.bin["]' lib/test_firmware.c
+    accept '[ ][*][\t]request_firmware_direct[(][)][ ]will[ ]be[ ]used[ ]instead' lib/test_firmware.c
+    accept '[ ][*][\t]of[ ]the[ ]request_firmware[*][(][)][ ]calls[ ]used[ ]in[ ]their[ ]tests' lib/test_firmware.c
+    accept '[ ][*][\t]request_firmware_direct[(][)][,][ ]otherwise[ ]request_firmware[(][)]' lib/test_firmware.c
+    accept '[\t]*test_fw_config->req_firmware[ ]=[ ]\(test_fw_config->sync_direct[ ][?][\n][ \t]*request_firmware_direct[ ][:][\n][ \t]*\)\?request_firmware[;]' lib/test_firmware.c
+    accept '[\t][\t]req->name[ ]=[ ]test_fw_config->name[;][\n][\t][\t]req->fw[ ]=[ ]NULL[;][\n][\t][\t]req->idx[ ]=[ ]i[;][\n][\t][\t]init_completion[(][&]req->completion[)][;][\n][\t][\t]rc[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]\([^);, \t\n]*[,][ \t\n]*\)*trigger_batched_cb[)][;]' lib/test_firmware.c
+    accept '[\t]release_firmware[(]test_firmware[)][;][\n][\t]test_firmware[ ]=[ ]NULL[;][\n][\t]rc[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]1[,][ ]name[^)\n]*[\n][ \t]*NULL[,][ ]trigger_async_request_cb[)]' lib/test_firmware.c
+    accept '[#][ ]name:[ ]test-firmware\.bin' tools/testing/selftests/firmware/fw_filesystem.sh
+    accept '[\t]*test_\(batched_\)\?request_firmware\(_direct\|_nowait_\(uevent\|custom\)\)\?\(_nofile\)\?\([(][)]\|[ ][$]i\)' tools/testing/selftests/firmware/fw_filesystem.sh
+    accept '[\t]echo[ ]-n[ ]["]Batched[ ]request_firmware\(_direct\|_nowait\)\?[(]\(uevent=\(true\|false\)\)\?[)][ ]\(nofile[ ]\)\?try[ ]#[$]1:[ ]["]' tools/testing/selftests/firmware/fw_filesystem.sh
+    accept '[\t]\(config_set_name\|test_wait_and_cancel_custom_load\)[ ]nope-test-firmware\.bin' tools/testing/selftests/firmware/fw_filesystem.sh
+    blobname 'amdgpu[/]%s_asd\.bin' drivers/gpu/drm/amd/amdgpu/psp_v10_0.c
+    blobname 'lantiq[/]xrx[23]00_phy\(22f\|11g\)_a\(14\|2[21]\)\.bin' drivers/soc/lantiq/gphy.c
+    blobname 'rtlwifi[/]rtl8822befw\.bin' drivers/staging/rtlwifi/rtl8822be/sw.c
+    # This loads a file named by the user.
+    accept '[\t]const[ ]char[ ][*]name[ ]=[ ]i915\.vbt_firmware[;]\n][\t]int[ ]ret[;][\n][\n][\t]if[ ][(]!name[ ][|][|][ ][!][*]name[)][\n][\t][\t]return[ ]-ENOENT[;][\n][\n][\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,]' drivers/gpu/drm/i915/intel_opregion.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
