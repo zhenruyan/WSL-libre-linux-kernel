@@ -4860,7 +4860,7 @@ set_except () {
     blobname '\(adsp\|slpi\)\.mdt' drivers/remoteproc/qcom_adsp_pil.c
     blobname 'wcnss\.mdt' drivers/remoteproc/qcom_wcnss.c
 
-    # New in 4.14.
+    # New in 4.14 (up to rc5).
     blobname 'amdgpu[/]vega10_acg_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
     blobname 'netronome[/]\(serial-%pMF-%02hhx-%02hhx\|pci-%s\)\.nffw' drivers/net/ethernet/netronome/nfp/nfp_main.c
     blobname 'brcmfmac4373-sdio\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
@@ -4915,6 +4915,8 @@ set_except () {
     blobname 'rtlwifi[/]rtl8822befw\.bin' drivers/staging/rtlwifi/rtl8822be/sw.c
     # This loads a file named by the user.
     accept '[\t]const[ ]char[ ][*]name[ ]=[ ]i915\.vbt_firmware[;][\n][\t]int[ ]ret[;][\n][\n][\t]if[ ][(]!name[ ][|][|][ ][!][*]name[)][\n][\t][\t]return[ ]-ENOENT[;][\n][\n][\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,]' drivers/gpu/drm/i915/intel_opregion.c
+    # New in 4.14-rc6.
+    defsnc '[\t]static[ ]const[ ]struct[ ]nphy_txiqcal_ladder[ ]ladder_\(lo\|iq\)\[\][ ]=' drivers/net/wireless/brcm80211/brcmsmac/phy/phy_n.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
