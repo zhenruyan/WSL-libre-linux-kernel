@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2017-10-23
+# deblob-check version 2017-11-30
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4917,6 +4917,8 @@ set_except () {
     accept '[\t]const[ ]char[ ][*]name[ ]=[ ]i915\.vbt_firmware[;][\n][\t]int[ ]ret[;][\n][\n][\t]if[ ][(]!name[ ][|][|][ ][!][*]name[)][\n][\t][\t]return[ ]-ENOENT[;][\n][\n][\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,]' drivers/gpu/drm/i915/intel_opregion.c
     # New in 4.14-rc6.
     defsnc '[\t]static[ ]const[ ]struct[ ]nphy_txiqcal_ladder[ ]ladder_\(lo\|iq\)\[\][ ]=' drivers/net/wireless/brcm80211/brcmsmac/phy/phy_n.c
+    # New in 4.14.3.
+    blobname 'iwlwifi-9000-pu-b0-jf-b0-' drivers/net/wireless/intel/iwlwifi/cfg/9000.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
