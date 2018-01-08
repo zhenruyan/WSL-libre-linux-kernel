@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2017-11-30
+# deblob-check version 2018-01-07
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2017 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2018 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -4922,6 +4922,51 @@ set_except () {
     # iwlwifi-9000 alone and starts with 'iwlwifi-9000\(' needed
     # adjusting as well.
     blobname 'iwlwifi-9000-pu-b0-jf-b0-' drivers/net/wireless/intel/iwlwifi/cfg/9000.c
+
+    # New in 4.15 (up to rc6).
+    accept '[\t]*0[ ][ ][/][*]1\([ ][ ][23456]\)*[*][/]\([ ][ ][789]\)*\([\n][\t]*\([ ]*[1-9][0-9]*\)*\)*[\n][\t]*100' arch/arm/boot/dts/imx6q-pistachio.dts
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]table\[\][ ]=' arch/mips/math-emu/dp_sqrt.c
+    defsnc 'const[ ]u8[ ]sm3_zero_message_hash\[SM3_DIGEST_SIZE\][ ]=' crypto/sm3_generic.c
+    defsc 'static[ ]const[ ]struct[ ]hash_testvec[ ]sm3_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]rcar_gen3_cpg_pll_config[ ]cpg_pll_configs\[8\][ ]__initconst[ ]=' drivers/clk/renesas/r8a77970-cpg-mssr.c
+    defsnc 'unsigned[ ]int[ ]sgl_ent_len\[\][ ]=' drivers/crypto/chelsio/chcr_algo.h
+    defsc 'static[ ]const[ ]struct[ ]pte_setting[ ]pte_settings\[mi_tiling_count\]\[mi_bpp_count\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_mem_input.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_4tap_16p_\(upscale\|117\|150\|183\)\[36\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_2tap_64p\[66\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_3tap_64p_\(upscale\|117\|150\|183\)\[99\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_4tap_64p_\(upscale\|117\|150\|183\)\[132\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_5tap_64p_\(upscale\|117\|150\|183\)\[165\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_6tap_64p_\(upscale\|117\|150\|183\)\[198\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_7tap_64p_\(upscale\|117\|150\|183\)\[231\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_8tap_64p_\(upscale\|117\|150\|183\)\[264\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]struct[ ]audio_clock_info[ ]audio_clock_info_table\[16\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_stream_encoder.c
+    defsnc 'static[ ]const[ ]struct[ ]audio_clock_info[ ]audio_clock_info_table_\(36\|48\)bpc\[14\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_stream_encoder.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]dvmm_Hw_Setting_\(2DTiling\|Linear\)\[4\]\[9\][ ]=' drivers/gpu/drm/amd/display/dc/dce110/dce110_mem_input_v.c
+    defsnc 'static[ ]const[ ]struct[ ]phm_fuses_default[ ]vega10_fuses_default\[\][ ]=' drivers/gpu/drm/amd/powerplay/hwmgr/pp_overdriver.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]soft_dummy_pp_table\[\][ ]=' drivers/gpu/drm/amd/powerplay/hwmgr/processpptables.c
+    accept 'static[ ]const[ ]PWR_DFY_Section[ ]pwr_virus_section[123456][ ]=[ ][{]\([\n][\t]\.dfy_\(cntl\|addr_\(hi\|lo\)\)[ ]=[ ]0x[0-9a-f]*[,]\)*[\n][\t]\.dfy_data[ ]=[ ][{]\([\n]\([ \t]0x[0-9a-f]*[,]\)*\)*[\n][\t][}][,][\n][\t]\.dfy_size[ ]=[ ][0-9]*[\n][}][;]' drivers/gpu/drm/amd/powerplay/inc/polaris10_pwrvirus.h
+    defsnc 'static[ ]const[ ]struct[ ]kx_odr_map[ ]samp_freq_table\[\][ ]=' drivers/iio/accel/kxcjk-1013.c
+    defsc 'static[ ]const[ ]struct[ ]reg_8[ ]imx274_\(mode\(1_3840x2160\|3_1920x1080\|5_1280x720\)_raw10\|start_2\)\[\][ ]=' drivers/media/i2c/imx274.c
+    defsnc '[\t]static[ ]const[ ]unsigned[ ]char[ ]\(y\|uv\)QuanTable51[18]\[\][ ]=' drivers/media/usb/gspca/ov519.c
+    defsnc 'static[ ]const[ ]u32[ ]t5_tp_mib_index_array\[9\]\[IREG_NUM_ELEM\][ ]=' drivers/net/ethernet/chelsio/cxgb4/cudbg_entity.h
+    defsnc 'static[ ]const[ ]struct[ ]tsadc_table[ ]rv1108_table\[\][ ]' drivers/thermal/rockchip_thermal.c
+    initnc '[/][*][ ]Seth[ ]Forshee.s[ ]regdb[ ]certificate[ ][*][/]' net/wireless/certs/sforshee.hex
+    initnc '\(Read\|Fill\)[ ]buffer[ ]content:' tools/testing/selftests/android/ion/README
+    blobname 'amdgpu[/]%s_\(pfp\|[mc]e\|mec2\?\)_2\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v8_0.c
+    blobname 'nvidia[/]tegra186[/]vic04_ucode\.bin' drivers/gpu/drm/tegra/vic.c
+    accept 'static[ ]const[ ]struct[ ]vic_config[ ]vic_t186_config[ ]=[ ][{][\n][\t]\.firmware[ ]=[ ]NVIDIA_TEGRA_186_VIC_FIRMWARE[,]' drivers/gpu/drm/tegra/vic.c
+    blobname 'gsl3680-chuwi-hi8-pro\.fw' drivers/platform/x86/silead_dmi.c
+    blobname 'gsl1686-digma_citi_e200\.fw' drivers/platform/x86/silead_dmi.c
+    accept '[/][*][ ]code[ ]to[ ]directly[ ]load[ ]a[ ]firmware[ ]database[ ]through[ ]request_firmware[ ][*][/]' net/wireless/reg.c
+    accept '[\t]if[ ][(]request_firmware[(][&]sig[,][ ]["]regulatory\.db\.p7s["][,]' net/wireless/reg.c
+    accept '[\t]return[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]["]regulatory\.db["][,]' net/wireless/reg.c
+    accept '[\t]err[ ]=[ ]request_firmware[(][&]fw[,][ ]["]regulatory\.db["][,]' net/wireless/reg.c
+    accept '[\t][ ][*][ ]the[ ]new[ ]path[,][ ]using[ ]request_firmware_direct[(][)]' drivers/gpu/drm/msm/adreno/adreno_gpu.h
+    accept '[\t][ ][*][ ]finally[ ]fall[ ]back[ ]to[ ]request_firmware[(][)]' drivers/gpu/drm/msm/adreno/adreno_gpu.h
+    blobname 'hideep_ts_\(%04x\|[0-9a-f]*\)\.bin' drivers/input/touchscreen/hideep.c
+    blobname 'dpfe\.bin' drivers/memory/brcmstb_dpfe.c
+    accept '[\t]err[ ]=[ ]request_firmware[(][&]clm[,][ ]clm_name[,][ ]dev[)][;]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
+    accept '[\t]*DRM_DEBUG_DRIVER[(]["]%s[ ]fw[ ]request_firmware[ ]err=%d[\\]n["][,]' drivers/gpu/drm/i915/intel_uc_fw.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
