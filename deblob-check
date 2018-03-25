@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2018-01-07
+# deblob-check version 2018-03-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -900,6 +900,7 @@ set_except () {
   blobna 'equest_ihex_firmwar'
   # Catch request_firmare misdeblobbed by the above.
   blobname 'r[/][*][(]DEBLOBBED[)][*][/]e' 
+  blobna '[Uu]p\(date\|grade\)[^\n]*[Mm]icrocode'
   blobna 'MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\([ 	\n]*MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\)*'
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
@@ -4967,6 +4968,62 @@ set_except () {
     blobname 'dpfe\.bin' drivers/memory/brcmstb_dpfe.c
     accept '[\t]err[ ]=[ ]request_firmware[(][&]clm[,][ ]clm_name[,][ ]dev[)][;]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
     accept '[\t]*DRM_DEBUG_DRIVER[(]["]%s[ ]fw[ ]request_firmware[ ]err=%d[\\]n["][,]' drivers/gpu/drm/i915/intel_uc_fw.c
+
+    accept 'The[ ]kernel[ ]can[ ]update[ ]microcode' Documentation/x86/microcode.txt
+    accept 'requires[ ]rebuilding[ ]the[ ]kernel[ ]each[ ]time[ ]updated[ ]microcode' Documentation/x86/microcode.txt
+    accept '[\t][ ][ ]If[ ]you[ ]say[ ]Y[ ]here[,][ ]you[ ]will[ ]be[ ]able[ ]to[ ]update[ ]the[ ]microcode' arch/x86/Kconfig
+    blobna '[,][ ]please[ ]upgrade[ ]microcode' arch/x86/events/intel/core.c
+    blobna 'please[ ]update[ ]microcode[ ]to[ ]version:[ ]0x%x[ ][(]or[ ]later[)]' arch/x86/kernel/apic/apic.c
+    accept '[ ][*][ ]*This[ ]driver[ ]allows[ ]to[ ]upgrade[ ]microcode' arch/x86/kernel/cpu/microcode/'\(amd\|core\)\.c'
+    accept '[\t][ ][*][ ]operation[ ]-[ ]when[ ]the[ ]other[ ]hyperthread[ ]has[ ]updated[ ]the[ ]microcode' arch/x86/kernel/cpu/microcode/core.c
+    accept '[ ][*][ ]mc_bp_resume[ ]-[ ]Update[ ]boot[ ]CPU[ ]microcode[ ]during[ ]resume' arch/x86/kernel/cpu/microcode/core.c
+    blobna '[,][ ]update[ ]BIOS[ ]or[ ]microcode[ ]of[ ]the[ ]CPU[!]' drivers/hwmon/coretemp.c
+    accept '[ ][*][ ]ipr_update_ioa_ucode[ ]-[ ]Update[ ]IOA[\'"'"']s[ ]microcode' drivers/scsi/ipr.c
+    accept '[ ][*][ ]Initiate[ ]an[ ]adapter[ ]reset[ ]to[ ]update[ ]the[ ]IOA[\'"'"']s[ ]microcode' drivers/scsi/ipr.c
+    accept '[\t]*struct[ ]xenpf_microcode_update[ ]*microcode' include/xen/interface/platform.h
+
+    # New in 4.16
+    blobname 'board-2\.bin' Documentation/devicetree/bindings/net/wireless/qcom,ath10k.txt
+    accept '[ ]*microcode_update_cpu[(][)][ ]which[ ]would[ ]call[ ]microcode_init_cpu[(][)][ ]in[ ]this[ ]case' Documentation/power/suspend-and-cpuhotplug.txt
+    accept '[\t]\.irp[\t]b\([,][0-9]\)*\([,][1-3][0-9]\)*' arch/arm64/crypto/sha3-ce-core.S
+    accept '\.Lsha512_rcon:\([\n][\t]\.quad[\t]*[0-9a-fx, ]*\)*' arch/arm64/crypto/sha512-ce-core.S
+    accept '[ ][*][ ]only[ ]when[ ]microcode[ ]has[ ]been[ ]updated[.][ ]Caller[ ]holds[ ]microcode_mutex[ ]and[ ]CPU' arch/x86/kernel/cpu/common.c
+    accept '[	][ ][ ]any[ ]request_firmware[(]\(["]whatever\.bin["]\)[)]' drivers/base/Kconfig
+    accept 'static[ ]int[ ]_request_firmware_load[(]struct[ ]fw_sysfs[ ][*]fw_sysfs[,]' drivers/base/firmware_class.c
+    accept '[\t]ret[ ]=[ ]_request_firmware_load[(]fw_sysfs[,][ ]opt_flags[,][ ]timeout[)][;]' drivers/base/firmware_class.c
+    defsnc 'static[ ]const[ ]struct[ ]pll_freq_tbl[ ]a53pll_freq\[\][ ]=' drivers/clk/qcom/a53-pll.c
+    defsnc 'static[ ]unsigned[ ]int[ ]d\?sgl_ent_len\[\][ ]=' drivers/crypto/chelsio/chcr_algo.c
+    # FPGA configuration/programming files are named in Device Tree
+    # overlays supplied by users.
+    accept 'static[ ]int[ ]fpga_mgr_firmware_load[(]' drivers/fpga/fpga-mgr.c
+    accept '[\t]*return[ ]fpga_mgr_firmware_load[(]mgr[,][ ]info[,][ ]info->firmware_name[)]' drivers/fpga/fpga-mgr.c
+    # Nice, asm sources are in the same file, within #if 0/#endif!  License is ok, too.
+    defsnc 'static[ ]const[ ]uint32_t[ ]cwsr_trap_gfx8_hex\[\][ ]=' drivers/gpu/drm/amd/amdkfd/cwsr_trap_handler_gfx8.asm
+    blobname 'i915[/]cnl_dmc_ver1_06\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'i915[/]kbl_dmc_ver1_04\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'i915[/]skl_dmc_ver1_27\.bin' drivers/gpu/drm/i915/intel_csr.c
+    defsnc 'static[ ]const[ ]u32[ ]lan2coefftab16\[240\][ ]=' drivers/gpu/drm/sun4i/sun8i_ui_scaler.c
+    defsnc 'static[ ]const[ ]u32[ ]\(lan3\|bicubic8\)coefftab32_\(left\|right\)\[480\][ ]=' drivers/gpu/drm/sun4i/sun8i_ui_scaler.c
+    defsnc 'static[ ]const[ ]u32[ ]\(lan2\|bicubic4\)coefftab32\[480\][ ]=' drivers/gpu/drm/sun4i/sun8i_ui_scaler.c
+    defsnc '[}][ ]zopt2201_scale_\(als\|uvb\)\[\][ ]=' drivers/iio/light/zopt2201.c
+    blobname 'raydium_\(%#04x\|[x0-9a-f]*\)\.fw' drivers/input/touchscreen/raydium_i2c_ts.c
+    defsnc '[\t]*static[ ]const[ ]u8[ ]bufs\[\][ ]=' drivers/media/dvb/dvb-usb/cxusb.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]ov7740_vga\[\][ ]=' drivers/media/i2c/ov7740.c
+    accept '[ ][*][ ]@fw_get_done[\t]*flag[ ]set[ ]when[ ]request_firmware[(][)][ ]is[ ]complete' drivers/media/platform/s5p-mfc/s5p_mfc_common.h
+    defsnc 'static[ ]const[ ]struct[ ]iro[ ]iro_arr\[51\][ ]=' drivers/net/ethernet/qlogic/qed/qed_hsi.h
+    defsnc 'static[ ]const[ ]struct[ ]ath10k_mem_section[ ]qca6174_hw\(21\|30\)_register_sections\[\][ ]=' drivers/net/wireless/ath/ath10k/coredump.c
+    blobname 'mt7662\(_rom_patch\)\?\.bin' drivers/net/wireless/mediatek/mt76/mt76x2.h
+    defsnc 'static[ ]const[ ]struct[ ]mtk_pin_field_calc[ ]mt7622_pin_\(mode\|sr\|smt\|pu\|pd\|e[48]\|[tr]dsel\)_range\[\][ ]=' drivers/pinctrl/mediatek/pinctrl-mt7622.c
+    blobname 'gsl\(3670-surftab-twin-10-1-st10432-8\|3676-onda-obook-20-plus\|1680-chuwi-hi8\|3676-chuwi-vi8\|1680-trekstor-primebook-c13\|1686-teclast_x98plus2\|1680-teclast-x3-plus\)\.fw' drivers/platform/x86/silead_dmi.c
+    defsnc 'static[ ]const[ ]struct[ ]xvcu_pll_cfg[ ]xvcu_pll_cfg\[\][ ]=' drivers/soc/xilinx/xlnx_vcu.c
+    defsnc 'u16[ ]const[ ]crc_ccitt_false_table\[256\][ ]=' lib/crc-ccitt.c
+    defsc 'static[ ]const[ ]struct[ ]aic32x4_rate_divs[ ]aic32x4_divs\[\][ ]=' sound/soc/codecs/tlv320aic32x4.c
+    defsnc 'static[ ]char[ ]const[ ][*][ ]const[ ]compressor_ratio_text\[\][ ]=' sound/soc/codecs/tscs42xx.c
+    defsnc '[\t]const[ ]u8[ ]norm_addrs\[\][ ]=' sound/soc/codecs/tscs42xx.c
+    # The firmware file name is supplied by the user.
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]flash->data[,]\([^\n]*[\n]\+[^\n}]\)*err[ ]=[ ]nfp_nsp_write_flash[(]nsp[,][ ]fw[)]' drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+    accept '[\t]*\(rc[ ]=[ ]\)\?wil_request_firmware[(]wil[,][ \n\t]*\(wil->wil_fw_name\|WIL_BOARD_FILE_NAME\)[,][ \n\t]*\(true\|false\)[)][;]' drivers/net/wireless/ath/wil6210/main.c
+
     ;;
 
   */*freedo*.patch | */*logo*.patch)
