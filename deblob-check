@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2018-03-24
+# deblob-check version 2018-03-25
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5023,6 +5023,8 @@ set_except () {
     # The firmware file name is supplied by the user.
     accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]flash->data[,]\([^\n]*[\n]\+[^\n}]\)*err[ ]=[ ]nfp_nsp_write_flash[(]nsp[,][ ]fw[)]' drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
     accept '[\t]*\(rc[ ]=[ ]\)\?wil_request_firmware[(]wil[,][ \n\t]*\(wil->wil_fw_name\|WIL_BOARD_FILE_NAME\)[,][ \n\t]*\(true\|false\)[)][;]' drivers/net/wireless/ath/wil6210/main.c
+    accept '[\t]retval0[ ]=[ ]report_missing_free_firmware[^\n]*[\n][\t]retval[ ]=[ ]request_firmware_direct[(]' include/linux/firmware.h
+    accept '[\t]retval0[ ]=[ ]report_missing_free_firmware[^\n]*[\n][\t]retval[ ]=[ ]request_firmware_into_buf[(][&]xfw[,][ ]NONFREE_FIRMWARE' include/linux/firmware.h
 
     ;;
 
