@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2018-03-25
+# deblob-check version 2018-05-27
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5026,6 +5026,48 @@ set_except () {
     accept '[\t]retval0[ ]=[ ]report_missing_free_firmware[^\n]*[\n][\t]retval[ ]=[ ]request_firmware_direct[(]' include/linux/firmware.h
     accept '[\t]retval0[ ]=[ ]report_missing_free_firmware[^\n]*[\n][\t]retval[ ]=[ ]request_firmware_into_buf[(][&]xfw[,][ ]NONFREE_FIRMWARE' include/linux/firmware.h
 
+    # New in 4.17
+    defsnc 'static[ ]const[ ]u8[ ]sbox\[256\][ ]=' crypto/sm4_generic.c
+    defsnc 'static[ ]const[ ]u32[ ]ck\[\][ ]=' crypto/sm4_generic.c
+    defsc 'static[ ]const[ ]struct[ ]cipher_testvec[ ]speck\(128\|64\)_\(xts_\)\?\(enc\|dec\)_tv_template\[\][ ]=' crypto/testmgr.h
+    accept '[ ][*][ ]request_firmware_into_buf[(][)][ ]or[ ]request_firmware_nowait[(][)][ ]with' drivers/base/firmware_loader/main.c
+    defsnc 'static[ ]const[ ]struct[ ]clk_div_table[ ]mcu_div_table\[\][ ]=' drivers/clk/clk-stm32mp1.c
+    defsnc 'static[ ]const[ ]struct[ ]profile_mode_setting[ ]smu7_profiling\[6\][ ]=' drivers/gpu/drm/amd/powerplay/hwmgr/smu7_hwmgr.c
+    defsnc 'static[ ]const[ ]u32[ ]sun4i_frontend_vert_coef\[32\][ ]=' drivers/gpu/drm/sun4i/sun4i_frontend.c
+    defsnc 'static[ ]const[ ]u32[ ]sun4i_frontend_horz_coef\[64\][ ]=' drivers/gpu/drm/sun4i/sun4i_frontend.c
+    defsnc 'static[ ]const[ ]struct[ ]lv0104cs_mapping[ ]lv0104cs_calibscales\[\][ ]=' drivers/iio/light/lv0104cs.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]rf_init1_cdata1\[40\][ ]=' drivers/media/dvb-frontends/cxd2880/cxd2880_tnrdmd.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]rf_init1_cdata3\[80\][ ]=' drivers/media/dvb-frontends/cxd2880/cxd2880_tnrdmd.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]rf_init1_cdata5\[50\][ ]=' drivers/media/dvb-frontends/cxd2880/cxd2880_tnrdmd.c
+    defsnc 'static[ ]struct[ ]regval[ ]ov2685_1600x1200_regs\[\][ ]=' drivers/media/i2c/ov2685.c
+    defsnc 'static[ ]const[ ]struct[ ]regval[ ]ov5695_\(global\|2592x1944\|1920x1080\|1296x972\|1280x720\|640x480\)_regs\[\][ ]=' drivers/media/i2c/ov5695.c
+    defsnc 'u_short[ ]ebc_plain_map\[NR_KEYS\][ ]=' drivers/s390/char/defkeymap.c
+    defsnc 'static[ ]const[ ]int16_t[ ]g_pyramid\[8\]\[8\][ ]=' drivers/staging/media/atomisp/pci/atomisp2/css2400/isp/kernels/tdf/tdf_1.0/ia_css_tdf.host.c
+    accept 'MODULE_FIRMWARE[(]["]aica_firmware\.bin["][)][;]' sound/sh/aica.c
+    accept '[\t]err[ ]=[ ]request_firmware[(][&]fw_entry[,][ ]["]aica_firmware\.bin["][,]' sound/sh/aica.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]norm_addrs\[\][ ]=' sound/soc/codecs/tscs42xx.c
+    accept '[\t]FW=["][$]FWPATH[/]test-firmware\.bin["]' tools/testing/selftests/firmware/fw_lib.sh
+    accept '\([/][*][ ]0x1[ ]\[\^\\000\][*]\[\^[/]\\000\][/][/][&][ ][*][/][ ]\)\?0x1B[,][ ]0x5E[,][ ]0x78[,][ ]0x3D[,][ ]0x00[,][ ]0x00[,][ \n]0x00[,][ ]0x18[,][ ][0x1-9A-F, \n]*' 'security/apparmor/\(null\|stacksplit\)dfa.in'
+    blobname 'rtl_bt[/]rtl\(8723d\|8821c\)_\(config\|fw\)\.bin' drivers/bluetooth/btrtl.c
+    blobname 'amdgpu[/]vega12_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
+    blobname 'amdgpu[/]vega12_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'amdgpu[/]vega12_vce\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+    blobname 'i915[/]cnl_dmc_ver1_07\.bin' drivers/gpu/drm/i915/intel_csr.c
+    defsnc 'static[ ]const[ ]struct[ ]af9013_reg_mask_val[ ]demod_init_tab\[\][ ]=' drivers/media/dvb-frontends/af9013_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]af9013_reg_mask_val[ ]tuner_init_tab_\(env77h11d5\|mt2060\(_2\)\?\|mxl500\(3d\|5\)\|qt1010\|mc44s803\|unknown\|tda18271\)\[\][ ]=' drivers/media/dvb-frontends/af9013_priv.h
+    blobname '\(vpu[/]\)\?vpu_fw_imx51\.bin' drivers/media/platform/coda/coda-common.c
+    blobname 'v4l-codahx4-imx51\.bin' drivers/media/platform/coda/coda-common.c
+    blobname 's5p-mfc-v10\.fw' drivers/media/platform/s5p-mfc/s5p_mfc.c
+    blobname 'example[ ]file[ ]wl1251-nvs\.bin[,][^*]*[*][/]' drivers/net/wireless/ti/wl1251/main.c
+    blobname '["]brcm[/]["]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h
+    blobname 'brcmfmac43\(143\|241b[045]\|29\|3[0459]\|340\|362\|430\(a0\)\?\|455\|5[46]\|73\)-sdio' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+    blobname 'brcmfmac43\(602\|50\(c2\)\?\|56\|570\|5[89]\|65[bc]\|66[bc]\|71\)-pcie' drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+    blobname 'brcmfmac43\(143\|236b\|242a\|569\|73\)' drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+    accept '[\t]struct[ ]brcmf_fw_name[ ]fwnames\[\][ ]=[ ][{][\n][\t][\t][{][ ]["]\.bin["]' 'drivers/net/wireless/broadcom/brcm80211/brcmfmac/\(pcie\|sdio\|usb\)\.c'
+    # We require a semicolon after MODULE_FIRMWARE, which this
+    # in-macro occurrence does not have, so take the semicolon from
+    # the previous in-macro declaration.
+    blobname '[;][ ]\\[\n]MODULE_FIRMWARE[(]BRCMF_FW_DEFAULT_PATH[^)]*[)]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h
     ;;
 
   */*freedo*.patch | */*logo*.patch)
