@@ -505,7 +505,7 @@ reject_firmware_nowait(struct module *module, int uevent,\
 	report_missing_free_firmware(dev_name(device), NULL);\
 	/* We assume NONFREE_FIRMWARE will not be found; how could it?  */\
 	return request_firmware_nowait(module, uevent, NONFREE_FIRMWARE,\
-				       device, gfp, NULL, cont);\
+				       device, gfp, context, cont);\
 }\
 static inline int\
 maybe_reject_firmware_nowait(struct module *module, int uevent,\

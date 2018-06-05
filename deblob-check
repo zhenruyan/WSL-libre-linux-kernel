@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2018-05-27
+# deblob-check version 2018-06-05
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1599,8 +1599,6 @@ set_except () {
     blobna 'chip->firmware[ ]=[ ]firmware[;]' sound/pci/riptide/riptide.c
 
     blobname '\(multi\|digi\)face_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
-
-    blobname 'aica_firmware\.bin' sound/sh/aica.c
 
     accept '[ ][*][^*]*\([*]\+[^/*][^*]*\)*[*]*Caution:[ ]This[ ]API[^*]*\([*]\+[^/*][^*]*\)*[*]*request_firmware.' sound/sound_firmware.c
     accept 'static[ ]int[ ]do_mod_firmware_load[(]' sound/sound_firmware.c

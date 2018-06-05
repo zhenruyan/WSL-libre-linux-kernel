@@ -501,7 +501,7 @@ reject_firmware_nowait(struct module *module, int uevent,\
 	report_missing_free_firmware(dev_name(device), NULL);\
 	/* We assume NONFREE_FIRMWARE will not be found; how could it?  */\
 	return request_firmware_nowait(module, uevent, NONFREE_FIRMWARE,\
-				       device, gfp, NULL, cont);\
+				       device, gfp, context, cont);\
 }\
 static inline int\
 maybe_reject_firmware_nowait(struct module *module, int uevent,\
@@ -3132,11 +3132,7 @@ clean_blob sound/pci/rme9652/hdsp.c
 clean_kconfig sound/pci/Kconfig SND_HDSP
 clean_mk CONFIG_SND_HDSP sound/pci/rme9652/Makefile
 
-announce SND_AICA - "Dreamcast Yamaha AICA sound"
-reject_firmware sound/sh/aica.c
-clean_blob sound/sh/aica.c
-clean_kconfig sound/sh/Kconfig SND_AICA
-clean_mk CONFIG_SND_AICA sound/sh/Makefile
+# SND_AICA is no longer disabled, its firmware is Free Software.
 
 announce SND_MSND_PINNACLE - "Support for Turtle Beach MultiSound Pinnacle"
 clean_blob sound/isa/msnd/msnd_pinnacle.h
