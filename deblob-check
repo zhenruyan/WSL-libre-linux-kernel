@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2018-06-05
+# deblob-check version 2018-07-29
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -898,8 +898,10 @@ set_except () {
   # that deblobbing turns them into r/*DEBLOBBED*/e, a syntax error.
   blobna 'equest_firmwar'
   blobna 'equest_ihex_firmwar'
+  blobna 'irmware_reques' # catch _nowarn; also caches _cache, but that's ok.
   # Catch request_firmare misdeblobbed by the above.
   blobname 'r[/][*][(]DEBLOBBED[)][*][/]e' 
+  blobname 'f[/][*][(]DEBLOBBED[)][*][/]t' 
   blobna '[Uu]p\(date\|grade\)[^\n]*[Mm]icrocode'
   blobna 'MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\([ 	\n]*MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\)*'
   blobna 'DEFAULT_FIRMWARE'
@@ -5066,6 +5068,86 @@ set_except () {
     # in-macro occurrence does not have, so take the semicolon from
     # the previous in-macro declaration.
     blobname '[;][ ]\\[\n]MODULE_FIRMWARE[(]BRCMF_FW_DEFAULT_PATH[^)]*[)]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h
+
+    # Adjust for catching firmware_request
+    accept 'static[ ]int[ ]coda_firmware_request[(]' drivers/media/platform/code/coda-common.c
+    accept '[\t]*ret[ ]=[ ]coda_firmware_request[(]' drivers/media/platform/code/coda-common.c
+    accept '[\t]struct[ ]gb_bootrom_get_firmware_request[ ][*]firmware_request[;]' drivers/staging/greybus/bootrom.c
+    accept '[\t]*\(if[ ][(]op->request->payload_size[ ]!=[ ]\)\?sizeof[(][*]firmware_request[)]' drivers/staging/greybus/bootrom.c
+    accept '[\t]firmware_request[ ]=[ ]op->request->' drivers/staging/greybus/bootrom.c
+    accept '[\t]\(offset\|size\)[ ]=[ ]le32_to_cpu[(]firmware_request->' drivers/staging/greybus/bootrom.c
+    accept '[\t]struct[ ]gb_fw_download_\(find\|fetch\|release\)_firmware_request[ ][*]request[;]' drivers/staging/greybus/fw-download.c
+
+    # New in 4.18 (-rc6)
+    blobname 'amdgpu[/]vega\(m\|20\)_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
+    blobname 'amdgpu[/]vega\(m\|20\)_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'amdgpu[/]vega\(m\|20\)_vce\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+    blobname 'amdgpu[/]vegam_\(ce\|pfp\|me\|mec\|mec2\|rlc\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v8_0.C
+    blobname 'amdgpu[/]\(vega\(10\|12\|20\)\|raven\)_\(ce\|pfp\|me\|mec\|mec2\|rlc\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_0.C
+    blobname 'amdgpu[/]vega\(10\|12\|20\)_\(sos\|asd\)\.bin' drivers/gpu/drm/amd/amdgpu/psp_v3_1.C
+    blobname 'amdgpu[/]vegam_sdma1\?\.bin' drivers/gpu/drm/amd/amdgpu/sdma_v3_0.C
+    blobname 'amdgpu[/]\(vega\(10\|12\|20\)\|raven\)_sdma1\?\.bin' drivers/gpu/drm/amd/amdgpu/sdma_v4_0.C
+    blobname 'amdgpu[/]vega\(m\|10\|10_acg12\|20\)_smc\.bin' drivers/gpu/drm/amd/amdgpu/smumgr.c
+    blobna 'https:[/][/]git\.kernel\.org[/][^"\n]*firmware\.git[/]tree[/]i915' drivers/gpu/drm/i915/intel_uc_fw.h
+    blobna 'You[ ]can[ ]use[ ][^"\n]*to[ ]get[ ]the[ ]firmware\.\?' drivers/media/usb/dvb-usb/dvb-usb-firmware.c
+    blob '[ ][*][ ]Firmware[ ]is:[\n][ ][*][	]Derived[ ]from[ ]proprietary[^*]*\([*]\+[^/*][^*]*\)*notice[ ]is[ ]accompanying[ ]it\.[\n][ ][*][/]' drivers/net/tg3.c
+    blobname 'gsl\(3692-jumper-ezpad-6-pro\|3680-\(pov-mobii-wintab-p800w-v20\|onda-v891w-v1\)\)\.fw' drivers/platform/x86/silead_dmi.c
+    blobname 'ctefx-\(sbz\|r3di\)\.bin' sound/pci/hda/patch_ca0132.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]float_\(vol_db\|zero_to_one\|xbass_xover\)_lookup\[\][ ]=' sound/pci/hda/patch_ca0132.c
+    blobna '[\t][/][*][\n][\t][ ][*][ ]Use[ ]default[ ]ctefx\.bin[ ]if[^*]*\([*]\+[^/*][^*]*\)*[*][/]' sound/pci/hda/patch_ca0132.c
+    defsnc 'static[ ]struct[ ]hda_verb[ ]sbz_init_verbs\[\][ ]=' sound/pci/hda/patch_ca0132.c
+    accept '\([ ]*:functions:[ ]\)\?firmware_request_\(nowarn\|cache\)\([(][)]\)\?' Documentation/driver-api/firmware/request_firmware.rst
+    accept 'this[ ]can[ ]be[ ]done[ ]with[ ]firmware_request_cache[(][)][ ]' Documentation/driver-api/firmware/request_firmware.rst
+    accept '[ ]*[.][.][.][\n][ ]*9[ ]*176[ ]*0[ ]*1[ ]*186[ 0-9\n]*' Documentation/vm/zsmalloc.rst
+    defsnc '\.Lmorus1280_\(const\|counter\):' arch/x86/crypto/morus1280-avx2-asm.S
+    defsnc 'static[ ]const[ ]struct[ ]cipher_testvec[ ]\(\(des3_ede\|bf\)_cbc\|tf_xts\|serpent\|tnepres\|serpent_xts\|speck128\|speck128_xts\|speck64_xts\|cast6_xts\|aes\|aes_cbc\|aes_xts\|aes_ctr_rfc3686\|tea\|xtea\|anubis\|anubis_cbc\|xeta\|camellia_cbc\|camellia_xts\|salsa20_stream\|chacha20\|cts_mode\)_tv_template\[\][ ]=' crypto/testmgr.h
+    accept '[\t ]*mechanism[ ]is[ ]request_firmware_direct[(][)][.]' drivers/base/firmware_loader/Kconfig
+    accept '[ ][*][ ]request_firmware[(][)][ ]-[ ]send[ ]firmware[ ]request' drivers/base/firmware_loader/main.c
+    accept 'request_firmware[(]const[ ]struct[ ]firmware[ ][*][*]firmware_p[,]' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]firmware_request_nowarn[(][)][ ]-[ ]request[ ]for[ ]an[ ]optional[ ]fw[ ]module' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]This[ ]function[ ]is[ ]similar[ ]in[ ]behaviour[ ]to[ ]request_firmware[(][)][,]' drivers/base/firmware_loader/main.c
+    accept 'int[ ]firmware_request_nowarn[(]const[ ]struct[ ]firmware[ ][*][*]firmware[,]' drivers/base/firmware_loader/main.c
+    accept '[\t]*ret[ ]=[ ]_request_firmware[(]firmware[,][ ]name[,][ ]device' drivers/base/firmware_loader/main.c
+    accept 'EXPORT_SYMBOL_GPL[(]firmware_request_\(nowarn\|cache\)[)]' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]request_firmware_direct[(][)][ ]-[ ]load[ ]firmware[ ]directly' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]firmware_request_cache[(][)][ ]-[ ]cache[ ]firmware[ ]for[ ]suspend' drivers/base/firmware_loader/main.c
+    accept 'int[ ]firmware_request_cache[(]struct[ ]device[ ][*]device[,]' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]request_firmware_into_buf[(][)][ ]-[ ]load[ ]firmware[ ]into[ ]a[ ]previously[ ]allocated[ ]buffer' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]request_firmware_nowait[(][)][ ]-[ ]asynchronous[ ]version[ ]of[ ]request_firmware' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ \t]*Asynchronous[ ]variant[ ]of[ ]request_firmware[(][)][ ]for[ ]user[ ]contexts:' drivers/base/firmware_loader/main.c
+    accept 'int[\n]request_firmware_nowait[(][\n][\t]struct[ ]module[ ][*]module' drivers/base/firmware_loader/main.c
+    accept '[\t]INIT_WORK[(][&]fw_work->work[,][ ]request_firmware_work_func[)]' drivers/base/firmware_loader/main.c
+    defsnc 'static[ ]struct[ ]clk_div_table[ ]nand_div_table\[\][ ]=' drivers/clk/actions/owl-s900.c
+    defsc 'static[ ]struct[ ]clk_factor_table[ ]sd_factor_table\[\][ ]=' drivers/clk/actions/owl-s900.c
+    defsnc '[\t][}][ ]id\[\][ ]=' drivers/crypto/caam/ctrl.c
+    defsc 'static[ ]const[ ]struct[ ]IP_BASE[ ]\(ATHUB\|CLK\|DCE\|DF\|FUSE\|GC\|HDP\|MMHUB\|MP[01]\|NBIO\|OSSSYS\|SDMA[01]\|SMUIO\|THM\|UMC\|UVD\|VCE\|XDMA\|RSMU\)_BASE[ ]*=' drivers/gpu/drm/amd/include/vega20_ip_offset.h
+    defsc 'vegam_power_tune_data_set_array\[POWERTUNE_DEFAULT_SET_MAX\][ ]=' drivers/gpu/drm/amd/powerplay/smumgr/vegam_smumgr.c
+    defsnc 'gv100_disp_core_mthd_head[ ]=' drivers/gpu/drm/nouveau/nvkm/engine/disp/coregv100.c
+    defsnc 'gv100_disp_wndw_mthd_base[ ]=' drivers/gpu/drm/nouveau/nvkm/engine/disp/wndwgv100.c
+    defsc 'gf100_grctx_alpha_beta_map\[17\]\[32\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgf100.c
+    defsnc 'gv100_grctx_init_sw_veid_bundle_init_0\[\][ ]=' drivers/gpu/drm/nouveau/nvkm/engine/gr/ctxgv100.c
+    defsnc 'static[ ]const[ ]struct[ ]dvb_pll_desc[ ]dvb_pll_tda665x_earth_pt1[ ]=' drivers/media/dvb-frontends/dvb-pll.c
+    defsnc 'static[ ]const[ ]struct[ ]imx258_reg[ ]mode_\(4208x3118\|2104_1560\|1048_780\)_regs\[\][ ]=' drivers/media/i2c/imx258.c
+    defsc 'static[ ]const[ ]struct[ ]reg_value[ ]ov7251_setting_vga_[369]0fps\[\][ ]=' drivers/media/i2c/ov7251.c
+    defsnc 'static[ ]const[ ]u8[ ]va1j5jf8007[st]_2[05]mhz_configs\[\]\[2\][ ]=' drivers/media/pci/pt1/pt1.c
+    defsnc 'static[ ]const[ ]struct[ ]iro[ ]iro_arr\[59\][ ]=' drivers/net/ethernet/qlogic/qed/qed_hsi.h
+    defsnc 'static[ ]const[ ]int[ ]pfuze3000_sw1a\[\][ ]=' drivers/regulator/pfuze100-regulator.c
+    accept 'struct[ ]gb_\(fw_download_\(find\|fetch\|release\)\|bootrom_get\)_firmware_request[ ][{]' drivers/staging/greybus/greybus_protocols.h
+    accept 'int[ ]firmware_request_nowarn[(]const[ ]struct[ ]firmware[ ][*][*]fw' include/linux/firmware.h
+    accept 'static[ ]inline[ ]int[ ]firmware_request_nowarn[(]const[ ]struct[ ]firmware[ ][*][*]fw' include/linux/firmware.h
+    accept 'int[ ]firmware_request_cache[(]struct[ ]device[ ][*]device' include/linux/firmware.h
+    accept '[\t]retval[ ]=[ ]firmware_request_nowarn[(][&]xfw[,][ ]NONFREE_FIRMWARE[,]' include/linux/firmware.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt1305_reg\[\][ ]=' sound/soc/codecs/rt1305.c
+    defsnc 'static[ ]char[ ]const[ ][*][ ]const[ ]comp_rat_txt\[\][ ]=' sound/soc/codecs/tscs454.c
+    accept '[ ]*[{]["]pid["]:21800[,]["]fd["]:5[,]["]prog_id["]:9[,]["]fd_type["]:["]uprobe["][,]["]filename["]:["][/]home[/]yhs[/]a\.out["][,]["]offset["]:1159[}]\]' tools/bpf/bpftool/Documentation/bpftool-perf.rst
+    accept '[#][ ]a[ ]file[ ]whose[ ]name[ ]is[ ]that[ ]of[ ]the[ ]specified[ ]litmus[ ]test[,][ ]but[ ]with[ ]["]\.out["]' tools/memory-model/scripts/checkalllitmus.sh
+    accept '[#][ ]with[ ]["]\.out["][ ]appended\.' tools/memory-model/scripts/checkalllitmus.sh
+    accept 'static[ ]struct[ ]bpf_test[ ]tests\[\][ ]=[ ][{][\n]\([^}][^\n]*[\n][\n]*\)*[}][;]' tools/testing/selftests/bpf/test_verifier.c
+    # Sources are in cwsr_trap_handler_gfx[89].asm.
+    defsnc 'static[ ]const[ ]uint32_t[ ]cwsr_trap_gfx[89]_hex\[\][ ]=' drivers/gpu/drm/amd/amdkfd/cwsr_trap_handler.h
+    blobname 'amd[/]sev\.fw' drivers/crypto/ccp/psp-dev.c
+    blobname 'chipone[/]icn8505-\(%s\|[^.",)]*\)\.fw' drivers/input/touchscreen/chipone_icn8505.c
+    accept '[\t]*return[ ]firmware_request_cache[(]dev->dev[,][ ]MT7601U_FIRMWARE[)]' drivers/net/wireless/mediatek/mt7601u/mcu.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
