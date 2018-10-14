@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2018-07-29
+# deblob-check version 2018-10-14
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5148,6 +5148,64 @@ set_except () {
     blobname 'amd[/]sev\.fw' drivers/crypto/ccp/psp-dev.c
     blobname 'chipone[/]icn8505-\(%s\|[^.",)]*\)\.fw' drivers/input/touchscreen/chipone_icn8505.c
     accept '[\t]*return[ ]firmware_request_cache[(]dev->dev[,][ ]MT7601U_FIRMWARE[)]' drivers/net/wireless/mediatek/mt7601u/mcu.c
+
+    # New in 4.19-rc7.
+    accept '[\t]*reg[ ]=[ ][<]\(0x\(40\)\?[08][ ]0xd[02][01][0-9a-f]0000[ ]0x0[ ]0x10000[\n\t ]*\)*[>][;]' 'Documentation/devicetree/bindings/crypto/hisilicon,hip07-sec\.txt\|arch/arm64/boot/dts/hisilicon/hip07\.dtsi'
+    defsnc 'const[ ]u8[ ]sha384_zero_message_hash\[SHA384_DIGEST_SIZE\][ ]=' crypto/sha512_generic.c
+    defsnc 'const[ ]u8[ ]sha512_zero_message_hash\[SHA512_DIGEST_SIZE\][ ]=' crypto/sha512_generic.c
+    defsnc 'static[ ]const[ ]char[ ]vmac64_string1\[144\][ ]=' crypto/testmgr.h
+    defsc 'static[ ]struct[ ]clk_factor_table[ ]lcd_factor_table\[\][ ]=' drivers/clk/actions/owl-s700.c
+    defsnc 'static[ ]int[ ]avs_map\[\][ ]=' drivers/cpufreq/armada-37xx-cpufreq.c
+    defsnc 'static[ ]const[ ]u32[ ]a6xx_registers\[\][ ]=' drivers/gpu/drm/msm/adreno/a6xx_gpu.c
+    defsnc '[\t]static[ ]const[ ]uint32_t[ ]off_tbl\[QSEED3_FILTERS\]\[QSEED3_LUT_REGIONS\]\[2\][ ]=' drivers/gpu/drm/msm/disp/dpu1/dpu_hw_util.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_value[ ]ov2680_setting_30fps_\(QUXGA_800_600\|UXGA_1600_1200\)\[\][ ]=' drivers/media/i2c/ov2680.c
+    defsnc 'static[ ]const[ ]uint8_t[ ]zigzag\[64\][ ]=' drivers/media/platform/vicodec/vicodec-codec.c
+    defsnc 'static[ ]const[ ]int[ ]quant_table\(_p\)\?\[\][ ]=' drivers/media/platform/vicodec/vicodec-codec.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]demod_init\[\]\[2\][ ]=' drivers/media/usb/dvb-usb-v2/gl861.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]cs47l35_reva_16_patch\[\][ ]=' drivers/mfd/cs47l35-tables.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]cs47l85_rev[ac]_\(16\|32\)_patch\[\][ ]=' drivers/mfd/cs47l85-tables.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]cs47l90_reva_16_patch\[\][ ]=' drivers/mfd/cs47l90-tables.c
+    defsnc 'static[ ]const[ ]u16[ ]rtl8366rb_init_jam_\(ver_[0123]\|f5d8235\)\[\][ ]=' drivers/net/dsa/rtl8366rb.c
+    defsnc '[\t]static[ ]const[ ]int[ ]mt76x0_tx_pwr_ch_list\[\][ ]=' drivers/net/wireless/mediatek/mt76/mt76x0/phy.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]madera_pin_single_group_pins\[\][ ]=' drivers/pinctrl/cirrus/pinctrl-madera-core.c
+    defsnc 'static[ ]const[ ]int[ ]adp5061_vmax\[36\][ ]=' drivers/power/supply/adp5061.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]sw2_sw4_val_tbl\[\][ ]=' drivers/regulator/cpcap-regulator.c
+    defsnc '[}][ ]segdist_codes\[\][ ]=' drivers/slimbus/stream.c
+    accept '#define[ ]PIOLED_GAMMA[\t]["]\([0234][ ]\|["][ ][\\][\n\t ]*["]\)*["]' drivers/staging/fbtft/fbtft_device.c
+    defsnc 'static[ ]const[ ]struct[ ]cp210x_rate[ ]cp210x_an205_table1\[\][ ]=' drivers/usb/serial/cp210x.c
+    defsnc 'static[ ]const[ ]u8[ ]\(precedence\|diffserv[843]\|besteffort\)\[\][ ]=' net/sched/sch_cake.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt5682_reg\[\][ ]=' sound/soc/codecs/rt5682.c
+    defsnc 'static[ ]struct[ ]hda_verb[ ]ca0132_init_verbs1\[\][ ]=' sound/pci/hda/patch_ca0132.c
+    blobname 'imx[/]sdma[/]sdma-imx31\.bin' arch/arm/boot/dts/imx31.dtsi
+    blobname 'imx[/]sdma[/]sdma-imx6q\.bin' arch/arm/boot/dts/imx6sll.dtsi
+    blobname 'mediatek[/]mt7622pr2h\.bin' drivers/bluetooth/btmtkuart.c
+    blobname 'qca[/]crnv%02x\.bin' drivers/bluetooth/btqca.c
+    blobname 'rtl_bt[/]rtl8723[bd]s_fw\.bin' drivers/bluetooth/btrtl.c
+    blobname '%s\(-%s\)\?\.bin' drivers/bluetooth/btrtl.c
+    blobname 'cf-fsi-fw\.bin' drivers/fsi/fsi-master-ast-cf.c
+    blobname 'amdgpu[/]\(bonaire\|hawaii\)_\(k_\)\?smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
+    blobname 'amdgpu[/]\(bonaire\|kabini\|kaveri\|hawaii\|mullins\)_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'amdgpu[/]\(bonaire\|kabini\|kaveri\|hawaii\|mullins\)_vce\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+    blobname 'amdgpu[/]%s_smc\.bin' 'drivers/gpu/drm/amd/amdgpu/[cs]i_dpm\.c'
+    blobname 'amdgpu[/]si58_mc\.bin' drivers/gpu/drm/amd/amdgpu/gmc_v6_0.c
+    blobname 'a630_\(sqe\.fw\|gmu\.bin\)' drivers/gpu/drm/msm/adreno/adreno_device.c
+    blobname 'qcom[/]venus-5\.2[/]venus\.mdt' drivers/media/platform/qcom/venus/core.c
+    blobname 'mellanox[/]mlxsw_spectrum-\(["][ ]__stringify[(]MLXSW_SP1_FWREV_[^)]*[)][ \\\n\t]*["]\.\)*mfa2' drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+    blobname 'wil6436\(_ftm\)\?\.fw' drivers/net/wireless/ath/wil6210/wil6210.h
+    blobna '[/][*][ ]brcmfmac436\(02\|6b\)-pcie\.\(ap\.\)\?bin[ ]from[ ]linux-firmware\.git[ ]commit[ ][0-9a-f]*[ ][*][/]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c
+    blobname 'mediatek[/]mt7610u\.bin' drivers/net/wireless/mediatek/mt76/mt76x0/usb.h
+    blobname 'mediatek[/]mt7662u\(_rom_patch\)\?\.bin' drivers/net/wireless/mediatek/mt76/mt76x2.h
+    blobname 'gsl3680-chuwi-vi10\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'gsl1680-connect-tablet9\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'gsl3692-cube-knote-i1101\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'gsl1680-onda-v820w-32g\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'gsl3676-onda-v891w-v3\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'keystone-dsp%d-fw' drivers/remoteproc/keystone_remoteproc.c
+    blobname 'mba\.mbn' drivers/remoteproc/qcom_q6v5_pil.c
+    blobname 'IPQ8074[/]q6_fw\.mdt' drivers/remoteproc/qcom_q6v5_wcss.c
+    blobname '%s-%s-%s\.bin' sound/soc/codecs/wm_adsp.c
+    accept '[\t]*rc[ ]=[ ]wil_request_firmware[(]wil[,][ ]board_file[,][ ]true[)][;]' drivers/net/wireless/ath/wil6210/main.c
+    blobna '[ ]\(Important[ ]Notes\|Obtaining[ ]and[ ]Creating\)[^\n]*\([\n]#\([\n]#\([\n]#[ ]*For[ ]the\)\?\)\?[ ][^\n]*\)\+' Documentation/sound/cards/multisound.sh
     ;;
 
   */*freedo*.patch | */*logo*.patch)
