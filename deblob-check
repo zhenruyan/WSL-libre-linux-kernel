@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-09-27
+# deblob-check version 2014-09-28
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3810,6 +3810,7 @@ set_except () {
     blobname 'dvb-tuner-si2158-a20-01\.fw' drivers/media/tuners/si2157_priv.h
     blobname 'brcm[/]brcmfmac43\(602\|5[46]\|570\)-pcie\.bin' drivers/net/wireless/brcm80211/brcmfmac/pcie.c
     blobname 'r8a779x_usb3_v1\.dlmem' drivers/usb/host/xhci-rcar.c
+    blobname 'iwlwifi-3165-' drivers/net/wireless/iwlwifi/iwl-7000.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
