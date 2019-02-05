@@ -1,13 +1,14 @@
 #! /bin/sh
 
 # deblob-check version 2014-12-07 + 2015-09-22's r12444
+#                         + partial 2015-06-06's r12228
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2014 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2015 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -3972,6 +3973,9 @@ set_except () {
 
     # New in 4.2.1 and 4.1.8.
     defsnc '[}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
+
+    # New in 4.1 (and 3.18.25).
+    blobname 'iwlwifi-7265D-' drivers/net/wireless/iwlwifi/pcie/7000.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
