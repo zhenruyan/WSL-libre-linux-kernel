@@ -1,8 +1,12 @@
 #!/bin/sh
 
-#    Copyright (C) 2008, 2009, 2010 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2012 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
+#
+#    This program is part of GNU Linux-libre, a GNU project that
+#    publishes scripts to clean up Linux so as to make it suitable for
+#    use in the GNU Project and in Free System Distributions.
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,7 +48,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.30 extra=3
+kver=2.6.30 extra=
 
 case $1 in
 --force)
@@ -273,19 +277,19 @@ for f in \
 done
 
 # Identify the tarball.
-grep -q 'EXTRAVERSION.*-libre' Makefile ||
-clean_sed "s,^EXTRAVERSION.*,&-libre$extra,
-" Makefile 'added -libre to EXTRAVERSION'
+grep -q 'EXTRAVERSION.*-gnu' Makefile ||
+clean_sed "s,^EXTRAVERSION.*,&-gnu$extra,
+" Makefile 'added -gnu to EXTRAVERSION'
 
 grep -q Linux-libre README ||
 clean_sed '
-1,3 s,Linux kernel release.*kernel\.org.*,Linux-libre <http://linux-libre.fsfla.org>,
-2,5 s,Linux version 2.6,Linux-libre,
+1,3 s,Linux kernel release.*kernel\.org.*,GNU Linux-libre <http://linux-libre.fsfla.org>,
+2,5 s,Linux version [0-9.]*,GNU Linux-libre,
 1,20 s,\(operating system \)\?Unix,Unix kernel,
 /WHAT IS LINUX/i\
-WHAT IS Linux-libre?\
+WHAT IS GNU Linux-libre?\
 \
-  Linux-libre is a Free version of the kernel Linux (see below),\
+  GNU Linux-libre is a Free version of the kernel Linux (see below),\
   suitable for use with the GNU Operating System in 100% Free\
   GNU/Linux-libre System Distributions.\
   http://www.gnu.org/distros/\
@@ -299,21 +303,22 @@ WHAT IS Linux-libre?\
 \
   Linux-libre started within the gNewSense GNU/Linux distribution.\
   It was later adopted by Jeff Moe, who coined its name, and in 2008\
-  it became a project maintained by FSF Latin America.\
+  it became a project maintained by FSF Latin America.  In 2012, it\
+  became part of the GNU Project.\
 \
-  The Linux-libre project takes a minimal-changes approach to cleaning\
-  up Linux, making no effort to substitute components that need to be\
-  removed with functionally equivalent Free ones.  Nevertheless, we\
-  encourage and support efforts towards doing so.\
+  The GNU Linux-libre project takes a minimal-changes approach to\
+  cleaning up Linux, making no effort to substitute components that\
+  need to be removed with functionally equivalent Free ones.\
+  Nevertheless, we encourage and support efforts towards doing so.\
   http://libreplanet.org/wiki/LinuxLibre:Devices_that_require_non-free_firmware\
 \
   Our mascot is Freedo, a light-blue penguin that has just come out\
-  of the the shower.  Although we like penguins, GNU is a much\
-  greater contribution to the entire system, so its mascot deserves\
-  more promotion.  See our web page for their images.\
+  of the shower.  Although we like penguins, GNU is a much greater\
+  contribution to the entire system, so its mascot deserves more\
+  promotion.  See our web page for their images.\
   http://linux-libre.fsfla.org/\
 
-' README 'added blurb about Linux-libre'
+' README 'added blurb about GNU Linux-libre'
 
 # Add reject_firmware and maybe_reject_firmware
 grep -q _LINUX_LIBRE_FIRMWARE_H include/linux/firmware.h ||
@@ -820,6 +825,7 @@ clean_mk CONFIG_DVB_TTUSB_BUDGET drivers/media/dvb/ttusb-budget/Makefile
 announce DVB_TTUSB_DEC - "Technotrend/Hauppauge USB DEC devices"
 reject_firmware drivers/media/dvb/ttusb-dec/ttusb_dec.c
 clean_blob drivers/media/dvb/ttusb-dec/ttusb_dec.c
+clean_blob Documentation/dvb/ttusb-dec.txt
 clean_kconfig drivers/media/dvb/ttusb-dec/Kconfig 'DVB_TTUSB_DEC'
 clean_mk CONFIG_DVB_TTUSB_DEC drivers/media/dvb/ttusb-dec/Makefile
 
@@ -827,6 +833,8 @@ clean_mk CONFIG_DVB_TTUSB_DEC drivers/media/dvb/ttusb-dec/Makefile
 
 announce VIDEO_BT848 - "BT848 Video For Linux"
 reject_firmware drivers/media/video/bt8xx/bttv-cards.c
+clean_blob drivers/media/video/bt8xx/bttv-cards.c
+clean_blob Documentation/video4linux/bttv/README
 clean_kconfig drivers/media/video/bt8xx/Kconfig 'VIDEO_BT848'
 clean_mk CONFIG_VIDEO_BT848 drivers/media/video/bt8xx/Makefile
 
@@ -1140,6 +1148,7 @@ drop_fw_file firmware/cis/LA-PCM.cis.ihex firmware/cis/LA-PCM.cis
 
 announce 3C359 - "3Com 3C359 Token Link Velocity XL adapter"
 drop_fw_file firmware/3com/3C359.bin.ihex firmware/3com/3C359.bin
+reject_firmware drivers/net/tokenring/3c359.c
 clean_blob drivers/net/tokenring/3c359.c
 clean_kconfig drivers/net/tokenring/Kconfig '3C359'
 clean_mk CONFIG_3C359 drivers/net/tokenring/Makefile
@@ -1286,7 +1295,7 @@ clean_blob drivers/net/wireless/libertas_tf/if_usb.c
 clean_kconfig drivers/net/wireless/Kconfig 'LIBERTAS_THINFIRM_USB'
 clean_mk CONFIG_LIBERTAS_THINFIRM_USB drivers/net/wireless/libertas_tf/Makefile
 
-announce MWL8K - 'Marvell 88W8xxx PCI/PCIe Wireless support'
+announce MWL8K - "Marvell 88W8xxx PCI/PCIe Wireless support"
 reject_firmware drivers/net/wireless/mwl8k.c
 clean_blob drivers/net/wireless/mwl8k.c
 clean_kconfig drivers/net/wireless/Kconfig 'MWL8K'
@@ -1315,7 +1324,7 @@ clean_blob drivers/net/wireless/p54/p54usb.h
 clean_kconfig drivers/net/wireless/p54/Kconfig 'P54_USB'
 clean_mk CONFIG_P54_USB drivers/net/wireless/p54/Makefile
 
-announce PRISM54 - 'Intersil Prism GT/Duette/Indigo PCI/Cardbus'
+announce PRISM54 - "Intersil Prism GT/Duette/Indigo PCI/Cardbus"
 reject_firmware drivers/net/wireless/prism54/islpci_dev.c
 clean_blob drivers/net/wireless/prism54/islpci_dev.c
 clean_sed '
@@ -1996,7 +2005,6 @@ clean_mk CONFIG_SOUND_PSS sound/oss/Makefile
 announce Documentation - "non-Free firmware scripts and documentation"
 clean_blob Documentation/dvb/avermedia.txt
 clean_blob Documentation/dvb/opera-firmware.txt
-clean_blob Documentation/dvb/ttusb-dec.txt
 clean_blob Documentation/sound/alsa/ALSA-Configuration.txt
 clean_blob Documentation/sound/oss/MultiSound
 clean_blob Documentation/sound/oss/PSS
