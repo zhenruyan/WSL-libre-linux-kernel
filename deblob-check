@@ -4596,6 +4596,11 @@ set_except () {
     # Backported into 4.9.94.
     # New in 4.13
     defsnc 'static[ ]const[ ]struct[ ]cpg_pll_config[ ]cpg_pll_configs\[8\][ ]__initconst[ ]=' drivers/clk/renesas/clk-rcar-gen2.c
+
+    # Backported into 4.9.95.
+    # New in 4.10-rc*.
+    accept '\.LK256:\([\n][ 	]*\.long[ 	]*0\(x[0-9a-f]*\([,]0x[0-9a-f]*\)*\)\?\)*[ \t]*[/][/][ ]*terminator' arch/arm64/crypto/sha256-core.S_shipped
+    accept '\.LK512:\([\n][ 	]*\.quad[ 	]*0\(x[0-9a-f]*\([,]0x[0-9a-f]*\)*\)\?\)*[ \t]*[/][/][ ]*terminator' arch/arm64/crypto/sha512-core.S_shipped
     ;;
 
   */*freedo*.patch | */*logo*.patch)
