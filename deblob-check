@@ -2,6 +2,7 @@
 
 # deblob-check version 2011-07-21 + 2011-11-10's r8178
 #                         + partial 2011-10-09's r8115
+#				  + 2012-02-03's r8344
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2850,6 +2851,9 @@ set_except () {
     accept '[	]\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'nouveau[/]\(nv%02x_\)\?%s' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'radeon[/]SUMO2\?_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
+
+    blobna '[/][*][\n][ ][*][ ]AMD[ ]microcode[ ]firmware[ ]naming[ ]convention[^*]*\([*]\+[^/*][^*]*\)*[*]*amd-ucode[/][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' arch/x86/kernel/microcode_amd.c
+    blobname 'amd-ucode[/]microcode_amd_fam\(%\.2x\|[0-9a-f]*\)h\.bin' arch/x86/kernel/microcode_amd.c
   ;;
 
   */*freedo*.patch | */*logo*.patch)
