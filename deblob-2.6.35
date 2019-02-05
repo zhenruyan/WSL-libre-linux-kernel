@@ -37,15 +37,14 @@
 # See also:
 # http://wiki.debian.org/KernelFirmwareLicensing
 # svn://svn.debian.org/kernel/dists/trunk/linux-2.6/debian/patches/debian/dfsg/files-1
-# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/firmware/firmware-removed
-# http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/gen-kernel
+# http://wiki.gnewsense.org/Builder gen-kernel
 
 # Thanks to Brian Brazil @ gnewsense
 
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.35 extra=2
+kver=2.6.35 extra=3
 
 case $1 in
 --force)
@@ -194,17 +193,17 @@ clean_sed () {
 }
 
 reject_firmware () {
-  #$1 = file
+  #$1 = file $2 = pre sed pattern
   filetest $1 || return
-  clean_sed '
+  clean_sed "$2"'
 s,request\(_ihex\)\?_firmware\(_nowait\)\?,reject_firmware\2,g
 ' "$1" 'disabled non-Free firmware-loading machinery'
 }
 
 maybe_reject_firmware () {
-  #$1 = file
+  #$1 = file $2 = pre sed pattern
   filetest $1 || return
-  clean_sed '
+  clean_sed "$2"'
 s,request_firmware\(_nowait\)\?,maybe_reject_firmware\1,g
 ' "$1" 'retain Free firmware-loading machinery, disabling non-Free one'
 }
@@ -277,6 +276,44 @@ done
 grep -q 'EXTRAVERSION.*-libre' Makefile ||
 clean_sed "s,^EXTRAVERSION.*,&-libre$extra,
 " Makefile 'added -libre to EXTRAVERSION'
+
+grep -q Linux-libre README ||
+clean_sed '
+1,3 s,Linux kernel release.*kernel\.org.*,Linux-libre <http://linux-libre.fsfla.org>,
+2,5 s,Linux version 2.6,Linux-libre,
+1,20 s,\(operating system \)\?Unix,Unix kernel,
+/WHAT IS LINUX/i\
+WHAT IS Linux-libre?\
+\
+  Linux-libre is a Free version of the kernel Linux (see below),\
+  suitable for use with the GNU Operating System in 100% Free\
+  GNU/Linux-libre System Distributions.\
+  http://www.gnu.org/distros/\
+\
+  It removes non-Free components from Linux, that are disguised as\
+  source code or distributed in separate files.  It also disables\
+  run-time requests for non-Free components, shipped separately or as\
+  part of Linux, and documentation pointing to them, so as to avoid\
+  (Free-)baiting users into the trap of non-Free Software.\
+  http://www.fsfla.org/anuncio/2010-11-Linux-2.6.36-libre-debait\
+\
+  Linux-libre started within the gNewSense GNU/Linux distribution.\
+  It was later adopted by Jeff Moe, who coined its name, and in 2008\
+  it became a project maintained by FSF Latin America.\
+\
+  The Linux-libre project takes a minimal-changes approach to cleaning\
+  up Linux, making no effort to substitute components that need to be\
+  removed with functionally equivalent Free ones.  Nevertheless, we\
+  encourage and support efforts towards doing so.\
+  http://libreplanet.org/wiki/LinuxLibre:Devices_that_require_non-free_firmware\
+\
+  Our mascot is Freedo, a light-blue penguin that has just come out\
+  of the the shower.  Although we like penguins, GNU is a much\
+  greater contribution to the entire system, so its mascot deserves\
+  more promotion.  See our web page for their images.\
+  http://linux-libre.fsfla.org/\
+
+' README 'added blurb about Linux-libre'
 
 # Add reject_firmware and maybe_reject_firmware
 grep -q _LINUX_LIBRE_FIRMWARE_H include/linux/firmware.h ||
@@ -1145,24 +1182,28 @@ clean_blob drivers/net/pcmcia/smc91c92_cs.c
 clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_SMC91C92'
 clean_mk CONFIG_PCMCIA_SMC91C92 drivers/net/pcmcia/Makefile
 
-announce PCCARD - "PCCard (PCMCIA/CardBus) support"
-reject_firmware drivers/pcmcia/ds.c
-clean_kconfig drivers/pcmcia/Kconfig 'PCCARD'
-clean_mk CONFIG_PCCARD drivers/pcmcia/Makefile
+# CIS files are not software.
+# announce PCCARD - "PCCard (PCMCIA/CardBus) support"
+# reject_firmware drivers/pcmcia/ds.c
+# clean_kconfig drivers/pcmcia/Kconfig 'PCCARD'
+# clean_mk CONFIG_PCCARD drivers/pcmcia/Makefile
 
 announce PCMCIA_3C574 - "3Com 3c574 PCMCIA support"
+# This is not software; it's Free, but GPLed without in-tree sources.
 drop_fw_file firmware/cis/3CCFEM556.cis.ihex firmware/cis/3CCFEM556.cis
-clean_blob drivers/net/pcmcia/3c574_cs.c
-clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C574'
-clean_mk CONFIG_PCMCIA_3C574 drivers/net/pcmcia/Makefile
+# clean_blob drivers/net/pcmcia/3c574_cs.c
+# clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C574'
+# clean_mk CONFIG_PCMCIA_3C574 drivers/net/pcmcia/Makefile
 
 announce PCMCIA_3C589 - "3Com 3c589 PCMCIA support"
+# This is not software; it's Free, but GPLed without in-tree sources.
 drop_fw_file firmware/cis/3CXEM556.cis.ihex firmware/cis/3CXEM556.cis
-clean_blob drivers/net/pcmcia/3c589_cs.c
-clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C589'
-clean_mk CONFIG_PCMCIA_3C589 drivers/net/pcmcia/Makefile
+# clean_blob drivers/net/pcmcia/3c589_cs.c
+# clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C589'
+# clean_mk CONFIG_PCMCIA_3C589 drivers/net/pcmcia/Makefile
 
 announce PCMCIA_PCNET - "NE2000 compatible PCMCIA support"
+# These are not software; they're Free, but GPLed without in-tree sources.
 drop_fw_file firmware/cis/LA-PCM.cis.ihex firmware/cis/LA-PCM.cis
 drop_fw_file firmware/cis/PCMLM28.cis.ihex firmware/cis/PCMLM28.cis
 drop_fw_file firmware/cis/DP83903.cis.ihex firmware/cis/DP83903.cis
@@ -1170,9 +1211,9 @@ drop_fw_file firmware/cis/NE2K.cis.ihex firmware/cis/NE2K.cis
 drop_fw_file firmware/cis/tamarack.cis.ihex firmware/cis/tamarack.cis
 drop_fw_file firmware/cis/PE-200.cis.ihex firmware/cis/PE-200.cis
 drop_fw_file firmware/cis/PE520.cis.ihex firmware/cis/PE520.cis
-clean_blob drivers/net/pcmcia/pcnet_cs.c
-clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_PCNET'
-clean_mk CONFIG_PCMCIA_PCNET drivers/net/pcmcia/Makefile
+# clean_blob drivers/net/pcmcia/pcnet_cs.c
+# clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_PCNET'
+# clean_mk CONFIG_PCMCIA_PCNET drivers/net/pcmcia/Makefile
 
 # tokenring
 
@@ -1585,7 +1626,7 @@ reject_firmware drivers/net/wimax/i2400m/fw.c
 clean_blob drivers/net/wimax/i2400m/sdio.c
 clean_blob drivers/net/wimax/i2400m/usb.c
 clean_blob Documentation/wimax/README.i2400m
-clean_kconfig drivers/net/wimax/i2400m/Kconfig CONFIG_WIMAX_I2400M
+clean_kconfig drivers/net/wimax/i2400m/Kconfig 'WIMAX_I2400M'
 clean_mk CONFIG_WIMAX_I2400M drivers/net/wimax/i2400m/Makefile
 
 # infiniband
@@ -1618,16 +1659,21 @@ clean_mk CONFIG_MISDN_SPEEDFAX drivers/isdn/hardware/mISDN/Makefile
 ##########
 
 announce SERIAL_8250_CS - "8250/16550 PCMCIA device support"
+# These are not software; they're Free, but GPLed without in-tree sources.
 drop_fw_file firmware/cis/MT5634ZLX.cis.ihex firmware/cis/MT5634ZLX.cis
 drop_fw_file firmware/cis/RS-COM-2P.cis.ihex firmware/cis/RS-COM-2P.cis
 drop_fw_file firmware/cis/COMpad2.cis.ihex firmware/cis/COMpad2.cis
 drop_fw_file firmware/cis/COMpad4.cis.ihex firmware/cis/COMpad4.cis
+# These are not software; they're Free, but GPLed without textual sources.
+# It could be assumed that these binaries *are* sources, since they
+# can be trivially converted back to a textual form, without loss,
+# but we're better off safe than sorry, so remove them from our tree.
 drop_fw_file firmware/cis/SW_555_SER.cis.ihex firmware/cis/SW_555_SER.cis
 drop_fw_file firmware/cis/SW_7xx_SER.cis.ihex firmware/cis/SW_7xx_SER.cis
 drop_fw_file firmware/cis/SW_8xx_SER.cis.ihex firmware/cis/SW_8xx_SER.cis
-clean_blob drivers/serial/serial_cs.c
-clean_kconfig drivers/serial/Kconfig 'SERIAL_8250_CS'
-clean_mk CONFIG_SERIAL_8250_CS drivers/serial/Makefile
+# clean_blob drivers/serial/serial_cs.c
+# clean_kconfig drivers/serial/Kconfig 'SERIAL_8250_CS'
+# clean_mk CONFIG_SERIAL_8250_CS drivers/serial/Makefile
 
 announce SERIAL_ICOM - "IBM Multiport Serial Adapter"
 reject_firmware drivers/serial/icom.c
