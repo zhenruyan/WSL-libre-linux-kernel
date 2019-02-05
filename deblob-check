@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-01-09
+# deblob-check version 2014-02-06
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3567,6 +3567,9 @@ set_except () {
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]aic3x_reg\[\][ ]=' sound/soc/codecs/tlv320aic3x.c
     blobname 'radeon[/]HAWAII_\(pfp\|[mc]e\|me\?c\|rlc\|sdma\|smc\)\.bin' drivers/gpu/drm/radeon/cik.c
     blobname 'ti-connectivity[/]wl1251-\(fw\|nvs\)\.bin' 'drivers/net/wireless/wl12\(51\|xx\)/wl1251.h'
+
+    # New in 3.13.2
+    blobname 'rtlwifi[/]rtl8192cufw_\([AB]\|TMSC\)\.bin' drivers/net/wireless/rtlwifi/rtl8192cu.sw
     ;;
 
   */*freedo*.patch | */*logo*.patch)
