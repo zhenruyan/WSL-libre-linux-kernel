@@ -2,6 +2,7 @@
 
 # deblob-check version 2014-12-07 + 2015-09-22's r12444
 #                         + partial 2015-06-06's r12228
+#                         + partial 2015-11-01's r12531
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3976,6 +3977,9 @@ set_except () {
 
     # New in 4.1 (and 3.18.25).
     blobname 'iwlwifi-7265D-' drivers/net/wireless/iwlwifi/pcie/7000.c
+
+    # New in 4.3 (and 3.18.35).
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]ak4643_reg\[\][ ]=' sound/soc/codecs/ak4642.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
