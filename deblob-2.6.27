@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#    Copyright (C) 2008, 2009 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008, 2009, 2010 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.27 extra=3
+kver=2.6.27 extra=4
 
 case $1 in
 --force)
@@ -190,7 +190,7 @@ clean_sed () {
   filetest $2 || return
   sed -e "$1" "$2" > "$2".deblob || {
     die $2: failed: ${3-applied sed script $1} && return 1; }
-  check_changed $2 && echo $2: ${3-applied sed script $1} 
+  check_changed $2 && echo $2: ${3-applied sed script $1}
 }
 
 reject_firmware () {
@@ -1762,6 +1762,7 @@ clean_blob Documentation/sound/alsa/ALSA-Configuration.txt
 clean_blob Documentation/sound/oss/MultiSound
 clean_blob Documentation/sound/oss/PSS
 clean_blob Documentation/sound/oss/PSS-updates
+clean_blob Documentation/sound/oss/README.OSS
 clean_file Documentation/dvb/get_dvb_firmware
 clean_file Documentation/video4linux/extract_xc3028.pl
 clean_sed s,usb8388,whatever,g drivers/base/Kconfig 'removed blob name'
