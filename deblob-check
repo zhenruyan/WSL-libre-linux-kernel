@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-01-03
+# deblob-check version 2011-01-07
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1511,7 +1511,7 @@ set_except () {
     # can be trivially converted back to a textual form, without loss.
     # blobname '\(cis[/]\)\?SW_\([78]xx\|555\)_SER\.cis' drivers/serial/serial_cs.c
 
-    accept '[	]dev_dbg[(][&]dev->dev,[ ]["]trying[ ]to[ ]load[ ]CIS[ ]file[ ]%s[\\]n["],[ ]filename[)][;][\n]*[	]if[ ][(]request_firmware[(]' drivers/pcmcia/ds.c
+    accept '[	]\(ds_\)\?\(dev_\)\?dbg[(]\(1[,][ ]\)\?\([&]dev->dev,[ ]\)\?["]trying[ ]to[ ]load[ ]\(CIS[ ]file\|firmware\)[ ]%s[\\]n["],[ ]filename[)][;][\n]*[	]if[ ][(]\(strlen[(]filename[)][^\n]*\([{][^}]*[	][}]\|[)][\n][	]*return[^\n]*[;]\)[\n]*[	]snprintf[(]path,[ ]\(20\|sizeof[(]path[)]\),[^\n]*,[ ]filename[)][;][\n]*[	]if[ ][(]request_firmware[(][&]fw,[ ]path\|request_firmware[(][&]fw,[ ]filename\),[ ][&]dev->dev[)][^\n]*[)][ ][{][\n][	]*if[ ][(]fw->size[ ]>=[ ]CISTPL_MAX_CIS_SIZE[)]' drivers/pcmcia/ds.c
     accept 'MODULE_FIRMWARE[(]["]\(cis[/]\)\?\(PCMLM28\|DP83903\|3C\(CF\|X\)EM556\|MT5634ZLX\|COMpad[24]\|RS-COM-2P\|GLOBETROTTER\|SW_\([78]xx\|555\)_SER\)\.cis["][)][;]\([\n]MODULE_FIRMWARE[(]["]\(cis[/]\)\?\(PCMLM28\|DP83903\|3C\(CF\|X\)EM556\|MT5634ZLX\|COMpad[24]\|RS-COM-2P\|GLOBETROTTER\|SW_\([78]xx\|555\)_SER\)\.cis["][)][;]\)*' drivers/serial/serial_cs.c
     accept 'MODULE_FIRMWARE[(]["]\(cis[/]\)\?\(PCMLM28\|DP83903\|LA-PCM\|PE520\|NE2K\|PE-200\|tamarack\)\.cis["][)][;]\([\n]MODULE_FIRMWARE[(]["]\(cis[/]\)\?\(PCMLM28\|DP83903\|LA-PCM\|PE520\|NE2K\|PE-200\|tamarack\)\.cis["][)][;]\)*' drivers/net/pcnet_cs.c
 

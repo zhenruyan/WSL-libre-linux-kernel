@@ -1242,15 +1242,15 @@ announce PCMCIA_3C574 - "3Com 3c574 PCMCIA support"
 # This is not software; it's Free, but GPLed without in-tree sources.
 drop_fw_file firmware/cis/3CCFEM556.cis.ihex firmware/cis/3CCFEM556.cis
 # clean_blob drivers/net/pcmcia/3c574_cs.c
-clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C574'
-clean_mk CONFIG_PCMCIA_3C574 drivers/net/pcmcia/Makefile
+# clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C574'
+# clean_mk CONFIG_PCMCIA_3C574 drivers/net/pcmcia/Makefile
 
 announce PCMCIA_3C589 - "3Com 3c589 PCMCIA support"
 # This is not software; it's Free, but GPLed without in-tree sources.
 drop_fw_file firmware/cis/3CXEM556.cis.ihex firmware/cis/3CXEM556.cis
 # clean_blob drivers/net/pcmcia/3c589_cs.c
-clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C589'
-clean_mk CONFIG_PCMCIA_3C589 drivers/net/pcmcia/Makefile
+# clean_kconfig drivers/net/pcmcia/Kconfig 'PCMCIA_3C589'
+# clean_mk CONFIG_PCMCIA_3C589 drivers/net/pcmcia/Makefile
 
 announce PCMCIA_PCNET - "NE2000 compatible PCMCIA support"
 # These are not software; they're Free, but GPLed without in-tree sources.
