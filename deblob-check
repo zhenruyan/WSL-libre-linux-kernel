@@ -1,13 +1,14 @@
 #! /bin/sh
 
-# deblob-check version 2014-02-06 + 2014-06-07 r11367
+# deblob-check version 2014-02-06 + 2014-06-07 r11367 + 2016-02-08 r11090
+#     + partial 2014-08-07 r11521 + 2015-09-22 r12444
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2014 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2016 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -3573,6 +3574,17 @@ set_except () {
 
     # New in 3.14.6
     blobname 'radeon[/]\(%s\|BONAIRE\|HAWAII\|TAHITI\|PITCAIRN\|VERDE\|OLAND\|HAINAN\)_mc2\.bin' 'drivers/gpu/drm/radeon/\(cik\|si\)\.c'
+
+    # The request_firmware below should really be reject_firmware, but
+    # it's never really called: it's in a callback passed to
+    # reject_firmware_nowait.
+    # Introduced in 3.12.10.
+    accept '[\t][\t][\t]err[ ]=[ ]request_firmware[(][&]firmware[,][ \t\n]*rtlpriv->cfg' drivers/net/wireless/rtlwifi/core.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5110_sysclk_revd_patch\[\][ ]=' sound/soc/codecs/wm5110.c
+    # New in 3.16
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm5110_revd_patch\[\][ ]=' drivers/mfd/wm5110-tables.c
+    # New in 4.2.1 and 4.1.8.
+    defsnc '[}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
