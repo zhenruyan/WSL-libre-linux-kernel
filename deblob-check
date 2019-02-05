@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-08-01
+# deblob-check version 2008-09-07
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -490,6 +490,11 @@ set_except () {
     addx "$1[^;]*;\\?" $2
   }
 
+  # Same as initnc, but require the terminating semicolon.
+  defsnc () {
+    addx "$1[^;]*;" $2
+  }
+
   # Look for a multi-line definition starting with a line that matches
   # $1 (implicitly anchored to the beginning of the line), and ending
   # at the first ';' that's not within comments.
@@ -526,7 +531,7 @@ set_except () {
     # sensitivity, so make sure the sequences of numbers that are not
     # blobs are not deblobbed.  FIXME: we should have patterns to
     # recognize the blobs instead.
-    accept "	static const u32 test_pat\[4\]\[6\] = {$sepx$blobpat*$sepx};" drivers/net/tg3.c
+    defsnc '	static const u32 test_pat\[4\]\[6\] =' drivers/net/tg3.c
     accept "	}\\(,\\? mem_tbl_5\\(70x\\|705\\|755\\|906\\)\\[\\] = {$sepx$blobpat*$sepx}\\)*;" drivers/net/tg3.c
     ;;
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
@@ -553,11 +558,9 @@ set_except () {
     # checked:
 
     accept '	\$3 = {{pge = {{ste = {\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\) =\|<repeats [0-9]\+ times>\)[{},\n 	]*\)*<repeats 11 times>}'"$eol"
-    # arch/sparc/lib/divdi3.S
-    accept '__clz_tab:[\n]	\.byte	0\(,[0-5]\)\+'"$sepx$blobpat*"
-    accept 'PITBL:[\n]  \.long  0xC0040000,0xC90FDAA2,'"$blobpat*"
-    # arch/m68k/mac/mac_penguin.S
-    accept '\(0x[0F][0F],\)\+\\[\n]\(\(0x[0F][0F],\)\+\\[\n]\)*\(0x[0F][0F],\)\+0x00'
+    accept '__clz_tab:[\n]	\.byte	0\(,[0-5]\)\+'"$sepx$blobpat*" arch/sparc/lib/divdi3.S
+    accept 'PITBL:[\n]  \.long  0xC0040000,0xC90FDAA2,'"$blobpat*" arch/sparc/lib/divdi3.S
+    accept '\(0x[0F][0F],\)\+\\[\n]\(\(0x[0F][0F],\)\+\\[\n]\)*\(0x[0F][0F],\)\+0x00' arch/m68k/mac/mac_penguin.S
     accept '\.lowcase:[\n]	\.byte 0x00\(,0x0[1-7]\)\+'"$sepx$blobpat*$eol" arch/s390/kernel/head.S
     accept '_zb_findmap:[\n]         \.byte  0\(,[123],0\)\+,4'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
     accept '_sb_findmap:[\n]         \.byte  8\(,0,[123]\)\+,0'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
@@ -601,6 +604,21 @@ set_except () {
     initnc 'static uint tas300\(1c\|4\)_\(master\|mixer\|treble\|bass\)_tab\[\]='
     initnc 'static short dmasound_[au]law2dma16\[\] ='
     initnc 'static const unsigned short DACVolTable\[101\] ='
+
+    # in 2.6.22
+    initnc 'static const UQItype __clz_tab\[\] =' arch/arm26/lib/udivdi3.c
+    initnc '	static unsigned char scale\[101\] =' sound/oss/opl3sa2.c
+    initnc '} syncs\[\] =' drivers/scsi/53c7xx.c
+    initnc 'genoa_md:'"$sepx$blobpat*"'[\n]	\.ascii	"Genoa"' arch/i386/boot/video.S
+
+    # in 2.6.21
+    initnc 'Vendor ID  Product ID[\n]-\+  -\+[\n]'"$blobpat*" Documentation/video4linux/sn9c102.txt
+    defsnc 'static short [au]law2dma16\[\]' arch/ppc/8xx_io/cs4218_tdm.c
+    defsnc '	static const char minimal_ascii_table\[\]' drivers/ieee1394/csr1212.c
+    defsnc 'static u16 key_map \[256\] =' drivers/media/dvb/ttpci/av7110_ir.c
+    defsnc 'static unsigned char gf64_inv\[64\] =' drivers/mtd/nand/cafe_ecc.c
+    defsnc 'static unsigned short err_pos_lut\[4096\] =' drivers/mtd/nand/cafe_ecc.c
+    defsnc 'static unsigned char testdata\[TESTDATA_LEN\] =' fs/jffs2/comprtest.c
 
     # new in 2.6.25
     accept "%canned_values = ([\\n]	\\([0-9]\\+ => \\[[ 	\\n]\\+\\(\\([0-9]\\+\\|'0x[0-9a-f]\\+'\\),[ 	\\n]*\\)*\\]\\(, \\|[\\n]\\)\\)*);"
@@ -652,7 +670,7 @@ set_except () {
 
     # These are regarded as ok
     initnc 'static const u8 SN9C102_\(Y\|UV\)_QTABLE[01]\[64\] = {'
-    initnc '	static const u8 jpeg_header\[589\] = {'
+    initnc '	static \(const \)\?u8 jpeg_header\[589\] = {' media/video/sn9c102/sn9c102_core.c
     accept '[	]\{1,2\}err = sn9c102_write_const_regs(cam\(,[ 	\n]\+{0x[0-9a-fA-F][0-9a-fA-F], 0x[0-9a-fA-F][0-9a-fA-F]}\)*);'
 
     # too lax?
@@ -690,7 +708,7 @@ set_except () {
     initnc '	#define WakeupSeq    {'
     initnc '	SetRate44100\[\] ='
     initnc '	const short period\[32\] ='
-    initnc '	\(const static\|static const\) int desc_idx_table\[\] ='
+    defsnc '	\(const static\|static const\) int desc_idx_table\[\] =' 'arch/arm/include/asm/hardware/iop3xx-adma.h|include/asm-arm/hardware/iop3xx-adma.h'
     initnc '	int prop_bcomm_irq\[3\*16\] ='
     initnc '	static char logSlopeTable\[128\] ='
     initnc '	static const int uc_\(dup\|word\)_table\[\]\[2\] ='
@@ -716,7 +734,7 @@ set_except () {
     initnc '	static unsigned char CRCTable2\[\] ='
     initnc '	static unsigned char default_colors\[\] ='
     initnc '	static unsigned char iso_regs\[8\]\[4\] ='
-    initnc '	static unsigned char log_scale\[101\] ='
+    initnc '	static unsigned char log_scale\[101\] =' sound/oss/pss.c
     initnc '	static unsigned char msg\[\] ='
     initnc '	static unsigned char static_pad\[\] ='
     initnc '	static unsigned char table_alaw2ulaw\[\] ='
@@ -741,7 +759,7 @@ set_except () {
     initnc '#define OV511_QUANTABLESIZE	64'
     initnc 'BYTE BtCard::SRAMTable_\(NTSC\|PAL\)\[\] ='
     initnc 'BYTE SRAMTable\[\]\[ 60 \] ='
-    accept 'irq_prio_[hdlc]*:'"$sepx$blobpat*"
+    accept 'irq_prio_\([hdl]\|l[cd]\):'"$sepx$blobpat*" 'arch/arm/inlcude/asm/hardware/entry-macro-iomd.S|include/asm-arm/hardware/entry-macro-iomd.S'
     initc '__u8 _ascebc\[256\] ='
     initc '__u8 _ebc_tolower\[256\] ='
     initc '__u8 _ebc_toupper\[256\] ='
@@ -761,7 +779,7 @@ set_except () {
     initnc 'static __u8 init7121ntsc\[\] ='
     initnc 'static __u8 init7121pal\[\] ='
     initnc 'static byte capidtmf_leading_zeroes_table\[0x100\] ='
-    initnc 'static char channel_map_madi_ss\[HDSPM_MAX_CHANNELS\] ='
+    defsnc 'static char channel_map_madi_[sdq]s\[HDSPM_MAX_CHANNELS\] =' sound/pci/rme9652/hdspm.c
     initnc 'static char coefficients\[NM_TOTAL_COEFF_COUNT \* 4\] ='
     initnc 'static char ecc_syndrome_table\[\] ='
     initnc 'static char isdn_audio_alaw_to_ulaw\[\] ='
@@ -876,7 +894,7 @@ set_except () {
     initnc 'static const unsigned short wd7000_iobase\[\] ='
     initnc 'static const unsigned short x86_keycodes\[256\] ='
     initnc 'static const unsigned table\[\] ='
-    initnc 'static int MV300_reg_8bit\[256\] ='
+    initnc 'static int MV300_reg_8bit\[256\] \?=' drivers/video/atafb.c
     initnc 'static int fifo_map\[\]\[MAX_TX_FIFOS\] ='
     initnc 'static int initial_lfsr\[\] ='
     initnc 'static int log_tbl\[129\] ='
@@ -887,7 +905,7 @@ set_except () {
     initnc 'static int reserve_list\[MAX_RES_ARGS\] ='
     initnc 'static int reverse6\[64\] ='
     initnc 'static short attack_time_tbl\[128\] ='
-    initnc 'static short beep_wform\[256\] ='
+    defsnc 'static short beep_wform\[256\] =' 'sound/ppc/beep.c|sound/oss/dmasound/dmasound_awacs.c|arch/ppc/8xx_io/cs4218_tdm.c'
     initnc 'static short decay_time_tbl\[128\] ='
     initnc 'static short isdn_audio_[ua]law_to_s16\[\] ='
     initnc 'static struct cipher_testvec anubis_cbc_dec_tv_template\[\] ='
@@ -986,7 +1004,7 @@ set_except () {
     initnc 'static unsigned char a2232_65EC02code\[\] ='
     initnc 'static unsigned char atkbd_set3_keycode\[512\] ='
     initnc 'static unsigned char atkbd_unxlate_table\[128\] ='
-    initnc 'static unsigned char banner_table\[\] ='
+    initnc 'static unsigned char banner_table\[\] =' arch/sh/boards/superh/microdev/led.c
     initnc 'static unsigned char bootlogo_bits\[\] ='
     initnc 'static unsigned char bus2core_8260\[\] ='
     initnc 'static unsigned char bus2core_8280\[\] ='
@@ -1095,12 +1113,13 @@ set_except () {
     initnc 'static const __u8 cxjpeg_\(640\|352\|320\|176\|qtable\)\[\]\[8\] =' drivers/media/video/gspca/conex.c
     initnc 'static const unsigned char quant\[\]\[0x88\] =' drivers/media/video/gspca/jpeg.h
     initnc 'static unsigned char huffman\[\] =' drivers/media/video/gspca/jpeg.h
-    initc '	static const struct ov_i2c_regvals norm_76[1247]0\[\] =' drivers/media/video/gspca/ov519.c
+    initc '	\?static const struct ov_i2c_regvals norm_76[1247]0\[\] =' drivers/media/video/gspca/ov519.c
     initnc 'static const __u8 pac207_sensor_init\[\]\[8\] =' drivers/media/video/gspca/pac207.c
     initnc 'static const __u8 pac7311_jpeg_header\[\] =' drivers/media/video/gspca/pac7311.c
+    initnc 'static const __u8 \(start\|page[34]\)_73\(02\|11\)\[\] =' drivers/media/video/gspca/pac7311.c
     initnc 'static const __u8 init\(Hv7131\|Ov\(6650\|7630\(_3\)\?\)\|Pas\(106\|202\)\|Tas51[13]0\)\[\] =' drivers/media/video/gspca/sonixb.c
     initnc 'static const __u8 \(hv7131\|ov\(6650\|7630\(_3\)\?\)\|pas\(106\|202\)\|tas51[13]0\)_sensor_init\(_com\)\?\[\]\[8\] =' drivers/media/video/gspca/sonixb.c
-    initnc 'static const __u8 \(hv7131r\|mi0360\|mo4000\|ov76\(60\|48\)\)_sensor_init\[\]\[8\] =' drivers/media/video/gspca/sonixj.c
+    defsnc 'static \(const \)\?__u8 \(hv7131r\|mi0360\|mo4000\|ov76\([36]0\|48\)\|om6802\)_sensor_init\[\]\[8\] =' drivers/media/video/gspca/sonixj.c
     initnc 'static const __u8 qtable4\[\] =' drivers/media/video/gspca/sonixj.c
     initnc 'static const __u16 \(spca500_visual\|Clicksmart510\)_defaults\[\]\[3\] =' drivers/media/video/gspca/spca500.c
     initnc 'static const __u8 qtable_\(creative_pccam\|kodak_ez200\|pocketdv\)\[2\]\[64\] =' drivers/media/video/gspca/spca500.c
@@ -1130,6 +1149,13 @@ set_except () {
     initnc 'static u8 sample_\(german_\(all\|old\)\|american_\(dialtone\|ringing\|busy\)\|special[123]\|silence\)\[\] =' drivers/isdn/mISDN/dsp_tones.c
     initnc 'struct pattern {[^}]*int tone;[^}]*} pattern\[\] =' drivers/isdn/mISDN/dsp_tones.c
     initnc 'static u8 \([au]\|_4\)law_to_\([ua]law\|4bit\)\[256\] =' drivers/isdn/mISDN/l1oip_codec.c
+    initnc 'static unsigned char banner_table\[\] =' arch/sh/boards/mach-microdev/led.c
+    initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const \(yytype_u\?int\(8\|16\)\|\(unsigned \)\?\(short\( int\)\?\|char\)\) yy[^[]*\[\] =[*][/];' scripts/genksyms/parse.c_shipped
+    accept 'irq_prio_\([hdl]\|l[cd]\):'"$sepx$blobpat*" arch/arm/inlcude/asm/hardware/entry-macro-iomd.S
+    defsnc '	static const int desc_idx_table\[\] =' arch/arm/include/asm/hardware/iop3xx-adma.h
+    defsnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const __u8 \(hv7131r\|mi0360\|mo4000\|ov76\(60\|48\)\)_sensor_init\[\]\[8\] = {[*][/];' drivers/media/video/gspca/sonixj.c
+    defsnc 'static const struct ath_hal ar5416hal =' drivers/net/wireless/ath9k/hw.c
+    defsnc 'static \(const \)\?u32 ar\(5416\|9280\)\(Modes\(_fast_clock\)\?\|Common\|BB_RfGain\|Bank6\(TPC\)\?\|Addac\)\(_91[06]0\(1_1\)\?\|_9280\(_2\)\?\)\?\[\]\[[236]\] =' drivers/net/wireless/ath9k/initvals.h
 
     ;;
     
@@ -1216,9 +1242,12 @@ set_except () {
     accept '		'"'"'0x[^\n]*[\n]\([^\n]*[\n]\)*	\]\(, [0-9]\+ => \[\)\?'"$eol"
     initnc 'const u\(8\|16\|32\) b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\] ='
     ;;
-  */nouveau-drm*.patch)
-    initnc '\(static uint32_t\|}\) nv04_graph_ctx_regs \[\] ='
-    initnc 'static int nv10_graph_ctx_regs \[\] ='
+  */*drm*.patch)
+    # linux-2.6-drm-i915-modeset.patch, nouveau-drm*.patch,
+    # drm-fedora9-rollup.patch
+    initnc 'static const u32 filter_table\[\] =' drivers/char/drm/intel_tv.c
+    initnc '\(static uint32_t\|}\) nv04_graph_ctx_regs \[\] =' drivers/char/drm/nv04_graph.c
+    initnc 'static int nv10_graph_ctx_regs \[\] =' drivers/char/drm/nv10_graph.c
 
     # Although the developers of the drivers are not trying to stop
     # anyone from modifying it or understanding it, they acknowledge
@@ -1227,7 +1256,7 @@ set_except () {
     # of the blobs have power to stop others from modifying them.
     # Non-Free software, for sure.
 
-    # initnc 'static uint32_t nv\(4[013467ace]\|49_4b\|8[46]\)_ctx_\(voodoo\|prog\)\[\] ='
+    # initnc 'static uint32_t nv\(4[013467ace]\|49_4b\|8[46]\)_ctx_\(voodoo\|prog\)\[\] =' 'drivers/char/drm/nv40_graph.c|.*'
     ;;
   */linux-2.6-lirc.patch)
     initnc 'const unsigned char map_table\[\] ='
@@ -1279,9 +1308,6 @@ set_except () {
     # git logs
     accept '   sudo modprobe ath5k debug=0x00000400[\n][ 	]*[\n]\([ 	]*Band[^\n]*[\n]\([ 	]*\(\(channels\|rates\):\|[- 	0-9a-f]*\|\[\.\.\. etc \]\)[\n]\)\+\)\+       540 000c 0000 0000'
     oprepline '	{ 1, MODULATION_XR, 3000, 1, 150, 3 },'
-    ;;
-  */linux-2.6-drm-i915-modeset.patch)
-    initnc 'static const u32 filter_table\[\] ='
     ;;
   */linux-2.6-netdev-e1000e*.patch)
     # drivers/net/e1000e/phy.c

@@ -44,11 +44,15 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.25 extra=3
+kver=2.6.25 extra=4
 
-if unifdef /dev/null; then :; else
-    echo unifdef is required >&2
-    exit 1
+case $1 in
+--force) die () { echo ERROR: "$@": ignored >&2; }; shift;;
+*) die () { echo "$@" >&2; exit 1; };;
+esac
+
+if unifdef -Utest /dev/null; then :; else
+    die unifdef is required
 fi
 
 check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
@@ -62,19 +66,16 @@ fi
 function clean_file {
 	#$1 = filename
 	if test ! -f $1; then
-		echo $1 does not exist, something is wrong >&2
-		exit 1
+		die $1 does not exist, something is wrong
 	fi
 	rm -v $1
 }
 
 function check_changed {
 	if test ! -f $1; then
-		echo $1 does not exist, something is wrong >&2
-		exit 1
+		die $1 does not exist, something is wrong
 	elif cmp $1.deblob $1 > /dev/null; then
-		echo $1 did not change, something is wrong >&2
-		exit 1
+		die $1 did not change, something is wrong
 	fi
 	mv $1.deblob $1
 }
@@ -83,8 +84,7 @@ function clean_blob {
 	#$1 = filename
 	if $have_check; then
 	    if test ! -f $1; then
-		echo $1 does not exist, something is wrong >&2
-		exit 1
+		die $1 does not exist, something is wrong
 	    fi
 	    name=$1
 	    echo Removing blobs from $name
@@ -122,7 +122,7 @@ function clean_mk {
 function clean_ifdef {
 	#$1 = filename $2 = macro to -U
 	echo unifdefing $1 with -U$2
-	unifdef $1 -U$2 > $1.deblob
+	unifdef -U$2 $1 > $1.deblob
 	check_changed $1
 }
 
@@ -163,8 +163,7 @@ for f in \
     sound/pci/cs46xx/imgs/cwcdma.asp \
 ; do
   if test ! $f; then
-    echo $f is not present, something is amiss >&2
-    exit 1
+    die $f is not present, something is amiss
   fi
 done
 
@@ -612,24 +611,27 @@ clean_kconfig sound/pci/Kconfig 'SND_CS46XX'
 # sed -i '/cs46xx\/ \\/d' sound/pci/Makefile
 
 # SND_KORG1212 - Korg 1212 IO
-clean_ifdef sound/pci/korg1212/korg1212.c CONFIG_SND_KORG1212_FIRMWARE_IN_KERNEL
 clean_blob sound/pci/korg1212/korg1212-firmware.h
+clean_ifdef sound/pci/korg1212/korg1212.c CONFIG_SND_KORG1212_FIRMWARE_IN_KERNEL
+clean_kconfig sound/pci/Kconfig 'SND_KORG1212_FIRMWARE_IN_KERNEL'
 
 # SND_MAESTRO3 - ESS Allegro/Maestro3
 clean_ifdef sound/pci/maestro3.c CONFIG_SND_MAESTRO3_FIRMWARE_IN_KERNEL
+clean_kconfig sound/pci/Kconfig 'SND_MAESTRO3_FIRMWARE_IN_KERNEL'
 
 # SND_YMFPCI - Yamaha YMF724/740/744/754
 clean_blob sound/pci/ymfpci/ymfpci_image.h
 clean_ifdef sound/pci/ymfpci/ymfpci_main.c CONFIG_SND_YMFPCI_FIRMWARE_IN_KERNEL
+clean_kconfig sound/pci/Kconfig 'SND_YMFPCI_FIRMWARE_IN_KERNEL'
 
 # SND_SB16_CSP_FIRMWARE_IN_KERNEL - SB16 Advanced Signal Processor
 clean_blob sound/isa/sb/sb16_csp_codecs.h
-clean_kconfig sound/isa/Kconfig SND_SB16_CSP_FIRMWARE_IN_KERNEL
+clean_kconfig sound/isa/Kconfig 'SND_SB16_CSP_FIRMWARE_IN_KERNEL'
 
 # SND_WAVEFRONT_FIRMWARE_IN_KERNEL
 # Most of this file is not matched by deblob-check because of WAIT_IDLE.
 # Just remove it.
 clean_file sound/isa/wavefront/yss225.c
-clean_kconfig sound/isa/Kconfig SND_WAVEFRONT_FIRMWARE_IN_KERNEL
+clean_kconfig sound/isa/Kconfig 'SND_WAVEFRONT_FIRMWARE_IN_KERNEL'
 
 exit 0
