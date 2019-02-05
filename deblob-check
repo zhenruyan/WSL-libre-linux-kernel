@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-02-06
+# deblob-check version 2014-02-06 + 2014-06-07 r11367
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3570,6 +3570,9 @@ set_except () {
 
     # New in 3.13.2
     blobname 'rtlwifi[/]rtl8192cufw_\([AB]\|TMSC\)\.bin' drivers/net/wireless/rtlwifi/rtl8192cu.sw
+
+    # New in 3.14.6
+    blobname 'radeon[/]\(%s\|BONAIRE\|HAWAII\|TAHITI\|PITCAIRN\|VERDE\|OLAND\|HAINAN\)_mc2\.bin' 'drivers/gpu/drm/radeon/\(cik\|si\)\.c'
     ;;
 
   */*freedo*.patch | */*logo*.patch)
