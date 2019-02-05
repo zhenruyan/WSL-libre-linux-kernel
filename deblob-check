@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-11-25
+# deblob-check version 2014-12-07
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2243,7 +2243,10 @@ set_except () {
     blobname '3826\.arm' 'drivers/\(net/wireless/p54/p54spi\|staging/stlc45xx/stlc45xx\)\.c'
     defsnc 'static[ ]unsigned[ ]char[ ]p54spi_eeprom\[\][ ]=' drivers/net/wireless/p54/p54spi_eeprom.h
     blobname '\(comedi[/]\)\?jr3pci\.idm\(["]\.[\n][ ][*][/]\)\?' drivers/staging/comedi/drivers/jr3_pci.c
-    blobname 'usbdux\(fast\)\?_firmware\.\(hex\|bin\)' 'drivers/staging/comedi/drivers/usbdux\(fast\)\?\.c'
+    accept '#define[ ]USBDUX_FIRMWARE[ \t]*["]usbdux_firmware\.bin["]' drivers/staging/comedi/drivers/usbdux.c
+    accept 'MODULE_FIRMWARE[(]USBDUX_FIRMWARE[)][;]' drivers/staging/comedi/drivers/usbdux.c
+    accept '#define[ ]FIRMWARE[ \t]*["]usbduxfast_firmware\.bin["]' drivers/staging/comedi/drivers/usbduxfast.c
+    accept 'MODULE_DESCRIPTION[(]["]USB-DUXfast[^"]*["][)][;][\n]MODULE_LICENSE[(]["]GPL["][)][;][\n]MODULE_FIRMWARE[(]FIRMWARE[)][;]' drivers/staging/comedi/drivers/usbduxfast.c
     blobname 'RT30xxEEPROM\.bin' drivers/staging/rt3070/common/eeprom.c
     defsnc 'static[ ]const[ ]u8[ ]default_cal_\(channels\|rssi\)\[\][ ]=' drivers/staging/stlc45xx/stlc45xx.c
     accept '[	][	]stlc45xx_error[(]["]request_firmware[(][)][ ]failed' drivers/staging/stlc45xx/stlc45xx.c
@@ -2953,7 +2956,8 @@ set_except () {
     blobname '%s[/]bdata\.%s\.bin' drivers/net/wireless/ath/ath6kl/init.c
     blobna 'Used[ ][(]for[ ]now[)][^*]*\([*]\+[^/*][^*]*\)*[*]*["]bdata\.bin["][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/net/wireless/ath/ath6kl/init.c
     blobname 'mrvl[/]pcie8766_uapsta\.bin' 'drivers/net/wireless/mwifiex/pcie\.[ch]'
-    blobname 'usbduxsigma_firmware\.bin' drivers/staging/comedi/drivers/usbduxsigma.c
+    accept '#define[ ]FIRMWARE[ \t]*["]usbduxsigma_firmware\.bin["]' drivers/staging/comedi/drivers/usbduxsigma.c
+    accept 'MODULE_DESCRIPTION[(]["]Stirling[/]ITL[ ]USB-DUX[ ]SIGMA[^"]*["][)][;][\n]MODULE_LICENSE[(]["]GPL["][)][;][\n]MODULE_FIRMWARE[(]FIRMWARE[)][;]' drivers/staging/comedi/drivers/usbduxsigma.c
     blobname 'as102_data[12]_[sd]t\.hex' drivers/staging/media/as102/as102_fw.c
     blob 'u8[ ]Rtl8192PciEFw\(Boot\|Main\|Data\)Array\[\(Boot\|Main\|Data\)ArrayLengthPciE\][ ]=[ ][{][^}]*[}][;]' drivers/staging/rtl8192e/r8192E_hwimg.c
     blobna '\([&]\|sizeof[(]\)Rtl8192PciEFw\(Boot\|Main\|Data\)Array\(\[0\]\|[)]\)\(,[ 	\n]*\([&]\|sizeof[(]\)Rtl8192PciEFw\(Boot\|Main\|Data\)Array\(\[0\]\|[)]\)\)*' drivers/staging/rtl8192e/r8192E_firmware.c

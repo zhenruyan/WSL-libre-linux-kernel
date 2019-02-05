@@ -370,9 +370,15 @@ clean_sed '$i\
 #define NONFREE_FIRMWARE "/*(DEBLOBBED)*/"\
 \
 static inline int\
+is_nonfree_firmware(const char *name)\
+{\
+  return strstr(name, NONFREE_FIRMWARE) != 0;\
+}\
+\
+static inline int\
 report_missing_free_firmware(const char *name, const char *what)\
 {\
-	printk(KERN_ERR "%s: Missing Free %s\\n", name,\
+	printk(KERN_ERR "%s: Missing Free %s (non-Free firmware loading is disabled)\\n", name,\
 	       what ? what : "firmware");\
 	return -EINVAL;\
 }\
@@ -392,7 +398,7 @@ static inline int\
 maybe_reject_firmware(const struct firmware **fw,\
 		      const char *name, struct device *device)\
 {\
-	if (strstr (name, NONFREE_FIRMWARE))\
+	if (is_nonfree_firmware(name))\
 		return reject_firmware(fw, name, device);\
 	else\
 		return request_firmware(fw, name, device);\
@@ -437,7 +443,7 @@ maybe_reject_firmware_nowait(struct module *module, int uevent,\
 			     void (*cont)(const struct firmware *fw,\
 					  void *context))\
 {\
-	if (strstr (name, NONFREE_FIRMWARE))\
+	if (is_nonfree_firmware(name))\
 		return reject_firmware_nowait(module, uevent, name,\
 					      device, gfp, context, cont);\
 	else\
@@ -465,6 +471,11 @@ maybe_reject_ihex_firmware(const struct firmware **fw,\
 \
 #endif /* _LINUX_LIBRE_IHEX_H */\
 ' include/linux/ihex.h 'added non-Free ihex firmware notification support'
+
+clean_sed '
+s,\(timeout = \)\(firmware_loading_timeout()\),\1is_nonfree_firmware(name) ? 1 : \2,
+' drivers/base/firmware_class.c 'shorten non-Free firmware fail-to-load timeout'
+
 
 ########
 # Arch #
@@ -1514,6 +1525,9 @@ clean_mk CONFIG_YAM drivers/net/hamradio/Makefile
 announce USB_IRDA - "IrDA USB dongles"
 reject_firmware drivers/net/irda/irda-usb.c
 clean_blob drivers/net/irda/irda-usb.c
+clean_sed '
+s,\(char stir421x_fw_name\)\[12\];,\1[16];,
+' drivers/net/irda/irda-usb.c "avoid buffer overflow with deblobbed filename"
 clean_kconfig drivers/net/irda/Kconfig 'USB_IRDA'
 clean_mk CONFIG_USB_IRDA drivers/net/irda/Makefile
 
@@ -2270,7 +2284,7 @@ clean_mk CONFIG_INPUT_IMS_PCU drivers/input/misc/Makefile
 ####################
 
 announce COMEDI - "Data acquisition support (comedi)"
-reject_firmware drivers/staging/comedi/drivers.c
+maybe_reject_firmware drivers/staging/comedi/drivers.c
 clean_kconfig drivers/staging/comedi/Kconfig 'COMEDI'
 clean_mk CONFIG_COMEDI drivers/staging/comedi/Makefile
 
@@ -2293,21 +2307,6 @@ announce COMEDI_NI_PCIDIO - "NI PCI-DIO32HS, PCI-6533, PCI-6534 support"
 clean_blob drivers/staging/comedi/drivers/ni_pcidio.c
 clean_kconfig drivers/staging/comedi/Kconfig 'COMEDI_NI_PCIDIO'
 clean_mk CONFIG_COMEDI_NI_PCIDIO drivers/staging/comedi/drivers/Makefile
-
-announce COMEDI_USBDUX - "ITL USBDUX support"
-clean_blob drivers/staging/comedi/drivers/usbdux.c
-clean_kconfig drivers/staging/comedi/Kconfig 'COMEDI_USBDUX'
-clean_mk CONFIG_COMEDI_USBDUX drivers/staging/comedi/drivers/Makefile
-
-announce COMEDI_USBDUXFAST - "ITL USB-DUXfast support"
-clean_blob drivers/staging/comedi/drivers/usbduxfast.c
-clean_kconfig drivers/staging/comedi/Kconfig 'COMEDI_USBDUXFAST'
-clean_mk CONFIG_COMEDI_USBDUXFAST drivers/staging/comedi/drivers/Makefile
-
-announce COMEDI_USBDUXSIGMA - "ITL USB-DUXsigma support"
-clean_blob drivers/staging/comedi/drivers/usbduxsigma.c
-clean_kconfig drivers/staging/comedi/Kconfig 'COMEDI_USBDUXSIGMA'
-clean_mk CONFIG_COMEDI_USBDUXSIGMA drivers/staging/comedi/drivers/Makefile
 
 
 #######
