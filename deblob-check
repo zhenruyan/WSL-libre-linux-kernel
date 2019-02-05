@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2010-08-02
+# deblob-check version 2010-08-03
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2544,6 +2544,7 @@ set_except () {
     defsnc '\(static[ ]\)\?uint[ ]patch_2[0ef]00\[\][ ]\(__initdata[ ]\)\?=' arch/powerpc/sysdev/micropatch.c
     defsnc 'static[ ]u32[ ]epll_div\[\]\[4\][ ]=' arch/arm/mach-s5pc100/clock.c
     blobname 'iwlwifi-6000g2a-' drivers/net/iwlwifi/iwl-6000.c
+    blobna '[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*[(]f2255usb\.bin[)][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/media/video/s2255drv.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
