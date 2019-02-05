@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2018-10-14
+# deblob-check version 2018-10-14 + 2018-12-17's r15763
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5206,6 +5206,10 @@ set_except () {
     blobname '%s-%s-%s\.bin' sound/soc/codecs/wm_adsp.c
     accept '[\t]*rc[ ]=[ ]wil_request_firmware[(]wil[,][ ]board_file[,][ ]true[)][;]' drivers/net/wireless/ath/wil6210/main.c
     blobna '[ ]\(Important[ ]Notes\|Obtaining[ ]and[ ]Creating\)[^\n]*\([\n]#\([\n]#\([\n]#[ ]*For[ ]the\)\?\)\?[ ][^\n]*\)\+' Documentation/sound/cards/multisound.sh
+
+    # New in 4.20-rc7 (and 4.19.11).
+    blobname 'amdgpu[/]polaris1[01]_k2_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
+    blobname 'amdgpu[/]polaris12_k_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
