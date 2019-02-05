@@ -199,7 +199,7 @@ else
   fi
 fi
 
-trap "status=$?; echo cleaning up...; rm -rf $cleanup; (exit $status); exit" 0 1 2 15
+trap 'status=$?; echo cleaning up...; rm -rf $cleanup; (exit $status); exit' 0 1 2 15
 
 set -e
 
@@ -309,7 +309,7 @@ done
 rm -f linux-libre-$kver-$gnu.tar
 
 cleanup=
-trap "status=$?; (exit $status); exit" 0 1 2 15
+trap 'status=$?; (exit $status); exit' 0 1 2 15
 
 echo All set, please review linux-libre-$kver-$gnu.patch
 

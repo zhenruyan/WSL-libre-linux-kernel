@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-03-19
+# deblob-check version 2012-03-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2625,7 +2625,7 @@ set_except () {
     defsnc '\(static[ ]const[ ]\)\?u16[ \n]*LCNPHY_txdigfiltcoeffs_\(cck\|ofdm\)\[LCNPHY_NUM_TX_DIG_FILTERS_\(CCK\|OFDM\)\][\n 	]*\[LCNPHY_NUM_DIG_FILT_COEFFS[ ][+][ ]1\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
     defsnc '\(static[ ]const[ ]\)\?nphy_ipa_txrxgain_t[ ]nphy_ipa_rxcal_gaintbl_2GHz\(_rev7\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
     defsnc 'static[ ]\(const[ ]\)\?chan_info_nphy_\(radio\)\?205[5x7]\(_rev5\)\?_t[ ]chan_info_nphy\(rev[3-9]\(n6\)\?\)\?_205[5-7]\(_A1\|v\([5-8]\|11\)\|_rev[4-8]\(v1\)\?\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
-    defsnc '\(static[ ]\)radio_\(20xx_\)\?regs_t[ ]regs_\(SYN_\|[RT]X_\)\?205[5-7]\(_A1\|_rev\([4-8]\|11\)\(v1\)\?\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
+    defsnc '\(static[ ]\)\?radio_\(20xx_\)\?regs_t[ ]regs_\(SYN_\|[RT]X_\)\?205[5-7]\(_A1\|_rev\([4-8]\|11\)\(v1\)\?\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
     defsnc 'static[ ]const[ ]u16[ ]tbl_iqcal_gainparams_nphy\[2\]\[NPHY_IQCAL_NUMGAINS\]\[8\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
     defsnc 'static[ ]\(const[ ]\)\?u32[ ]nphy_tpc_\(5GHz_\)\?txgain\(_[ei]pa\)\?\(\(_[25]g\)\?\(_\(2057\)\?\(rev\([3-7]\|4n6\)\?\)\?\)\?\|_HiPwrEPA\)\?\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
     defsnc 'static[ ]const[ ]u16[ ]nphy_tpc_loscale\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_n\.c\|brcmsmac/phy/phy_n\.c\)'
@@ -2778,7 +2778,7 @@ set_except () {
     defsnc 'u32[ ]\(RTL\|Rtl\)8192CU\(PHY_REG\|_\?\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\[RTL8192CU\(PHY_REG\|\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)_\?\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\(LENGTH\|Length\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192cu/table.c
     blobname 'rtl_nic[/]rtl8105e-1\.fw' drivers/net/r8169.c
     defsnc 'static[ ]const[ ]\(A_INT32\|s32\)[ ]wmi_rateTable\[\]\[2\][ ]=' drivers/staging/ath6kl/wmi/wmi.c
-    defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\[\(256\)\?\][ ]=' drivers/staging/easycap/easycap_low.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\?\[\(256\)\?\][ ]=' drivers/staging/easycap/easycap_low.c
     defsnc 'static[ ]const[ ]ccktxbbgain_struct[ ]rtl8192_cck_txbbgain_\(ch14_\)\?table\[\][ ]=' drivers/staging/rtl8192e/r8192E_dm.c
     defsnc '[	]unsigned[ ]char[ ]data_ptr\[36\][ ]=' drivers/usb/storage/ene_ub6250.c
     blobname 'ene-ub6250[/]sd_\(init[12]\|rdwr\)\.bin' drivers/usb/storage/ene_ub6250.c
@@ -2856,7 +2856,7 @@ set_except () {
     accept '[	][	 ]*\(if[ ][(]\|[ ][ ][ ][ ]\)nvc0_graph_create_fw[(]dev[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]priv->fuc4\(09\|1a\)[cd][)]' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'nouveau[/]\(nv%02x_\)\?%s' drivers/gpu/drm/nouveau/nvc0_graph.c
     blobname 'radeon[/]SUMO2\?_\(pfp\|me\)\.bin' drivers/gpu/drm/radeon/r600.c
-    blobname 'iwlwifi-\(105\|20[03]0\)-' drivers/net/iwlwifi/iwl-2000.c
+    blobname 'iwlwifi-\(105\|20[03]\?0\)-' drivers/net/iwlwifi/iwl-2000.c
     blobname '__stringify[(]api[)][ ]["]\.ucode["]' 'drivers/net/iwlwifi/iwl-\(3945.h\|\(4965\|[1256]000\)\.c\)'
     # New in 3.1
     blobname 'sdma-imx25\.bin' arch/arm/mach-imx/mm-imx25.c
@@ -2887,7 +2887,7 @@ set_except () {
     defsnc '[	]u8[ ]channel_\(5g\|all\|info\)\[\(45\|59\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/phy.c
     blobname 'rtlwifi[/]rtl8192defw[.]bin' drivers/net/wireless/rtlwifi/rtl8192de/sw.c
     defsnc 'u32[ ]rtl8192de_\(phy_reg\|radio[ab]\|mac\|agctab\)_\(\(2t\(_int_pa\)\?\|[25]g\)\?array\|array_pg\)\[\(PHY_REG\|RADIO[AB]\|MAC\|AGCTAB\)_\(\(2T\(_INT_PA\)\?_\|[25]G_\)\?ARRAY\|ARRAY_PG_\)LENGTH\][ ]=' drivers/net/wireless/rtlwifi/rtl8192de/table.c
-    defsnc 'static[ ]\(const[ ]\)struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_cmn\.c'
+    defsnc 'static[ ]\(const[ ]\)\?struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_cmn\.c'
     defsnc 'struct[ ]lcnphy_rx_iqcomp[ ]lcnphy_rx_iqcomp_table_rev0\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
     defsnc 'static[ ]\(const[ ]\)\?struct[ ]chan_info_2064_lcnphy[ ]chan_info_2064_lcnphy\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
     defsnc '\(static[ ]const[ ]\)\?struct[ ]lcnphy_radio_regs[ ]lcnphy_radio_regs_2064\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
@@ -3012,7 +3012,7 @@ set_except () {
     blobname 'brcm[/]bcm4329-fullmac-4\.\(bin\|txt\)' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmfmac/bcmchip\.h'
     blobname 'brcm[/]bcm43xx' 'drivers/\(staging\|net/wireless\)/brcm80211/sys/wl_mac80211\.c'
     blobname '%s\(_hdr\)\?-%d\.fw' 'drivers/\(staging\|net/wireless\)/brcm80211/sys/wl_mac80211\.c'
-    defsnc 'static[ ]\(const[ ]\)struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_cmn\.c'
+    defsnc 'static[ ]\(const[ ]\)\?struct[ ]chan_info_basic[ ]chan_info_all\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_cmn\.c'
     defsnc 'static[ ]const[ ]s8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' drivers/net/wireless/brcm80211/brcmsmac/phy/phy_lcn.c
     defsnc '\(static[ ]const[ ]\)\?s8[ ]lcnphy_gain_index_offset_for_pkt_rssi\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/\(phy/wlc_phy_lcn\.c\|brcmsmac/phy/phy_lcn\.c\)'
     defsnc 'static[ ]\(const[ ]\)\?struct[ ]chan_info_2064_lcnphy[ ]chan_info_2064_lcnphy\[\][ ]=' 'drivers/\(staging\|net/wireless\)/brcm80211/brcmsmac/phy/phy_lcn\.c'
@@ -3372,7 +3372,7 @@ set_except () {
     defsnc 'u32[ ]\(RTL\|Rtl\)8192CU\(PHY_REG\|_\?\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\[RTL8192CU\(PHY_REG\|\(RADIO\|Radio\)[AB]\|MAC\|AGCTAB\)_\([21]T\(_HP\)\?_\?\(ARRAY\|Array\)_\?\|\(ARRAY\|Array\)_PG\)\(_HP\)\?\(LENGTH\|Length\)\][ ]=' drivers/net/wireless/rtlwifi/rtl8192cu/table.c
     blobname 'rtl_nic[/]rtl8105e-1\.fw' drivers/net/r8169.c
     defsnc 'static[ ]const[ ]\(A_INT32\|s32\)[ ]wmi_rateTable\[\]\[2\][ ]=' drivers/staging/ath6kl/wmi/wmi.c
-    defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\[256\][ ]=' drivers/staging/easycap/easycap_low.c
+    defsnc '\(static[ ]\)\?const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\?\[256\][ ]=' drivers/staging/easycap/easycap_low.c
     defsnc 'static[ ]const[ ]ccktxbbgain_struct[ ]rtl8192_cck_txbbgain_\(ch14_\)\?table\[\][ ]=' drivers/staging/rtl8192e/r8192E_dm.c
     defsnc '[	]unsigned[ ]char[ ]data_ptr\[36\][ ]=' drivers/usb/storage/ene_ub6250.c
     blobname 'ene-ub6250[/]sd_\(init[12]\|rdwr\)\.bin' drivers/usb/storage/ene_ub6250.c
