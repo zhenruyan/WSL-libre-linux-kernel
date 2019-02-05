@@ -4583,6 +4583,10 @@ set_except () {
     # Backported into 4.9.36.
     # New in 4.10-rc*.
     blobname 'radeon[/]si58_mc\.bin' 'drivers/gpu/drm/amd/amdgpu/gmc_v6_0\.c\|drivers/gpu/drm/radeon/si\.c'
+
+    # Backported into 4.9.41.
+    # New in 4.10-rc*.
+    blobname 'cbfw-3\.2\.5\.1\.bin' drivers/scsi/bfa/bfad.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
