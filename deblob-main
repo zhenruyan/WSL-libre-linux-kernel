@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Copyright (C) 2008, 2009 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright (C) 2008, 2009, 2010 Alexandre Oliva <lxoliva@fsfla.org>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -161,7 +161,7 @@ echo Uncompressing linux-$kver.tar.bz2 into linux-$kver.tar
 rm -rf linux-$kver linux-$kver.tar
 bunzip2 < linux-$kver.tar.bz2 > linux-$kver.tar
 
-echo Extracing linux-$kver.tar into linux-$kver
+echo Extracting linux-$kver.tar into linux-$kver
 tar -xf linux-$kver.tar
 rm -rf linux-$kver-$libre linux-$kver-$libre.tar
 
@@ -171,7 +171,7 @@ cp -lR linux-$kver/. linux-$kver-$libre
 
 rm -f linux-$kver-$libre.log linux-$kver-$libre.log.tmp
 echo Deblobbing within linux-$kver-$libre, saving output to linux-$kver-$libre.log
-# We can't just pipe deblob into tee, for then we fail to detect 
+# We can't just pipe deblob into tee, for then we fail to detect
 # error conditions.  Use file renaming to tell whether we succeeded.
 if (cd linux-$kver-$libre && /bin/sh ../$deblob $force) 2>&1; then
   mv linux-$kver-$libre.log.tmp linux-$kver-$libre.log

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#    Copyright (C) 2008, 2009 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008, 2009, 2010 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.32 extra=
+kver=2.6.32 extra=1
 
 case $1 in
 --force)
@@ -190,7 +190,7 @@ clean_sed () {
   filetest $2 || return
   sed -e "$1" "$2" > "$2".deblob || {
     die $2: failed: ${3-applied sed script $1} && return 1; }
-  check_changed $2 && echo $2: ${3-applied sed script $1} 
+  check_changed $2 && echo $2: ${3-applied sed script $1}
 }
 
 reject_firmware () {
@@ -1362,14 +1362,14 @@ clean_file drivers/staging/rt2860/common/firmware.h
 clean_blob drivers/staging/rt2860/rt_linux.h
 clean_sed '
 /^NDIS_STATUS NICLoadFirmware(/,/^}$/{
-  s/^\(	*\)pFirmwareImage = .*FirmwareImage.*;/\1printk("%s: missing Free firmware\\n", __func__);\n\1return NDIS_STATUS_FAILURE;\n&/
+  s/^\(	*\)pFirmwareImage = .*FirmwareImage.*;/\1return printk("%s: missing Free firmware\\n", __func__),\n\1	NDIS_STATUS_FAILURE;\n&/
 }' drivers/staging/rt2860/common/rtmp_init.c 'report missing Free firmware'
 clean_blob drivers/staging/rt2860/common/rtmp_init.c
 clean_sed '
 /^INT[	]set_eFuseLoadFromBin_Proc(/,/^}$/{
   /src = kmalloc/i\
 	printk("%s: missing Free firmware\\n", __func__);\
-	return FALSE;	
+	return FALSE;
 }' drivers/staging/rt2860/common/eeprom.c 'report missing Free firmware'
 clean_blob drivers/staging/rt2860/common/eeprom.c
 clean_kconfig drivers/staging/rt2860/Kconfig RT2860
@@ -1391,7 +1391,7 @@ clean_blob drivers/staging/rt3090/rt_ate.h
 clean_blob drivers/staging/rt3090/rt_ate.c
 clean_sed '
 /^NDIS_STATUS RtmpAsicLoadFirmware(/,/^}$/{
-  s/^\(	*\)pFirmwareImage = .*FirmwareImage.*;/\1printk("%s: missing Free firmware\\n", __func__);\n\1return NDIS_STATUS_FAILURE;\n&/
+  s/^\(	*\)pFirmwareImage = .*FirmwareImage.*;/\1return printk("%s: missing Free firmware\\n", __func__),\n\1	NDIS_STATUS_FAILURE;\n&/
 }' drivers/staging/rt3090/common/rtmp_mcu.c 'report missing Free firmware'
 clean_blob drivers/staging/rt3090/common/rtmp_mcu.c
 clean_kconfig drivers/staging/rt3090/Kconfig RT3090
@@ -1414,10 +1414,10 @@ announce VT6656 - "VIA Technologies VT6656 support"
 clean_sed '
 /^FIRMWAREbDownload($/,/^}$/ {
   /PBYTE.*pBuffer/ i\
-	PBYTE abyFirmware[1] = 0;
+    PBYTE abyFirmware[1] = { 0 };
   /-->Download firmware/ i\
-	printk("vt6656: missing Free firmware\\n");\
-	return (FALSE);
+    printk("vt6656: missing Free firmware\\n");\
+    return (FALSE);
 }' drivers/staging/vt6656/firmware.c 'report missing Free firmware'
 clean_blob drivers/staging/vt6656/firmware.c
 clean_kconfig drivers/staging/vt6656/Kconfig 'VT6656'
@@ -2030,6 +2030,7 @@ clean_blob Documentation/sound/alsa/ALSA-Configuration.txt
 clean_blob Documentation/sound/oss/MultiSound
 clean_blob Documentation/sound/oss/PSS
 clean_blob Documentation/sound/oss/PSS-updates
+clean_blob Documentation/sound/oss/README.OSS
 clean_file Documentation/dvb/get_dvb_firmware
 clean_file Documentation/video4linux/extract_xc3028.pl
 clean_sed s,usb8388,whatever,g drivers/base/Kconfig 'removed blob name'
