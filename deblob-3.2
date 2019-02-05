@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#    Copyright (C) 2008-2012 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2013 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -48,7 +48,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=3.2 extra=
+kver=3.2 extra=1
 
 case $1 in
 --force)
@@ -80,6 +80,7 @@ if [ ! -f $check ] ; then
   have_check=false
 else
   have_check=:
+  [ -x $check ] || check="/bin/sh $check"
 fi
 
 filetest () {
@@ -116,7 +117,13 @@ clean_blob () {
     name=$1
     set fnord "$@" -d
     shift 2
-    $check "$@" -i linux-$kver $name > $name.deblob
+    if $check "$@" -i linux-$kver $name > $name.deblob; then
+      if [ ! -s $name.deblob ]; then
+	die got an empty file after removing blobs from $name
+      fi
+    else
+      die failed removing blobs from $name
+    fi
     check_changed $name && echo $name: removed blobs
   else
     clean_file $1
@@ -238,8 +245,6 @@ undefault_firmware () {
 # corresponding sources are present.
 
 for f in \
-  drivers/char/ser_a2232fw.h \
-    drivers/char/ser_a2232fw.ax \
   drivers/gpu/drm/nouveau/nva3_copy.fuc.h \
     drivers/gpu/drm/nouveau/nva3_copy.fuc \
   drivers/gpu/drm/nouveau/nvc0_copy.fuc.h \
@@ -248,24 +253,18 @@ for f in \
     drivers/gpu/drm/nouveau/nvc0_grgpc.fuc \
   drivers/gpu/drm/nouveau/nvc0_grhub.fuc.h \
     drivers/gpu/drm/nouveau/nvc0_grhub.fuc \
-  drivers/net/ixp2000/ixp2400_rx.ucode \
-    drivers/net/ixp2000/ixp2400_rx.uc \
-  drivers/net/ixp2000/ixp2400_tx.ucode \
-    drivers/net/ixp2000/ixp2400_rx.uc \
   drivers/net/wan/wanxlfw.inc_shipped \
     drivers/net/wan/wanxlfw.S \
   drivers/net/wireless/atmel.c \
     drivers/net/wireless/atmel.c \
-  drivers/scsi/53c700_d.h_shipped \
-    drivers/scsi/53c700.scr \
   drivers/scsi/aic7xxx/aic79xx_seq.h_shipped \
     drivers/scsi/aic7xxx/aic79xx.seq \
   drivers/scsi/aic7xxx/aic7xxx_seq.h_shipped \
     drivers/scsi/aic7xxx/aic7xxx.seq \
   drivers/scsi/aic7xxx_old/aic7xxx_seq.c \
     drivers/scsi/aic7xxx_old/aic7xxx.seq \
-  drivers/scsi/53c7xx_d.h_shipped \
-    drivers/scsi/53c7xx.scr \
+  drivers/scsi/53c700_d.h_shipped \
+    drivers/scsi/53c700.scr \
   drivers/scsi/sym53c8xx_2/sym_fw1.h \
     drivers/scsi/sym53c8xx_2/sym_fw1.h \
   drivers/scsi/sym53c8xx_2/sym_fw2.h \
@@ -281,9 +280,7 @@ for f in \
   firmware/isci/isci_firmware.bin.ihex \
     drivers/scsi/isci/firmware/create_fw.c \
 ; do
-  if test ! $f; then
-    die $f is not present, something is amiss && return
-  fi
+  filetest $f
 done
 
 # Identify the tarball.
@@ -623,15 +620,6 @@ reject_firmware drivers/media/dvb/dvb-usb/dvb-usb-firmware.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB'
 clean_mk CONFIG_DVB_USB drivers/media/dvb/dvb-usb/Makefile
 
-announce DVB_USB_AF9005 - "Afatech AF9005 DVB-T USB1.1"
-clean_file drivers/media/dvb/dvb-usb/af9005-script.h
-clean_sed '
-s,^	deb_info("load init script\\n");$,	{\n		err("Missing Free init script\\n");\n		return scriptlen = ret = -EINVAL;\n		,;
-' drivers/media/dvb/dvb-usb/af9005-fe.c 'report missing Free init script'
-clean_blob drivers/media/dvb/dvb-usb/af9005-fe.c
-clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
-clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
-
 announce DVB_B2C2_FLEXCOP - "Technisat/B2C2 FlexCopII(b) and FlexCopIII adapters"
 reject_firmware drivers/media/dvb/b2c2/flexcop-fe-tuner.c
 
@@ -644,6 +632,11 @@ clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_A800'
 clean_mk CONFIG_DVB_USB_A800 drivers/media/dvb/dvb-usb/Makefile
 
 announce DVB_USB_AF9005 - "Afatech AF9005 DVB-T USB1.1 support"
+clean_file drivers/media/dvb/dvb-usb/af9005-script.h
+clean_sed '
+s,^	deb_info("load init script\\n");$,	{\n		err("Missing Free init script\\n");\n		return scriptlen = ret = -EINVAL;\n		,;
+' drivers/media/dvb/dvb-usb/af9005-fe.c 'report missing Free init script'
+clean_blob drivers/media/dvb/dvb-usb/af9005-fe.c
 clean_blob drivers/media/dvb/dvb-usb/af9005.c
 clean_kconfig drivers/media/dvb/dvb-usb/Kconfig 'DVB_USB_AF9005'
 clean_mk CONFIG_DVB_USB_AF9005 drivers/media/dvb/dvb-usb/Makefile
@@ -1597,12 +1590,6 @@ clean_blob drivers/net/wireless/ath/ath6kl/core.h
 clean_blob drivers/net/wireless/ath/ath6kl/sdio.c
 clean_kconfig drivers/net/wireless/ath/ath6kl/Kconfig 'ATH6KL'
 clean_mk CONFIG_ATH6KL drivers/net/wireless/ath/ath6kl/Makefile
-
-announce ATH9K_HTC - "Atheros HTC based wireless cards support"
-reject_firmware drivers/net/wireless/ath/ath9k/hif_usb.c
-clean_blob drivers/net/wireless/ath/ath9k/hif_usb.c
-clean_kconfig drivers/net/wireless/ath/ath9k/Kconfig 'ATH9K_HTC'
-clean_mk CONFIG_ATH9K_HTC drivers/net/wireless/ath/ath9k/Makefile
 
 announce PRISM2_USB - "Prism2.5/3 USB driver"
 reject_firmware drivers/staging/wlan-ng/prism2fw.c
