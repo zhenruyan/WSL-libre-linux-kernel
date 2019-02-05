@@ -1,5 +1,5 @@
 #!/bin/sh
-#
+
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2008 Alexandre Oliva <lxoliva@fsfla.org>
 #
@@ -16,46 +16,44 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-#
+
+
 # deblob - remove non-free blobs from the vanilla linux kernel
-#
-# http://www.blagblagblag.org/pub/BLAG/linux/kernel/v2.6
-#  ftp://ftp.blagblagblag.org/pub/BLAG/linux/kernel/v2.6
+
 # http://www.fsfla.org/svn/fsfla/software/linux-libre
-#
+
+
+# This script, suited for the kernel version named below, in kver,
+# attempts to remove only non-Free Software bits, without removing
+# Free Software that happens to be in the same file.
+
+# Drivers that currently require non-Free firmware are retained, but
+# firmware included in GPLed sources is replaced with /*(DEBLOBBED)*/
+# if the deblob-check script, that knows how to do this, is present.
+# -lxoliva
+
+
 # See also:
 # http://wiki.debian.org/KernelFirmwareLicensing
 # svn://svn.debian.org/kernel/dists/trunk/linux-2.6/debian/patches/debian/dfsg/files-1
 # http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/firmware/firmware-removed
 # http://svn.gnewsense.svnhopper.net/gnewsense/builder/trunk/gen-kernel
-#
-# Thanks to Brian Brazil @ gnewsense
-#
 
-# This version, suited for 2.6.26, avoids removing Free Software for
-# the sake of removing non-Free Software.  Drivers that currently
-# require non-Free firmware are retained, but firmware included in
-# GPLed sources is replaced with /*(DEBLOBBED)*/ if the deblob-check
-# script, that knows how to do this, is present.  -lxoliva
+# Thanks to Brian Brazil @ gnewsense
+
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.26 extra=
+kver=2.6.26 extra=1
 
-sed -i "s,^EXTRAVERSION.*,EXTRAVERSION = -libre$extra," Makefile
-
-####################
-# FOOOOO XXXXXX
-# drivers/net/tokenring/Kconfig needs as last line:
-# endif # TR
-# drivers/media/Kconfig needs before endmenu
-# endif # DAB
-
-if [ ! -f `which unifdef` ] ; then echo "requires unifdef" ; exit ; fi
+if unifdef /dev/null; then :; else
+    echo unifdef is required >&2
+    exit 1
+fi
 
 check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
 if [ ! -f $check ] ; then
-  echo "optional deblob-check missing, will remove entire files"
+  echo optional deblob-check missing, will remove entire files >&2
   have_check=false
 else
   have_check=:
@@ -128,6 +126,51 @@ function clean_ifdef {
 	check_changed $1
 }
 
+
+# First, check that files that contain firmwares and their
+# corresponding sources are present.
+
+for f in \
+  drivers/char/ser_a2232fw.h \
+    drivers/char/ser_a2232fw.ax \
+  drivers/net/ixp2000/ixp2400_rx.ucode \
+    drivers/net/ixp2000/ixp2400_rx.uc \
+  drivers/net/ixp2000/ixp2400_tx.ucode \
+    drivers/net/ixp2000/ixp2400_rx.uc \
+  drivers/net/wan/wanxlfw.inc_shipped \
+    drivers/net/wan/wanxlfw.S \
+  drivers/net/wireless/atmel.c \
+    drivers/net/wireless/atmel.c \
+  drivers/scsi/53c700_d.h_shipped \
+    drivers/scsi/53c700.scr \
+  drivers/scsi/aic7xxx/aic79xx_seq.h_shipped \
+    drivers/scsi/aic7xxx/aic79xx.seq \
+  drivers/scsi/aic7xxx/aic7xxx_seq.h_shipped \
+    drivers/scsi/aic7xxx/aic7xxx.seq \
+  drivers/scsi/aic7xxx_old/aic7xxx_seq.c \
+    drivers/scsi/aic7xxx_old/aic7xxx.seq \
+  drivers/scsi/53c7xx_d.h_shipped \
+    drivers/scsi/53c7xx.scr \
+  drivers/scsi/sym53c8xx_2/sym_fw1.h \
+    drivers/scsi/sym53c8xx_2/sym_fw1.h \
+  drivers/scsi/sym53c8xx_2/sym_fw2.h \
+    drivers/scsi/sym53c8xx_2/sym_fw2.h \
+  drivers/usb/serial/keyspan_pda_fw.h \
+    drivers/usb/serial/keyspan_pda.S \
+  drivers/usb/serial/xircom_pgs_fw.h \
+    drivers/usb/serial/xircom_pgs.S \
+  sound/pci/cs46xx/imgs/cwcbinhack.h \
+    sound/pci/cs46xx/imgs/cwcdma.asp \
+; do
+  if test ! $f; then
+    echo $f is not present, something is amiss >&2
+    exit 1
+  fi
+done
+
+# Identify the tarball.
+sed -i "s,^EXTRAVERSION.*,&-libre$extra," Makefile
+
 #######################
 # Removed ATM Drivers #
 #######################
@@ -137,16 +180,7 @@ clean_blob drivers/atm/atmsar11.data
 
 # ATM_FORE200E_PCA
 # ATM_FORE200E_SBA - SBA-200E
-# it appears by placing these files under the GPL this company
-# now has to release the source
-
-# There's no code in this file. --lxoliva
-# clean_file drivers/atm/fore200e_firmware_copyright
-
-# There's only GPLed code in this one. --lxoliva
-# clean_file drivers/atm/fore200e_mkfirm.c
-
-clean_kconfig drivers/atm/Kconfig 'ATM_\(FORE\).*'
+clean_kconfig drivers/atm/Kconfig 'ATM_FORE.*'
 clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 
 clean_file drivers/atm/pca200e.data
@@ -170,7 +204,7 @@ clean_blob drivers/char/dsp56k.c
 clean_kconfig arch/m68k/Kconfig 'ATARI_DSP56K'
 clean_mk CONFIG_ATARI_DSP56K drivers/char/Makefile
 
-# drm
+# gpu drm
 
 # DRM_MGA - Matrox g200/g400
 clean_blob drivers/char/drm/mga_ucode.h
@@ -578,7 +612,7 @@ clean_kconfig sound/pci/Kconfig 'SND_CS46XX'
 # sed -i '/cs46xx\/ \\/d' sound/pci/Makefile
 
 # SND_KORG1212 - Korg 1212 IO
-# clean_ifdef sound/pci/korg1212/korg1212.c CONFIG_SND_KORG1212_FIRMWARE_IN_KERNEL
+clean_ifdef sound/pci/korg1212/korg1212.c CONFIG_SND_KORG1212_FIRMWARE_IN_KERNEL
 clean_blob sound/pci/korg1212/korg1212-firmware.h
 
 # SND_MAESTRO3 - ESS Allegro/Maestro3
@@ -588,53 +622,14 @@ clean_ifdef sound/pci/maestro3.c CONFIG_SND_MAESTRO3_FIRMWARE_IN_KERNEL
 clean_blob sound/pci/ymfpci/ymfpci_image.h
 clean_ifdef sound/pci/ymfpci/ymfpci_main.c CONFIG_SND_YMFPCI_FIRMWARE_IN_KERNEL
 
+# SND_SB16_CSP_FIRMWARE_IN_KERNEL - SB16 Advanced Signal Processor
+clean_blob sound/isa/sb/sb16_csp_codecs.h
+clean_kconfig sound/isa/Kconfig SND_SB16_CSP_FIRMWARE_IN_KERNEL
 
-###############
-# Not Removed #
-###############
+# SND_WAVEFRONT_FIRMWARE_IN_KERNEL
+# Most of this file is not matched by deblob-check because of WAIT_IDLE.
+# Just remove it.
+clean_file sound/isa/wavefront/yss225.c
+clean_kconfig sound/isa/Kconfig SND_WAVEFRONT_FIRMWARE_IN_KERNEL
 
-# This is not removed in debian nor gnewsense nor do I think
-# it should be removed. It's on debian's list to check out
-# I think it points at firmware, but doesn't contain any
-# (e.g. if you add the file yss225_registers.bin it will use it)
-# clean_blob sound/isa/wavefront/wavefront_fx.c
-
-# VIDEO_STRADIS - Stradis 4:2:2 MPEG-2 video driver
-# This just sets a few values and a bunch of zeros. It doesn't look like
-# it was done by anything that would have upstream source code. This should 
-# probably be kept. It's removed in gnewsense, but not even mentioned
-# by debian as potential candidate. It is used by stratis.c
-# clean_blob drivers/media/video/cs8420.h
-
-# gnewsense removes drivers/serial/jsm/jsm_neo.c but vanilla version looks ok
-
-# Not in kernel 2.6.23
-# drivers/scsi/qla2xxx/ql2100_fw.c
-# drivers/scsi/qla2xxx/ql2200_fw.c
-# drivers/scsi/qla2xxx/ql2300_fw.c
-# drivers/scsi/qla2xxx/ql2322_fw.c
-# drivers/scsi/qla2xxx/ql2400_fw.c
-# drivers/usb/net/kawethfw.h
-# sound/isa/sb/sb16/sb16_csp_codecs.h
-# sound/oss/yss225.c
-# drivers/scsi/53c7xx_d.h_shipped 53c7xx.scr
-# sound/pci/cs46xx/imgs/cwcemb80.h
-
-# Not in kernel 2.6.24
-# drivers/net/dgrs_firmware.c
-
-# blobs but free source available (source listed 2nd)
-# drivers/char/ser_a2232fw.h				ser_a2232fw.ax
-# drivers/net/ixp2000/ixp2400_rx.ucode			ixp2400_rx.uc
-# drivers/net/ixp2000/ixp2400_tx.ucode			ixp2400_rx.uc
-# drivers/net/wan/wanxlfw.inc_shipped			wanxlfw.S
-# drivers/net/wireless/atmel.c				atmel.c
-# drivers/scsi/53c700_d.h_shipped			53c700.scr
-# drivers/scsi/aic7xxx/aic79xx_seq.h_shipped		aic79xx.seq
-# drivers/scsi/aic7xxx/aic7xxx_seq.h_shipped		aic7xxx.seq
-# drivers/scsi/aic7xxx_old/aic7xxx_seq.c		aic7xxx.seq
-# drivers/scsi/sym53c8xx_2/sym_fw1.h			sym_fw1.h
-# drivers/scsi/sym53c8xx_2/sym_fw2.h			sym_fw2.h
-# drivers/usb/serial/keyspan_pda_fw.h			keyspan_pda.S
-# drivers/usb/serial/xircom_pgs_fw.h			xircom_pgs.S
-
+exit 0
