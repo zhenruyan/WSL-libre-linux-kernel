@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-03-25
+# deblob-check version 2014-06-07
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3581,6 +3581,9 @@ set_except () {
     blobname 'cbfw-3\.2\.3\.0\.bin' drivers/scsi/bfa/bfad.c
     blobname 'ctfw-3\.2\.3\.0\.bin' drivers/scsi/bfa/bfad.c
     blobname 'ct2fw-3\.2\.3\.0\.bin' drivers/scsi/bfa/bfad.c
+
+    # New in 3.14.6
+    blobname 'radeon[/]\(%s\|BONAIRE\|HAWAII\|TAHITI\|PITCAIRN\|VERDE\|OLAND\|HAINAN\)_mc2\.bin' 'drivers/gpu/drm/radeon/\(cik\|si\)\.c'
     ;;
 
   */*freedo*.patch | */*logo*.patch)
