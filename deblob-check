@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-05-18
+# deblob-check version 2008-07-14
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -26,7 +26,7 @@
 
 
 # usage: deblob-check [-S] [-vv] [-s S] [-lDdBbCcXxPpFftVh?H] \
-#        [*.tar* patch-* *.patch]
+#        [*.tar* patch-* *.patch *.diff]
 
 # Look for too-long undocumented sequences of numbers (generally blobs
 # in disguise) in source files.
@@ -515,8 +515,8 @@ set_except () {
     # sensitivity, so make sure the sequences of numbers that are not
     # blobs are not deblobbed.  FIXME: we should have patterns to
     # recognize the blobs instead.
-    initnc '	static const u32 test_pat\[4\]\[6\] ='
-    initnc '	}, mem_tbl_5705\[\] ='
+    accept "	static const u32 test_pat\[4\]\[6\] = {$sepx$blobpat*$sepx};" drivers/net/tg3.c
+    accept "	}\\(,\\? mem_tbl_5\\(70x\\|705\\|755\\|906\\)\\[\\] = {$sepx$blobpat*$sepx}\\)*;" drivers/net/tg3.c
     ;;
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
     # false alarms, contain source
@@ -647,6 +647,20 @@ set_except () {
     initnc 'static const struct ath5k_ini_rf rfregs_5413\[\] ='
     initnc 'const u\(8\|16\|32\) b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\] ='
 
+    # new in 2.6.26
+    initnc 'static u64 vec2off\[68\] =' arch/ia64/kvm/process.c
+    initnc "			interrupts = <\\(0x\\)\\?3 \\(0x\\)\\?0 \\(0x\\)\\?0  $blobpat*>;" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
+    initnc 'static const u32 crctab32\[\] =' arch/x86/boot/tools/build.c
+    initnc 'static struct mse2snr_tab \(vsb\|qam\(64\|256\)\)_mse2snr_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} \(VSB\|QAM\)_mod_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} itd1000_\(lpf_pga\|fre_values\)\[\] =' drivers/media/dvb/frontends/itd1000.c
+    initnc '} \(vsb\|qam\(64\|256\)\)_snr_tab\[\] =' drivers/media/dvb/frontends/s5h1411.c
+    initnc '} snr_tab\[\] =' drivers/media/dvb/frontends/tda10048.c
+    initnc 'static u32 reg_init_initialize\[\] =' drivers/media/video/saa717x.c
+    initnc 'static const u32 \(main\|gear\)_seedset\[BACKOFF_SEEDSET_ROWS\]\[BACKOFF_SEEDSET_LFSRS\] =' drivers/net/forcedeth.c
+    initnc 'static const struct ath5k_ini_mode rf24\(13\|25\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c
+    initnc 'static const u16 wm9713_reg\[\] =' sound/soc/codecs/wm9713.c
+
     # quite suspicious
     # arch/parisc/kernel/perf_images.h
     initc 'static uint32_t onyx_images\[\]\[PCXU_IMAGE_SIZE\/sizeof(uint32_t)\] __read_mostly ='
@@ -692,7 +706,7 @@ set_except () {
     initnc '	#define WakeupSeq    {'
     initnc '	SetRate44100\[\] ='
     initnc '	const short period\[32\] ='
-    initnc '	const static int desc_idx_table\[\] ='
+    initnc '	\(const static\|static const\) int desc_idx_table\[\] ='
     initnc '	int prop_bcomm_irq\[3\*16\] ='
     initnc '	static char logSlopeTable\[128\] ='
     initnc '	static const int uc_\(dup\|word\)_table\[\]\[2\] ='
@@ -983,7 +997,7 @@ set_except () {
     initnc 'static uchar sbox\[8\]\[4\]\[16\] ='
     initnc 'static uint16_t crc_table\[256\] ='
     initnc 'static uint8_t lpfcAlpaArray\[\] ='
-    initnc 'static uint8_t seqprog\[\] ='
+    initnc 'static \(const \)\?uint8_t seqprog\[\] ='
     initnc 'static unsigned char V110_OffMatrix_9600\[\] ='
     initnc 'static unsigned char V110_OnMatrix_9600\[\] ='
     initnc 'static unsigned char a2232_65EC02code\[\] ='
@@ -1111,7 +1125,7 @@ set_except () {
     initnc 'static u32 reg_init_initialize\[\] =' drivers/media/video/saa717x.c
     initnc '	} vals\[\] =' drivers/media/video/saa717x.c
     initnc 'static const u32 \(main\|gear\)_seedset\[BACKOFF_SEEDSET_ROWS\]\[BACKOFF_SEEDSET_LFSRS\] =' drivers/net/forcedeth.c
-    blob '^unsigned char \(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\) = '"$blobsep$blobseq*$blobsep;" drivers/s390/net/qeth_core_mpc.c # from drivers/s390/net/qeth_mpc.c in 2.6.25
+    blob '^unsigned char \(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\) = '"$sepx$blobseq*$sepx;" drivers/s390/net/qeth_core_mpc.c # from drivers/s390/net/qeth_mpc.c in 2.6.25
     initnc '} pll_table\[\] =' drivers/video/geode/lxfb_ops.c
     accept "  { 0x00014284,  19688 },[\n]  { 0x00011104,  20400 },[\n]  { $blobpat* }," drivers/video/geode/lxfb_ops.c # won't be necessary in rc3
     initnc 'static const u16 wm9713_reg\[\] =' sound/soc/codecs/wm9713.c
@@ -1214,6 +1228,11 @@ set_except () {
     initnc 'static const struct ath5k_ini_mode rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c # ?
     initnc '		} blinkrates\[\] ='
 
+    initnc 'static const u8 rtl8225z2_agc\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_ofdm\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck_ch14\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+
     # git logs
     accept '   sudo modprobe ath5k debug=0x00000400[\n][ 	]*[\n]\([ 	]*Band[^\n]*[\n]\([ 	]*\(\(channels\|rates\):\|[- 	0-9a-f]*\|\[\.\.\. etc \]\)[\n]\)\+\)\+       540 000c 0000 0000'
     oprepline '	{ 1, MODULATION_XR, 3000, 1, 150, 3 },'
@@ -1278,7 +1297,7 @@ defineblob='[ 	]*#[ 	]*define[ 	]\+\([^\n]*\\[\n]\)*[^\n]*'"$blobseq"'\([^\n]*\\
 
 # Regular expression that matches an assembly label followed by a blob
 # without any intervening label.
-asmblob="[a-zA-Z_.][^\\n:;#/ 	]*[ ]*:\\([^:]*\\|$asmcomment\\)*$blobseq\\([^:]*\\|$asmcomment\\)*"
+asmblob="[a-zA-Z_.][^\\n:;#/ 	]*[ ]*:\\([^:{}]*\\|$asmcomment\\)*$blobseq\\([^:]*\\|$asmcomment\\)*"
 
 # Regular expression that matches one or more blobs without
 # intervening line breaks.
@@ -1862,7 +1881,7 @@ check () {
   *.tar*)
     cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'"
     ;;
-  *patch* | *diff*)
+  *.patch | patch-* | *.diff)
     sedpatch='
       /^[-]/d;
       /^\(@@\|+++\) / {
