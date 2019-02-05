@@ -63,7 +63,7 @@ esac
 
 mver=$1 extra=$2 sver=$3
 kver=$mver$sver libre=libre$extra
-deblob= dir=`echo $0 | sed 's,/[^/]*$,,'`
+deblob= dir=`echo "$0" | sed 's,[^/]*$,,;s,^$,.,;s,/*$,,'`
 
 if test ! -f linux-$kver.tar.bz2; then
   echo linux-$kver.tar.bz2 does not exist >&2

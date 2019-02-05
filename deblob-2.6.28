@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.28 extra=1
+kver=2.6.28 extra=2
 
 fatal () {
   echo "$@"
@@ -56,7 +56,7 @@ case $1 in
 *) die () { fatal "$@"; }; forced=false;;
 esac
 
-check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
+check=`echo "$0" | sed 's,[^/]*$,,;s,^$,.,;s,/*$,,'`/deblob-check
 if [ ! -f $check ] ; then
   if $forced; then
     die deblob-check script missing, will remove entire files
@@ -362,6 +362,9 @@ announce ARCH_NETX - "Hilscher NetX based"
 clean_sed '
 s,\([" ]\)request_firmware(,\1reject_firmware(,
 ' arch/arm/mach-netx/xc.c 'disabled non-Free firmware-loading machinery'
+clean_blob arch/arm/mach-netx/xc.c
+clean_kconfig arch/arm/Kconfig 'ARCH_NETX'
+clean_mk CONFIG_ARCH_NETX arch/arm/Makefile
 
 
 #######
@@ -728,6 +731,7 @@ reject_firmware drivers/media/dvb/siano/smscoreapi.c
 reject_firmware drivers/media/dvb/siano/smsusb.c
 clean_blob drivers/media/dvb/siano/smscoreapi.c
 clean_blob drivers/media/dvb/siano/smsusb.c
+clean_blob drivers/media/dvb/siano/sms-cards.c
 clean_kconfig drivers/media/dvb/siano/Kconfig 'DVB_SIANO_SMS1XXX'
 clean_mk CONFIG_DVB_SIANO_SMS1XXX drivers/media/dvb/siano/Makefile
 
@@ -762,6 +766,7 @@ announce VIDEO_CX18 - "Conexant cx23418 MPEG encoder support"
 reject_firmware drivers/media/video/cx18/cx18-av-firmware.c
 reject_firmware drivers/media/video/cx18/cx18-firmware.c
 clean_blob drivers/media/video/cx18/cx18-av-firmware.c
+clean_blob drivers/media/video/cx18/cx18-firmware.c
 clean_kconfig drivers/media/video/cx18/Kconfig 'VIDEO_CX18'
 clean_mk CONFIG_VIDEO_CX18 drivers/media/video/cx18/Makefile
 
@@ -1299,6 +1304,16 @@ clean_kconfig drivers/bluetooth/Kconfig 'BT_HCIBT3C'
 clean_mk CONFIG_BT_HCIBT3C drivers/bluetooth/Makefile
 
 
+########
+# ISDN #
+########
+
+announce ISDN_DIVAS - "Support Eicon DIVA Server cards"
+clean_blob drivers/isdn/hardware/eicon/cardtype.h
+clean_blob drivers/isdn/hardware/eicon/dsp_defs.h
+clean_kconfig drivers/isdn/hardware/eicon/Kconfig 'ISDN_DIVAS'
+clean_mk CONFIG_ISDN_DIVAS drivers/isdn/hardware/eicon/Makefile
+
 ##########
 # Serial #
 ##########
@@ -1414,6 +1429,12 @@ announce SCSI_QLA_FC - "QLogic QLA2XXX Fibre Channel Support"
 reject_firmware drivers/scsi/qla2xxx/qla_gbl.h
 reject_firmware drivers/scsi/qla2xxx/qla_init.c
 reject_firmware drivers/scsi/qla2xxx/qla_os.c
+clean_sed '
+/^config SCSI_QLA_FC$/,/^config /{
+  /^	By default, firmware/i\
+	/*(DEBLOBBED)*/
+  /^	By default, firmware/,/ftp:[/][/].*firmware[/]/d
+}' drivers/scsi/qla2xxx/Kconfig 'removed firmware notes'
 clean_blob drivers/scsi/qla2xxx/qla_os.c
 clean_kconfig drivers/scsi/qla2xxx/Kconfig 'SCSI_QLA_FC'
 clean_mk CONFIG_SCSI_QLA_FC drivers/scsi/qla2xxx/Makefile
@@ -1788,6 +1809,7 @@ clean_mk CONFIG_SOUND_PAS sound/oss/Makefile
 clean_mk CONFIG_SOUND_SB sound/oss/Makefile
 
 announce SOUND_PSS - "PSS (AD1848, ADSP-2115, ESC614) support"
+clean_sed 's,^\( [*] .*synth"\)\.$,\1/*.,' sound/oss/pss.c 'avoid nested comments'
 clean_blob sound/oss/pss.c
 clean_kconfig sound/oss/Kconfig 'SOUND_PSS'
 clean_sed '
@@ -1810,7 +1832,7 @@ clean_blob Documentation/sound/oss/PSS
 clean_blob Documentation/sound/oss/PSS-updates
 clean_file Documentation/dvb/get_dvb_firmware
 clean_file Documentation/video4linux/extract_xc3028.pl
-clean_blob drivers/base/Kconfig
+clean_sed s,usb8388,whatever,g drivers/base/Kconfig 'removed blob name'
 clean_blob firmware/WHENCE
 
 exit 0
