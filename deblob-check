@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2018-01-07
+# deblob-check version 2018-01-07 + 2018-03-24's r14712 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4967,6 +4967,9 @@ set_except () {
     blobname 'dpfe\.bin' drivers/memory/brcmstb_dpfe.c
     accept '[\t]err[ ]=[ ]request_firmware[(][&]clm[,][ ]clm_name[,][ ]dev[)][;]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
     accept '[\t]*DRM_DEBUG_DRIVER[(]["]%s[ ]fw[ ]request_firmware[ ]err=%d[\\]n["][,]' drivers/gpu/drm/i915/intel_uc_fw.c
+
+    # New in 4.16, backported to 4.15.13 and 4.14.30.
+    accept '[ ][*][ ]@fw_get_done[\t]*flag[ ]set[ ]when[ ]request_firmware[(][)][ ]is[ ]complete' drivers/media/platform/s5p-mfc/s5p_mfc_common.h
     ;;
 
   */*freedo*.patch | */*logo*.patch)
