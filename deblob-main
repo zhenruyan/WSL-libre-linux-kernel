@@ -18,12 +18,14 @@
 # USA
 
 # deblob.sh - prepare a linux-libre tarball out of a non-libre Linux
-# tarball.  It expects the Linux release (kver) as the first argument,
-# and the libre sub-release (extra) as the second optional argument.
+# tarball.  It expects the Linux release (mver, say 2.6.25) as the
+# first argument, the libre sub-release (extra) as the second optional
+# argument, and the patch release (sver, say .13) as an optional third
+# argument.  mver and sver are pasted together to form kver.
 
-# linux-$kver.tar.bz2 and deblob-$kver must exist in the current
-# directory, and the line that sets kver and extra in deblob-$kver
-# must match the command-line arguments.  
+# linux-$kver.tar.bz2 and deblob-$mver must exist in the current
+# directory, and the line that sets kver and extra in deblob-$mver
+# must match mver and extra.
 
 # The resulting tarball is put in linux-$kver-libre$extra.tar.bz2, and
 # an uncompressed xdelta that produces linux-$kver-libre$extra.tar out
@@ -42,7 +44,7 @@
 # At the end, the script attempts to generate a digital signature for
 # the newly-created tarball.  This is the last thing the script does,
 # so interrupting it at that point to skip the signing won't fail to
-# do anything else.  
+# do anything else.
 
 # It is safe to interrupt the script at any other point.  When it gets
 # a ^C (other than during signing), it starts cleaning up all of its
@@ -50,7 +52,8 @@
 # behind, and then it will refuse to run again before you clean it up
 # by hand.  It takes extra care to avoid overwriting useful files.
 
-kver=$1 extra=$2 libre=libre$extra
+mver=$1 extra=$2 sver=$3
+kver=$mver$sver libre=libre$extra
 deblob= dir=`echo $0 | sed 's,/[^/]*$,,'`
 
 if test ! -f linux-$kver.tar.bz2; then
@@ -58,21 +61,21 @@ if test ! -f linux-$kver.tar.bz2; then
   exit 1
 fi
 
-if test -f deblob-$kver; then
-  deblob=deblob-$kver
+if test -f deblob-$mver; then
+  deblob=deblob-$mver
 elif test -f deblob; then
   deblob=deblob
-elif test -f $dir/deblob-$kver; then
-  cp $dir/deblob-$kver deblob
+elif test -f $dir/deblob-$mver; then
+  cp $dir/deblob-$mver deblob
   deblob=deblob
 else
   echo deblob does not exist >&2
   exit 1
 fi
 
-x1="kver=$kver extra=$extra"
-x2=`grep \"^$x1$\" $deblob`
-if test "$x1" != "$x2"; then
+x1="kver=$mver extra=$extra"
+x2=`grep "^kver=[^ ]* extra=[0-9]*$" $deblob`
+if test "$x1" = "$x2"; then
   :
 else
   echo deblob script does not match command-line arguments >&2
