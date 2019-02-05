@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-03-15
+# deblob-check version 2011-04-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2742,6 +2742,8 @@ set_except () {
     blobname 'rpm_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
     blobname 'mwl8k[/]fmimage_8366_ap-["][ ][#]api[ ]["]\.fw' drivers/net/wireless/mwl8k.c
     blobname 'rtl_nic[/]rtl8168d-[12]\.fw' drivers/net/r8169.c
+    # New in 2.6.38.4
+    defsnc '[	]static[ ]DEFINE_TEST_\(OK\|FAIL\)[(][^)]*[)][ ]=' lib/test-kstrtox.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -2836,6 +2838,11 @@ set_except () {
     defsnc '[	]\(static[ ]const[ ]\)\?u32[ ]reg_boundaries\[\][ ]=' drivers/net/bnx2.c
     initnc 'static[ ]const[ ]struct[ ]ath5k_ini_mode[ ]rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\][ ]=' drivers/net/wireless/ath5k/initvals.c
     defsnc 'static[ ]u32[ ]\(h_prescale\|v_gain\)\[64\][ ]=' drivers/staging/stradis/stradis.c
+    ;;
+
+  */patch*-2.6.38*)
+    # New in 2.6.38.4
+    defsnc '[	]static[ ]DEFINE_TEST_\(OK\|FAIL\)[(][^)]*[)][ ]=' lib/test-kstrtox.c
     ;;
 
   */patch*-2.6.37-rc*) # up to -rc8-git3
@@ -3589,6 +3596,7 @@ set_except () {
     defsnc '\(static[ ]uint32_t\|[}]\)[ ]nv04_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv04_graph.c
     defsnc 'static[ ]int[ ]nv1[07]_graph_ctx_regs[ ]\?\[\][ ]=' drivers/char/drm/nv10_graph.c
     defsnc '[	][}][ ]common_modes\[17\][ ]=' drivers/gpu/drm/radeon/radeon_connectors.c
+    defsnc 'static[ ]const[ ]u8[ ]types\[256\][ ]=' drivers/gpu/drm/nouveau/nvc0_vram.c
 
     # drm-upgrayedd.patch
     defsnc 'static[ ]const[ ]u16[ ]\(y\|uv\)_static_hcoeffs\[N_HORIZ_\(Y\|UV\)_TAPS[ ][*][ ]N_PHASES\][ ]=' drivers/gpu/drm/i915/intel_overlay.c
