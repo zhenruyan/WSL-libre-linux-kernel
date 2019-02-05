@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2014-08-07
+# deblob-check version 2014-08-07 + 2015-09-22's r12444
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2014 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2015 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -3757,6 +3757,9 @@ set_except () {
     defsnc 'static[ ]unsigned[ ]char[ ]bcd2000_init_sequence\[\][ ]=' sound/usb/bcd2000/bcd2000.c
     blobna '[ ][*][ ]xxd[ ]-r[ ]-p[ ]mXTXXX[^\n]*maxtouch\.fw[\n][ \t]*[*][/]' drivers/input/touchscreen/atmel_mxt_ts.c
     blobname 's5p-mfc-v8\.fw' drivers/media/platform/s5p-mfc/s5p_mfc.c
+
+    # New in 4.2.1 and 4.1.8.
+    defsnc '[}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
