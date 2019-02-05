@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2016-07-10
+# deblob-check version 2016-07-24
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4475,6 +4475,7 @@ set_except () {
     blobname 'nvidia[/]tegra\(124\|210\)[/]xusb\.bin' drivers/usb/host/xhci-tegra.c
     accept '[\t]*ath10k_info[(]ar[,][ ]["][/][*][(]DEBLOBBED[)][*][/][ ]didn.t' drivers/net/wireless/ath/ath10k/testmode.c
     accept 'static[ ]const[ ]struct[ ]tegra_xusb_soc[ ]tegra\(124\|210\)_soc[ ]=[ ][{][\n][\t][.]firmware[ ]=' drivers/usb/host/xhci-tegra.c
+    blobname 'i915[/]kbl_dmc_ver1\.bin' drivers/gpu/drm/i915/intel_csr.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
