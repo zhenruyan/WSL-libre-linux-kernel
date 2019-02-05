@@ -2,6 +2,7 @@
 
 #    Copyright (C) 2008, 2009 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
+#    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,16 +45,26 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.30 extra=
-
-fatal () {
-  echo "$@"
-  exit 1
-}
+kver=2.6.30 extra=1
 
 case $1 in
---force) die () { echo ERROR: "$@": ignored >&2; }; forced=:; shift;;
-*) die () { fatal "$@"; }; forced=false;;
+--force)
+  echo "WARNING: Using the force, ignored errors will be" >&2
+  die () {
+    echo ERROR: "$@" >&2
+    errors=:
+  }
+  forced=: errors=false
+  shift
+  ;;
+*)
+  die () {
+    echo ERROR: "$@" >&2
+    echo Use --force to ignore
+    exit 1
+  }
+  forced=false errors=false
+  ;;
 esac
 
 check=`echo "$0" | sed 's,[^/]*$,,;s,^$,.,;s,/*$,,'`/deblob-check
@@ -68,129 +79,132 @@ else
   have_check=:
 fi
 
+filetest () {
+  if [ ! -f $1 ]; then
+    die $1 does not exist, something is wrong && return 1
+  fi
+}
+
 announce () {
-	echo
-	echo "$@"
+  echo
+  echo "$@"
 }
 
 clean_file () {
-	#$1 = filename
-	if test ! -f $1; then
-		die $1 does not exist, something is wrong
-	fi
-	rm $1
-	echo $1: removed
+  #$1 = filename
+  filetest $1 || return
+  rm $1
+  echo $1: removed
 }
 
 check_changed () {
-	if test ! -f $1; then
-		die $1 does not exist, something is wrong
-	elif cmp $1.deblob $1 > /dev/null; then
-		die $1 did not change, something is wrong
-	fi
-	mv $1.deblob $1
+  #$1 = filename
+  if cmp $1.deblob $1 > /dev/null; then
+    rm $1.deblob
+    die $1 did not change, something is wrong && return 1
+  fi
+  mv $1.deblob $1
 }
 
 clean_blob () {
-	#$1 = filename
-	if $have_check; then
-	    if test ! -f $1; then
-		die $1 does not exist, something is wrong
-	    fi
-	    name=$1
-	    set fnord "$@" -d
-	    shift 2
-	    $check "$@" -i linux-$kver $name > $name.deblob
-	    echo $name: removed blobs
-	    check_changed $name
-	else
-	    clean_file $1
-	fi
+  #$1 = filename
+  filetest $1 || return
+  if $have_check; then
+    name=$1
+    set fnord "$@" -d
+    shift 2
+    $check "$@" -i linux-$kver $name > $name.deblob
+    check_changed $name && echo $name: removed blobs
+  else
+    clean_file $1
+  fi
 }
 
 dummy_blob () {
-	#$1 = filename
-	if test -f $1; then
-	    die $1 exists, something is wrong
-	elif test ! -f firmware/Makefile; then
-	    die firmware/Makefile does not exist, something is wrong
-	fi
+  #$1 = filename
+  if test -f $1; then
+    die $1 exists, something is wrong && return
+  elif test ! -f firmware/Makefile; then
+    die firmware/Makefile does not exist, something is wrong && return
+  fi
 
-	clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
-	  firmware/Makefile "dropped $1"
+  clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
+    firmware/Makefile "dropped $1"
 }
 
 clean_fw () {
-	#$1 = firmware text input, $2 = firmware output
-	if test ! -f $1; then
-		die $1 does not exist, something is wrong
-	elif test -f $2; then
-		die $2 exists, something is wrong
-	fi
-	clean_blob $1 -s 4
-	dummy_blob $2
+  #$1 = firmware text input, $2 = firmware output
+  filetest $1 || return
+  if test -f $2; then
+    die $2 exists, something is wrong && return
+  fi
+  clean_blob $1 -s 4
+  dummy_blob $2
 }
 
 drop_fw_file () {
-	#$1 = firmware text input, $2 = firmware output
-	if test ! -f $1; then
-		die $1 does not exist, something is wrong
-	elif test -f $2; then
-		die $2 exists, something is wrong
-	fi
-	clean_file $1
-	dummy_blob $2
+  #$1 = firmware text input, $2 = firmware output
+  filetest $1 || return
+  if test -f $2; then
+    die $2 exists, something is wrong && return
+  fi
+  clean_file $1
+  dummy_blob $2
 }
 
 clean_kconfig () {
-        #$1 = filename $2 = things to remove
-	case $1 in
-	-f)
-		shift
-		;;
-	*)
-		if $have_check; then
-			return
-		fi
-		;;
-	esac
-	sed "/^config \\($2\\)\$/{p;i\
+  #$1 = filename $2 = things to remove
+  case $1 in
+  -f)
+    shift
+    ;;
+  *)
+    if $have_check; then
+      return
+    fi
+    ;;
+  esac
+  filetest $1 || return
+  sed "/^config \\($2\\)\$/{p;i\
 	depends on NONFREE
 d;}" $1 > $1.deblob
-	echo $1: marked config $2 as depending on NONFREE
-	check_changed $1
+  check_changed $1 && echo $1: marked config $2 as depending on NONFREE
 }
 
 clean_mk () {
-	#$1 = config $2 = Makefile name
-	# We don't clean up Makefiles any more --lxoliva
-	# sed -i "/\\($1\\)/d" $2
-	# echo $2: removed $1 support
-	# check_changed $2
-	if sed -n "/\\($1\\)/p" $2 | grep . > /dev/null; then
-	    :
-	else
-	    die $2 does not contain matches for $1
-	fi
+  #$1 = config $2 = Makefile name
+  # We don't clean up Makefiles any more --lxoliva
+  # sed -i "/\\($1\\)/d" $2
+  # echo $2: removed $1 support
+  # check_changed $2
+  filetest $2 || return
+  if sed -n "/\\($1\\)/p" $2 | grep . > /dev/null; then
+    :
+  else
+    die $2 does not contain matches for $1
+  fi
 }
 
 clean_sed () {
-	#$1 = sed-script $2 = file $3 = comment
-	sed -e "$1" "$2" > "$2".deblob
-	echo $2: ${3-applied sed script $1}
-	check_changed "$2"
+  #$1 = sed-script $2 = file $3 = comment
+  filetest $2 || return
+  sed -e "$1" "$2" > "$2".deblob || {
+    die $2: failed: ${3-applied sed script $1} && return 1; }
+  check_changed $2 && echo $2: ${3-applied sed script $1} 
 }
 
 reject_firmware () {
-	#$1 = file
-	clean_sed '
+  #$1 = file
+  filetest $1 || return
+  clean_sed '
 s,request\(_ihex\)\?_firmware\(_nowait\)\?,reject_firmware\2,g
 ' "$1" 'disabled non-Free firmware-loading machinery'
 }
 
 maybe_reject_firmware () {
-	#$1 = file
-	clean_sed '
+  #$1 = file
+  filetest $1 || return
+  clean_sed '
 s,request_firmware\(_nowait\)\?,maybe_reject_firmware\1,g
 ' "$1" 'retain Free firmware-loading machinery, disabling non-Free one'
 }
@@ -203,8 +217,8 @@ undefine_macro () {
   macro=$1 repl=$2 msg=$3; shift 3
   for f in "$@"; do
     clean_sed "
-  s,^#define $macro .*\$,/*(DEBLOBBED)*/,;
-  s,$macro,$repl,g;
+s,^#define $macro .*\$,/*(DEBLOBBED)*/,;
+s,$macro,$repl,g;
 " "$f" "$msg"
   done
 }
@@ -255,18 +269,18 @@ for f in \
     sound/pci/cs46xx/imgs/cwcdma.asp \
 ; do
   if test ! $f; then
-    die $f is not present, something is amiss
+    die $f is not present, something is amiss && return
   fi
 done
 
 # Identify the tarball.
-clean_sed "
-s,^EXTRAVERSION.*,&-libre$extra,
+grep -q 'EXTRAVERSION.*-libre' Makefile ||
+clean_sed "s,^EXTRAVERSION.*,&-libre$extra,
 " Makefile 'added -libre to EXTRAVERSION'
 
 # Add reject_firmware and maybe_reject_firmware
-clean_sed '
-$i\
+grep -q _LINUX_LIBRE_FIRMWARE_H include/linux/firmware.h ||
+clean_sed '$i\
 #ifndef _LINUX_LIBRE_FIRMWARE_H\
 #define _LINUX_LIBRE_FIRMWARE_H\
 \
@@ -448,58 +462,49 @@ clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
 announce DRM_R128 - "ATI Rage 128"
 clean_sed '
-/^static int r128_do_init_cce([^;]*$/,/^}$/{
-  /^	r128_cce_load_microcode(dev_priv);$/{
-    i\
-	DRM_ERROR("Missing Free microcode!\\n");\
-	dev->dev_private = (void *)dev_priv;\
-	r128_do_cleanup_cce(dev);\
-	return -EINVAL;
-  }
-}' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
+/^static void r128_cce_load_microcode(drm_r128_private_t \* dev_priv)/i\
+#define r128_cce_load_microcode(dev_priv) \\\
+  do { \\\
+    DRM_ERROR("Missing Free microcode!\\n"); \\\
+    dev->dev_private = (void *)dev_priv; \\\
+    r128_do_cleanup_cce(dev); \\\
+    return -EINVAL; \\\
+  } while (0)
+' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/r128/r128_cce.c
 clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 announce DRM_RADEON - "ATI Radeon"
 clean_sed '
-/^static int radeon_do_init_cp([^;]*$/,/^}$/{
-  /^	radeon_cp_load_microcode(dev_priv);$/{
-    i\
-	DRM_ERROR("Missing Free microcode!\\n");\
-	radeon_do_cleanup_cp(dev);\
-	return -EINVAL;
-  }
-}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on init'
-clean_sed '
-/^static int radeon_do_resume_cp([^;]*$/,/^}$/{
-  /^	radeon_cp_load_microcode(dev_priv);$/{
-    i\
-	DRM_ERROR("Missing Free microcode!\\n");\
-	return -EINVAL;
-  }
-}' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on resume'
+/^static void radeon_cp_load_microcode(drm_radeon_private_t \* dev_priv)/i\
+#define radeon_cp_load_microcode(dev_priv) \\\
+  do { \\\
+    DRM_ERROR("Missing Free microcode!\\n"); \\\
+    radeon_do_cleanup_cp(dev); \\\
+    return -EINVAL; \\\
+  } while (0)
+' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/radeon/radeon_cp.c
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
 clean_sed '
-/^int r600_do_init_cp([^;]*$/,/^}$/{
-  /^		r[67]00_cp_load_microcode(dev_priv);$/{
-    i\
-		do {\
-			DRM_ERROR("Missing Free microcode!\\n");\
-			r600_do_cleanup_cp(dev);\
-			return -EINVAL;\
-		} while (0);
-  }
-}' drivers/gpu/drm/radeon/r600_cp.c 'report missing Free microcode on init'
+/^static void r600_cp_load_microcode(drm_radeon_private_t \*dev_priv)/i\
+#define r600_cp_load_microcode(dev_priv) \\\
+  do { \\\
+    DRM_ERROR("Missing Free microcode!\\n"); \\\
+    r600_do_cleanup_cp(dev); \\\
+    return -EINVAL; \\\
+  } while (0)
+' drivers/gpu/drm/radeon/r600_cp.c 'report missing Free r600 microcode'
 clean_sed '
-/^int r600_do_resume_cp([^;]*$/,/^}$/{
-  /^		r[67]00_cp_load_microcode(dev_priv);$/{
-    i\
-		DRM_ERROR("Missing Free microcode!\\n");\
-		return -EINVAL;
-  }
-}' drivers/gpu/drm/radeon/r600_cp.c 'report missing Free microcode on resume'
+/^static void r700_cp_load_microcode(drm_radeon_private_t \*dev_priv)/i\
+#define r700_cp_load_microcode(dev_priv) \\\
+  do { \\\
+    DRM_ERROR("Missing Free microcode!\\n"); \\\
+    r600_do_cleanup_cp(dev); \\\
+    return -EINVAL; \\\
+  } while (0)
+' drivers/gpu/drm/radeon/r600_cp.c 'report missing Free r700 microcode'
 clean_blob drivers/gpu/drm/radeon/r600_cp.c
 clean_blob drivers/gpu/drm/radeon/r600_microcode.h
 clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_RADEON'
@@ -917,6 +922,7 @@ clean_sed '
   return (printk(KERN_ERR PFX "%s: Missing Free firmware\\n", bp->dev->name),\\\
 	  -EINVAL)
 }' drivers/net/bnx2x_main.c 'report missing Free firmware'
+clean_blob drivers/net/bnx2x_hsi.h
 clean_kconfig drivers/net/Kconfig 'BNX2X'
 clean_mk CONFIG_BNX2X drivers/net/Makefile
 
@@ -998,7 +1004,7 @@ clean_sed '
 		printk("%s: missing Free firmware\\n", __func__);\
 		return (STATUS_FAILURE);\
 #define PhyUcode NULL		
-}' drivers/staging/sxg/sxg.c
+}' drivers/staging/sxg/sxg.c 'report missing Free firmware'
 clean_blob drivers/staging/sxg/sxg.c
 clean_kconfig drivers/staging/sxg/Kconfig 'SXG'
 clean_mk CONFIG_SXG drivers/staging/sxg/Makefile
@@ -1403,7 +1409,7 @@ clean_sed '
 }' drivers/staging/rt3070/common/rtmp_init.c 'report missing Free firmware'
 clean_blob drivers/staging/rt3070/common/rtmp_init.c
 clean_kconfig drivers/staging/rt3070/Kconfig RT3070
-clean_kconfig 'CONFIG_RT3070' drivers/staging/rt3070/Makefile
+clean_mk CONFIG_RT3070 drivers/staging/rt3070/Makefile
 
 # wimax
 
@@ -1467,6 +1473,14 @@ clean_mk CONFIG_COMEDI_USB_DRIVERS drivers/staging/comedi/drivers/Makefile
 announce ME4000 - "Meilhaus ME-4000 I/O board"
 clean_file drivers/staging/me4000/me4000_firmware.h
 clean_file drivers/staging/me4000/me4610_firmware.h
+clean_sed '
+/^static int me4000_xilinx_download([^;]*$/,/^}$/{
+  /firm = .*xilinx_firm.*/i\
+	printk(KERN_ERR "me4000: Missing Free firmware\\n");\
+	return -EIO;
+}
+' drivers/staging/me4000/me4000.c 'report missing Free firmware'
+clean_blob drivers/staging/me4000/me4000.c
 clean_kconfig drivers/staging/me4000/Kconfig 'ME4000'
 clean_mk CONFIG_ME4000 drivers/staging/me4000/Makefile
 
@@ -1952,5 +1966,9 @@ clean_file Documentation/video4linux/extract_xc3028.pl
 clean_sed s,usb8388,whatever,g drivers/base/Kconfig 'removed blob name'
 clean_blob firmware/README.AddingFirmware
 clean_blob firmware/WHENCE
+
+if $errors; then
+  echo errors above were ignored because of --force >&2
+fi
 
 exit 0
