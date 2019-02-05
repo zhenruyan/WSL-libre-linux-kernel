@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2015-08-15
+# deblob-check version 2015-08-15 + 2015-09-22's r12444
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4212,6 +4212,9 @@ set_except () {
     blobname 'atmel[/]wilc1000\(_ap\|_p2p\)\?_fw\.bin' drivers/staging/wilc1000/Makefile
     blobname 'wifi_firmware\(_ap\|_p2p_concurrency\)\?\.bin' drivers/staging/wilc1000/linux_wlan.c
     blob 'This[ ]directory[ ]is[ ]_NOT_[ ]for[ ]adding[ ]arbitrary[ ]new[ ]firmware[ ]images.*git[ ]pull[ ]request[ ]to:[\n][^\n]*linux-firmware\@kernel\.org[\n][^\n]*mailing[ ]lists\.' firmware/README.AddingFirmware
+
+    # New in 4.2.1 and 4.1.8.
+    defsnc '[}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
