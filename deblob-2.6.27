@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.27 extra=1
+kver=2.6.27 extra=2
 
 fatal () {
   echo "$@"
@@ -111,9 +111,9 @@ clean_blob () {
 dummy_blob () {
 	#$1 = filename
 	if test -f $1; then
-	    fatal $1 exists, something is wrong
+	    die $1 exists, something is wrong
 	elif test ! -f firmware/Makefile; then
-	    fatal firmware/Makefile does not exist, something is wrong
+	    die firmware/Makefile does not exist, something is wrong
 	fi
 
 	clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
@@ -123,9 +123,9 @@ dummy_blob () {
 clean_fw () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
-		fatal $1 does not exist, something is wrong
+		die $1 does not exist, something is wrong
 	elif test -f $2; then
-		fatal $2 exists, something is wrong
+		die $2 exists, something is wrong
 	fi
 	clean_blob $1 -s 4
 	dummy_blob $2
@@ -134,9 +134,9 @@ clean_fw () {
 drop_fw_file () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
-		fatal $1 does not exist, something is wrong
+		die $1 does not exist, something is wrong
 	elif test -f $2; then
-		fatal $2 exists, something is wrong
+		die $2 exists, something is wrong
 	fi
 	clean_file $1
 	dummy_blob $2
@@ -376,6 +376,8 @@ announce ATM_FORE200E - "FORE Systems 200E-series"
 reject_firmware drivers/atm/fore200e.c
 clean_blob drivers/atm/fore200e.c
 clean_blob Documentation/networking/fore200e.txt
+clean_blob drivers/atm/.gitignore
+clean_blob Documentation/dontdiff
 clean_kconfig drivers/atm/Kconfig 'ATM_FORE200E'
 clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 
@@ -414,7 +416,7 @@ clean_mk CONFIG_MOXA_INTELLIO drivers/char/Makefile
 announce DRM_MGA - "Matrox g200/g400"
 clean_blob drivers/gpu/drm/mga/mga_ucode.h
 clean_blob drivers/gpu/drm/mga/mga_warp.c
-clean_kconfig drivers/gpu/drm/Kconfig 'DRM_MGA'
+clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_MGA'
 clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
 announce DRM_R128 - "ATI Rage 128"
@@ -429,7 +431,7 @@ clean_sed '
   }
 }' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/r128/r128_cce.c
-clean_kconfig drivers/gpu/drm/Kconfig 'DRM_R128'
+clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 announce DRM_RADEON - "ATI Radeon"
@@ -452,7 +454,7 @@ clean_sed '
 }' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on resume'
 clean_blob drivers/gpu/drm/radeon/radeon_cp.c
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
-clean_kconfig drivers/gpu/drm/Kconfig 'DRM_RADEON'
+clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
 
 
@@ -901,8 +903,7 @@ clean_sed '
   /^	for ([^;]*ucode_opts[^{]*) {$/,/^	}$/ {
     /^	}$/ i\
 	}\
-		DPRINTK(DRV, ERR, "Missing Free firmware\\n");\
-		/* ??? We should error out somehow.  */\
+		DPRINTK(DRV, ERR, "Missing Free firmware, proceeding without\\n");\
 		goto noloaducode;
   }
 }
