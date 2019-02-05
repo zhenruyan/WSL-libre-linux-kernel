@@ -52,6 +52,15 @@
 # behind, and then it will refuse to run again before you clean it up
 # by hand.  It takes extra care to avoid overwriting useful files.
 
+# If deblob-$mver finds any unexpected situation, it will error out,
+# and then deblob-main will quit.  Pass --force to deblob-main, before
+# any other argument, for deblob-main to ignore any such situations.
+
+case $1 in
+--force) force=--force; shift;;
+*) force=;;
+esac
+
 mver=$1 extra=$2 sver=$3
 kver=$mver$sver libre=libre$extra
 deblob= dir=`echo $0 | sed 's,/[^/]*$,,'`
@@ -74,7 +83,7 @@ else
 fi
 
 x1="kver=$mver extra=$extra"
-x2=`grep "^kver=[^ ]* extra=[0-9]*$" $deblob`
+x2=`grep "^kver=[^ ]* extra=" $deblob`
 if test "$x1" = "$x2"; then
   :
 else
@@ -165,10 +174,15 @@ cp linux-$kver.tar linux-$kver-$libre.tar
 cp -lR linux-$kver/. linux-$kver-$libre
 
 echo Deblobbing within linux-$kver-$libre
-(cd linux-$kver-$libre && /bin/sh ../$deblob) || exit 1
+if (cd linux-$kver-$libre && /bin/sh ../$deblob $force); then
+  :
+else
+  echo $deblob failed, aborting >&2
+  exit 1
+fi
 rm -f linux-$kver-$libre.patch
 
-# Do not copy these scripts for now, deblob-check regards itself as a blog.
+# Do not copy these scripts for now, deblob-check regards itself as a blob.
 # cp -p $0 $deblob deblob-check linux-$kver-$libre
 
 echo Generating linux-$kver-$libre.patch
@@ -197,11 +211,14 @@ echo Wiping out extracted trees
 rm -rf linux-$kver orig-linux-$kver
 
 echo Creating xdelta between linux-$kver.tar and linux-$kver-$libre.tar
-xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || :
+xdelta delta -0 linux-$kver.tar linux-$kver-$libre.tar linux-$kver-$libre.xdelta || : # xdelta returns nonzero on success
 
 echo Compressing linux-$kver-$libre.tar and linux-$kver-$libre.xdelta
 rm -f linux-$kver.tar
-bzip2 -9 linux-$kver-$libre.tar linux-$kver-$libre.xdelta
+bzip2 -9 linux-$kver-$libre.tar
+if test -f linux-$kver-$libre.xdelta; then
+  bzip2 -9 linux-$kver-$libre.xdelta
+fi
 
 trap "status=$?; (exit $status); exit" 0 1 2 15
 
@@ -209,8 +226,10 @@ echo Done except for signing, feel free to interrupt
 gpg -a --detach-sign linux-$kver-$libre.tar.bz2
 mv linux-$kver-$libre.tar.bz2.asc linux-$kver-$libre.tar.bz2.sign
 
-gpg -a --detach-sign linux-$kver-$libre.xdelta.bz2
-mv linux-$kver-$libre.xdelta.bz2.asc linux-$kver-$libre.xdelta.bz2.sign
+if test -f linux-$kver-$libre.xdelta.bz2; then
+  gpg -a --detach-sign linux-$kver-$libre.xdelta.bz2
+  mv linux-$kver-$libre.xdelta.bz2.asc linux-$kver-$libre.xdelta.bz2.sign
+fi
 
 echo All set, please review linux-$kver-$libre.patch
 
