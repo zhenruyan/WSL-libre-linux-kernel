@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#    Copyright (C) 2008-2016 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2017 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -48,7 +48,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=4.10 extra= # for -rc7
+kver=4.10 extra=
 
 case $1 in
 --force)
