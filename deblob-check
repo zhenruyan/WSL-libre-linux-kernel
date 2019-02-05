@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-07-14
+# deblob-check version 2008-07-16
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -661,6 +661,9 @@ set_except () {
     initnc 'static const struct ath5k_ini_mode rf24\(13\|25\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c
     initnc 'static const u16 wm9713_reg\[\] =' sound/soc/codecs/wm9713.c
 
+    # This looks suspicious, but it pretty much just sets stuff to zero.
+    initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h
+
     # quite suspicious
     # arch/parisc/kernel/perf_images.h
     initc 'static uint32_t onyx_images\[\]\[PCXU_IMAGE_SIZE\/sizeof(uint32_t)\] __read_mostly ='
@@ -776,7 +779,6 @@ set_except () {
     initnc 'static __const__ __u16 gx_coeff\[256\] ='
     initnc 'static __u8 init7121ntsc\[\] ='
     initnc 'static __u8 init7121pal\[\] ='
-    initnc 'static __u8 mode8420\(pro\|con\)\[\] ='
     initnc 'static byte capidtmf_leading_zeroes_table\[0x100\] ='
     initnc 'static char channel_map_madi_ss\[HDSPM_MAX_CHANNELS\] ='
     initnc 'static char coefficients\[NM_TOTAL_COEFF_COUNT \* 4\] ='
@@ -1001,7 +1003,6 @@ set_except () {
     initnc 'static unsigned char V110_OffMatrix_9600\[\] ='
     initnc 'static unsigned char V110_OnMatrix_9600\[\] ='
     initnc 'static unsigned char a2232_65EC02code\[\] ='
-    initnc 'static unsigned char alaw_main\[\] ='
     initnc 'static unsigned char atkbd_set3_keycode\[512\] ='
     initnc 'static unsigned char atkbd_unxlate_table\[128\] ='
     initnc 'static unsigned char banner_table\[\] ='
@@ -1014,11 +1015,7 @@ set_except () {
     initnc 'static unsigned char expressiontab\[128\] ='
     initnc 'static unsigned char header2\[\] ='
     initnc 'static unsigned char hidp_keycode\[256\] ='
-    initnc 'static unsigned char ima_adpcm_capture\[\] ='
-    initnc 'static unsigned char ima_adpcm_init\[\] ='
-    initnc 'static unsigned char ima_adpcm_playback\[\] ='
     initnc 'static unsigned char irq_xlate\[32\] ='
-    initnc 'static unsigned char mulaw_main\[\] ='
     initnc 'static unsigned char nkbd_keycode\[128\] ='
     initnc 'static unsigned char pan_volumes\[256\] ='
     initnc 'static unsigned char parm_block\[32\] ='
@@ -1094,6 +1091,18 @@ set_except () {
     initnc '} vsb_snr_tab\[\] ='
     initnc '} yss225_registers\[\] __devinitdata ='
     ;;
+  */patch*2.6.27-rc* | */patch*2.6.26-git*)
+    accept '	\.section __ex_table,"a"'"$sepx$blobpat*" 'arch/x86/lib/copy_user_\(nocache_\)\?64.S'
+    initnc 'static struct cipher_testvec des3_ede_cbc_\(enc\|dec\)_tv_template\[\] =' crypto/tcrypt.h
+
+    accept 'desc_config1:[\n]	\.byte 0x09, 0x02'"$sepx$blobpat*" 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
+    accept 'string_mfg:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_mfg_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
+    accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
+    accept ':03000000020200F9[\n]:040023000205\(9B0037\|5F0073\)[\n]\(:050030000000000000CB[\n]\|:0400430002010000B6[\n]\)*'"$sepx$blobpat*"'[\n]:\(0E06E0006400670065007400060334003700F4\|0606A000060334003700E0\)[\n]:00000001FF[\n]' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).HEX'
+    initnc 'static const u16 uda1380_reg\[UDA1380_CACHEREGNUM\] =' sound/soc/codecs/uda1380.c
+    initnc 'static const u16 wm8510_reg\[WM8510_CACHEREGNUM\] =' sound/soc/codecs/wm8510.c
+    ;;
+    
   */patch*2.6.26-rc*)
     initnc 'static u64 vec2off\[68\] =' arch/ia64/kvm/process.c
     initnc "			interrupts = <\\(0x\\)\\?3 \\(0x\\)\\?0 \\(0x\\)\\?0  $blobpat*>;" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
@@ -1881,7 +1890,7 @@ check () {
   *.tar*)
     cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'"
     ;;
-  *.patch | patch-* | *.diff)
+  *.patch | */patch-* | *.diff)
     sedpatch='
       /^[-]/d;
       /^\(@@\|+++\) / {
