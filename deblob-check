@@ -1,6 +1,7 @@
 #! /bin/sh
 
-# deblob-check version 2011-07-21
+# deblob-check version 2011-07-21 + 2011-11-10's r8178
+#                         + partial 2011-10-09's r8115
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2335,7 +2336,7 @@ set_except () {
     defsnc '[	]struct[ ]jlj_command[ ]start_commands\[\][ ]=' drivers/media/video/gspca/jeilinj.c
     defsnc 'static[ ]u8[ ]init_code\[\]\[2\][ ]=' drivers/media/dvb/dvb-usb/friio-fe.c
     defsnc 'static[ ]const[ ]u8[ ]va1j5jf8007[ts]_\(2[05]mhz_\)\?prepare_bufs\[\]\[2\][ ]=' 'drivers/media/dvb/pt1/va1j5jf8007[st]\.c'
-    accept '[	]\+request_firmware[(][)][ ]will[ ]hit[ ]an[ ]OOPS' drivers/media/dvb/frontends/dib7000p.c
+    accept '[	 ]\+request_firmware[(][)][ ]will[ ]hit[ ]an[ ]OOPS' drivers/media/dvb/frontends/dib7000p.c
     defsnc 'static[ ]long[ ]limiter_times\[\][ ]=' drivers/media/radio/si4713-i2c.c
     blobname 'c[tb]fw\(_\(fc\|cna\)\)\?\.bin' drivers/scsi/bfa/bfad_fwimg.c
     defsnc 'static[ ]const[ ]u16[ ]\(VDCDC[1x]\|LDO[12]\)_VSEL_table\[\][ ]=' 'drivers/regulator/tps650\(23\|7x\)-regulator\.c'
@@ -2363,7 +2364,7 @@ set_except () {
     defsnc 'int[ ]wm831x_isinkv_values\[WM831X_ISINK_MAX_ISEL[ ][+][ ][1]\][ ]=' drivers/mfd/wm831x-core.c
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]hwecc4_2048[ ]__initconst[ ]=' drivers/mtd/nand/davinci_nand.c
     defsnc 'static[ ]const[ ]u16[ ]wm8974_reg\[WM8974_CACHEREGNUM\][ ]=' sound/soc/codecs/wm8974.c
-    defsnc 'static[ ]const[ ]u16[ ]ak4642_reg\[AK4642_CACHEREGNUM\][ ]=' sound/soc/codecs/ak4642.c
+    defsnc 'static[ ]const[ ]u\(8\|16\)[ ]ak4642_reg\[AK4642_CACHEREGNUM\][ ]=' sound/soc/codecs/ak4642.c
     accept 'int[ ]snd_hda_load_patch[(][^\n;{]*[)][ \n][{][^\n]*\([\n]\+[^\n}][^\n]*\)*hda_codec[^\n]*\([\n]\+[^\n}][^\n]*\)*request_firmware[^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}]' sound/pci/hda/hda_hwdep.c
     accept '[ ][ ][ ]Bit[ 0-7]*' Documentation/input/sentelic.txt
     accept 'The[ ]hd-audio[ ]driver[ ]reads[ ]the[ ]file[ ]via[ ]request_firmware[(][)]\.' Documentation/sound/alsa/HD-Audio.txt
