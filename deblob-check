@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-03-11
+# deblob-check version 2012-03-19
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -158,7 +158,7 @@
 
 # Anything else is assumed to be a source file.
 
-# *.gz | *.bz2: Decompress automatically.
+# *.gz | *.bz2 | *.xz | *.lz: Decompress automatically.
 
 
 # The exit status is only significant for the --list options: it will
@@ -5866,7 +5866,9 @@ BAD regular expression:
   # Decompress as needed...
   case $input in
   *.bz2) cmd='bunzip2' ;;
-  *.gz) cmd='gunzip' ;;
+  *.xz) cmd='unxz' ;;
+  *.lz) cmd='lzip -d' ;;
+  *.gz | *.tgz) cmd='gunzip' ;;
   *) cmd= ;;
   esac
   if test -n "$cmd"; then
