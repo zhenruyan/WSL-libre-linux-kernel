@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2016-05-08
+# deblob-check version 2016-05-09
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3694,7 +3694,7 @@ set_except () {
     accept '[	]err[ ]=[ ]request_firmware_nowait[(][^\n]*,[ ]CARL9170FW_NAME,' drivers/net/wireless/carl9170/usb.c
     defsnc 'static[ ]const[ ]struct[ ]b43_nphy_channeltab_entry_rev3[ ]b43_nphy_channeltab_\(phy\|radio\)_rev\([34568]\|7_9\|11\)\[\][ ]=' drivers/net/wireless/b43/radio_2056.c
     defsnc 'static[ ]const[ ]u32[ ]b43_ntab_noisevar_r3\[\][ ]=' drivers/net/wireless/b43/tables_nphy.c
-    blobname 'iwlwifi-8000-' drivers/net/wireless/iwlwifi/iwl-8000.c
+    blobname 'iwlwifi-8000C\?-' drivers/net/wireless/intel/iwlwifi/iwl-8000.c
     blobname 'iwl_nvm_8000\.bin' drivers/net/wireless/iwlwifi/iwl-8000.c
     defsnc 'static[ ]const[ ]u8[ ]iwl_nvm_channels_family_8000\[\][ ]=' drivers/net/wireless/iwlwifi/iwl-nvm-parse.c
     defsnc 'static[ ]const[ ]u16[ ]expected_tpt_\(siso\|mimo2\)_[248]0MHz\[4\]\[IWL_RATE_COUNT\][ ]=' drivers/net/wireless/iwlwifi/mvm/rs.c
@@ -4031,7 +4031,7 @@ set_except () {
     blobname 'firmware-4\.bin' drivers/net/wireless/ath/ath10k/hw.h
     blobname 'brcm[/]brcmfmac43340-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c
     blobname 'iwlwifi-7260-' drivers/net/wireless/iwlwifi/pcie/7000.c
-    blobname 'iwlwifi-8000' drivers/net/wireless/iwlwifi/iwl-8000.c
+    blobname 'iwlwifi-8000' drivers/net/wireless/intel/iwlwifi/iwl-8000.c
     blobname 'iwl_nvm_8000B\.bin' drivers/net/wireless/iwlwifi/iwl-8000.c
     blobname 'mrvl[/]sd8801_uapsta\.bin' drivers/net/wireless/mwifiex/sdio.h
     blobname 'mrvl[/]usb8801_uapsta\.bin' drivers/net/wireless/mwifiex/usb.h
@@ -4422,6 +4422,7 @@ set_except () {
     blobname 'intel[/]ibt-hw-%x\.%x\.bddata' drivers/bluetooth/hci_ag6xx.c
     blobname 'intel[/]ibt-hw-%x\.%x\.%x-fw-%x\.%x\.%x\.%x\.%x\.pbn' drivers/bluetooth/hci_ag6xx.c
     blobname 'melfas_mip4\.fw' drivers/input/touchscreen/melfas_mip4.c
+    blobname 'iwlwifi-8000C-' drivers/net/wireless/intel/iwlwifi/iwl-8000.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
