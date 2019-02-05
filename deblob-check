@@ -2,13 +2,14 @@
 
 # deblob-check version 2017-10-23 + 2017-11-30's r14468
 #				  + 2017-12-01's r14470
+#				  + 2018-03-24's r14712 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2017 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2018 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -4923,6 +4924,9 @@ set_except () {
     # iwlwifi-9000 alone and starts with 'iwlwifi-9000\(' needed
     # adjusting as well.
     blobname 'iwlwifi-9000-pu-b0-jf-b0-' drivers/net/wireless/intel/iwlwifi/cfg/9000.c
+
+    # New in 4.16, backported to 4.15.13 and 4.14.30.
+    accept '[ ][*][ ]@fw_get_done[\t]*flag[ ]set[ ]when[ ]request_firmware[(][)][ ]is[ ]complete' drivers/media/platform/s5p-mfc/s5p_mfc_common.h
     ;;
 
   */*freedo*.patch | */*logo*.patch)
