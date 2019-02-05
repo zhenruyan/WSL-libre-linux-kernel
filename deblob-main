@@ -1,0 +1,311 @@
+#! /bin/sh
+
+# Copyright (C) 2008-2016 Alexandre Oliva <lxoliva@fsfla.org>
+
+# This program is part of GNU Linux-libre, a GNU project that
+# publishes scripts to clean up Linux so as to make it suitable for
+# use in the GNU Project and in Free System Distributions.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+# USA
+
+# deblob-main - prepare a GNU Linux-libre tarball out of a non-libre
+# Linux tarball.  It expects the Linux release (mver, say 3.0) as the
+# first argument, the gnu sub-release (extra) as the second optional
+# argument, and the patch release (sver, say .13) as an optional third
+# argument.  mver and sver are pasted together to form kver.
+
+# linux-$kver.tar.bz2 and deblob-$mver must exist in the current
+# directory, and the line that sets kver and extra in deblob-$mver
+# must match mver and extra.
+
+# The resulting tarball is put in linux-libre-$kver-gnu$extra.tar.bz2.
+# An uncompressed xdelta that produces linux-libre-$kver-gnu$extra.tar
+# out of linux-$kver.tar is put in linux-libre-$kver-gnu$extra.xdelta.
+# This xdelta can be distributed to enable third parties to easily
+# reconstruct the binary tarball starting out of sources downloaded
+# from kernel.org, but without distributing non-Free Software
+# yourself, because xdelta (unlike patches) is not reversible: the
+# removed bits are not present in it at all.
+
+# xdelta version 3 uses different command line syntax, and it switched
+# to the more standardized but less efficient vcdiff file format.
+# This script will also produce a vcdiff file if xdelta3 is present,
+# and it expects the xdelta program to use the version 1 syntax.
+
+# To enable you to check the differences between the tarballs, a patch
+# file is generated in linux-libre-$kver-gnu$extra.patch.  This patch
+# file contains the non-Free blobs, even though in reversed form, so
+# its distribution is discouraged.
+
+# The tar files and binary deltas are finally compressed with bzip2,
+# and optionally with lzip and xz too, if the compressors are
+# available.
+
+# At the end, the script attempts to generate a digital signature for
+# the newly-created tarball.  This is the last thing the script does,
+# so interrupting it at that point to skip the signing won't fail to
+# do anything else.
+
+# It is safe to interrupt the script at any other point.  When it gets
+# a ^C (other than during signing), it starts cleaning up all of its
+# temporary and output files.  If you insist, it may leave junk
+# behind, and then it will refuse to run again before you clean it up
+# by hand.  It takes extra care to avoid overwriting useful files.
+
+# If deblob-$mver finds any unexpected situation, it will error out,
+# and then deblob-main will quit.  Pass --force to deblob-main, before
+# any other argument, for deblob-main to ignore any such situations.
+
+case $1 in
+--force) force=--force; shift;;
+*) force=;;
+esac
+
+# We don't want e.g. diff output translations to affect us.
+LC_ALL=C; export LC_ALL
+LANGUAGE=C; export LANGUAGE
+
+mver=$1 extra=$2 sver=$3
+kver=$mver$sver gnu=gnu$extra
+deblob= dir=`echo "$0" | sed 's,[^/]*$,,;s,^$,.,;s,/*$,,'`
+
+if test -f linux-$kver.tar; then
+  zext=tar     zcmd=
+elif test -f linux-$kver.tar.bz2; then
+  zext=tar.bz2 zcmd=bunzip2
+elif test -f linux-$kver.tar.xz; then
+  zext=tar.xz  zcmd=unxz
+elif test -f linux-$kver.tar.lz; then
+  zext=tar.lz  zcmd="lzip -d"
+elif test -f linux-$kver.tar.gz; then
+  zext=tar.gz  zcmd=gunzip
+elif test -f linux-$kver.tgz; then
+  zext=tgz     zcmd=gunzip
+else
+  echo linux-$kver.tar not found, tried .bz2, .xz, .lz, .gz and .tgz too >&2
+  exit 1
+fi
+
+if test -f deblob-$mver; then
+  deblob=deblob-$mver
+elif test -f deblob; then
+  deblob=deblob
+elif test -f $dir/deblob-$mver; then
+  cp $dir/deblob-$mver deblob
+  deblob=deblob
+else
+  echo deblob does not exist >&2
+  exit 1
+fi
+
+x1="kver=$mver extra=$extra"
+x2=`grep "^kver=[^ ]* extra=" $deblob`
+if test "$x1" = "$x2"; then
+  :
+else
+  echo deblob script does not match command-line arguments >&2
+  echo expected: $x1 >&2
+  echo found   : $x2 >&2
+  exit 1
+fi
+
+cleanup=
+
+for f in \
+  linux-libre-$kver-$gnu.tar.bz2 \
+  linux-libre-$kver-$gnu.tar.bz2.asc \
+  linux-libre-$kver-$gnu.tar.bz2.sign \
+  linux-libre-$kver-$gnu.tar.xz \
+  linux-libre-$kver-$gnu.tar.xz.asc \
+  linux-libre-$kver-$gnu.tar.xz.sign \
+  linux-libre-$kver-$gnu.tar.lz \
+  linux-libre-$kver-$gnu.tar.lz.asc \
+  linux-libre-$kver-$gnu.tar.lz.sign \
+  linux-libre-$kver-$gnu.tar \
+  linux-libre-$kver-$gnu.tar.asc \
+  linux-libre-$kver-$gnu.tar.sign \
+  linux-libre-$kver-$gnu.patch \
+  linux-libre-$kver-$gnu.log \
+  linux-libre-$kver-$gnu.vcdiff \
+  linux-libre-$kver-$gnu.vcdiff.bz2 \
+  linux-libre-$kver-$gnu.vcdiff.bz2.asc \
+  linux-libre-$kver-$gnu.vcdiff.bz2.sign \
+  linux-libre-$kver-$gnu.vcdiff.xz \
+  linux-libre-$kver-$gnu.vcdiff.xz.asc \
+  linux-libre-$kver-$gnu.vcdiff.xz.sign \
+  linux-libre-$kver-$gnu.vcdiff.lz \
+  linux-libre-$kver-$gnu.vcdiff.lz.asc \
+  linux-libre-$kver-$gnu.vcdiff.lz.sign \
+  linux-libre-$kver-$gnu.xdelta \
+  linux-libre-$kver-$gnu.xdelta.bz2 \
+  linux-libre-$kver-$gnu.xdelta.bz2.asc \
+  linux-libre-$kver-$gnu.xdelta.bz2.sign \
+  linux-libre-$kver-$gnu.xdelta.xz \
+  linux-libre-$kver-$gnu.xdelta.xz.asc \
+  linux-libre-$kver-$gnu.xdelta.xz.sign \
+  linux-libre-$kver-$gnu.xdelta.lz \
+  linux-libre-$kver-$gnu.xdelta.lz.asc \
+  linux-libre-$kver-$gnu.xdelta.lz.sign \
+; do
+  if test -f $f; then
+    echo $f already exists >&2
+    exit 1
+  fi
+  cleanup="$cleanup $f"
+done
+
+for d in \
+  linux-$kver \
+  linux-libre-$kver-$gnu \
+  orig-linux-$kver \
+; do
+  if test -d $d; then
+    echo $d already exists >&2
+    exit 1
+  fi
+  cleanup="$cleanup $d"
+done
+
+if test -f $dir/deblob-$kver; then
+  if cmp $dir/deblob-$kver $deblob; then
+    :
+  else
+    echo $dir/deblob-$kver and $deblob are different >&2
+    exit 1
+  fi
+fi
+
+if test ! -f deblob-check; then
+  if test -f $dir/deblob-check; then
+    cp $dir/deblob-check deblob-check
+  fi
+else
+  if test -f $dir/deblob-check; then
+    if cmp $dir/deblob-check deblob-check; then
+      :
+    else
+      echo $dir/deblob-check and deblob-check are different >&2
+      exit 1
+    fi
+  fi
+fi
+
+trap 'status=$?; echo cleaning up...; rm -rf $cleanup; (exit $status); exit' 0 1 2 15
+
+set -e
+
+if test -n "$zcmd"; then
+  echo Uncompressing linux-$kver.$zext into linux-$kver.tar
+  rm -rf linux-$kver.tar
+  cleanup="$cleanup linux-$kver.tar"
+  $zcmd < linux-$kver.$zext > linux-$kver.tar
+fi
+
+echo Extracting linux-$kver.tar into linux-$kver
+rm -rf linux-$kver
+tar -xf linux-$kver.tar
+rm -rf linux-libre-$kver-$gnu linux-libre-$kver-$gnu.tar
+
+echo Copying linux-$kver to linux-libre-$kver-$gnu
+cp linux-$kver.tar linux-libre-$kver-$gnu.tar
+cp -lR linux-$kver/. linux-libre-$kver-$gnu
+
+rm -f linux-libre-$kver-$gnu.log linux-libre-$kver-$gnu.log.tmp
+echo Deblobbing within linux-libre-$kver-$gnu, saving output to linux-libre-$kver-$gnu.log
+# We can't just pipe deblob into tee, for then we fail to detect
+# error conditions.  Use file renaming to tell whether we succeeded.
+if (cd linux-libre-$kver-$gnu && /bin/sh ../$deblob $force) 2>&1; then
+  mv linux-libre-$kver-$gnu.log.tmp linux-libre-$kver-$gnu.log
+fi | tee linux-libre-$kver-$gnu.log.tmp
+if test ! -f linux-libre-$kver-$gnu.log; then
+  mv linux-libre-$kver-$gnu.log.tmp linux-libre-$kver-$gnu.log
+  echo $deblob failed, aborting >&2
+  exit 1
+fi
+rm -f linux-libre-$kver-$gnu.patch
+
+# Do not copy these scripts for now, deblob-check regards itself as a blob.
+# cp -p $0 $deblob deblob-check linux-libre-$kver-$gnu
+
+echo Generating linux-libre-$kver-$gnu.patch
+diff -druN linux-$kver linux-libre-$kver-$gnu > linux-libre-$kver-$gnu.patch || :
+
+echo Removing removed or modified files from linux-libre-$kver-$gnu.tar
+diff -rq linux-$kver linux-libre-$kver-$gnu |
+sed -n "
+  s,^Only in \\(linux-$kver\\(/.*\\)\\?\\): \\(.*\\),\1/\3,p;
+  s,^Files \\(linux-$kver\\)/\\(.*\\) and linux-libre-$kver-$gnu/\\2 differ,\\1/\\2,p;
+" |
+xargs tar --delete -f linux-libre-$kver-$gnu.tar
+
+echo Adding modified or added files to linux-libre-$kver-$gnu.tar
+rm -rf orig-linux-$kver
+mv linux-$kver orig-linux-$kver
+mv linux-libre-$kver-$gnu linux-$kver
+diff -rq orig-linux-$kver linux-$kver |
+sed -n "
+  s,^Files orig-\\(linux-$kver/.*\\) and \\1 differ,\\1,p;
+  s,^Only in \\(linux-$kver\\(/.*\\)\\?\\): \\(.*\\),\\1/\\3,p;
+" |
+xargs tar --append -f linux-libre-$kver-$gnu.tar
+
+echo Wiping out extracted trees
+rm -rf linux-$kver orig-linux-$kver
+
+echo Creating vcdiff between linux-$kver.tar and linux-libre-$kver-$gnu.tar
+xdelta3 -e -9 -S djw -s linux-$kver.tar linux-libre-$kver-$gnu.tar linux-libre-$kver-$gnu.vcdiff || : # don't fail if xdelta3 is not present
+
+echo Creating xdelta between linux-$kver.tar and linux-libre-$kver-$gnu.tar
+xdelta delta -0 linux-$kver.tar linux-libre-$kver-$gnu.tar linux-libre-$kver-$gnu.xdelta || : # xdelta returns nonzero on success
+
+cleanup="linux-libre-$kver-$gnu.tar linux-libre-$kver-$gnu.xdelta"
+
+echo Compressing binary deltas and linux-libre-$kver-$gnu.tar
+rm -f linux-$kver.tar
+if test -f linux-libre-$kver-$gnu.xdelta; then
+  bzip2 -k9 linux-libre-$kver-$gnu.xdelta
+  xz -k9 linux-libre-$kver-$gnu.xdelta || :
+  lzip -k9s64MiB linux-libre-$kver-$gnu.xdelta || :
+fi
+bzip2 -k9 linux-libre-$kver-$gnu.tar
+xz -k9 linux-libre-$kver-$gnu.tar || :
+lzip -k9s64MiB linux-libre-$kver-$gnu.tar || :
+
+echo Done except for signing, feel free to interrupt
+for f in \
+  linux-libre-$kver-$gnu.tar \
+  linux-libre-$kver-$gnu.tar.bz2 \
+  linux-libre-$kver-$gnu.tar.xz \
+  linux-libre-$kver-$gnu.tar.lz \
+  linux-libre-$kver-$gnu.vcdiff \
+  linux-libre-$kver-$gnu.xdelta \
+  linux-libre-$kver-$gnu.xdelta.bz2 \
+  linux-libre-$kver-$gnu.xdelta.xz \
+  linux-libre-$kver-$gnu.xdelta.lz \
+; do
+  if test -f $f; then
+    gpg -a --detach-sign $f
+    mv $f.asc $f.sign
+  fi
+done
+
+rm -f $cleanup
+cleanup=
+trap 'status=$?; (exit $status); exit' 0 1 2 15
+
+echo All set, please review linux-libre-$kver-$gnu.patch
+
+exit 0
