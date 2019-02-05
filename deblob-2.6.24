@@ -40,7 +40,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.24 extra=1
+kver=2.6.24 extra=2
 
 sed -i "s,^EXTRAVERSION.*,EXTRAVERSION = -libre$extra," Makefile
 
@@ -53,23 +53,41 @@ sed -i "s,^EXTRAVERSION.*,EXTRAVERSION = -libre$extra," Makefile
 
 if [ ! -f `which unifdef` ] ; then echo "requires unifdef" ; exit ; fi
 
+check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
+if [ ! -f $check ] ; then
+  echo "optional deblob-check missing, will remove entire files"
+  have_check=false
+else
+  have_check=:
+fi
+
 function clean_file {
 	#$1 = filename
+	if test ! -f $1; then
+		echo $1 does not exist, something is wrong >&2
+		exit 1
+	fi
 	rm -v $1
 }
 
 function check_changed {
-	if cmp $1.deblob $1 > /dev/null; then
+	if test ! -f $1; then
+		echo $1 does not exist, something is wrong >&2
+		exit 1
+	elif cmp $1.deblob $1 > /dev/null; then
 		echo $1 did not change, something is wrong >&2
 		exit 1
 	fi
 	mv $1.deblob $1
 }
 
-check=`echo $0 | sed 's,/[^/]*$,,'`/deblob-check
 function clean_blob {
 	#$1 = filename
-	if test -f $check; then
+	if $have_check; then
+	    if test ! -f $1; then
+		echo $1 does not exist, something is wrong >&2
+		exit 1
+	    fi
 	    name=$1
 	    echo Removing blobs from $name
 	    set fnord "$@" -d
@@ -268,19 +286,10 @@ clean_blob drivers/media/video/usbvideo/vicam.c
 clean_kconfig drivers/media/video/usbvideo/Kconfig 'USB_VICAM'
 clean_mk CONFIG_USB_VICAM drivers/media/video/usbvideo/Makefile
 
-# other...
-
-# disable -- appears to neeed other DVB bits
-clean_mk CONFIG_DVB_CORE drivers/media/Makefile
-clean_mk CONFIG_VIDEOBUF_DVB drivers/media/video/Makefile
-clean_mk CONFIG_VIDEO_SAA7134 drivers/media/video/Makefile
-clean_mk CONFIG_VIDEO_CX88 drivers/media/video/Makefile
-clean_kconfig drivers/media/Kconfig 'VIDEOBUF_DVB'
 
 #######################
 # Removed net Drivers #
 #######################
-
 
 # ACENIC - Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit
 clean_blob drivers/net/acenic_firmware.h
@@ -307,9 +316,12 @@ clean_mk CONFIG_CASSINI drivers/net/Makefile
 
 # E100 - Intel(R) PRO/100+
 clean_blob drivers/net/e100.c
-sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/e100.c
-# clean_kconfig drivers/net/Kconfig 'E100'
-# clean_mk CONFIG_E100 drivers/net/Makefile
+if $have_check; then
+  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/e100.c
+else
+  clean_kconfig drivers/net/Kconfig 'E100'
+  clean_mk CONFIG_E100 drivers/net/Makefile
+fi
 
 # MYRI_SBUS - MyriCOM Gigabit Ethernet
 clean_blob drivers/net/myri_code.h
@@ -342,7 +354,12 @@ patch --no-backup-if-mismatch -p0 <<\EOF # patches/linux-2.6-tg3-clean.patch
  
 EOF
 clean_blob drivers/net/tg3.c -s 9
-sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/tg3.c 
+if $have_check; then
+  sed -i 's:\(\/\*(DEBLOBBED)\*\/\),:\1:' drivers/net/tg3.c 
+else
+  clean_kconfig drivers/net/Kconfig 'TIGON3'
+  clean_mk CONFIG_TIGON3 drivers/net/Makefile
+fi
 
 # TYPHOON - 3cr990 series Typhoon
 clean_blob drivers/net/typhoon-firmware.h
