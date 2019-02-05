@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2016-09-25
+# deblob-check version 2016-09-25 + 2017-01-09's r13475
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2016 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2017 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -4520,6 +4520,10 @@ set_except () {
     blobname 'rt5514_dsp_fw[12]\.bin' sound/soc/codecs/rt5514.h
     blobname 'modem\.mdt' drivers/remoteproc/qcom_q6v5_pil.c
     blobname 'mba\.b00' drivers/remoteproc/qcom_q6v5_pil.c
+
+    # New in 4.9.2 and 4.8.17.
+    accept '[\t]*fwname[ ]=[ ]["]fuc4\(09\|1a\)[cd]["][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    accept '[\t]*snprintf[(]f[,][ ]sizeof[(]f[)][,][ ]["]nouveau[/]nv%02x_%s["][,][ ]device->chipset[,][ ]fwname[)][;][\n][\t]*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]f[,][ ]device->dev[)][;][\n][\t]*if[ ][(]ret[)][ ][{][\n][\t]*snprintf[(]f[,][ ]sizeof[(]f[)][,][ ]["]nouveau[/]%s["][,][ ]fwname[)][;][\n][\t]*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]f[,][ ]device->dev[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
