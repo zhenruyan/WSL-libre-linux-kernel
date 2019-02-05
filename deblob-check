@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2015-06-14 + 2015-09-22's r12444
+#                         + partial 2015-11-01's r12531
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4146,6 +4147,9 @@ set_except () {
 
     # New in 4.2.1 and 4.1.8.
     defsnc '[}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
+
+    # New in 4.3 (and 4.1.26).
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]ak4643_reg\[\][ ]=' sound/soc/codecs/ak4642.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
