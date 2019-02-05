@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2013-10-30
+# deblob-check version 2013-11-14
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3527,6 +3527,7 @@ set_except () {
     accept '[	]*\(\(el\)\?if[ ]\[[ ]-f\|cp[ ]-v[ ]--\)[ ]["][$][{]objtree[}][/]arch[/]mips[/]boot[/]\(compressed[/]\)\?vmlinux\.bin["]' scripts/package/buildtar
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]pcm1681_reg_defaults\[\][ ]=' sound/soc/codecs/pcm1681.c
     defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]wm8997_sysclk_reva_patch\[\][ ]=' sound/soc/codecs/wm8997.c
+    blob '[\t]0xE1[,][ ]0x88[,][ ]0x10[,][ ]0x00[,][ ]0x0B[,][ ]0x00[,][ ]0x01[,][ ]0x00[,]\([\n][\t][0-9xA-F, ]*\)*' drivers/staging/rtl8188eu/hal/Hal8188EFWImg_CE.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
