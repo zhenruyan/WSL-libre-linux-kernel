@@ -1,0 +1,2051 @@
+#! /bin/sh
+
+# deblob-check version 2008-08-04
+# Inspired in gNewSense's find-firmware script.
+# Written by Alexandre Oliva <lxoliva@fsfla.org>
+
+# Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
+# versions.
+
+# Copyright (C) 2008 Alexandre Oliva
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+# USA
+
+
+# usage: deblob-check [-S] [-vv] [-s S] [-lDdBbCcXxPpFftVh?H] \
+#        [*.tar* patch-* *.patch *.diff]
+
+# Look for too-long undocumented sequences of numbers (generally blobs
+# in disguise) in source files.
+
+# The order of command line flags is significant.  Flags given out of
+# the order above won't be handled correctly, sorry.
+
+# -s --sensitivity: must be followed by a blank and a number.
+#		Specifies the number of consecutive integral or
+#		character constants that trigger the blob detector.
+
+#    --reverse-patch: Test the removed parts of a patch, rather than
+#		the added ones.
+
+# The default sensitivity is 32 constants.
+
+# The sensitivity, if present, must be the first option.  The action
+# selection, if present, must be the first argument, except for the
+# sensitivity and verbosity.
+
+# The default can be overridden with one of:
+
+# -l --list-blobs: list files that contain sequences that match the
+#		blob detector test and that are not known to be false
+#		positives.  This is the default option.
+
+# -d --deblob --mark-blobs: print the processed input, replacing
+#		sequences that match the blob detector test and that
+#		are NOT known to be false positives with
+#		/*(DEBLOBBED)*/.
+
+# -D --cat: print the processed input, as it would have been fed to
+#		the blob detector script.  Use -S to save the sed
+#		script used to process it, and search for `sedcat:' in
+#		comments to locate the relevant adaptation points.
+
+# -b --print-marked-blobs: like -d, but print only the matching
+#		sequences.
+
+# -B --print-blobs: like -b, but do not deblob the sequences.
+
+# -c --print-marked-blobs-with-context: like -b, but try to maximize
+#		the context around the blobs.  This maximization will
+#		sometimes disregard known false positives, if they
+#		happen to be contained within the extended match.
+#		This is probably an indication that the false positive
+#		matching rule could be improved.
+
+# -C --print-blobs-with-context: like -B, but try to maximize the
+#		context around the blobs.
+
+# -X --print-all-matches: print all blobs, be they known false
+#		positives or blobs.
+
+# -x --list-all-matches: list files that contain sequences that appear
+#		to be blobs, be they known false positives or not.
+
+# -p --mark-false-positives: print the processed input, replacing
+#		sequences that match the blob detector test, but that
+#		are known to be false positives, with /*(DEBLOBBED)*/.
+
+# -P --list-false-positives: list files that contain false positives.
+
+# -f --print-marked-false-positives: like -p, but print only the
+#		matching sequences.
+
+# -F --print-false-positives: like -f, but do not deblob the sequences.
+
+# -t --test: run (very minimal) self-test.
+
+# -V --version: print a version number
+
+# -h -? -H --help: print short or long help message
+
+
+# debugging options:
+
+# -S --save-scripts: save scripts and temporary files.
+
+# -v --verbose: increase verbosity level, for internal debugging.  May
+#		be given at most twice.
+
+# The exit status is only significant for the --list options: it will
+# be true if nothing was found, and false otherwise.
+
+: # Mark the end of the help message.
+
+# TODO:
+
+# - Improve handling of command-line arguments, so as to not make the
+# order relevant.
+
+# - Add an option for the user to feed their own false positive
+# patterns.
+
+# - Add support to recognize known blobs (or other non-Free
+# signatures, really), to speed up the scanning of files containing
+# blobs, and to avoid attempts to disguise blobs.
+
+# - Factor out the code in the various print_* and list_* parts of the
+# sed script, at least in the shell sources.  Make sure they're all
+# included and expanded in a saved --cat script though.
+
+# - Add support for file name tagging in patterns, such that blobs or
+# false positives are recognized only when handling the specific
+# filename, be it stand-alone, as part of a patch or a tarball.  This
+# should help avoid recognition of actual blobs as false positives
+# just because there's a symbol with a different name elsewhere.
+
+#   It is convenient that the patterns provided by the user to
+# recognize file names can be empty (for backward compatibility), but
+# this should ideally be phased out in favor of more precise matches.
+# It's important that files can be recognized with leading tarball or
+# patch names, that the filename used within the tarball contain
+# leading garbage, and even that a partial pathname be recognizable
+# (say recognize drivers/net/whatever.c when the input file is named
+# ../net/whatever.c).
+
+#   Rather than using regular expressions to recognize multiple files
+# it's convenient (but not quite essential) that filename patterns be
+# specifiable as regular expressions, rather than simple filenames,
+# but there are other ways around this.
+
+#   Maintaining begin/end markers in a stack-like fashion as part of
+# the processed stream, and using the names in them as (optional) part
+# of the recognition patterns, would enable us to do it.
+
+#   Introducing annotations next to the false positives (and recognized
+# blobs) as an early part of the process may speed things up and
+# enable fast processing, but how to introduce the annotations quickly
+# in the first place?  Given patterns such as
+
+#   \(\(file1\)\(.*\)\(pat1\)\|\(file2\)\(.*\)\(pat2\)\|...\)
+
+# how do we get sed to introduce a marker that contains file2 right
+# before or right after pat2, without turning a big efficient regexp
+# into a slowish sequence of s/// commands?
+
+# - Re-check and narrow false-positive patterns to make sure they
+# apply only to the relevant content.
+
+# - Scripting abilities, so as to be able to automate the removal of
+# source files or of blobs from source files in a tarball without
+# having to extract the entire tarball (as in tar --update/--delete)
+# would be nice.  Carrying over removed files automatically into
+# patches would also be great, and this sort of script would be
+# perfect to document what has been done to a tarball plus a set of
+# patches.  Something like deblob.script:
+#
+#   tarball linux-2.6.24.tar.bz2
+#   delete net/wireloss/freedom.c drivers/me/crazy.c
+#   deblob include/linux/slab-blob-kfree.h
+#   deconfig drivers/char/drm DRM_IS_BAD
+#
+#   patch patch-2.6.25-rc7.bz2
+#   delete arch/power/over/you.c
+
+# such that the deletes from an earlier file would carry over into the
+# subsequent ones, and new tarballs and patch files would be generated
+# with the libre- prefix in their basename, and the xdeltas between
+# the original files and the modified files would be minimal, and
+# redundant with this script and the input script while at that.
+
+# - Improve documentation of the code.
+
+# - Write a decent testsuite.
+
+# - Insert your idea here. :-)
+
+# Yeah, lots of stuff to do.  Want to help?
+
+# This makes it much faster, and mostly immune to non-ASCII stuff, as
+# long as a 8-bit-safe sed is used.  Probably a safe assumption these
+# days.
+case ${LANG+set} in set) LANG=C; export LANG;; esac
+
+rm="rm -f"
+case $1 in
+--save-scripts | -S)
+  shift
+  rm="echo preserving"
+  ;;
+esac
+
+# Choose verbosity level for sed script debugging and performance
+# analysis.
+case $1 in
+--verbose | -v)
+  shift
+  case $1 in
+  --verbose | -v)
+    shift
+    v="i\\
+:
+p;
+i\\
+"
+    ;;
+  *)
+    v="P;i\\
+"
+    ;;
+  esac
+  ;;
+*) 
+  v="# "
+  ;;
+esac
+
+sens=31 # 32 - 1
+case $1 in
+--sensitivity | -s)
+  sens=$2;
+  shift 2 || exit 1
+
+  if test "$sens" -gt 0 2>/dev/null; then
+    :
+  else
+    echo invalid sensitivity: $sens >&2
+    exit 1
+  fi
+
+  sens=`expr $sens - 1`
+  ;;
+esac
+
+reverse_patch=false
+case $1 in
+--reverse-patch)
+  reverse_patch=:
+  shift;
+  ;;
+esac
+
+test_mode=false
+
+name=deblob-check
+
+case $1 in
+--version | -V)
+  sed '/^# '$name' version /,/^# Written by/ { s/^# //; p; }; d' < $0
+  exit 0
+  ;;
+
+-\? | -h)
+  sed -n '/^# usage:/,/# -h/ { /^# -/,/^$/{s/^# \(-.*\):.*/\1/p; d; }; s/^\(# \?\)\?//p; }' < $0 &&
+  echo
+  echo "run \`$name --help | more' for full usage"
+  exit 0
+  ;;
+
+--help | -H)
+  sed -n '/^# '$name' version /,/^[^#]/ s/^\(# \?\)\?//p' < $0
+  exit 0
+  ;;
+
+--test | -t)
+  test_mode=:
+  ;;
+
+--mark-false-positives | -p)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "b list_both;" "p;" "b list_matches;"
+  }
+  ;;
+
+--print-marked-false-positives | -f)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "b print_marked_matches;" "" "b print_marked_matches;"
+  }
+  ;;
+
+--print-false-positives | -F)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "b print_matches;" "" "b print_matches;"
+  }
+  ;;
+
+--deblob | --mark-blobs | -d)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "b list_blobs;" "p;" "p;"
+  }
+  ;;
+
+--cat | -D)
+  shift;
+  set_sed_cmd () {
+    set_sedmain \
+      "# sedcat: Actual blob detected, but there may be false positives." \
+      "# sedcat: No blob whatsoever found." \
+      "# sedcat: False positives found." \
+      "p; d; # sedcat: Just print stuff, remove this line to run the actual script."
+  }
+  ;;
+
+--print-marked-blobs | -b)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "b print_marked_blobs;"
+  }
+  ;;
+
+--print-blobs | -B)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "b print_blobs;"
+  }
+  ;;
+
+--print-marked-blobs-with-context | -c)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "b print_marked_cblobs;"
+  }
+  ;;
+
+--print-blobs-with-context | -C)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "b print_cblobs;"
+  }
+  ;;
+
+--list-false-positives | -P)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "" "" "
+i\\
+$file
+q 1;"
+  }
+  ;;
+
+--list-all-matches | -x)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "
+i\\
+$file
+q 1;" "" "
+i\\
+$file
+q 1;"
+  }
+  ;;
+
+--print-all-matches | -X)
+  shift;
+  set_sed_cmd () {
+    set_sedmain "b print_both;" "" "b print_matches;"
+  }
+  ;;
+
+*)
+  case $1 in
+  -- | -l | --list-blobs) shift;;
+  esac
+  case $1 in
+  -*)
+    if test ! -f "$1"; then
+      echo "$name: \`$1' given too late or out of the proper sequence." >&2
+      echo "$name: The order of arguments is significant, see the usage." >&2
+      exit 1
+    fi
+    ;;
+  esac
+      
+  set_sed_cmd () {
+    set_sedmain "
+i\\
+$file
+q 1;"
+  }
+  ;;
+
+esac
+
+case $1 in
+--) shift;;
+esac
+
+if $test_mode; then
+  pass=:
+
+  # Exercise some nasty inputs to see that we recognize them as blobs
+  # with full context.
+  for string in \
+    "1,2,3,4" \
+    "= {
+1, 0x2, 03, L'\x4'
+}" \
+    "=
+{
+  '\\x1', '\\002'
+  ,
+  {
+    { \"\\x3\", },
+    \"\\004\"
+  },
+};" \
+    ".long 1,2
+     .long \$3,\$4" \
+    "#define X { 1, 2, \\
+		 3, 4, /* comment */ \\
+	       }" \
+  "= {
+/*
+ * multi-line
+ * comment
+ */
+ {
+   0x4c00c000, 0x00000000, 0x00060000, 0x00000000,
+ },
+}" \
+  ; do
+    case `echo "$string" | $0 -s 4 -c` in
+    "::: - :::
+$string") ;;
+    *) echo "failed positive test for:
+$string" >&2
+       pass=false;;
+    esac
+  done
+
+  # Make sure we do not recognize these as blobs.
+  for string in \
+    "#define X { 1, 2 }
+#define Y { 3, 4 }" \
+    " 0x00, 0x00, 0x00 " \
+  ; do
+    case `echo "$string" | $0 -s 4` in
+    "") ;;
+    *) echo "failed negative test for:
+$string" >&2
+       pass=false;;
+    esac
+  done
+
+  # How did we do?
+  if $pass; then
+    echo success
+  fi
+
+  $pass
+  exit
+fi
+
+# Call addx as needed to set up more patterns to be recognized as
+# false positives.  Takes the input filename in $1.
+
+set_except () {
+  # Look for a multi-line definition starting with a line that matches
+  # $1 (implicitly anchored to the beginning of the line), and ending
+  # at the first ';'.  $2 may optionally name the files in which this
+  # match is to be disregarded as a potential blob.
+  initnc () {
+    addx "$1[^;]*;\\?" $2
+  }
+
+  # Same as initnc, but require the terminating semicolon.
+  defsnc () {
+    addx "$1[^;]*;" $2
+  }
+
+  # Look for a multi-line definition starting with a line that matches
+  # $1 (implicitly anchored to the beginning of the line), and ending
+  # at the first ';' that's not within comments.
+  initc () {
+    addx "$1\\([^;]*\\|$comment\\)*;\\?" $2
+  }
+
+  # Accept as a non-blob an expression $1 that would have otherwise
+  # triggered blob detection.  The expression must end in a way that
+  # would trigger the blob detection machinery.
+  accept () {
+    addx "$1" $2
+  }
+
+  # Match up to the end a comment started in $1.
+  ocomment () {
+    addx "$1\\([^*]\\|[*][*]*[^*/]\\|[*]*[\\n]\\)*[*]*[*][/]" $2
+  }
+
+  # Match $1 followed by backslash-terminated lines and a last
+  # non-backslash-terminated line.
+  oprepline () {
+    addx "$1\\([^\\n]*\\\\[\\n]\\)*[^\\n\\\\]*$eol" $2
+  }
+
+  # Match $1 in $2 as a blob.  Not implemented yet.
+  blob () {
+    :
+  }
+
+  case /$1 in
+  /drivers/net/tg3.c)
+    # This file contains firmwares that we deblob with high
+    # sensitivity, so make sure the sequences of numbers that are not
+    # blobs are not deblobbed.  FIXME: we should have patterns to
+    # recognize the blobs instead.
+    defsnc '	static const u32 test_pat\[4\]\[6\] =' drivers/net/tg3.c
+    accept "	}\\(,\\? mem_tbl_5\\(70x\\|705\\|755\\|906\\)\\[\\] = {$sepx$blobpat*$sepx}\\)*;" drivers/net/tg3.c
+    ;;
+  */*linux*.tar* | */*kernel*.tar* | */*linux-*.*.*/*)
+    # false alarms, contain source
+    # drivers/net/wan/wanxlfw.inc_shipped -> wanxlfw.S
+    accept 'static u8 firmware\[\]={[\n]0x60,\(0x00,\)*0x16,\(0x00,\)*\([\n]\(0x[0-9A-F][0-9A-F],\)*\)*[\n]0x23,0xFC,0x00,0x00,0x00,0x01,0xFF,0xF9,0x00,0xD4,0x61,0x00,0x06,0x74,0x33,0xFC,\([\n]\(0x[0-9A-F][0-9A-F],\)*\)*0x00[\n]};'
+    # drivers/usb/serial/xircom_pgs_fw.h -> xircom_pgs.S
+    initnc 'static const struct ezusb_hex_record xircom_pgs_firmware\[\] ='
+    # drivers/usb/serial/keyspan_pda_fw_h -> keyspan_pda.S
+    initnc 'static const struct ezusb_hex_record keyspan_pda_firmware\[\] ='
+    # arch/m68k/ifpsp060/*.sa -> src/*.s
+    accept '	\.long	0x60ff0000,0x02360000,0x60ff0000,0x16260000[\n]'"$sepx$blobpat*"
+    accept '	\.long	0x60ff0000,0x17400000,0x60ff0000,0x15f40000[\n]'"$sepx$blobpat*"
+    # arch/powerpc/platforms/cell/spufs/spu_save_dump.h_shipped -> spu_save.c
+    initnc 'static unsigned int spu_save_code\[\]  __attribute__((__aligned__(128))) ='
+    # arch/powerpc/platforms/cell/spufs/spu_restore_dump.h_shipped -> spu_restore.c
+    initnc 'static unsigned int spu_restore_code\[\]  __attribute__((__aligned__(128))) ='
+    # drivers/net/ixp2000/ixp2400_tx.ucode -> ixp2400_tx.uc
+    initnc '	\.initial_reg_values	= (struct ixp2000_reg_value \[\]) {'
+    # drivers/net/ixp2000/ixp2400_rx.ucode -> ixp2400_rx.uc
+    initnc '	\.initial_reg_values	= (struct ixp2000_reg_value \[\]) {'
+    initnc '[ 	]*\.\(digest\|entries\|input\|key\|output\|plaintext\|result\)[ 	]*= [{"]' crypto/tcrypt.h
+
+    # checked:
+
+    accept '	\$3 = {{pge = {{ste = {\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\) =\|<repeats [0-9]\+ times>\)[{},\n 	]*\)*<repeats 11 times>}'"$eol"
+    accept '__clz_tab:[\n]	\.byte	0\(,[0-5]\)\+'"$sepx$blobpat*" arch/sparc/lib/divdi3.S
+    accept 'PITBL:[\n]  \.long  0xC0040000,0xC90FDAA2,'"$blobpat*" arch/sparc/lib/divdi3.S
+    accept '\(0x[0F][0F],\)\+\\[\n]\(\(0x[0F][0F],\)\+\\[\n]\)*\(0x[0F][0F],\)\+0x00' arch/m68k/mac/mac_penguin.S
+    accept '\.lowcase:[\n]	\.byte 0x00\(,0x0[1-7]\)\+'"$sepx$blobpat*$eol" arch/s390/kernel/head.S
+    accept '_zb_findmap:[\n]         \.byte  0\(,[123],0\)\+,4'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
+    accept '_sb_findmap:[\n]         \.byte  8\(,0,[123]\)\+,0'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
+    accept '	\.section __ex_table,"a"'"$sepx$blobpat*" arch/powerpc/lib/copyuser_64.S
+    accept '	memcpy(src, "\\x01\\x00\\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00".*PROGxxxx' arch/powerpc/platforms/iseries/mf.c
+    initnc 'static const unsigned int cpu_745x\[2\]\[16\] =' arch/ppc/platforms/ev64260.c
+    initnc 'const unsigned char __flsm1_tab\[256\] =' arch/alpha/lib/fls.c
+    accept '#define _MAP_0_32_ASCII_SEG7_NON_PRINTABLE	\\[\n]	\(0,\)\+'"$eol" drivers/input/misc/map_to_7segment.h
+    initc '	static int      init_values_b\[\] =' sound/oss/ad1848.c
+    initnc 'static unsigned char atkbd_set2_keycode\[512\] =' drivers/input/keyboard/atkbd.c
+    accept 'desc_config1:[\n]	\.byte 0x09, 0x02'"$sepx$blobpat*" 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
+    accept 'string_mfg:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_mfg_end:' 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
+    accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
+    accept '   [/][*] \(SQCIF\|QSIF\|QCIF\|SIF\|CIF\|VGA\) [*][/][\n]   {[\n]      {'"$blobpat*" drivers/media/video/pwc/pwc-nala.h
+    accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/*.ppm
+    accept 'for i in [ 	0-9\\\n]*[\n]do' Documentation/specialix.txt
+    accept '         :   3600000   3400000   3200000   3000000   2800000 ' Documentation/cpu-freq/cpufreq-stats.txt
+    accept '00 00[\n]64 01[\n]8e 0b[\n][\n][0-9a-f \n]*fe fe' 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
+    accept '0f 00 08 08 64 00 0a 00 - id 0[\n]'"$blobpat*" 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
+    accept 'default nvram data:'"$sepx$blobpat*" 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
+    accept '0x0458     0x7025[\n]'"$blobpat*" Documentation/video4linux/sn9c102.txt
+    accept '0x102c     0x6151[\n]'"$blobpat*" Documentation/video4linux/et61x251.txt
+    accept '0x041e     0x4017[\n]'"$blobpat*" Documentation/video4linux/zc0301.txt
+    accept '  (gdb) x\/100x \$25[\n]  0x507d2434:     0x507d2434      0x00000000      0x08048000      0x080a4f8c'"$sepx$blobpat*" Documentation/uml/UserModeLinux-HOWTO.txt
+    accept '      1  0  0  0  0x308'"$sepx$blobpat*" Documentation/isdn/README.inc
+    accept 'domain<N> <cpumask> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'"$eol" Documentation/sched-stats.txt
+    accept '[ *	]*0                   1                   2                   3[\n][ *	]*0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1' 'net/ipv4/ipvs/ip_vs_sync.c|net/sctp/sm_make_chunk.c|include/linux/scpt.h'
+    accept ' \*  1 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0' arch/x86/lguest/boot.c
+    ocomment '	[/][*] Configure the PCI bus bursts and FIFO thresholds.' drivers/net/fealnx.c
+    ocomment '[/][*] the original LUT values from Alex van Kaam <darkside@chello\.nl>' drivers/hwmon/via686a.c
+    initc 'static const unsigned char init\[\] = {[^;]*MODE=0 ;.*SAA_7114_NTSC_HSYNC_START' drivers/media/video/saa7114.c
+
+    # in 2.6.23 only
+    accept " Psize    Ipps       Tput     Rxint     Txint    Done     Ndone[\\n] ---------------------------------------------------------------\\([\\n][ 0-9]\\+\\)\\+$eol"
+    initnc 'static u_short ataplain_map\[NR_KEYS\] __initdata ='
+    initnc 'static RegInitializer initData\[\] __initdata ='
+    initnc '	static const unsigned char invert5\[\] ='
+    initnc 'static unsigned char alpa2target\[\] ='
+    initnc 'static unsigned char target2alpa\[\] ='
+    oprepline '#define INIT_THREAD [{0},]\+[ 	]*\\[\n][ 	]*[{0},]\+'
+    initnc 'static uint tas300\(1c\|4\)_\(master\|mixer\|treble\|bass\)_tab\[\]='
+    initnc 'static short dmasound_[au]law2dma16\[\] ='
+    initnc 'static const unsigned short DACVolTable\[101\] ='
+
+    # in 2.6.22
+    initnc 'static const UQItype __clz_tab\[\] =' arch/arm26/lib/udivdi3.c
+    initnc '	static unsigned char scale\[101\] =' sound/oss/opl3sa2.c
+    initnc '} syncs\[\] =' drivers/scsi/53c7xx.c
+    initnc 'genoa_md:'"$sepx$blobpat*"'[\n]	\.ascii	"Genoa"' arch/i386/boot/video.S
+
+    # in 2.6.21
+    initnc 'Vendor ID  Product ID[\n]-\+  -\+[\n]'"$blobpat*" Documentation/video4linux/sn9c102.txt
+    defsnc 'static short [au]law2dma16\[\]' arch/ppc/8xx_io/cs4218_tdm.c
+    defsnc '	static const char minimal_ascii_table\[\]' drivers/ieee1394/csr1212.c
+    defsnc 'static u16 key_map \[256\] =' drivers/media/dvb/ttpci/av7110_ir.c
+    defsnc 'static unsigned char gf64_inv\[64\] =' drivers/mtd/nand/cafe_ecc.c
+    defsnc 'static unsigned short err_pos_lut\[4096\] =' drivers/mtd/nand/cafe_ecc.c
+    defsnc 'static unsigned char testdata\[TESTDATA_LEN\] =' fs/jffs2/comprtest.c
+
+    # new in 2.6.25
+    accept "%canned_values = ([\\n]	\\([0-9]\\+ => \\[[ 	\\n]\\+\\(\\([0-9]\\+\\|'0x[0-9a-f]\\+'\\),[ 	\\n]*\\)*\\]\\(, \\|[\\n]\\)\\)*);"
+
+    # from 2.6.25-rc* patches
+    initnc '	int bcomm_irq\[3\*16\] ='
+    initnc '	static const int8 countLeadingZerosHigh\[\] ='
+    initnc 'static struct nic_qp_map nic_qp_mapping_[01]\[\] ='
+    initnc 'static struct regval ov_initvals\[\] ='
+    initnc 'static struct regval stk1125_initvals\[\] ='
+    initnc 'static u8 bnx2x_stats_len_arr\[BNX2X_NUM_STATS\] ='
+    initnc 'static const struct arb_line read_arb_data\[NUM_RD_Q\]\[MAX_RD_ORD + 1\] ='
+    initnc 'static const struct arb_line write_arb_data\[NUM_WR_Q\]\[MAX_WR_ORD + 1\] ='
+    oprepline '#define AR5K_RATES_11A '
+    oprepline '#define AR5K_RATES_11B '
+    oprepline '#define AR5K_RATES_11G '
+    oprepline '#define AR5K_RATES_TURBO '
+    oprepline '#define AR5K_RATES_XR '
+    initnc '		} blinkrates\[\] ='
+    initnc 'static const struct ath5k_ini ar5212_ini\[\] ='
+    initnc 'static const struct ath5k_ini_mode rf5413_ini_mode_end\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5111\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5112\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5112a\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5413\[\] ='
+    initnc 'const u\(8\|16\|32\) b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\] ='
+
+    # new in 2.6.26
+    initnc 'static u64 vec2off\[68\] =' arch/ia64/kvm/process.c
+    initnc "			interrupts = <\\(0x\\)\\?3 \\(0x\\)\\?0 \\(0x\\)\\?0  $blobpat*>;" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
+    initnc 'static const u32 crctab32\[\] =' arch/x86/boot/tools/build.c
+    initnc 'static struct mse2snr_tab \(vsb\|qam\(64\|256\)\)_mse2snr_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} \(VSB\|QAM\)_mod_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} itd1000_\(lpf_pga\|fre_values\)\[\] =' drivers/media/dvb/frontends/itd1000.c
+    initnc '} \(vsb\|qam\(64\|256\)\)_snr_tab\[\] =' drivers/media/dvb/frontends/s5h1411.c
+    initnc '} snr_tab\[\] =' drivers/media/dvb/frontends/tda10048.c
+    initnc 'static u32 reg_init_initialize\[\] =' drivers/media/video/saa717x.c
+    initnc 'static const u32 \(main\|gear\)_seedset\[BACKOFF_SEEDSET_ROWS\]\[BACKOFF_SEEDSET_LFSRS\] =' drivers/net/forcedeth.c
+    initnc 'static const struct ath5k_ini_mode rf24\(13\|25\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c
+    initnc 'static const u16 wm9713_reg\[\] =' sound/soc/codecs/wm9713.c
+
+    # This looks suspicious, but it pretty much just sets stuff to zero.
+    initnc 'static __u8 mode8420\(pro\|con\)\[\] =' drivers/media/video/cs8420.h
+
+    # quite suspicious
+    # arch/parisc/kernel/perf_images.h
+    initc 'static uint32_t onyx_images\[\]\[PCXU_IMAGE_SIZE\/sizeof(uint32_t)\] __read_mostly ='
+    initc 'static uint32_t cuda_images\[\]\[PCXW_IMAGE_SIZE\/sizeof(uint32_t)\] __read_mostly ='
+
+    # These are regarded as ok
+    initnc 'static const u8 SN9C102_\(Y\|UV\)_QTABLE[01]\[64\] = {'
+    initnc '	static \(const \)\?u8 jpeg_header\[589\] = {' media/video/sn9c102/sn9c102_core.c
+    accept '[	]\{1,2\}err = sn9c102_write_const_regs(cam\(,[ 	\n]\+{0x[0-9a-fA-F][0-9a-fA-F], 0x[0-9a-fA-F][0-9a-fA-F]}\)*);'
+
+    # too lax?
+    initnc 'static yyconst \(flex_int\(16\|32\)_t\|\(\(short \)\?int\)\) yy_[^[]*\[[][0-9]*\] ='
+    initnc 'static const \(yytype_u\?int\(8\|16\)\|\(unsigned \)\?\(short\( int\)\?\|char\)\) yy[^[]*\[\] ='
+    initnc '\(\|	\)static \(const \|\)\(unsigned \(short\|char\)\|struct SiS_[^ ]*\) SiS[^[]*\(\[[] [*0-9]*\]\)\+ *='
+
+    initnc 'static const a3d_Hrtf_t A3dHrirZeros = {'
+    initnc 'static const a3d_Hrtf_t A3dHrirImpulse = {'
+    initnc 'static const a3d_Hrtf_t A3dHrirOnes = {'
+    initnc 'static const a3d_Hrtf_t A3dHrirSatTest = {'
+    initnc 'static const a3d_Hrtf_t A3dHrirDImpulse = {'
+    initnc 'static const a3d_ItdDline_t A3dItdDlineZeros = {'
+    initnc 'static auxxEqCoeffSet_t asEqCoefsNormal = {'
+    initnc 'static xtalk_dline_t const alXtalkDlineTest = {'
+    initnc 'static struct nand_ecclayout rtc_from4_nand_oobinfo = {'
+    initnc 'static const s16 tempLUT\[\] ='
+    initnc 'static const u8 viaLUT\[\] ='
+    initnc 'static struct { int xres, yres, left, right, upper, lower, hslen, vslen, vfreq; } timmings\[\] __initdata = {'
+    initnc 'static struct platinum_regvals platinum_reg_init_[0-9]* = {'
+    initnc '} sisfb_ddc[sf]modes\[\] __devinitdata ='
+    initnc 'static struct dvb_pll_desc [^\n]* = {'
+    initnc 'static u32 LABELPATCHES\[\] __attribute((unused)) ='
+
+    initnc 'static dbdev_tab_t dbdev_tab\[\] ='
+    accept '\(EXP\|LOG\|ATAN\)TBL:'"$sepx$blobpat*"
+    initnc 'static char fm_volume_table\[128\] ='
+    initnc 'unsigned int snd_gf1_scale_table\[SNDRV_GF1_SCALE_TABLE_SIZE\] ='
+    # remaining after original deblob_2_6_24, not fully checked
+
+    oprepline '#define OV51[18]_\(Y\|UV\)QUANTABLE {'
+    initnc '		static unsigned char const data_bit\[64\] ='
+    initnc '		static const u8 data_sbit\[32\] ='
+    initnc '	\.RightCoefs ='
+    initnc '	#define WakeupSeq    {'
+    initnc '	SetRate44100\[\] ='
+    initnc '	const short period\[32\] ='
+    initnc '	\(const static\|static const\) int desc_idx_table\[\] ='
+    initnc '	int prop_bcomm_irq\[3\*16\] ='
+    initnc '	static char logSlopeTable\[128\] ='
+    initnc '	static const int uc_\(dup\|word\)_table\[\]\[2\] ='
+    initnc '	static const struct mc7_timing_params mc7_timings\[\] ='
+    initnc '	static const u8 biphase_tbl\[\] ='
+    initnc '	static const u8 cs170\[7 \* 8\] ='
+    initnc '	static const u8 cs3[13]a\[8 \* 4\] ='
+    initnc '	static const u8 dramsr13\[12 \* 5\] ='
+    initnc '	static const u8 log10\[\] ='
+    initnc '	static const u8 mpeg_hdr_data\[\] ='
+    initnc '	static const u8 sdramtype\[13\]\[5\] ='
+    initnc '	static const u8 t\[\] ='
+    initnc '	static const unsigned int avg_pkts\[NCCTRL_WIN\] ='
+    initnc '	static const unsigned short ac97_defaults\[\] ='
+    initnc '	static int exp_lut\[256\] ='
+    initnc '	static u16 jpeg_tables\[\]\[70\] ='
+    initnc '	static u16 tables\[\] ='
+    initnc '	static u32 logMagTable\[128\] ='
+    initnc '	static u8 init_bufs\[13\]\[5\] ='
+    initnc '	static u8 sine \[\] ='
+    initnc '	static u_short geometry_table\[\]\[[45]\] ='
+    initnc '	static unsigned char CRCTable1\[\] ='
+    initnc '	static unsigned char CRCTable2\[\] ='
+    initnc '	static unsigned char default_colors\[\] ='
+    initnc '	static unsigned char iso_regs\[8\]\[4\] ='
+    initnc '	static unsigned char log_scale\[101\] =' sound/oss/pss.c
+    initnc '	static unsigned char msg\[\] ='
+    initnc '	static unsigned char static_pad\[\] ='
+    initnc '	static unsigned char table_alaw2ulaw\[\] ='
+    initnc '	static unsigned char table_ulaw2alaw\[\] ='
+    initnc '	u32 reg_boundaries\[\] ='
+    initnc '	u8 b\[\] ='
+    initnc '	uint8_t tx\[\] ='
+    initnc '	unsigned char saa7111_regs\[\] ='
+    initnc '	unsigned char sas_pcd_m_pg\[\] ='
+    initnc '	} modedb\[5\] ='
+    initnc '	} reg_tbl\[\] ='
+    initnc '	} vals\[\] ='
+    initnc '	} vm_devices\[\] ='
+    initnc '    static const code distfix\[32\] ='
+    initnc '    static const code lenfix\[512\] ='
+    initnc '  int poly\[\]='
+    initnc '  static const unsigned char asso_values\[\] ='
+    initnc '  static unsigned char asso_values\[\] ='
+    initnc '  } cards_ds\[\] ='
+    initnc '    static const int8 countLeadingZerosHigh\[\] ='
+    initnc '    static const unsigned short d\(base\|ext\)\[32\] ='
+    initnc '#define OV511_QUANTABLESIZE	64'
+    initnc 'BYTE BtCard::SRAMTable_\(NTSC\|PAL\)\[\] ='
+    initnc 'BYTE SRAMTable\[\]\[ 60 \] ='
+    accept 'irq_prio_[hdlc]*:'"$sepx$blobpat*"
+    initc '__u8 _ascebc\[256\] ='
+    initc '__u8 _ebc_tolower\[256\] ='
+    initc '__u8 _ebc_toupper\[256\] ='
+    initnc 'adapter_tag_info_t aic7[9x]xx_tag_info\[\] ='
+    initnc 'char dmasound_alaw2dma8\[\] ='
+    initnc 'char dmasound_ulaw2dma8\[\] ='
+    initnc 'const struct aper_size_info_16 agp3_generic_sizes\[AGP_GENERIC_SIZES_ENTRIES\] ='
+    initnc 'const u16 crc_itu_t_table\[256\] ='
+    initnc 'const u8 byte_rev_table\[256\] ='
+    initnc 'const u8 crc7_syndrome_table\[256\] ='
+    initnc 'const unsigned char INIT_2\[127\] ='
+    initnc 'int snd_sf_vol_table\[128\] ='
+    initnc 'static	u_char	irq_to_siubit\[\] ='
+    initnc 'static	u_char	irq_to_siureg\[\] ='
+    initnc 'static Byte_t RData\[RDATASIZE\] ='
+    initnc 'static __const__ __u16 gx_coeff\[256\] ='
+    initnc 'static __u8 init7121ntsc\[\] ='
+    initnc 'static __u8 init7121pal\[\] ='
+    initnc 'static byte capidtmf_leading_zeroes_table\[0x100\] ='
+    defsnc 'static char channel_map_madi_[sdq]s\[HDSPM_MAX_CHANNELS\] =' sound/pci/rme9652/hdspm.c
+    initnc 'static char coefficients\[NM_TOTAL_COEFF_COUNT \* 4\] ='
+    initnc 'static char ecc_syndrome_table\[\] ='
+    initnc 'static char isdn_audio_alaw_to_ulaw\[\] ='
+    initnc 'static char isdn_audio_ulaw_to_alaw\[\] ='
+    initnc 'static char mix_cvt\[101\] ='
+    initnc 'static char opl3_volume_table\[128\] ='
+    initnc 'static const RegInitializer initData\[\] __initdata ='
+    initnc 'static const __u16 crc10_table\[256\] ='
+    initnc 'static const __u32 crc_c\[256\] ='
+    initnc 'static const char zr360[56]0_dht\[0x1a4\] ='
+    initnc 'static const char zr360[56]0_dqt\[0x86\] ='
+    initnc 'static const fixp_t cos_table\[46\] ='
+    initnc 'static const int init_seq\[\] ='
+    initnc 'static const int mobile_vid_table\[32\] ='
+    initnc 'static const s16 snd_opl4_pitch_map\[0x600\] ='
+    initnc 'static const s8 \(b43\(\|legacy\)\|bcm43xx\)_tssi2dbm_[bg]_table\[\] ='
+    initnc 'static const s8 budtab\[256\] ='
+    initnc 'static const struct aper_size_info_32 u3_sizes\[8\] ='
+    initnc 'static const struct aper_size_info_8 via_generic_sizes\[9\] ='
+    initnc 'static const struct color clut_vga16\[16\] ='
+    initnc 'static const struct gain_entry gain_table\[2\]\[108\] ='
+    initnc 'static const struct mV_pos __initdata mobilevrm_mV\[32\] ='
+    initnc 'static const struct mV_pos __initdata vrm85_mV\[32\] ='
+    initnc 'static const struct menelaus_vtg_value vcore_values\[\] ='
+    initnc 'static const struct opl4_region regions_[0-9a-frums]*\[\] ='
+    initnc 'static const struct regval regval_table\[\] ='
+    initnc 'static const struct rf_channel rf_vals_5222\[\] ='
+    initnc 'static const struct rf_channel rf_vals_5225_2527\[\] ='
+    initnc 'static const struct rf_channel rf_vals_5226\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2522\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2523\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2524\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2525\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2525e\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2528\[\] ='
+    initnc 'static const struct rf_channel rf_vals_noseq\[\] ='
+    initnc 'static const struct rf_channel rf_vals_seq\[\] ='
+    initnc 'static const u16 Sbox\[256\] ='
+    initnc 'static const u16 count_lut\[\] ='
+    # drivers/net/e1000e/phy.c
+    initnc 'static const u16 e1000_igp_2_cable_length_table\[\] ='
+    initnc 'static const u16 rtl8225bcd_rxgain\[\] ='
+    initnc 'static const u16 rtl8225z2_rxgain\[\] ='
+    initnc 'static const u16 stufftab\[5 \* 256\] ='
+    initnc 'static const u16 tkip_sbox\[256\] ='
+    initnc 'static const u16 wm8753_reg\[\] ='
+    initnc 'static const u32 SS[0-3]\[256\] ='
+    initnc 'static const u32 S[1-8]\[64\] ='
+    initnc 'static const u32 T[0-5]\[256\] ='
+    initnc 'static const u32 Tm\[24\]\[8\] ='
+    initnc 'static const u32 bass_table\[41\]\[5\] ='
+    initnc 'static const u32 bf_sbox\[256 \* 4\] ='
+    initnc 'static const u32 camellia_sp0222\[256\] ='
+    initnc 'static const u32 camellia_sp1110\[256\] ='
+    initnc 'static const u32 camellia_sp3033\[256\] ='
+    initnc 'static const u32 camellia_sp4404\[256\] ='
+    initnc 'static const u32 crc32c_table\[256\] ='
+    initnc 'static const u32 db_table\[101\] ='
+    initnc 'static const u32 m8xx_size_to_gray\[M8XX_SIZES_NO\] ='
+    initnc 'static const u32 mds\[4\]\[256\] ='
+    initnc 'static const u32 pc2\[1024\] ='
+    initnc 'static const u32 s[1-7]\[256\] ='
+    initnc 'static const u32 sb8\[256\] ='
+    initnc 'static const u32 tfrc_calc_x_lookup\[TFRC_CALC_X_ARRSIZE\]\[2\] ='
+    initnc 'static const u32 treble_table\[41\]\[5\] ='
+    initnc 'static const u64 [CT][0-7]\[256\] ='
+    initnc 'static const u64 sbox[1-4]\[256\] ='
+    initnc 'static const u64 sha512_K\[80\] =' 'crypto/sha512\(_generic\)\?.c'
+    initnc 'static const u8 Tr\[4\]\[8\] ='
+    initnc 'static const u8 aes_sbox\[256\] ='
+    initnc 'static const u8 calc_sb_tbl\[512\] ='
+    initnc 'static const u8 exp_to_poly\[492\] ='
+    initnc 'static const u8 legal_ansi_char_array\[0x40\] ='
+    initnc 'static const u8 parity\[\] ='
+    initnc 'static const u8 pc1\[256\] ='
+    initnc 'static const u8 poly_to_exp\[255\] ='
+    initnc 'static const u8 q[01]\[256\] ='
+    initnc 'static const u8 ratio_lut\[\] ='
+    initnc 'static const u8 rs\[256\] ='
+    initnc 'static const u8 rtl8225_agc\[\] ='
+    initnc 'static const u8 rtl8225_tx_power_cck\[\] ='
+    initnc 'static const u8 rtl8225_tx_power_cck_ch14\[\] ='
+    initnc 'static const u8 rtl8225z2_tx_gain_cck_ofdm\[\] ='
+    initnc 'static const u8 setup\[\] ='
+    initnc 'static const u8 speedtab \[3\]\[12\] ='
+    initnc 'static const u_char irq_to_siubit\[\] ='
+    initnc 'static const u_char irq_to_siureg\[\] ='
+    initnc 'static const u_char nand_ecc_precalc_table\[\] ='
+    initnc 'static const uint8_t parity\[256\] ='
+    initnc 'static const unsigned char \(UV\|Y\)_QUANTABLE\[64\] ='
+    initnc 'static const unsigned char __initdata mV_mobilevrm\[32\] ='
+    initnc 'static const unsigned char __initdata mV_vrm85\[32\] ='
+    initnc 'static const unsigned char barco_p1\[2\]\[9\]\[7\]\[3\] ='
+    initnc 'static const unsigned char bitcounts\[256\] ='
+    initnc 'static const unsigned char blue\[256\] ='
+    initnc 'static const unsigned char chktab[hl]\[256\] ='
+    initnc 'static const unsigned char comet_miireg2offset\[32\] ='
+    initnc 'static \(const \)\?unsigned char euc2sjisibm_g3upper_map\[\]\[2\] ='
+    initnc 'static const unsigned char green\[256\] ='
+    initnc 'static const unsigned char hash_table_ops\[64\*4\] ='
+    initnc 'static const unsigned char hid_keyboard\[256\] ='
+    initnc 'static const unsigned char mts_direction\[256\/8\] ='
+    initnc 'static const unsigned char red\[256\] ='
+    initnc 'static \(const \)\?unsigned char sjisibm2euc_map\[\]\[2\] ='
+    initnc 'static const unsigned char vol_cvt_datt\[128\] ='
+    initnc 'static const unsigned char wm_vol\[256\] ='
+    initnc 'static const unsigned int MulIdx\[16\]\[16\] ='
+    initnc 'static const unsigned int crctab32\[\] ='
+    initnc 'static const unsigned short crc_flex_table\[\] ='
+    initnc 'static const unsigned short logtable\[256\] ='
+    initnc 'static const unsigned short wd7000_iobase\[\] ='
+    initnc 'static const unsigned short x86_keycodes\[256\] ='
+    initnc 'static const unsigned table\[\] ='
+    initnc 'static int MV300_reg_8bit\[256\] \?=' drivers/video/atafb.c
+    initnc 'static int fifo_map\[\]\[MAX_TX_FIFOS\] ='
+    initnc 'static int initial_lfsr\[\] ='
+    initnc 'static int log_tbl\[129\] ='
+    initnc 'static int logitech_expanded_keymap\[LOGITECH_EXPANDED_KEYMAP_SIZE\] ='
+    initnc 'static int miro_fmtuner\[\]  ='
+    initnc 'static int miro_tunermap\[\] ='
+    initnc 'static int register_size\[\] ='
+    initnc 'static int reserve_list\[MAX_RES_ARGS\] ='
+    initnc 'static int reverse6\[64\] ='
+    initnc 'static short attack_time_tbl\[128\] ='
+    defsnc 'static short beep_wform\[256\] =' 'sound/ppc/beep.c|sound/oss/dmasound/dmasound_awacs.c|arch/ppc/8xx_io/cs4218_tdm.c'
+    initnc 'static short decay_time_tbl\[128\] ='
+    initnc 'static short isdn_audio_[ua]law_to_s16\[\] ='
+    initnc 'static struct cipher_testvec anubis_cbc_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec anubis_cbc_enc_tv_template\[\] ='
+    initnc 'static struct cipher_testvec anubis_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec anubis_enc_tv_template\[\] ='
+    initnc 'static struct cipher_testvec camellia_cbc_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec camellia_cbc_enc_tv_template\[\] ='
+    initnc 'static struct cipher_testvec camellia_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec camellia_enc_tv_template\[\] ='
+    initnc 'static struct cipher_testvec cast6_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec cast6_enc_tv_template\[\] ='
+    initnc 'static struct cipher_testvec serpent_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec serpent_enc_tv_template\[\] ='
+    initnc 'static struct cipher_testvec tea_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec tea_enc_tv_template\[\] ='
+    initnc 'static struct cipher_testvec tf_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec tf_enc_tv_template\[\] ='
+    initnc 'static struct cipher_testvec tnepres_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec xeta_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec xeta_enc_tv_template\[\] ='
+    initnc 'static struct cipher_testvec xtea_dec_tv_template\[\] ='
+    initnc 'static struct cipher_testvec xtea_enc_tv_template\[\] ='
+    initnc 'static struct comp_testvec deflate_decomp_tv_template\[\] ='
+    initnc 'static struct hash_testvec aes_xcbc128_tv_template\[\] =' crypto/tcrypt.h
+    initnc 'static struct hash_testvec crc32c_tv_template\[\] ='
+    initnc 'static struct hash_testvec hmac_sha256_tv_template\[\] =' crypto/tcrypt.h
+    initnc 'static struct hash_testvec sha256_tv_template\[\] ='
+    initnc 'static struct hash_testvec sha384_tv_template\[\] ='
+    initnc 'static struct hash_testvec sha512_tv_template\[\] ='
+    initnc 'static struct hash_testvec wp256_tv_template\[\] ='
+    initnc 'static struct hash_testvec wp384_tv_template\[\] ='
+    initnc 'static struct hash_testvec wp512_tv_template\[\] ='
+    initnc 'static struct iwl\(3945\)\?_tx_power power_gain_table\[2\]\[IWL_MAX_GAIN_ENTRIES\] ='
+    initnc 'static struct ovcamchip_regvals regvals_init_\(76be\|7[16]20\|7x10\)\[\] ='
+    initnc 'static struct regval_list ov7670_default_regs\[\] ='
+    initnc 'static struct s_c2 SetRate48000\[\] ='
+    initnc 'static struct tea6420_multiplex TEA6420_line\[MXB_AUDIOS+1\]\[2\] ='
+    initnc 'static struct wm_info i810_wm_16_100\[\] ='
+    initnc 'static struct wm_info i810_wm_16_133\[\] ='
+    initnc 'static struct wm_info i810_wm_24_100\[\] ='
+    initnc 'static struct wm_info i810_wm_24_133\[\] ='
+    initnc 'static struct wm_info i810_wm_8_100\[\] ='
+    initnc 'static struct wm_info i810_wm_8_133\[\] ='
+    initnc 'static struct { struct fb_bitfield red, green, blue, transp; int bits_per_pixel; } colors\[\] ='
+    initnc 'static u16 asEqCoefsPipes\[64\] ='
+    initnc 'static u16 asEqCoefsZeros\[50\] ='
+    initnc 'static u16 asEqOutStateZeros\[48\] ='
+    initnc 'static u16 default_key_map \[256\] ='
+    initnc 'static u16 eq_levels\[64\] ='
+    initnc 'static u32  crc32tab\[\] __attribute__ ((aligned(8))) ='
+    initnc 'static u32 ac3_frames\[3\]\[32\] ='
+    initnc 'static u32 adwDecim8\[33\] ='
+    initnc 'static u32 h_prescale\[64\] ='
+    initnc 'static u32 v_gain\[64\] ='
+    initnc 'static u8 cvs_time_value\[\]\[XFER_UDMA_6 - XFER_UDMA_0 + 1\] ='
+    initnc 'static u8 SRAM_Table\[\]\[60\] ='
+    initnc 'static u8 act_time_value\[\]\[8\] ='
+    initnc 'static u8 alps_tdee4_stv0297_inittab\[\] ='
+    initnc 'static u8 bnx2_5706_stats_len_arr\[BNX2_NUM_STATS\] ='
+    initnc 'static u8 bnx2_5708_stats_len_arr\[BNX2_NUM_STATS\] ='
+    initnc 'static u8 flit_desc_map\[\] ='
+    initnc 'static u8 ini_time_value\[\]\[8\] ='
+    initnc 'static u8 init_tab \[\] ='
+    initnc 'static u8 mac_reader\[\] ='
+    initnc 'static u8 mt2131_config1\[\] =' drivers/media/dvb/frontends/mt2131.c # <= 2.6.25
+    initnc 'static u8 mt2131_config1\[\] =' drivers/media/common/tuners/mt2131.c # >= 2.6.26
+    initnc 'static u8 mt2266_init2\[\] =' drivers/media/dvb/frontends/mt2266.c # <= 2.6.25
+    initnc 'static u8 mt2266_init2\[\] =' drivers/media/common/tuners/mt2266.c # >= 2.6.26
+    initnc 'static u8 opera1_inittab\[\] ='
+    initnc 'static u8 rco_time_value\[\]\[8\] ='
+    initnc 'static u8 saa7113_init_regs\[\] ='
+    initnc 'static u8 samsung_tbmu24112_inittab\[\] ='
+    initnc 'static u8 tas3004_treble_table\[\] ='
+    initnc 'static u8 w1_crc8_table\[\] ='
+    initnc 'static u_char const data_sizes_32\[32\] ='
+    initnc 'static u_long ident_map\[32\] ='
+    initnc 'static u_short alt_map\[NR_KEYS\] ='
+    initnc 'static u_short altgr_map\[NR_KEYS\] ='
+    initnc 'static u_short ctrl_alt_map\[NR_KEYS\] ='
+    initnc 'static u_short ctrl_map\[NR_KEYS\] *='
+    initnc 'static u_short shift_ctrl_map\[NR_KEYS\] ='
+    initnc 'static u_short shift_map\[NR_KEYS\] *='
+    initnc 'static uchar perm1\[56\] ='
+    initnc 'static uchar perm2\[48\] ='
+    initnc 'static uchar perm3\[64\] ='
+    initnc 'static uchar perm4\[48\] ='
+    initnc 'static uchar perm5\[32\] ='
+    initnc 'static uchar perm6\[64\] ='
+    initnc 'static uchar sbox\[8\]\[4\]\[16\] ='
+    initnc 'static uint16_t crc_table\[256\] ='
+    initnc 'static uint8_t lpfcAlpaArray\[\] ='
+    initnc 'static \(const \)\?uint8_t seqprog\[\] ='
+    initnc 'static unsigned char V110_OffMatrix_9600\[\] ='
+    initnc 'static unsigned char V110_OnMatrix_9600\[\] ='
+    initnc 'static unsigned char a2232_65EC02code\[\] ='
+    initnc 'static unsigned char atkbd_set3_keycode\[512\] ='
+    initnc 'static unsigned char atkbd_unxlate_table\[128\] ='
+    initnc 'static unsigned char banner_table\[\] =' arch/sh/boards/superh/microdev/led.c
+    initnc 'static unsigned char bootlogo_bits\[\] ='
+    initnc 'static unsigned char bus2core_8260\[\] ='
+    initnc 'static unsigned char bus2core_8280\[\] ='
+    initnc 'static unsigned char caseorder\[256\] ='
+    initnc 'static unsigned char crystal_key\[\] ='
+    initnc 'static unsigned char dsp_ulaw\[\] ='
+    initnc 'static unsigned char expressiontab\[128\] ='
+    initnc 'static unsigned char header2\[\] ='
+    initnc 'static unsigned char hidp_keycode\[256\] ='
+    initnc 'static unsigned char irq_xlate\[32\] ='
+    initnc 'static unsigned char nkbd_keycode\[128\] ='
+    initnc 'static unsigned char pan_volumes\[256\] ='
+    initnc 'static unsigned char parm_block\[32\] ='
+    initnc 'static unsigned char raw3270_ebcgraf\[64\] ='
+    initnc 'static unsigned char rfcomm_crc_table\[256\] ='
+    initnc 'static unsigned char rwa_unlock\[\] __initdata ='
+    initnc 'static unsigned char seqprog\[\] ='
+    initnc 'static unsigned char snd_opl4_volume_table\[128\] ='
+    initnc 'static unsigned char splash_bits\[\] ='
+    initnc 'static unsigned char sunkbd_keycode\[128\] ='
+    initnc 'static unsigned char ufs_fragtable_8fpb\[\] ='
+    initnc 'static unsigned char ufs_fragtable_other\[\] ='
+    initnc 'static unsigned char ulaw_dsp\[\] ='
+    initnc 'static unsigned char usb_kbd_keycode\[256\] ='
+    initnc 'static unsigned char vga_font\[cmapsz\] \(BTDATA \|\)='
+    initnc 'static unsigned char voltab[12]\[128\] ='
+    initnc 'static unsigned char vpd89_data\[\] ='
+    initnc 'static unsigned char xtkbd_keycode\[256\] ='
+    initnc 'static unsigned int ac3_bitrates\[32\] ='
+    initnc 'static unsigned int bass_volume_table\[\] ='
+    initnc 'static unsigned int bitrates\[3\]\[16\] ='
+    initnc 'static unsigned int isa_dma_port\[8\]\[7\] ='
+    initnc 'static unsigned int master_volume_table\[\] ='
+    initnc 'static unsigned int mixer_volume_table\[\] ='
+    initnc 'static unsigned int pan_table\[63\] ='
+    initnc 'static unsigned int snapper_bass_volume_table\[\] ='
+    initnc 'static unsigned int snapper_treble_volume_table\[\] ='
+    initnc 'static unsigned int treble_volume_table\[\] ='
+    initnc 'static unsigned int valid_mem\[\] ='
+    initnc 'static unsigned long arthur_to_linux_signals\[32\] ='
+    initnc 'static unsigned long shmedia_opcode_table\[64\] ='
+    initnc 'static unsigned nv\([34]\|10\)TableP\(FIFO\|GRAPH\|RAMIN\)\[\]\[2\] ='
+    initnc 'static unsigned short fcstab\[256\] ='
+    initnc 'static unsigned short init[1234]\[128\] \/\*__devinitdata\*\/ ='
+    initnc 'static unsigned short log_table\[LOG_TABLE_SIZE\*2\] ='
+    initnc 'static unsigned short rc_ioport\[\] ='
+    initnc 'static unsigned short translations\[\]\[256\] ='
+    initnc 'static unsigned short treble_parm\[12\]\[9\] ='
+    initnc 'struct RGBColors TextCLUT\[256\] ='
+    initnc 'struct VgaRegs GenVgaTextRegs\[NREGS+1\] ='
+    initnc 'struct battery_thresh  spitz_battery_levels_noac\[\] ='
+    initnc 'struct battery_thresh spitz_battery_levels_acin\[\] ='
+    initnc 'struct fb_bitfield rgb_bitfields\[\]\[4\] ='
+    initnc 'struct mode_registers std_modes\[\] ='
+    initnc 'struct vmode_attr vmode_attrs\[VMODE_MAX\] ='
+    initnc 'u16 const crc16_table\[256\] ='
+    initnc 'u16 const crc_ccitt_table\[256\] ='
+    initnc 'u16 hfsplus_compose_table\[\] ='
+    initnc 'u16 hfsplus_decompose_table\[\] ='
+    initnc 'u_char const data_sizes_16\[32\] ='
+    initnc 'u_short alt_map\[NR_KEYS\] ='
+    initnc 'u_short altgr_map\[NR_KEYS\] ='
+    initnc 'u_short ctrl_alt_map\[NR_KEYS\] ='
+    initnc 'u_short ctrl_map\[NR_KEYS\] *='
+    initnc 'u_short plain_map\[NR_KEYS\] *='
+    initnc 'u_short shift_ctrl_map\[NR_KEYS\] ='
+    initnc 'u_short shift_map\[NR_KEYS\] *='
+    initnc 'uint patch_2[0f]00\[\] ='
+    initnc '\(uint16_t\|u16\) e1000_igp_cable_length_table\[IGP01E1000_AGC_LENGTH_TABLE_SIZE\] =' drivers/net/e1000/e1000_hw.c # u16 on 2.6.26
+    initnc '\(uint16_t\|u16\) e1000_igp_2_cable_length_table\[IGP02E1000_AGC_LENGTH_TABLE_SIZE\] =' drivers/net/e1000/e1000_hw.c # u16 on 2.6.26
+    initnc '} euc2sjisibm_jisx0212_map\[\] ='
+    initnc '} freq\[\] ='
+    initnc '} hps_h_coeff_tab \[\] ='
+    initnc '} hps_v_coeff_tab \[\] ='
+    initnc '} init_tab\[\] ='
+    initnc '} maven_gamma\[\] ='
+    initnc '} mem_table\[\] ='
+    initnc '} mxb_saa7740_init\[\] ='
+    initnc '} pll_table\[\] =' drivers/video/geode/lxfb_ops.c
+    initnc '} qam256_snr_tab\[\] ='
+    initnc '} qam64_snr_tab\[\] ='
+    initnc '} sil_port\[\] ='
+    initnc '} vsb_snr_tab\[\] ='
+    initnc '} yss225_registers\[\] __devinitdata ='
+    ;;
+
+  */patch*2.6.27-rc* | */patch*2.6.26-git* | */git-linus.diff)
+    accept '	\.section __ex_table,"a"'"$sepx$blobpat*" 'arch/x86/lib/copy_user_\(nocache_\)\?64.S'
+    initnc 'static struct cipher_testvec des3_ede_cbc_\(enc\|dec\)_tv_template\[\] =' crypto/tcrypt.h
+    accept 'desc_config1:[\n]	\.byte 0x09, 0x02'"$sepx$blobpat*" 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
+    accept 'string_mfg:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_mfg_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
+    accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
+    accept ':03000000020200F9[\n]:040023000205\(9B0037\|5F0073\)[\n]\(:050030000000000000CB[\n]\|:0400430002010000B6[\n]\)*'"$sepx$blobpat*"'[\n]:\(0E06E0006400670065007400060334003700F4\|0606A000060334003700E0\)[\n]:00000001FF[\n]' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).HEX'
+    accept ':100000000C004000000000000000000000000000A4[\n]'"$sepx$blobpat*"'[\n]\/\* DSP56001 bootstrap code \*\/' firmware/dsp56k/bootstrap.bin.ihex
+    initnc 'static const u16 uda1380_reg\[UDA1380_CACHEREGNUM\] =' sound/soc/codecs/uda1380.c
+    initnc 'static const u16 wm8510_reg\[WM8510_CACHEREGNUM\] =' sound/soc/codecs/wm8510.c
+
+    initnc 'static const unsigned short atkbd_set[23]_keycode\[512\] =' drivers/input/keyboard/atkbd.c
+    initnc 'static const unsigned short atkbd_unxlate_table\[128\] =' drivers/input/keyboard/atkbd.c
+    initnc 'static const unsigned char usb_kbd_keycode\[256\] =' drivers/hid/usbhid/usbkbd.c
+    initnc '		u8 buf, bufs\[\] =' drivers/media/dvb/dvb-usb/cxusb.c
+    initnc 'static struct dvb_pll_desc [^\n]* =' drivers/media/dvb/frontends/dvb-pll.c
+    initnc '	static int sysdiv_to_div_x_2\[\] =' arch/powerpc/platforms/512x/clock.c
+    initnc 'static const __u8 cx_inits_\(176\|320\|352\|640\)\[\] =' drivers/media/video/gspca/conex.c
+    initnc 'static const __u8 cx_jpeg_init\[\]\[8\] =' drivers/media/video/gspca/conex.c
+    initnc 'static const __u8 cxjpeg_\(640\|352\|320\|176\|qtable\)\[\]\[8\] =' drivers/media/video/gspca/conex.c
+    initnc 'static const unsigned char quant\[\]\[0x88\] =' drivers/media/video/gspca/jpeg.h
+    initnc 'static unsigned char huffman\[\] =' drivers/media/video/gspca/jpeg.h
+    initc '	static const struct ov_i2c_regvals norm_76[1247]0\[\] =' drivers/media/video/gspca/ov519.c
+    initnc 'static const __u8 pac207_sensor_init\[\]\[8\] =' drivers/media/video/gspca/pac207.c
+    initnc 'static const __u8 pac7311_jpeg_header\[\] =' drivers/media/video/gspca/pac7311.c
+    initnc 'static const __u8 init\(Hv7131\|Ov\(6650\|7630\(_3\)\?\)\|Pas\(106\|202\)\|Tas51[13]0\)\[\] =' drivers/media/video/gspca/sonixb.c
+    initnc 'static const __u8 \(hv7131\|ov\(6650\|7630\(_3\)\?\)\|pas\(106\|202\)\|tas51[13]0\)_sensor_init\(_com\)\?\[\]\[8\] =' drivers/media/video/gspca/sonixb.c
+    initnc 'static const __u8 \(hv7131r\|mi0360\|mo4000\|ov76\(60\|48\)\)_sensor_init\[\]\[8\] =' drivers/media/video/gspca/sonixj.c
+    initnc 'static const __u8 qtable4\[\] =' drivers/media/video/gspca/sonixj.c
+    initnc 'static const __u16 \(spca500_visual\|Clicksmart510\)_defaults\[\]\[3\] =' drivers/media/video/gspca/spca500.c
+    initnc 'static const __u8 qtable_\(creative_pccam\|kodak_ez200\|pocketdv\)\[2\]\[64\] =' drivers/media/video/gspca/spca500.c
+    initnc 'static const __u16 spca501c\?_\(\(3com\|arowana\|mysterious\)_\)\?\(init\|open\)_data\[\]\[3\] =' drivers/media/video/gspca/spca501.c
+    initnc 'static const __u16 spca505b\?_\(init\|open\)_data\(_ccd\)\?\[\]\[3\] =' drivers/media/video/gspca/spca505.c
+    initnc 'static const __u16 spca508\(cs110\|_sightcam2\?\|_vista\)\?_init_data\[\]\[3\] =' drivers/media/video/gspca/spca508.c
+    initnc 'static const __u16 spca561_init_data\[\]\[2\] =' drivers/media/video/gspca/spca561.c
+    initnc 'static const __u16 spca504\(_pccam600\|A_clicksmart420\)_\(init\|open\)_data\[\]\[3\] =' drivers/media/video/gspca/sunplus.c
+    initnc 'static const __u8 qtable_\(creative_pccam\|spca504_default\)\[2\]\[64\] =' drivers/media/video/gspca/sunplus.c
+    initnc 'static const __u8 \(effects\|gamma\)_table\[MAX_[A-Z]*\]\[[0-9]*\] =' drivers/media/video/gspca/t631.c
+    initnc 'static const __u8 tas5130a_sensor_init\[\]\[8\] =' drivers/media/video/gspca/t613.c
+    initnc '	static const __u8 \(read_indexs\|n\(set\)\?[0-9]*\|missing\)\[[0-9x]*\] =' drivers/media/video/gspca/t613.c
+    initc 'static const __u8 \(mi13[12]0\|po3130\|hv7131r\|ov76[67]0\)_\(\(soc\)\?initQ\?VGA_\(JPG\|data\)\|rundata\)\[\]\[4\] =' drivers/media/video/gspca/vc032x.c
+    initnc 'static const struct usb_action \(cs2102\|hdcs2020xx\|icm105axx\|ov7630c\|pb0330[3x]x\)_Initial\(Scale\)\?\[\] =' drivers/media/video/gspca/zc3xx.c
+    initnc 'static const u8 rtl8225z2_agc\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_agc\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_ofdm\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck_ch14\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const __u16 t10_dif_crc_table\[256\] =' lib/crc-t10dif.c
+    initnc 'static crb_128M_2M_block_map_t crb_128M_2M_map\[64\] =' drivers/net/netxen/netxen_hw.c
+    initnc 'static const __u16 crc10_table\[256\] =' drivers/usb/serial/safe_serial.c
+    accept '[ 	]*\( *0\)*\( *1\)*[\n][ 	]*0 1 2 3 4 5 6 7 8 9 0 1 *2 3 4 5 6 7' 'Documentation/bt8xxgpio.txt'
+    initnc '	static int exp_lut\[256\] =' drivers/isdn/mISDN/dsp_audio.c
+    initnc 'static const u32 bf_pbox\[16 \+ 2\] =' drivers/isdn/mISDN/dsp_blowfish.c
+    initnc 'static const u32 bf_sbox\[256 \* 4\] =' drivers/isdn/mISDN/dsp_blowfish.c
+    initnc 'static u8 sample_\(german_\(all\|old\)\|american_\(dialtone\|ringing\|busy\)\|special[123]\|silence\)\[\] =' drivers/isdn/mISDN/dsp_tones.c
+    initnc 'struct pattern {[^}]*int tone;[^}]*} pattern\[\] =' drivers/isdn/mISDN/dsp_tones.c
+    initnc 'static u8 \([au]\|_4\)law_to_\([ua]law\|4bit\)\[256\] =' drivers/isdn/mISDN/l1oip_codec.c
+    initnc 'static unsigned char banner_table\[\] =' arch/sh/boards/mach-microdev/led.c
+    initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const \(yytype_u\?int\(8\|16\)\|\(unsigned \)\?\(short\( int\)\?\|char\)\) yy[^[]*\[\] =[*][/];' scripts/genksyms/parse.c_shipped
+
+    ;;
+    
+  */drm-modesetting-radeon.patch)
+    initnc 'static int atom_dst_to_src\[8\]\[4\] =' drivers/gpu/drm/radeon/atom.c
+    ;;
+
+  */patch*2.6.26-rc*)
+    initnc 'static u64 vec2off\[68\] =' arch/ia64/kvm/process.c
+    initnc "			interrupts = <\\(0x\\)\\?3 \\(0x\\)\\?0 \\(0x\\)\\?0  $blobpat*>;" 'arch/powerpc/boot/dts/\(cm5200\|lite5200b\?\|kuroboxHG\|pcm030\|tqm5200\).dts'
+    initnc 'static const u32 crctab32\[\] =' arch/x86/boot/tools/build.c
+    initnc 'static const u64 sha512_K\[80\] =' 'crypto/sha512\(_generic\)\?.c'
+    initnc 'static struct hash_testvec \(hmac_sha\(224\|256\)\|aes_xcbc128\|crc32c\)_tv_template\[\] =' crypto/tcrypt.h
+    initnc 'static struct cipher_testvec \(bf_cbc\|serpent\|tnepres\|aes\(_\(cbc\|ctr\|xts\)\)\?\|x\?tea\|anubis\(_cbc\)\?\|xeta\|camellia_cbc\|cts_mode\)_\(enc\|dec\)_tv_template\[\] =' crypto/tcrypt.h
+    initnc '		\.\(digest\|entries\|input\|key\|output\|plaintext\|result\)[ 	]*= [{"]' crypto/tcrypt.h
+    initnc 'static const u8 speedtab \[3\]\[12\] =' drivers/ide/legacy/umc8672.c
+    initnc 'static u8 cvs_time_value\[\]\[XFER_UDMA_6 - XFER_UDMA_0 + 1\] =' drivers/ide/pci/sis5513.c
+    initnc 'static u8 \(ini\|act\|rco\)_time_value\[\]\[8\] =' drivers/ide/pci/sis5513.c
+    initnc 'static u8 mt2131_config1\[\] =' drivers/media/common/tuners/mt2131.c
+    initnc 'static u8 mt2266_init2\[\] =' drivers/media/common/tuners/mt2266.c
+    initnc 'u16 e1000_igp_cable_length_table\[IGP01E1000_AGC_LENGTH_TABLE_SIZE\] =' drivers/net/e1000/e1000_hw.c
+    initnc '\(uint16_t\|u16\) e1000_igp_2_cable_length_table\[IGP02E1000_AGC_LENGTH_TABLE_SIZE\] =' drivers/net/e1000/e1000_hw.c # u16 on 2.6.26
+    oprepline '#define AR5K_RATES_11[ABG] ' drivers/net/wireless/ath5k/ath5k.h
+    oprepline '	{ 1, MODULATION_XR, 1000, 2, 139, 1 },	' drivers/net/wireless/ath5k/ath5k.h
+    initnc 'static const struct ath5k_ini_mode rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c
+    initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =[*][/];' scripts/kconfig/zconf.tab.c_shipped
+    initnc 'static const yytype_u\?int\(8\|16\) yy[^\n []*\[\] =' scripts/kconfig/zconf.tab.c_shipped
+    # new in 2.6.26
+    initnc 'static struct mse2snr_tab \(vsb\|qam\(64\|256\)\)_mse2snr_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} \(VSB\|QAM\)_mod_tab\[\] =' drivers/media/dvb/frontends/au8522.c
+    initnc '} itd1000_\(lpf_pga\|fre_values\)\[\] =' drivers/media/dvb/frontends/itd1000.c
+    initnc '} \(vsb\|qam\(64\|256\)\)_snr_tab\[\] =' drivers/media/dvb/frontends/s5h1411.c
+    initnc '} snr_tab\[\] =' drivers/media/dvb/frontends/tda10048.c
+    initnc '	static const u8 biphase_tbl\[\] =' drivers/media/video/cx18/cx18-av-vbi.c
+    initnc '	static const u8 mpeg_hdr_data\[\] =' drivers/media/video/cx18/cx18-vbi.c
+    initnc 'static u32 reg_init_initialize\[\] =' drivers/media/video/saa717x.c
+    initnc '	} vals\[\] =' drivers/media/video/saa717x.c
+    initnc 'static const u32 \(main\|gear\)_seedset\[BACKOFF_SEEDSET_ROWS\]\[BACKOFF_SEEDSET_LFSRS\] =' drivers/net/forcedeth.c
+    blob '^unsigned char \(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\) = '"$sepx$blobseq*$sepx;" drivers/s390/net/qeth_core_mpc.c # from drivers/s390/net/qeth_mpc.c in 2.6.25
+    initnc '} pll_table\[\] =' drivers/video/geode/lxfb_ops.c
+    accept "  { 0x00014284,  19688 },[\n]  { 0x00011104,  20400 },[\n]  { $blobpat* }," drivers/video/geode/lxfb_ops.c # won't be necessary in rc3
+    initnc 'static const u16 wm9713_reg\[\] =' sound/soc/codecs/wm9713.c
+    accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_blackfin_clut224.ppm
+    ;;
+  */patch*2.6.25-rc*)
+    initnc ';[/][*]@@ -[0-9]*,[0-9]* +[0-9]*,[0-9]* @@ static uchar sbox\[8\]\[4\]\[16\] = {[*][/];'
+    accept '	\$3 = {{pge = {{ste = {\(\([0-9][0-9a-fx{},\n 	]*\|\(pge\|ste\) =\|<repeats [0-9]\+ times>\)[{},\n 	]*\)*<repeats 11 times>}'"$eol"
+    initnc 'static yyconst flex_int\(16\|32\)_t yy_[^[]*\[[0-9]*\] ='
+    initnc 'static const yytype_u\?int\(8\|16\) yy[^[]*\[\] ='
+    initnc '	int bcomm_irq\[3\*16\] ='
+    initnc '	static const int8 countLeadingZerosHigh\[\] ='
+    initnc 'static unsigned long shmedia_opcode_table\[64\] ='
+    initnc 'u_char const data_sizes_16\[32\] ='
+    initnc 'static u_char const data_sizes_32\[32\] ='
+    initnc '		\.\(digest\|entries\|input\|key\|output\|plaintext\|result\)[ 	]*= {'
+    initnc 'static struct [^\n]*_testvec [^\n]*_tv_template\[\] ='
+    initnc 'static struct nic_qp_map nic_qp_mapping_[01]\[\] ='
+    initnc 'static u8 mt2266_init2\[\] ='
+    initnc 'static struct regval ov_initvals\[\] ='
+    initnc 'static struct regval stk1125_initvals\[\] ='
+    initnc 'static u8 bnx2x_stats_len_arr\[BNX2X_NUM_STATS\] ='
+    initnc 'static const struct arb_line read_arb_data\[NUM_RD_Q\]\[MAX_RD_ORD + 1\] ='
+    initnc 'static const struct arb_line write_arb_data\[NUM_WR_Q\]\[MAX_WR_ORD + 1\] ='
+    initnc 'uint16_t e1000_igp_cable_length_table\[IGP01E1000_AGC_LENGTH_TABLE_SIZE\] ='
+    initnc 'uint16_t e1000_igp_2_cable_length_table\[IGP02E1000_AGC_LENGTH_TABLE_SIZE\] ='
+    oprepline '#define AR5K_RATES_11\([ABG]\|TURBO\|XR\) ' drivers/net/wireless/ath5k/ath5k.h
+    initnc '		} blinkrates\[\] ='
+    initnc 'static const struct ath5k_ini ar5212_ini\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5111\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5112\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5112a\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5413\[\] ='
+    initnc 'static const u16 rtl8225bcd_rxgain\[\] ='
+    initnc 'static const u8 rtl8225_agc\[\] ='
+    initnc 'static const u8 rtl8225_tx_power_cck\[\] ='
+    initnc 'static const u8 rtl8225_tx_power_cck_ch14\[\] ='
+    initnc 'static const u16 rtl8225z2_rxgain\[\] ='
+    accept '     \( 49,\)*[\n]\([ 0-9,]*[\n]\)*     \( 49,\)*'"$eol"
+    initnc 'static const unsigned char wm_vol\[256\] ='
+    accept 'domain<N> <cpumask> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'"$eol"
+    # drivers/net/e1000e/phy.c
+    initnc 'static const u16 e1000_igp_2_cable_length_table\[\] ='
+    accept '	24 => \[[\n]\([^\n]*[\n]\)*	\]\(, [0-9]\+ => \[\)\?'"$eol"
+    accept '		'"'"'0x[^\n]*[\n]\([^\n]*[\n]\)*	\]\(, [0-9]\+ => \[\)\?'"$eol"
+    initnc 'const u\(8\|16\|32\) b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\] ='
+    ;;
+  */nouveau-drm*.patch)
+    initnc '\(static uint32_t\|}\) nv04_graph_ctx_regs \[\] ='
+    initnc 'static int nv10_graph_ctx_regs \[\] ='
+
+    # Although the developers of the drivers are not trying to stop
+    # anyone from modifying it or understanding it, they acknowledge
+    # these are bits of code, obtained through mmio interactions.
+    # This means these blobs are not source code, AND original authors
+    # of the blobs have power to stop others from modifying them.
+    # Non-Free software, for sure.
+
+    # initnc 'static uint32_t nv\(4[013467ace]\|49_4b\|8[46]\)_ctx_\(voodoo\|prog\)\[\] ='
+    ;;
+  */linux-2.6-lirc.patch)
+    initnc 'const unsigned char map_table\[\] ='
+    ;;
+  */linux-2.6-modsign-mpilib.patch)
+    initnc 'const unsigned char __clz_tab\[\] ='
+    ;;
+  */linux-2.6-wireless*.patch)
+    initnc 'const u\(8\|16\|32\) b43_ntab_\(\(adjustpower\|estimatepowerlt\|gainctl\|iqlt\|loftlt\|noisevar1\|tdi[24]0a\)[01]\|channelest\|frame\(lookup\|struct\)\|mcs\|pilot\|tdtrn\|tmap\)\[\] ='
+    initnc 'static const s8 \(b43\(legacy\)\?\|bcm43xx\)_tssi2dbm_[bg]_table\[\] ='
+    initnc 'static struct iwl\(3945\)\?_tx_power power_gain_table\[2\]\[IWL_MAX_GAIN_ENTRIES\] ='
+    initnc 'static const struct gain_entry gain_table\[2\]\[108\] ='
+    initnc 'static const struct rf_channel rf_vals_5222\[\] ='
+    initnc 'static const struct rf_channel rf_vals_5225_2527\[\] ='
+    initnc 'static const struct rf_channel rf_vals_5226\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2522\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2523\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2524\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2525\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2525e\[\] ='
+    initnc 'static const struct rf_channel rf_vals_bg_2528\[\] ='
+    initnc 'static const struct rf_channel rf_vals_noseq\[\] ='
+    initnc 'static const struct rf_channel rf_vals_seq\[\] ='
+    initnc '	static const u8 t\[\] ='
+    initnc 'static const u16 rtl8225bcd_rxgain\[\] ='
+    initnc 'static const u8 rtl8225_agc\[\] ='
+    initnc 'static const u8 rtl8225_tx_power_cck\[\] ='
+    initnc 'static const u8 rtl8225_tx_power_cck_ch14\[\] ='
+    initnc 'static const u16 rtl8225z2_rxgain\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5111\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5112\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5112a\[\] ='
+    initnc 'static const struct ath5k_ini_rf rfregs_5413\[\] ='
+    oprepline '#define AR5K_RATES_11A '
+    oprepline '#define AR5K_RATES_11B '
+    oprepline '#define AR5K_RATES_11G '
+    oprepline '#define AR5K_RATES_TURBO '
+    oprepline '#define AR5K_RATES_XR '
+    initnc 'static const struct ath5k_ini ar5212_ini\[\] ='
+    initnc 'static const struct ath5k_ini_mode rf\(5413\|24\(13\|25\)\)_ini_mode_end\[\] =' drivers/net/wireless/ath5k/initvals.c # ?
+    initnc '		} blinkrates\[\] ='
+
+    initnc 'static const u8 rtl8225z2_agc\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_ofdm\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck_ch14\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+
+    # git logs
+    accept '   sudo modprobe ath5k debug=0x00000400[\n][ 	]*[\n]\([ 	]*Band[^\n]*[\n]\([ 	]*\(\(channels\|rates\):\|[- 	0-9a-f]*\|\[\.\.\. etc \]\)[\n]\)\+\)\+       540 000c 0000 0000'
+    oprepline '	{ 1, MODULATION_XR, 3000, 1, 150, 3 },'
+    ;;
+  */linux-2.6-drm-i915-modeset.patch)
+    initnc 'static const u32 filter_table\[\] ='
+    ;;
+  */linux-2.6-netdev-e1000e*.patch)
+    # drivers/net/e1000e/phy.c
+    initnc 'static const u16 e1000_igp_2_cable_length_table\[\] ='
+    ;;
+  esac
+}  
+
+# Regular expression that matches a literal constant.
+constx="[0-9][0-9a-fA-FxX]*"
+# Regular expression that matches a separator between consecutive
+# literal constants.
+sepx="\\([,:{} 	\\nLlUu\"\'\\\\]\\+[xX\$]\\?\\|[ 	\\n]*[.][a-zA-Z][a-zA-Z0-9]*[ 	]\\+[\$]\\?\\)"
+
+# Regular expression that matches a continuation of a blob, after an
+# initial constant.  *, \+ and \? can be safely appended to it without
+# \(\)s.
+blobcont="\\($sepx$constx\\)"
+
+# Regular expression that matches the initial constant of a blob plus
+# its continuation.  *, \+ and \? can be safely appended to it without
+# \(\)s.
+blobpat="$constx$blobcont"
+
+# Regular expression that matches a blob with the exact number of
+# constants specified as sensitivity.
+blobseq="$blobpat\\{$sens\\}"
+
+# Regular expression that matches a blob with the exact specified
+# length, or longer.
+blobfseq="$blobseq$blobcont*"
+
+# Regular expression that matches the beginning of the pattern or a
+# line break.  It must be \(\)ed, such that it can be named in
+# replacement patterns without being named.
+bol="\\(^\\|[\\n]\\)"
+
+# Regular expression that matches the end of the pattern or a line
+# break.  It must be \(\)ed, such that it can be named in replacement
+# patterns without being named.
+eol="\\([\\n]\\|\$\\)"
+
+# Regular expression that matches a C-style comment.
+comment="\\([/][*]\\([^*]*\\|[*]\\+[^/*]\\)*[*]\\+[/]\\|[/][/][^\\n]*[\\n]\\)"
+
+# Regular expression that matches comments typically used in assembly.
+asmcomment="\\($comment\\|[;#][^\\n]*[\\n]\\)"
+
+# Regular expression that matches a braced initializer containing at
+# least one blob.
+initblob="[^\\n]*=\\([ 	\\n\\\\]*\\|$comment\\)*{\\([^;]*\\|$comment\\)*$blobseq\\([^;]*\\|$comment\\)*}\\?\\([ 	\\n\\\\]*\\|$comment\\);\\?"
+
+# Regular expression that matches a C (possibly multi-line) #define
+# that contains a blob.
+defineblob='[ 	]*#[ 	]*define[ 	]\+\([^\n]*\\[\n]\)*[^\n]*'"$blobseq"'\([^\n]*\\[\n]\)*'
+
+# Regular expression that matches an assembly label followed by a blob
+# without any intervening label.
+asmblob="[a-zA-Z_.][^\\n:;#/ 	]*[ ]*:\\([^:{}]*\\|$asmcomment\\)*$blobseq\\([^:]*\\|$asmcomment\\)*"
+
+# Regular expression that matches one or more blobs without
+# intervening line breaks.
+sblobctx="\\([^\\n]*$blobfseq\\)\\+"
+
+# Regular expression that matches the context for a long blob match.
+lblobctx="\\($initblob\\|$defineblob\\|$asmblob\\|$sblobctx\\)"
+
+# Set up the sed script that will go through the (processed) input,
+# looking for sequences of blobs and printing whatever was requested.
+# It accepts 3 arguments.
+
+# $1 is the action in case blobs were found in the input.
+
+# $2 is the action in case no blobs were found, not even false positives.
+
+# $3 is the action in case false positives were located.
+
+# $4 is the action for every complete input pattern.
+
+set_sedmain () {
+  falsepos=`sed 's,^\\\|,,;s,^,\\\\(,;s,$,\\\\),' < "$falsepos_name"`
+
+  if test -s "$falsepos_name"; then
+    check_false_positives="$v:???falsepos
+/$bol$falsepos/!b blob;
+$v:+++falsepos
+h;
+s/$bol$falsepos/\\1;\/**\/;/g;
+# See if, after removing all matches, we end up without any blobs.
+$v:???blobseq
+/$blobseq/!{
+  g;
+  b falsepos;
+}
+g;
+"
+  else
+    falsepos="$^"
+    check_false_positives=
+  fi
+
+  sedmain="
+/^;[/][*]\\(end .*\\)\\?[*][/];$/{
+  $4;
+  d;
+}
+/^;[/][*]begin /!{
+  : internal_error
+  i\\
+Internal error at
+  p;
+  q 2;
+}
+$v:reading file in
+h;
+n;
+: read_more
+/^;[/][*]end [^\\n]*[*][/];$/! {
+  H;
+  n;
+  b read_more;
+}
+H;
+g;
+$4
+s/^\(;[/][*]begin [^\n]*[\n]\)*//;
+s/\\($bol;[/][*]\\(end [^\n]*\\)\\?[*][/];\\)*$//;
+$v:???!blobseq
+/$blobseq/!b clean;
+$check_false_positives
+# Fall through.
+: blob
+$v:blob
+$1
+d;
+: clean
+$2
+d;
+: falsepos
+$v:falsepos
+$3
+d;
+
+: print_matches
+$v:print_matches
+/^$falsepos/! {
+  $v:delete unmatching lines
+  h;
+  s/[\\n]$falsepos.*//;
+  : print_matches_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b print_matches_nomatch_loop;
+  }
+  x;
+  b print_matches_delete_to_eol;
+}
+h;
+s/^\\($falsepos[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to match
+/$blobfseq/ {
+  i\\
+::: $file :::
+  p;
+}
+g;
+s/^\\($falsepos[^\\n]*\\)//;
+: print_matches_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b print_matches;
+
+: print_marked_matches
+$v:print_marked_matches
+/^$falsepos/! {
+  h;
+  s/[\\n]$falsepos.*//;
+  : print_marked_matches_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b print_marked_matches_nomatch_loop;
+  }
+  x;
+  b print_marked_matches_delete_to_eol;
+}
+h;
+s/^\\($falsepos[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to match
+/$blobfseq/{
+  i\\
+::: $file :::
+  s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g;
+  s/$blobfseq/\/*(DEBLOBBED)*\//g;
+  p;
+}
+g;
+s/^\\($falsepos[^\\n]*\\)//;
+: print_marked_matches_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b print_marked_matches;
+
+: print_blobs
+$v:print_blobs
+/^$falsepos/ {
+  $v:delete false positive
+  # This is tricky.  We don't want to print the false positive.
+  /^$falsepos[^\\n]*$blobseq/ {
+    $v:delete false positive immediately followed by blob
+    h;
+    s/^\\($falsepos\\)[^\\n]*$blobseq.*/\\1/;
+    : print_blobs_match_loop
+    /[\\n]/ {
+      s/^[^\\n]*[\\n]//;
+      x;
+      s/^[^\\n]*[\\n]//;
+      x;
+      b print_blobs_match_loop;
+    }
+    G;
+    b print_blobs_delete_to_eol;
+  }
+  s/^$falsepos//;
+  b print_blobs_delete_to_eol;
+}
+/^[^\\n]*$blobseq/! {
+  $v:delete non-blob header
+  h;
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobseq\\).*//;
+  : print_blobs_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b print_blobs_nomatch_loop;
+  }
+  x;
+  b print_blobs_delete_to_eol;
+}
+h;
+i\\
+::: $file :::
+s/^\\([^\\n]*\\($blobfseq[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to blob
+p;
+g;
+s/^\\([^\\n]*\\($blobfseq[^\\n]*\\)\\+\\)//;
+: print_blobs_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b print_blobs;
+
+: print_marked_blobs
+$v:print_marked_blobs
+/^$falsepos/ {
+  $v:delete false positive
+  # This is tricky.  We don't want to print the false positive.
+  /^$falsepos[^\\n]*$blobseq/ {
+    $v:delete false positive immediately followed by blob
+    h;
+    s/^\\($falsepos\\)[^\\n]*$blobseq.*/\\1/;
+    : print_marked_blobs_match_loop
+    /[\\n]/ {
+      s/^[^\\n]*[\\n]//;
+      x;
+      s/^[^\\n]*[\\n]//;
+      x;
+      b print_marked_blobs_match_loop;
+    }
+    G;
+    b print_marked_blobs_delete_to_eol;
+  }
+  s/^falsepos//;
+  b print_marked_blobs_delete_to_eol;
+}
+/^[^\\n]*$blobseq/! {
+  $v:delete non-blob header
+  h;
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobseq\\).*//;
+  : print_marked_blobs_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b print_marked_blobs_nomatch_loop;
+  }
+  x;
+  b print_marked_blobs_delete_to_eol;
+}
+h;
+i\\
+::: $file :::
+s/^\\([^\\n]*\\($blobfseq[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to blob
+s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g;
+s/$blobfseq/\/*(DEBLOBBED)*\//g;
+p;
+g;
+s/^\\([^\\n]*\\($blobfseq[^\\n]*\\)\\+\\)//;
+: print_marked_blobs_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b print_marked_blobs;
+
+: print_cblobs
+$v:print_cblobs
+/^$falsepos/ {
+  $v:delete false positive
+  # This is tricky.  We don't want to print the false positive.
+  /^$falsepos[^\\n]*$blobseq/ {
+    $v:delete false positive immediately followed by blob
+    h;
+    s/^\\($falsepos\\)[^\\n]*$blobseq.*/\\1/;
+    : print_cblobs_match_loop
+    /[\\n]/ {
+      s/^[^\\n]*[\\n]//;
+      x;
+      s/^[^\\n]*[\\n]//;
+      x;
+      b print_cblobs_match_loop;
+    }
+    G;
+    b print_cblobs_delete_to_eol;
+  }
+  s/^$falsepos//;
+  b print_cblobs_delete_to_eol;
+}
+/^$lblobctx/! {
+  $v:delete non-blob header
+  h;
+  s/[\\n]\\($falsepos\\|$lblobctx\\).*//;
+  : print_cblobs_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b print_cblobs_nomatch_loop;
+  }
+  x;
+  b print_cblobs_delete_to_eol;
+}
+h;
+i\\
+::: $file :::
+s/^\\($lblobctx[^\\n]*\\($blobfseq[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to blob
+p;
+g;
+s/^\\($lblobctx[^\\n]*\\($blobfseq[^\\n]*\\)*\\)//;
+: print_cblobs_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b print_cblobs;
+
+: print_marked_cblobs
+$v:print_marked_cblobs
+/^$falsepos/ {
+  $v:delete false positive
+  # This is tricky.  We don't want to print the false positive.
+  /^$falsepos[^\\n]*$blobseq/ {
+    $v:delete false positive immediately followed by blob
+    h;
+    s/^\\($falsepos\\)[^\\n]*$blobseq.*/\\1/;
+    : print_marked_cblobs_match_loop
+    /[\\n]/ {
+      s/^[^\\n]*[\\n]//;
+      x;
+      s/^[^\\n]*[\\n]//;
+      x;
+      b print_marked_cblobs_match_loop;
+    }
+    G;
+    b print_marked_cblobs_delete_to_eol;
+  }
+  s/^$falsepos//;
+  b print_marked_cblobs_delete_to_eol;
+}
+/^$lblobctx/! {
+  $v:delete non-blob header
+  h;
+  s/[\\n]\\($falsepos\\|$lblobctx\\).*//;
+  : print_marked_cblobs_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b print_marked_cblobs_nomatch_loop;
+  }
+  x;
+  b print_marked_cblobs_delete_to_eol;
+}
+h;
+i\\
+::: $file :::
+s/^\\($lblobctx[^\\n]*\\($blobfseq[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to blob
+s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g;
+s/$blobfseq/\/*(DEBLOBBED)*\//g;
+p;
+g;
+s/^\\($lblobctx[^\\n]*\\($blobfseq[^\\n]*\\)*\\)//;
+: print_marked_cblobs_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b print_marked_cblobs;
+
+: print_both
+$v:print_both
+/^\\($falsepos\\|[^\\n]*$blobseq\\)/! {
+  $v:delete non-blob header
+  h;
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobseq\\).*//;
+  : print_both_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b print_both_nomatch_loop;
+  }
+  x;
+  b print_both_delete_to_eol;
+}
+h;
+i\\
+::: $file :::
+s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobfseq[^\\n]*\\)\\($blobfseq[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to blob
+p;
+g;
+s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobfseq[^\\n]*\\)\\($blobfseq[^\\n]*\\)*\\)//;
+: print_both_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b print_both;
+
+: list_matches
+$v:list_matches
+/^$falsepos/! {
+  $v:print unmatching lines
+  h;
+  s/[\\n]$falsepos.*//;
+  p;
+  : list_matches_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b list_matches_nomatch_loop;
+  }
+  x;
+  b list_matches_delete_to_eol;
+}
+h;
+s/^\\($falsepos[^\\n]*\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to match
+/$blobfseq/{
+  s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g;
+  s/$blobfseq/\/*(DEBLOBBED)*\//g;
+}
+p;
+g;
+s/^\\($falsepos[^\\n]*\\)//;
+: list_matches_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b list_matches;
+
+: list_blobs
+$v:list_blobs
+/^$falsepos/ {
+  $v:print false positive
+  # This is tricky.  We don't want to deblob the false positive.
+  /^$falsepos[^\\n]*$blobseq/ {
+    $v:print false positive immediately followed by blob
+    h;
+    s/^\\($falsepos\\)[^\\n]*$blobseq.*/\\1/;
+    : list_blobs_match_loop
+    /[\\n]/ {
+      P;
+      s/^[^\\n]*[\\n]//;
+      x;
+      s/^[^\\n]*[\\n]//;
+      x;
+      b list_blobs_match_loop;
+    }
+    G;
+    b list_blobs_delete_to_eol;
+  }
+  h;
+  s/^\\($falsepos[^\\n]*\\)[\\n].*/\\1/;
+  p;
+  g;
+  s/^\\($falsepos[^\\n]*\\)//;
+  b list_blobs_delete_to_eol;
+}
+/^[^\\n]*$blobseq/! {
+  $v:print non-blob header
+  h;
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobseq\\).*//;
+  p;
+  : list_blobs_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b list_blobs_nomatch_loop;
+  }
+  x;
+  b list_blobs_delete_to_eol;
+}
+h;
+s/^\\([^\\n]*\\($blobfseq[^\\n]*\\)\\+\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to blob
+s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g;
+s/$blobfseq/\/*(DEBLOBBED)*\//g;
+p;
+g;
+s/^\\([^\\n]*\\($blobfseq[^\\n]*\\)\\+\\)//;
+: list_blobs_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b list_blobs;
+
+: list_both
+$v:list_both
+/^\\($falsepos\\|[^\\n]*$blobseq\\)/! {
+  $v:print non-blob header
+  h;
+  s/[\\n]\\($falsepos\\|[^\\n]*$blobseq\\).*//;
+  p;
+  : list_both_nomatch_loop
+  /[\\n]/ {
+    s/^[^\\n]*[\\n]//;
+    x;
+    s/^[^\\n]*[\\n]//;
+    x;
+    b list_both_nomatch_loop;
+  }
+  x;
+  b list_both_delete_to_eol;
+}
+h;
+s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobfseq[^\\n]*\\)\\($blobfseq[^\\n]*\\)*\\)\\([\\n].*\\)\\?$/\\1/;
+$v:narrowed to blob
+s/{\\($sepx\\)\\?$blobfseq\\($sepx\\)\\?}[ 	]*;/{\/*(DEBLOBBED)*\/};/g;
+s/$blobfseq/\/*(DEBLOBBED)*\//g;
+p;
+g;
+s/^\\(\\($falsepos[^\\n]*\\|[^\\n]*$blobfseq[^\\n]*\\)\\($blobfseq[^\\n]*\\)*\\)//;
+: list_both_delete_to_eol
+$v:delete to eol
+s/^[^\\n]*//;
+/^$/d;
+s/^[\\n]//;
+b list_both;
+
+"
+}
+
+# Process an input file named in $1 and run it through the blob
+# recognizer.  Functions set_except and set_sed_cmd provide additional
+# arguments on a per-file and per-action basis.
+
+check () {
+  case "$#" in 1) ;; *) echo ICE >&2; exit 1;; esac
+
+  input=$1
+
+  falsepos_name=`mktemp -t deblob-check-falsepos-XXXXXX`
+  tempfiles="$falsepos_name"
+
+
+  # Add $1 to falsepos.  Its usage makes it implicitly anchored to the
+  # beginning of the line.  $2, if present, will some day narrow the
+  # falsepos matches to files that match it.
+  addx () {
+    if test -n "$1"; then
+      echo -n "\\|$1" >> $falsepos_name
+    fi
+  }
+
+  set_except "$input"
+
+  set_sed_cmd "$input"
+
+  rm -f "$falsepos_name"
+  tempfiles=
+
+  # Choose the input source...
+  case $input in
+  -) in= ;;
+  *) in='< "$input"' ;;
+  esac
+
+  set fnord # shifted out below
+
+  # Decompress as needed...
+  case $input in
+  *.bz2) cmd='bunzip2' ;;
+  *.gz) cmd='gunzip' ;;
+  *) cmd= ;;
+  esac
+  if test -n "$cmd"; then
+    set "$@" "$cmd"
+  fi
+
+  # Extract or otherwise munge...
+  case /$input in
+  *.tar*)
+    cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'"
+    ;;
+  *.patch | */patch-* | *.diff)
+    if $reverse_patch; then
+      s=- r=+
+    else
+      s=+ r=-
+    fi
+    sedpatch="
+      /^[$r]/d;
+      /^\\(@@\\|$s$s$s\\) / {
+	i\\
+;/**/;\\
+;/*end patchlet */;\\
+;/*begin patchlet */;
+	s/^/;\\/*/;
+	s/\$/*\\/;/;
+      };
+      s/^[ $s]//;"
+    cmd='sed "$sedpatch"'
+    ;;
+  *)
+    cmd='cat'
+    ;;
+  esac
+  cmd="{ echo \";/*begin $input*/;\"; $cmd; echo \";/*end $input*/;\"; }"
+  set "$@" "$cmd"
+
+  case $input in
+  *.tar*)
+    cmd="{ cat; cat > /dev/null; }"
+    set "$@" "$cmd"
+    ;;
+  esac
+
+  # Then run through the selected action.
+  if test "$rm" != "rm -f" || test ! `echo "$sedmain" | wc -c` -lt 1024; then
+    scriptname=`mktemp -t deblob-check-sedmain-XXXXXX`
+    tempfiles="$tempfiles $scriptname"
+    echo "$sedmain" > $scriptname
+    cmd="sed -n -f \"$scriptname\""
+  else
+    cmd='sed -n "$sedmain"'
+  fi
+  set "$@" "$cmd"
+
+  test $# != 1 || set "$@" "cat"
+
+  shift # fnord goes out here
+
+  pipe=
+  for cmd
+  do
+    if test -z "$pipe"; then
+      pipe="$cmd $in"
+    else
+      pipe="$pipe | $cmd"
+    fi
+  done
+
+  eval "$pipe"
+  status=$?
+
+  $rm $tempfiles
+  tempfiles=
+
+  (exit $status)
+}
+
+# If no input given, use stdin.
+case $# in
+0)
+  test -t 0 && echo reading from standard input >&2
+  set fnord -
+  shift
+  ;;
+esac
+
+# The lines below commented out out #list: can be used to get a list
+# of matching inputs.  ATM this is useless, so we just use a shell
+# boolean.
+
+#list: n=$#
+pass=:
+
+tempfiles=
+trap "status=$?; test -z \"$tempfiles\" || rm -f $tempfiles; (exit $status); exit" 0 1 2 15
+
+# Go through each of the input files in the command line.
+for file
+do
+  # If we print anything whatsoever (even a blank line) while
+  # processing it, we've failed.
+  if check "$file"; then
+    :
+  else
+    pass=false
+    #list: set fnord "$@" "$file"
+    #list: shift
+  fi
+done
+
+#list: shift $n
+
+#list: exec test $# = 0
+$pass
+exit
