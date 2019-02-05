@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2011-05-05a
+# deblob-check version 2011-05-05a+r7978(2011-06-03)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2749,7 +2749,7 @@ set_except () {
     blobname 'dvb-usb-SkyStar_USB_HD_FW_v17_63\.HEX\.fw' drivers/media/dvb/dvb-usb/technisat-usb2.c
     defsnc 'static[ ]const[ ]struct[ ]dib0090_pll[ ]dib0090_\(p1g_\)\?pll_table\[\][ ]=' drivers/media/dvb/frontends/dib0090.c
     defsnc '[	]static[ ]u8[ ]sine[ ]\?\[\][ ]=' drivers/media/dvb/frontends/dib7000p.c
-    defsnc 'u32[ ]fe_info\[44\][ ]=' drivers/media/dvb/frontends/dib9000.c
+    defsnc '\(static[ ]const[ ]\)\?u32[ ]fe_info\[44\][ ]=' drivers/media/dvb/frontends/dib9000.c
     blobname 'dvb-netup-altera-01\.fw' drivers/media/video/cx23885/cx23885-cards.c
     # These are suspicious, but the regularity suggests data.
     defsnc 'static[ ]const[ ]u8[ ]\(nw80[012]\|spacecam2\?\|cvideopro\|dlink\|ds3303\|kr651\|kritter\|mustek\|proscope\|twinkle\|dvcv6\)_start\(_\([12]\|q\?vga\)\)\?\[\][ ]=' drivers/media/video/gspca/nw80x.c
