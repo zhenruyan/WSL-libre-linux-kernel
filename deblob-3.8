@@ -48,7 +48,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=3.8 extra=
+kver=3.8 extra=1
 
 case $1 in
 --force)
@@ -1664,17 +1664,6 @@ announce ATH6KL_USB - "Atheros ath6kl USB support"
 clean_blob drivers/net/wireless/ath/ath6kl/usb.c
 clean_kconfig drivers/net/wireless/ath/ath6kl/Kconfig 'ATH6KL_USB'
 clean_mk CONFIG_ATH6KL_USB drivers/net/wireless/ath/ath6kl/Makefile
-
-announce ATH9K - "Atheros 802.11n wireless cards support"
-reject_firmware drivers/net/wireless/ath/ath9k/init.c
-clean_kconfig drivers/net/wireless/ath/ath9k/Kconfig 'ATH9K'
-clean_mk CONFIG_ATH9K drivers/net/wireless/ath/ath9k/Makefile
-
-announce ATH9K_HTC - "Atheros HTC based wireless cards support"
-reject_firmware drivers/net/wireless/ath/ath9k/hif_usb.c
-clean_blob drivers/net/wireless/ath/ath9k/hif_usb.c
-clean_kconfig drivers/net/wireless/ath/ath9k/Kconfig 'ATH9K_HTC'
-clean_mk CONFIG_ATH9K_HTC drivers/net/wireless/ath/ath9k/Makefile
 
 announce PRISM2_USB - "Prism2.5/3 USB driver"
 reject_firmware drivers/staging/wlan-ng/prism2fw.c
