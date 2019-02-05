@@ -45,7 +45,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.31 extra=1
+kver=2.6.31 extra=2
 
 case $1 in
 --force)
@@ -80,7 +80,9 @@ else
 fi
 
 filetest () {
-  [ -f $1 ]
+  if [ ! -f $1 ]; then
+    die $1 does not exist, something is wrong && return 1
+  fi
 }
 
 announce () {
@@ -186,7 +188,8 @@ clean_mk () {
 clean_sed () {
   #$1 = sed-script $2 = file $3 = comment
   filetest $2 || return
-  sed -e "$1" "$2" > "$2".deblob
+  sed -e "$1" "$2" > "$2".deblob || {
+    die $2: failed: ${3-applied sed script $1} && return 1; }
   check_changed $2 && echo $2: ${3-applied sed script $1} 
 }
 
@@ -1397,7 +1400,7 @@ clean_mk CONFIG_RT2870 drivers/staging/rt2870/Makefile
 announce RT3070 - "Ralink 3070 wireless support"
 clean_file drivers/staging/rt3070/firmware.h
 clean_kconfig drivers/staging/rt3070/Kconfig RT3070
-clean_kconfig 'CONFIG_RT3070' drivers/staging/rt3070/Makefile
+clean_mk CONFIG_RT3070 drivers/staging/rt3070/Makefile
 
 announce RTL8192SU - "RealTek RTL8192SU Wireless LAN NIC driver"
 reject_firmware drivers/staging/rtl8192su/r819xU_firmware.c
@@ -1510,6 +1513,14 @@ clean_mk CONFIG_COMEDI_USB_DRIVERS drivers/staging/comedi/drivers/Makefile
 announce ME4000 - "Meilhaus ME-4000 I/O board"
 clean_file drivers/staging/me4000/me4000_firmware.h
 clean_file drivers/staging/me4000/me4610_firmware.h
+clean_sed '
+/^static int me4000_xilinx_download([^;]*$/,/^}$/{
+  /firm = .*xilinx_firm.*/i\
+	printk(KERN_ERR "me4000: Missing Free firmware\\n");\
+	return -EIO;
+}
+' drivers/staging/me4000/me4000.c 'report missing Free firmware'
+clean_blob drivers/staging/me4000/me4000.c
 clean_kconfig drivers/staging/me4000/Kconfig 'ME4000'
 clean_mk CONFIG_ME4000 drivers/staging/me4000/Makefile
 
