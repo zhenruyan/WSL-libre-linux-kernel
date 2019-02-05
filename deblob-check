@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-03-24
+# deblob-check version 2012-04-16
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1145,7 +1145,7 @@ set_except () {
     accept '[	]-[ ]move[ ]firmware[ ]loading[ ]to[ ]request_firmware[(][)]' drivers/staging/slicoss/README
     accept 'config[ ]FIRMWARE_IN_KERNEL.*let[ ]firmware[ ]be[ ]loaded[ ]from[ ]userspace\.' drivers/base/Kconfig
     accept '[	 ]*and[ ]request_firmware[(][)][ ]in[ ]the[ ]source' drivers/base/Kconfig
-    accept '\(static[ ]int[\n ]\)\?_request_firmware[(]const[ ]struct[ ]firmware[ ][*][*]firmware_p,[^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
+    accept '\(static[ ]\(int\|void\)[\n ]\)\?_request_firmware\(_prepare\|_cleanup\)\?[(]const[ ]struct[ ]firmware[ ][*][*]\?firmware\(_p\)\?[,)][^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept 'static[ ]int[\n ]request_firmware_work_func[(]void[ ][*]arg[)][\n][{]\([\n]\+[^\n}][^\n]*\)*ret[ ]=[ ]_request_firmware[(][^\n]*\([\n]\+[^\n}][^\n]*\)*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept '[/][*][*][\n][ ][*][ ]request_firmware:[ ]-[ ]send[ ]firmware[ ][^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
     accept '[/][*][*][\n][ ][*][ ]request_firmware_nowait\(:\|[ ]-\)[ ]asynchronous[ ]version[^{]*[\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*[\n]\+[}][\n]' drivers/base/firmware_class.c
@@ -2807,7 +2807,7 @@ set_except () {
     accept '[	]struct[ ]nvc0_graph_fuc[ ]fuc4\(09\|1a\)[cd]' drivers/gpu/drm/nouveau/nvc0_graph.h
     defsnc 'static[ ]const[ ]u8[ ]sht15_crc8_table\[\][ ]=' drivers/hwmon/sht15.c
     defsnc 'static[ ]u8[ ]stv0288_bsbe1_d01a_inittab\[\][ ]=' drivers/media/dvb/frontends/bsbe1-d01a.h
-    defsnc '[	]struct[ ]reg_val_mask[ ]tab\[\][ ]=' 'drivers/media/dvb/frontends/cxd2820r_\(c\|t2\)\.c'
+    defsnc '[	]struct[ ]reg_val_mask[ ]tab\[\][ ]=' 'drivers/media/dvb/frontends/\(cxd2820r_\(c\|t2\)\|af9033\)\.c'
     blobname 'drxd-a2-1\.1\.fw' drivers/media/dvb/frontends/drxd_hard.c
     blobname 'drxd-b1-1\.1\.fw' drivers/media/dvb/frontends/drxd_hard.c
     blob '[/][*][	]if[ ][(]\(reject\|request\)_firmware[(][&]state->fw[,][ ]["]drxd\.fw["][,][ ]state->dev[)]<0[)][ ][*][/]'
@@ -3006,6 +3006,38 @@ set_except () {
 
   */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
+    ;;
+
+  */patch-3.3*gnu*)
+    # These patterns are *way* too broad for general use, but they're fine
+    # for patches between deblob-checked releases.
+    accept 'static[ ]\(int\|void\)[ ]_request_firmware' drivers/base/firmware_class.c
+    accept 'request_firmware[(]const' drivers/base/firmware_class.c
+    accept '[	]*ret[ ]=[ ]_request_firmware' drivers/base/firmware_class.c
+    accept '[	]*_request_firmware_cleanup' drivers/base/firmware_class.c
+    ;;
+
+  */drivers-media-update.patch)
+    blobname 'dvb-usb-lme2510c\?-\(lg\|s7395\)\.fw' drivers/media/dvb/dvb-usb/lmedm04.c
+    blobname 'dvb-usb-lme2510c\?-s0194\.fw' drivers/media/dvb/dvb-usb/lmedm04.c
+    accept '[	]*props->firmware[ ]=[ ]fw_it913\(5_v[12]\|7\)' drivers/media/dvb/dvb-usb/it913x.c
+    defsnc '[	][}][ ]regs\[\][ ]=' drivers/media/video/em28xx/em28xx-dvb.c
+    defsnc '[	]struct[ ]reg_val_mask[ ]tab\[\][ ]=' 'drivers/media/dvb/frontends/\(cxd2820r_\(c\|t2\)\|af9033\)\.c'
+    accept '[	]0x43,[ ]11,[	][0-9a-fx, 	\n]*' drivers/media/video/gspca/pac7302.c
+    # Entries above are in 3.3; below are for 3.4.
+    blobname 'dvb-usb-terratec-h7-drxk\.fw' drivers/media/dvb/dvb-usb/az6007.c
+    blobname 'dvb-usb-terratec-h7-az6007\.fw' drivers/media/dvb/dvb-usb/az6007.c
+    blobname 'dvb-usb-lme2510c-rs2000\.fw' drivers/media/dvb/dvb-usb/lmedm04.c
+    blobname 'dvb-fe-xc5000\(-1\.6\.114\|c-41\.024\.5-31875\)\.fw' drivers/media/common/tuners/xc5000.c
+    defsnc '[	]struct[ ]rtl2830_reg_val_mask[ ]tab\[\][ ]=' drivers/media/dvb/frontends/rtl2830.c
+    defsnc '[	]static[ ]u8[ ]bw_params1\[3\]\[34\][ ]=' drivers/media/dvb/frontends/rtl2830.c
+    blobname 'dvb-demod-drxk-pctv\.fw' drivers/media/video/em28xx/em28xx-dvb.c
+    defsnc 'static[ ]const[ ]u16[ ]vs6624_p1\[\][ ]=' drivers/media/video/vs6624.c
+    defsnc 'static[ ]const[ ]struct[ ]coeff[ ]coeff_lut\[\][ ]=' drivers/media/dvb/frontends/af9033_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]val_snr[ ]\(qpsk\|qam\(16\|64\)\)_snr_lut\[\][ ]=' drivers/media/dvb/frontends/af9033_priv.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_val[ ]\(ofsm_init\|tuner_init_\(tua9001\|fc0011\|mxl5007t\|tda18218\)\)\[\][ ]=' drivers/media/dvb/frontends/af9033_priv.h
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]az6007_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/az6007.c
+    accept '[	]*\.download_firmware[ ]=[ ]af9035_download_firmware\(_it9135\)\?[,][\n][	]*\.firmware[ ]=[ ]["]' drivers/media/dvb/dvb-usb/af9035.c
     ;;
 
   */brcm80211.patch)
