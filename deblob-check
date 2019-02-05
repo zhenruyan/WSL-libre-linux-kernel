@@ -1,6 +1,7 @@
 #! /bin/sh
 
-# deblob-check version 2018-03-25
+# deblob-check version 2018-03-25 + 2018-05-27's r15022 (partial)
+#				  + 2018-06-05's r15066
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1599,8 +1600,6 @@ set_except () {
     blobna 'chip->firmware[ ]=[ ]firmware[;]' sound/pci/riptide/riptide.c
 
     blobname '\(multi\|digi\)face_firmware\(_rev11\)\?\.bin' sound/pci/rme9652/hdsp.c
-
-    blobname 'aica_firmware\.bin' sound/sh/aica.c
 
     accept '[ ][*][^*]*\([*]\+[^/*][^*]*\)*[*]*Caution:[ ]This[ ]API[^*]*\([*]\+[^/*][^*]*\)*[*]*request_firmware.' sound/sound_firmware.c
     accept 'static[ ]int[ ]do_mod_firmware_load[(]' sound/sound_firmware.c
@@ -5026,6 +5025,9 @@ set_except () {
     accept '[\t]retval0[ ]=[ ]report_missing_free_firmware[^\n]*[\n][\t]retval[ ]=[ ]request_firmware_direct[(]' include/linux/firmware.h
     accept '[\t]retval0[ ]=[ ]report_missing_free_firmware[^\n]*[\n][\t]retval[ ]=[ ]request_firmware_into_buf[(][&]xfw[,][ ]NONFREE_FIRMWARE' include/linux/firmware.h
 
+    # Backported to 4.16.14-gnu
+    accept 'MODULE_FIRMWARE[(]["]aica_firmware\.bin["][)][;]' sound/sh/aica.c
+    accept '[\t]err[ ]=[ ]request_firmware[(][&]fw_entry[,][ ]["]aica_firmware\.bin["][,]' sound/sh/aica.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
