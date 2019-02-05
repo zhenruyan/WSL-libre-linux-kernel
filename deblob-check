@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2008-07-16
+# deblob-check version 2008-07-26
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -37,6 +37,9 @@
 # -s --sensitivity: must be followed by a blank and a number.
 #		Specifies the number of consecutive integral or
 #		character constants that trigger the blob detector.
+
+#    --reverse-patch: Test the removed parts of a patch, rather than
+#		the added ones.
 
 # The default sensitivity is 32 constants.
 
@@ -247,6 +250,14 @@ case $1 in
   fi
 
   sens=`expr $sens - 1`
+  ;;
+esac
+
+reverse_patch=false
+case $1 in
+--reverse-patch)
+  reverse_patch=:
+  shift;
   ;;
 esac
 
@@ -547,67 +558,37 @@ set_except () {
     accept 'PITBL:[\n]  \.long  0xC0040000,0xC90FDAA2,'"$blobpat*"
     # arch/m68k/mac/mac_penguin.S
     accept '\(0x[0F][0F],\)\+\\[\n]\(\(0x[0F][0F],\)\+\\[\n]\)*\(0x[0F][0F],\)\+0x00'
-    # arch/s390/kernel/head.S
-    accept '\.lowcase:[\n]	\.byte 0x00\(,0x0[1-7]\)\+'"$sepx$blobpat*$eol"
-    # arch/s390/kernel/bitmap.S
-    accept '_zb_findmap:[\n]         \.byte  0\(,[123],0\)\+,4'"$sepx$blobpat*$eol"
-    accept '_sb_findmap:[\n]         \.byte  8\(,0,[123]\)\+,0'"$sepx$blobpat*$eol"
-    # arch/powerpc/lib/copyuser_64.S
-    accept '	\.section __ex_table,"a"'"$sepx$blobpat*"
-    # arch/powerpc/platforms/iseries/mf.c
-    accept '	memcpy(src, "\\x01\\x00\\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00".*PROGxxxx'
-    # arch/ppc/platforms/ev64260.c
-    initnc 'static const unsigned int cpu_745x\[2\]\[16\] ='
-    # arch/alpha/lib/fls.c
-    initnc 'const unsigned char __flsm1_tab\[256\] ='
-    # drivers/input/misc/map_to_7segment.h
-    accept '#define _MAP_0_32_ASCII_SEG7_NON_PRINTABLE	\\[\n]	\(0,\)\+'"$eol"
-    # sound/oss/ad1848.c
-    initc '	static int      init_values_b\[\] ='
-    # drivers/input/keyboard/atkbd.c
-    initnc 'static unsigned char atkbd_set2_keycode\[512\] ='
-    # drivers/usb/serial/keyspan_pda.S and
-    # drivers/usb/serial/xircom_pgs.S
-    accept 'desc_config1:[\n]	\.byte 0x09, 0x02'"$sepx$blobpat*"
-    accept 'string_mfg:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_mfg_end:'
-    accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:'
-    # drivers/media/video/pwc/pwc-nala.h
-    accept '   [/][*] \(SQCIF\|QSIF\|QCIF\|SIF\|CIF\|VGA\) [*][/][\n]   {[\n]      {'"$blobpat*"
-    # drivers/video/logo/*.ppm
-    accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+'
-    # Documentation/specialix.txt
-    accept 'for i in [ 	0-9\\\n]*[\n]do'
-    # Documentation/cpu-freq/cpufreq-stats.txt
-    accept '         :   3600000   3400000   3200000   3000000   2800000 '
-    # Documentation/scsi/sym53c8xx_2.txt and
-    # Documentation/scsi/ncr53c8xx_2.txt
-    accept '00 00[\n]64 01[\n]8e 0b[\n][\n][0-9a-f \n]*fe fe'
-    accept '0f 00 08 08 64 00 0a 00 - id 0[\n]'"$blobpat*"
-    accept 'default nvram data:'"$sepx$blobpat*"
-    # Documentation/video4linux/sn9c102.txt
-    accept '0x0458     0x7025[\n]'"$blobpat*"
-    # Documentation/video4linux/et61x251.txt
-    accept '0x102c     0x6151[\n]'"$blobpat*"
-    # Documentation/video4linux/zc0301.txt
-    accept '0x041e     0x4017[\n]'"$blobpat*"
-    # Documentation/uml/UserModeLinux-HOWTO.txt
-    accept '  (gdb) x\/100x \$25[\n]  0x507d2434:     0x507d2434      0x00000000      0x08048000      0x080a4f8c'"$sepx$blobpat*"
-    # Documentation/isdn/README.inc
-    accept '      1  0  0  0  0x308'"$sepx$blobpat*"
-    # Documentation/sched-stats.txt
-    accept 'domain<N> <cpumask> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'"$eol"
-    # net/ipv4/ipvs/ip_vs_sync.c and
-    # net/sctp/sm_make_chunk.c and
-    # include/linux/sctp.h
-    accept '[ *	]*0                   1                   2                   3[\n][ *	]*0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1'
-    # arch/x86/lguest/boot.c
-    accept ' \*  1 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
-    # drivers/net/fealnx.c
-    ocomment '	[/][*] Configure the PCI bus bursts and FIFO thresholds.'
-    # drivers/hwmon/via686a.c
-    ocomment '[/][*] the original LUT values from Alex van Kaam <darkside@chello\.nl>'
-    # drivers/media/video/saa7114.c
-    initc 'static const unsigned char init\[\] = {[^;]*MODE=0 ;.*SAA_7114_NTSC_HSYNC_START'
+    accept '\.lowcase:[\n]	\.byte 0x00\(,0x0[1-7]\)\+'"$sepx$blobpat*$eol" arch/s390/kernel/head.S
+    accept '_zb_findmap:[\n]         \.byte  0\(,[123],0\)\+,4'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
+    accept '_sb_findmap:[\n]         \.byte  8\(,0,[123]\)\+,0'"$sepx$blobpat*$eol" arch/s390/kernel/bitmap.S
+    accept '	\.section __ex_table,"a"'"$sepx$blobpat*" arch/powerpc/lib/copyuser_64.S
+    accept '	memcpy(src, "\\x01\\x00\\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00".*PROGxxxx' arch/powerpc/platforms/iseries/mf.c
+    initnc 'static const unsigned int cpu_745x\[2\]\[16\] =' arch/ppc/platforms/ev64260.c
+    initnc 'const unsigned char __flsm1_tab\[256\] =' arch/alpha/lib/fls.c
+    accept '#define _MAP_0_32_ASCII_SEG7_NON_PRINTABLE	\\[\n]	\(0,\)\+'"$eol" drivers/input/misc/map_to_7segment.h
+    initc '	static int      init_values_b\[\] =' sound/oss/ad1848.c
+    initnc 'static unsigned char atkbd_set2_keycode\[512\] =' drivers/input/keyboard/atkbd.c
+    accept 'desc_config1:[\n]	\.byte 0x09, 0x02'"$sepx$blobpat*" 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
+    accept 'string_mfg:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_mfg_end:' 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
+    accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'drivers/usb/serial/\(keyspan_pda\|xircom_pgs\).S'
+    accept '   [/][*] \(SQCIF\|QSIF\|QCIF\|SIF\|CIF\|VGA\) [*][/][\n]   {[\n]      {'"$blobpat*" drivers/media/video/pwc/pwc-nala.h
+    accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/*.ppm
+    accept 'for i in [ 	0-9\\\n]*[\n]do' Documentation/specialix.txt
+    accept '         :   3600000   3400000   3200000   3000000   2800000 ' Documentation/cpu-freq/cpufreq-stats.txt
+    accept '00 00[\n]64 01[\n]8e 0b[\n][\n][0-9a-f \n]*fe fe' 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
+    accept '0f 00 08 08 64 00 0a 00 - id 0[\n]'"$blobpat*" 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
+    accept 'default nvram data:'"$sepx$blobpat*" 'Documentation/scsi/\(sym\|ncr\)53c8xx_2.txt'
+    accept '0x0458     0x7025[\n]'"$blobpat*" Documentation/video4linux/sn9c102.txt
+    accept '0x102c     0x6151[\n]'"$blobpat*" Documentation/video4linux/et61x251.txt
+    accept '0x041e     0x4017[\n]'"$blobpat*" Documentation/video4linux/zc0301.txt
+    accept '  (gdb) x\/100x \$25[\n]  0x507d2434:     0x507d2434      0x00000000      0x08048000      0x080a4f8c'"$sepx$blobpat*" Documentation/uml/UserModeLinux-HOWTO.txt
+    accept '      1  0  0  0  0x308'"$sepx$blobpat*" Documentation/isdn/README.inc
+    accept 'domain<N> <cpumask> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'"$eol" Documentation/sched-stats.txt
+    accept '[ *	]*0                   1                   2                   3[\n][ *	]*0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1' 'net/ipv4/ipvs/ip_vs_sync.c|net/sctp/sm_make_chunk.c|include/linux/scpt.h'
+    accept ' \*  1 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0' arch/x86/lguest/boot.c
+    ocomment '	[/][*] Configure the PCI bus bursts and FIFO thresholds.' drivers/net/fealnx.c
+    ocomment '[/][*] the original LUT values from Alex van Kaam <darkside@chello\.nl>' drivers/hwmon/via686a.c
+    initc 'static const unsigned char init\[\] = {[^;]*MODE=0 ;.*SAA_7114_NTSC_HSYNC_START' drivers/media/video/saa7114.c
 
     # in 2.6.23 only
     accept " Psize    Ipps       Tput     Rxint     Txint    Done     Ndone[\\n] ---------------------------------------------------------------\\([\\n][ 0-9]\\+\\)\\+$eol"
@@ -1091,16 +1072,65 @@ set_except () {
     initnc '} vsb_snr_tab\[\] ='
     initnc '} yss225_registers\[\] __devinitdata ='
     ;;
-  */patch*2.6.27-rc* | */patch*2.6.26-git*)
+
+  */patch*2.6.27-rc* | */patch*2.6.26-git* | */git-linus.diff)
     accept '	\.section __ex_table,"a"'"$sepx$blobpat*" 'arch/x86/lib/copy_user_\(nocache_\)\?64.S'
     initnc 'static struct cipher_testvec des3_ede_cbc_\(enc\|dec\)_tv_template\[\] =' crypto/tcrypt.h
-
     accept 'desc_config1:[\n]	\.byte 0x09, 0x02'"$sepx$blobpat*" 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
     accept 'string_mfg:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_mfg_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
     accept 'string_product:[\n]\?\(;\?	\.byte[^\n]*[\n]\)\+string_product_end:' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).S'
     accept ':03000000020200F9[\n]:040023000205\(9B0037\|5F0073\)[\n]\(:050030000000000000CB[\n]\|:0400430002010000B6[\n]\)*'"$sepx$blobpat*"'[\n]:\(0E06E0006400670065007400060334003700F4\|0606A000060334003700E0\)[\n]:00000001FF[\n]' 'firmware/keyspan_pda/\(keyspan_pda\|xircom_pgs\).HEX'
+    accept ':100000000C004000000000000000000000000000A4[\n]'"$sepx$blobpat*"'[\n]\/\* DSP56001 bootstrap code \*\/' firmware/dsp56k/bootstrap.bin.ihex
     initnc 'static const u16 uda1380_reg\[UDA1380_CACHEREGNUM\] =' sound/soc/codecs/uda1380.c
     initnc 'static const u16 wm8510_reg\[WM8510_CACHEREGNUM\] =' sound/soc/codecs/wm8510.c
+
+    initnc 'static const unsigned short atkbd_set[23]_keycode\[512\] =' drivers/input/keyboard/atkbd.c
+    initnc 'static const unsigned short atkbd_unxlate_table\[128\] =' drivers/input/keyboard/atkbd.c
+    initnc 'static const unsigned char usb_kbd_keycode\[256\] =' drivers/hid/usbhid/usbkbd.c
+    initnc '		u8 buf, bufs\[\] =' drivers/media/dvb/dvb-usb/cxusb.c
+    initnc 'static struct dvb_pll_desc [^\n]* =' drivers/media/dvb/frontends/dvb-pll.c
+    initnc '	static int sysdiv_to_div_x_2\[\] =' arch/powerpc/platforms/512x/clock.c
+    initnc 'static const __u8 cx_inits_\(176\|320\|352\|640\)\[\] =' drivers/media/video/gspca/conex.c
+    initnc 'static const __u8 cx_jpeg_init\[\]\[8\] =' drivers/media/video/gspca/conex.c
+    initnc 'static const __u8 cxjpeg_\(640\|352\|320\|176\|qtable\)\[\]\[8\] =' drivers/media/video/gspca/conex.c
+    initnc 'static const unsigned char quant\[\]\[0x88\] =' drivers/media/video/gspca/jpeg.h
+    initnc 'static unsigned char huffman\[\] =' drivers/media/video/gspca/jpeg.h
+    initc '	static const struct ov_i2c_regvals norm_76[1247]0\[\] =' drivers/media/video/gspca/ov519.c
+    initnc 'static const __u8 pac207_sensor_init\[\]\[8\] =' drivers/media/video/gspca/pac207.c
+    initnc 'static const __u8 pac7311_jpeg_header\[\] =' drivers/media/video/gspca/pac7311.c
+    initnc 'static const __u8 init\(Hv7131\|Ov\(6650\|7630\(_3\)\?\)\|Pas\(106\|202\)\|Tas51[13]0\)\[\] =' drivers/media/video/gspca/sonixb.c
+    initnc 'static const __u8 \(hv7131\|ov\(6650\|7630\(_3\)\?\)\|pas\(106\|202\)\|tas51[13]0\)_sensor_init\(_com\)\?\[\]\[8\] =' drivers/media/video/gspca/sonixb.c
+    initnc 'static const __u8 \(hv7131r\|mi0360\|mo4000\|ov76\(60\|48\)\)_sensor_init\[\]\[8\] =' drivers/media/video/gspca/sonixj.c
+    initnc 'static const __u8 qtable4\[\] =' drivers/media/video/gspca/sonixj.c
+    initnc 'static const __u16 \(spca500_visual\|Clicksmart510\)_defaults\[\]\[3\] =' drivers/media/video/gspca/spca500.c
+    initnc 'static const __u8 qtable_\(creative_pccam\|kodak_ez200\|pocketdv\)\[2\]\[64\] =' drivers/media/video/gspca/spca500.c
+    initnc 'static const __u16 spca501c\?_\(\(3com\|arowana\|mysterious\)_\)\?\(init\|open\)_data\[\]\[3\] =' drivers/media/video/gspca/spca501.c
+    initnc 'static const __u16 spca505b\?_\(init\|open\)_data\(_ccd\)\?\[\]\[3\] =' drivers/media/video/gspca/spca505.c
+    initnc 'static const __u16 spca508\(cs110\|_sightcam2\?\|_vista\)\?_init_data\[\]\[3\] =' drivers/media/video/gspca/spca508.c
+    initnc 'static const __u16 spca561_init_data\[\]\[2\] =' drivers/media/video/gspca/spca561.c
+    initnc 'static const __u16 spca504\(_pccam600\|A_clicksmart420\)_\(init\|open\)_data\[\]\[3\] =' drivers/media/video/gspca/sunplus.c
+    initnc 'static const __u8 qtable_\(creative_pccam\|spca504_default\)\[2\]\[64\] =' drivers/media/video/gspca/sunplus.c
+    initnc 'static const __u8 \(effects\|gamma\)_table\[MAX_[A-Z]*\]\[[0-9]*\] =' drivers/media/video/gspca/t631.c
+    initnc 'static const __u8 tas5130a_sensor_init\[\]\[8\] =' drivers/media/video/gspca/t613.c
+    initnc '	static const __u8 \(read_indexs\|n\(set\)\?[0-9]*\|missing\)\[[0-9x]*\] =' drivers/media/video/gspca/t613.c
+    initc 'static const __u8 \(mi13[12]0\|po3130\|hv7131r\|ov76[67]0\)_\(\(soc\)\?initQ\?VGA_\(JPG\|data\)\|rundata\)\[\]\[4\] =' drivers/media/video/gspca/vc032x.c
+    initnc 'static const struct usb_action \(cs2102\|hdcs2020xx\|icm105axx\|ov7630c\|pb0330[3x]x\)_Initial\(Scale\)\?\[\] =' drivers/media/video/gspca/zc3xx.c
+    initnc 'static const u8 rtl8225z2_agc\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_agc\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_ofdm\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const u8 rtl8225z2_tx_power_cck_ch14\[\] =' drivers/net/wireless/rtl8187_rtl8225.c
+    initnc 'static const __u16 t10_dif_crc_table\[256\] =' lib/crc-t10dif.c
+    initnc 'static crb_128M_2M_block_map_t crb_128M_2M_map\[64\] =' drivers/net/netxen/netxen_hw.c
+    initnc 'static const __u16 crc10_table\[256\] =' drivers/usb/serial/safe_serial.c
+    accept '[ 	]*\( *0\)*\( *1\)*[\n][ 	]*0 1 2 3 4 5 6 7 8 9 0 1 *2 3 4 5 6 7' 'Documentation/bt8xxgpio.txt'
+    initnc '	static int exp_lut\[256\] =' drivers/isdn/mISDN/dsp_audio.c
+    initnc 'static const u32 bf_pbox\[16 \+ 2\] =' drivers/isdn/mISDN/dsp_blowfish.c
+    initnc 'static const u32 bf_sbox\[256 \* 4\] =' drivers/isdn/mISDN/dsp_blowfish.c
+    initnc 'static u8 sample_\(german_\(all\|old\)\|american_\(dialtone\|ringing\|busy\)\|special[123]\|silence\)\[\] =' drivers/isdn/mISDN/dsp_tones.c
+    initnc 'struct pattern {[^}]*int tone;[^}]*} pattern\[\] =' drivers/isdn/mISDN/dsp_tones.c
+    initnc 'static u8 \([au]\|_4\)law_to_\([ua]law\|4bit\)\[256\] =' drivers/isdn/mISDN/l1oip_codec.c
+
     ;;
     
   */patch*2.6.26-rc*)
@@ -1886,22 +1916,27 @@ check () {
   fi
 
   # Extract or otherwise munge...
-  case $input in
+  case /$input in
   *.tar*)
     cmd="tar -xf - --to-command='echo \";/*begin \$TAR_FILENAME*/;\"; cat; echo \";/**/;\"; echo \";/*end \$TAR_FILENAME*/;\"'"
     ;;
   *.patch | */patch-* | *.diff)
-    sedpatch='
-      /^[-]/d;
-      /^\(@@\|+++\) / {
-	i\
-;/**/;\
-;/*end patchlet */;\
+    if $reverse_patch; then
+      s=- r=+
+    else
+      s=+ r=-
+    fi
+    sedpatch="
+      /^[$r]/d;
+      /^\\(@@\\|$s$s$s\\) / {
+	i\\
+;/**/;\\
+;/*end patchlet */;\\
 ;/*begin patchlet */;
-	s/^/;\/*/;
-	s/$/*\/;/;
+	s/^/;\\/*/;
+	s/\$/*\\/;/;
       };
-      s/^[ +]//;'
+      s/^[ $s]//;"
     cmd='sed "$sedpatch"'
     ;;
   *)
