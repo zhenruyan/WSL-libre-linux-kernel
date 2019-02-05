@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2016-11-29 + 2017-01-09's r13475
+#   + partial 2017-02-05's r13539
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4578,6 +4579,10 @@ set_except () {
     # New in 4.9.2 and 4.8.17.
     accept '[\t]*fwname[ ]=[ ]["]fuc4\(09\|1a\)[cd]["][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
     accept '[\t]*snprintf[(]f[,][ ]sizeof[(]f[)][,][ ]["]nouveau[/]nv%02x_%s["][,][ ]device->chipset[,][ ]fwname[)][;][\n][\t]*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]f[,][ ]device->dev[)][;][\n][\t]*if[ ][(]ret[)][ ][{][\n][\t]*snprintf[(]f[,][ ]sizeof[(]f[)][,][ ]["]nouveau[/]%s["][,][ ]fwname[)][;][\n][\t]*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]f[,][ ]device->dev[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+
+    # Backported into 4.9.36.
+    # New in 4.10-rc*.
+    blobname 'radeon[/]si58_mc\.bin' 'drivers/gpu/drm/amd/amdgpu/gmc_v6_0\.c\|drivers/gpu/drm/radeon/si\.c'
     ;;
 
   */*freedo*.patch | */*logo*.patch)
