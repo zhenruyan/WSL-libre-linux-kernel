@@ -456,7 +456,10 @@ clean_mk CONFIG_MICROCODE_INTEL arch/x86/kernel/Makefile
 
 announce IXP4XX_NPE - "IXP4xx Network Processor Engine support"
 reject_firmware arch/arm/mach-ixp4xx/ixp4xx_npe.c
+clean_blob arch/arm/mach-ixp4xx/ixp4xx_npe.c
 clean_blob Documentation/arm/IXP4xx
+clean_kconfig arch/arm/mach-ixp4xx/Kconfig 'ARCH_IXP4XX'
+clean_mk CONFIG_IXP4XX_NPE arch/arm/mach-ixp4xx/Makefile
 
 announce ARCH_NETX - "Hilscher NetX based"
 clean_sed '
