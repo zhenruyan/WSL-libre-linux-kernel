@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-01-05
+# deblob-check version 2012-01-05 + 2012-02-03's r8344
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2965,6 +2965,9 @@ set_except () {
     blobname 's5p-mfc\.fw' drivers/media/video/s5p-mfc/s5p_mfc_ctrl.c
     blobname 'rtl_nic[/]rtl8168f-[12]\.fw' drivers/net/ethernet/realtek/r8169.c
     accept '[	]bp->firmware[ ]=[ ]NULL[;]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+
+    blobna '[/][*][\n][ ][*][ ]AMD[ ]microcode[ ]firmware[ ]naming[ ]convention[^*]*\([*]\+[^/*][^*]*\)*[*]*amd-ucode[/][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' arch/x86/kernel/microcode_amd.c
+    blobname 'amd-ucode[/]microcode_amd_fam\(%\.2x\|[0-9a-f]*\)h\.bin' arch/x86/kernel/microcode_amd.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
