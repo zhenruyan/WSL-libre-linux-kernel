@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2017-08-26
+# deblob-check version 2017-08-26 + 2017-10-23's r14392
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4859,6 +4859,10 @@ set_except () {
     accept '[\t]ret[ ]=[ ]reject_firmware_nowait[(][^)]*[,][ ]qtnf_firmware_load[)][;][\n][\t]*if[ ][(]ret[ ][<][ ]0[)][\n][\t]*pr_err[(]["]request_firmware_nowait[ ]error' drivers/net/wireless/quantenna/qtnfmac/pearl/pcie.c
     blobname '\(adsp\|slpi\)\.mdt' drivers/remoteproc/qcom_adsp_pil.c
     blobname 'wcnss\.mdt' drivers/remoteproc/qcom_wcnss.c
+
+    # Backported into 4.13.10.
+    # New in 4.14-rc6.
+    defsnc '[\t]static[ ]const[ ]struct[ ]nphy_txiqcal_ladder[ ]ladder_\(lo\|iq\)\[\][ ]=' drivers/net/wireless/brcm80211/brcmsmac/phy/phy_n.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
