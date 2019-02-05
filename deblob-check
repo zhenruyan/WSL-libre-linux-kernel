@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2012-05-16
+# deblob-check version 2012-05-17
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3179,7 +3179,7 @@ set_except () {
     accept '[	][{]0xa1[,][ ]0x6e[,][ ][0-9xa-f, ]*[,][ ]0x00[,][ ]0x10[}][,]\([\n][	][{]0x[ac]1[,][ ]0x6e[,][ ][0-9xa-f, ]*[,][ ]0x00[,][ ]0x10[}][,][}][,]\)*' drivers/media/video/gspca/sonixj.c
     ;;
 
-  */atl1c_net_next_update-3.4.patch)
+  */atl1c_net_next_update-3.[34].patch)
     defsnc 'static[ ]const[ ]struct[ ]atl1c_platform_patch[ ]plats\[\][ ]__devinitdata[ ]=' drivers/net/ethernet/atheros/atl1c/atl1c_main.c
     ;;
 
