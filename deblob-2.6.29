@@ -44,7 +44,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=2.6.29 extra=
+kver=2.6.29 extra=1
 
 fatal () {
   echo "$@"
@@ -111,9 +111,9 @@ clean_blob () {
 dummy_blob () {
 	#$1 = filename
 	if test -f $1; then
-	    fatal $1 exists, something is wrong
+	    die $1 exists, something is wrong
 	elif test ! -f firmware/Makefile; then
-	    fatal firmware/Makefile does not exist, something is wrong
+	    die firmware/Makefile does not exist, something is wrong
 	fi
 
 	clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
@@ -123,9 +123,9 @@ dummy_blob () {
 clean_fw () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
-		fatal $1 does not exist, something is wrong
+		die $1 does not exist, something is wrong
 	elif test -f $2; then
-		fatal $2 exists, something is wrong
+		die $2 exists, something is wrong
 	fi
 	clean_blob $1 -s 4
 	dummy_blob $2
@@ -134,9 +134,9 @@ clean_fw () {
 drop_fw_file () {
 	#$1 = firmware text input, $2 = firmware output
 	if test ! -f $1; then
-		fatal $1 does not exist, something is wrong
+		die $1 does not exist, something is wrong
 	elif test -f $2; then
-		fatal $2 exists, something is wrong
+		die $2 exists, something is wrong
 	fi
 	clean_file $1
 	dummy_blob $2
@@ -382,6 +382,8 @@ announce ATM_FORE200E - "FORE Systems 200E-series"
 reject_firmware drivers/atm/fore200e.c
 clean_blob drivers/atm/fore200e.c
 clean_blob Documentation/networking/fore200e.txt
+clean_blob drivers/atm/.gitignore
+clean_blob Documentation/dontdiff
 clean_kconfig drivers/atm/Kconfig 'ATM_FORE200E'
 clean_mk CONFIG_ATM_FORE200E drivers/atm/Makefile
 
@@ -420,7 +422,7 @@ clean_mk CONFIG_MOXA_INTELLIO drivers/char/Makefile
 announce DRM_MGA - "Matrox g200/g400"
 clean_blob drivers/gpu/drm/mga/mga_ucode.h
 clean_blob drivers/gpu/drm/mga/mga_warp.c
-clean_kconfig drivers/gpu/drm/Kconfig 'DRM_MGA'
+clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_MGA'
 clean_mk CONFIG_DRM_MGA drivers/gpu/drm/Makefile
 
 announce DRM_R128 - "ATI Rage 128"
@@ -435,7 +437,7 @@ clean_sed '
   }
 }' drivers/gpu/drm/r128/r128_cce.c 'report missing Free microcode'
 clean_blob drivers/gpu/drm/r128/r128_cce.c
-clean_kconfig drivers/gpu/drm/Kconfig 'DRM_R128'
+clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_R128'
 clean_mk CONFIG_DRM_R128 drivers/gpu/drm/Makefile
 
 announce DRM_RADEON - "ATI Radeon"
@@ -458,7 +460,7 @@ clean_sed '
 }' drivers/gpu/drm/radeon/radeon_cp.c 'report missing Free microcode on resume'
 clean_blob drivers/gpu/drm/radeon/radeon_cp.c
 clean_blob drivers/gpu/drm/radeon/radeon_microcode.h
-clean_kconfig drivers/gpu/drm/Kconfig 'DRM_RADEON'
+clean_kconfig -f drivers/gpu/drm/Kconfig 'DRM_RADEON'
 clean_mk CONFIG_DRM_RADEON drivers/gpu/drm/Makefile
 
 
@@ -609,9 +611,10 @@ clean_mk CONFIG_DVB_USB_VP7045 drivers/media/dvb/dvb-usb/Makefile
 # dvb/frontends
 
 announce DVB_AF9013 - "Afatech AF9013 demodulator"
-undefault_firmware 'AF9013' drivers/media/dvb/frontends/af9013.c
+undefault_firmware 'AF9013' \
+  drivers/media/dvb/frontends/af9013.c \
+  drivers/media/dvb/frontends/af9013_priv.h
 reject_firmware drivers/media/dvb/frontends/af9013.c
-clean_blob drivers/media/dvb/frontends/af9013_priv.h
 clean_kconfig drivers/media/dvb/frontends/Kconfig 'DVB_AF9013'
 clean_mk CONFIG_DVB_AF9013 drivers/media/dvb/frontends/Makefile
 
@@ -918,6 +921,10 @@ drop_fw_file firmware/e100/d101m_ucode.bin.ihex firmware/e100/d101m_ucode.bin
 drop_fw_file firmware/e100/d101s_ucode.bin.ihex firmware/e100/d101s_ucode.bin
 drop_fw_file firmware/e100/d102e_ucode.bin.ihex firmware/e100/d102e_ucode.bin
 reject_firmware drivers/net/e100.c
+clean_sed '
+/^static const struct firmware \*e100_\(reject\|request\)_firmware(/,/^}$/{
+  s:^\(.*\)return ERR_PTR(err);$:\1DPRINTK(PROBE,ERR, "Proceeding without firmware\\n");\n\1return NULL;:
+}' drivers/net/e100.c 'proceed without firmware'
 clean_blob drivers/net/e100.c
 clean_kconfig drivers/net/Kconfig 'E100'
 clean_mk CONFIG_E100 drivers/net/Makefile
@@ -1340,10 +1347,11 @@ clean_mk CONFIG_RT2870 drivers/staging/rt2870/Makefile
 
 # wimax
 
-annunce WIMAX_I2400M - "Intel Wireless WiMAX Connection 2400"
+announce WIMAX_I2400M - "Intel Wireless WiMAX Connection 2400"
 reject_firmware drivers/net/wimax/i2400m/fw.c
 clean_blob drivers/net/wimax/i2400m/sdio.c
 clean_blob drivers/net/wimax/i2400m/usb.c
+clean_blob Documentation/wimax/README.i2400m
 clean_kconfig drivers/net/wimax/i2400m/Kconfig CONFIG_WIMAX_I2400M
 clean_mk CONFIG_WIMAX_I2400M drivers/net/wimax/i2400m/Makefile
 
