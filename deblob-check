@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2015-12-22
+# deblob-check version 2015-12-22 + 2017-10-23's r14392
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2015 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2017 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -4342,6 +4342,10 @@ set_except () {
     accept '[ ][*][ ]fpga_mgr_firmware_load[ ]-' drivers/fpga/fpga-mgr.c
     accept 'EXPORT_SYMBOL_GPL[(]fpga_mgr_firmware_load[)][;]' drivers/fpga/fpga-mgr.c
     accept '[\t ]*CHIP_IS_E2[(]bp[)][ ][?][ ]["]everest2["][ ]:[ ]["]everest3["][/][*][(]DEBLOBBED[)][*][/][)][;]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+
+    # Backported into 4.4.95.
+    # New in 4.14-rc6.
+    defsnc '[\t]static[ ]const[ ]struct[ ]nphy_txiqcal_ladder[ ]ladder_\(lo\|iq\)\[\][ ]=' drivers/net/wireless/brcm80211/brcmsmac/phy/phy_n.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
