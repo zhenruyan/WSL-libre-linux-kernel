@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2018-12-17
+# deblob-check version 2019-02-11
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2018 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2019 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -907,7 +907,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\)[\\]\?["]'
+  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\)[\\]\?["]'
   # Catch misdeblobbed fw extension.
   blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
@@ -3861,8 +3861,8 @@ set_except () {
     accept 'int[ ]wil_request_firmware[(]' 'drivers/net/wireless/ath/wil6210/\(fw_inc\.c\|wil6210\.h\)'
     accept '[\t]*rc[ ]=[ ]wil_request_firmware[(]wil[,][ ]WIL_FW_NAME[)][;]' drivers/net/wireless/ath/wil6210/fw_inc.c
     blobname 'wil6210\.fw' drivers/net/wireless/ath/wil6210/wil6210.h
-    blobname 'FW[ ]Version:[ ]%d_%d_%d' drivers/net/wireless/broadcom/bnx2x/bnx2x_main.c
-    blobname '\([,][\n \t]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\)_VERSION\)\+' drivers/net/wireless/broadcom/bnx2x/bnx2x_main.c
+    blobna 'FW[ ]Version:[ ]%d_%d_%d' drivers/net/wireless/broadcom/bnx2x/bnx2x_main.c
+    blobna '\([,][\n \t]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)\+' drivers/net/wireless/broadcom/bnx2x/bnx2x_main.c
     blobname 'iwlwifi-8000' drivers/net/wireless/iwlwifi/iwl-8000.c
     blobname '["]-["][ ]__stringify[(]api[)][ ]["]\.ucode["]' drivers/net/wireless/iwlwifi/iwl-8000.c
     blobname '%s%s-%s\.ucode' drivers/net/wireless/iwlwifi/iwl-drv.c
@@ -5244,6 +5244,66 @@ set_except () {
     # New in 4.20-rc7.
     blobname 'amdgpu[/]polaris1[01]_k2_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
     blobname 'amdgpu[/]polaris12_k_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
+
+    # New in 5.0-rc5.
+    defsnc '__visible[ ]const[ ]u32[ ]crypto_[fi][tl]_tab\[4\]\[256\][ ]__cacheline_aligned[ ]=' crypto/aes_generic.c
+    defsnc 'static[ ]const[ ]u8[ ]Tau\[64\][ ]=' crypto/streebog_generic.c
+    defsnc 'static[ ]const[ ]u8[ ]Pi\[256\][ ]=' crypto/streebog_generic.c
+    defsnc 'static[ ]const[ ]unsigned[ ]long[ ]long[ ]Ax\[8\]\[256\][ ]=' crypto/streebog_generic.c
+    defsnc 'static[ ]const[ ]struct[ ]hash_testvec[ ]hmac_streebog\(256\|512\)_tv_template\[\][ ]=' crypto/testmgr.h
+    defsc 'static[ ]const[ ]struct[ ]cipher_testvec[ ]xchacha\(20\|12\)_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]profile_mode_setting[ ]smu7_profiling\[7\][ ]=' drivers/gpu/drm/amd/powerplay/hwmgr/smu7_hwmgr.c
+    defsnc 'static[ ]const[ ]uint32_t[ ]vpp_filter_coefs_bicubic\[\][ ]=' drivers/gpu/drm/meson/meson_vpp.c
+    defsc 'static[ ]const[ ]unsigned[ ]int[ ]a\(200\|220\|225\)_registers\[\][ ]=' drivers/gpu/drm/msm/adreno/a2xx_gpu.c
+    defsc 'static[ ]const[ ]u32[ ]a6xx_\(ps_cluster_rac\|vbif_registers\|gmu_[gc]x_registers\)\[\][ ]=' drivers/gpu/drm/msm/adreno/a6xx_gpu-state.h
+    defsc 'static[ ]const[ ]struct[ ]cmd_set[ ]qcom_2k_panel_magic_cmds\[\][ ]=' drivers/gpu/drm/panel/panel-truly-nt35597.c
+    defsnc 'static[ ]const[ ]struct[ ]dw_hdmi_mpll_config[ ]sun50i_h6_mpll_cfg\[\][ ]=' drivers/gpu/drm/sun4i/sun8i_hdmi_phy.c
+    defsnc 'static[ ]const[ ]struct[ ]dw_hdmi_curr_ctrl[ ]sun50i_h6_cur_ctr\[\][ ]=' drivers/gpu/drm/sun4i/sun8i_hdmi_phy.c
+    defsnc '[\t]mipi_dbi_command[(]mipi[,][ ]HX8357D_SETGAMMA[,]' drivers/gpu/drm/tinydrm/hx8357d.c
+    defsnc 'static[ ]const[ ]int[ ]rm3100_samp_rates\[RM3100_SAMP_NUM\]\[3\][ ]=' drivers/iio/magnetometer/rm3100-core.c
+    defsc 'static[ ]const[ ]struct[ ]reg_8[ ]mode_\(4096x2304\|1920x1080\|table_common\)\[\][ ]=' drivers/media/i2c/imx214.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_value[ ]ov5640_setting_\(VGA_640_480\|XGA_1024_768\|QVGA_320_240\|QCIF_176_144\|NTSC_720_480\|PAL_720_576\|720P_1280_720\|1080P_1920_1080\|QSXGA_2592_1944\)\[\][ ]=' drivers/media/i2c/ov5640.c
+    defsnc 'static[ ]const[ ]u32[ ]aspeed_video_jpeg_quant\[ASPEED_VIDEO_JPEG_QUANT_SIZE\][ ]=' drivers/media/platform/aspeed-video.c
+    defsnc 'static[ ]const[ ]u32[ ]aspeed_video_jpeg_dct\[ASPEED_VIDEO_JPEG_NUM_QUALITIES\][\n\t ]*\[ASPEED_VIDEO_JPEG_DCT_SIZE\][ ]=' drivers/media/platform/aspeed-video.c
+    defsnc '[\t]static[ ]u8[ ]rss_key\[AQ_CFG_RSS_HASHKEY_SIZE\][ ]=' drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+    defsnc 'static[ ]const[ ]u16[ ]mlxsw_sp_acl_bf_crc_tab\[256\][ ]=' drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
+    defsc '[\t]*ipu3_css_bds_configs\[IMGU_BDS_CONFIG_LEN\][ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc 'const[ ]s16[ ]ipu3_css_gdc_lut\[4\]\[256\][ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc 'const[ ]struct[ ]ipu3_uapi_bnr_static_config[ ]ipu3_css_bnr_defaults[ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc 'const[ ]struct[ ]ipu3_uapi_gamma_corr_lut[ ]ipu3_css_gamma_lut[ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc '[\t]*ipu3_css_tcc_gain_pcwl_lut[ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc 'const[ ]struct[ ]imgu_abi_anr_config[ ]ipu3_css_anr_defaults[ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]\(luma\|chroma\)_\(q\|ac\)_table\[\][ ]=' drivers/staging/media/rockchip/vpu/rockchip_vpu_jpeg.c
+    defsc 'static[ ]const[ ]unsigned[ ]char[ ]rockchip_vpu_jpeg_header\[JPEG_HEADER_SIZE\][ ]=' drivers/staging/media/rockchip/vpu/rockchip_vpu_jpeg.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]fontdata_ter16x32\[FONTDATAMAX\][ ]=' lib/fonts/font_ter16x32.c
+    accept '[\t][\t]\([{][ ]timeout\|["]tests[/]\|[!][ ]grep[ ]-Eq\)[^\n]*[ ]["]tests\/\$\{testname\}\.vg\.out["]' tools/lib/lockdep/run_tests.sh
+    blobname 'amdgpu[/]\(%s\|picasso\)_rlc\(_am4\)\?\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
+    blobname 'amdgpu[/]\(%s\|vega20\)_ta\.bin' drivers/gpu/drm/amd/amdgpu/psp_v11_0.c
+    blobname 'yamato_\(pm4\|pfp\)\.fw' drivers/gpu/drm/msm/adreno/adreno_device.c
+    blobname 'leia_\(pm4\|pfp\)_470\.fw' drivers/gpu/drm/msm/adreno/adreno_device.c
+    blobname 'nvidia[/]tegra194[/]vic\.bin' drivers/gpu/drm/tegra/vic.c
+    blobname 'qtn[/]\(fmac\|uboot\)_qsr1000\.img' drivers/net/wireless/quantenna/qtnfmac/qtn_hw_ids.h
+    accept '\(static[ ]inline[ ]void[ ]\|[\t]*\)pqi_request_firmware_feature[(]' drivers/scsi/smartpqi/smartpqi_init.c
+    blobname 'intel[/]ipu3-fw\.bin' drivers/staging/media/ipu3/ipu3-css-fw.h
+    blobname 'intel[/]\(dsp_fw_icl\.bin\|sof-icl\(\.ri\|-rt274\.tplg\)\)' sound/soc/intel/common/soc-acpi-intel-icl-match.c
+    blobname 'iwl-dbg-tlv\.ini' drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c
+    accept '\(static[ ]int[ ]\|[\t]*\)brcmf_fw_request_firmware[(]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
+    blobna 'snprintf[(]version[,][ ]ETHTOOL_FWVERS_LEN[,][ ]["][ ]storm[ ]%d\.%d\.%d\.%d["]\([,][ \t\n]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)\+[)]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+    # In case the command matched by the above is changed and it then
+    # fails to match, catch the snprintf format string, since the FW
+    # macros will be caught and dropped by other much earlier patterns.
+    blobname '[ ]storm[ ]%d\.%d\.%d\.%d' drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+    # These are probably wolder, we did not check for .ri and .tplg before.
+    blobname 'intel[/]sof-apl\(\.ri\|-\(rt298\|da7219\|pcm512x\|wm8804\|tdf8532\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-bxt-match.c
+    blobname 'intel[/]sof-byt\(\.ri\|-\(rt5670\|rt5640\|rt5651\|da7213\|rt5645\|max98090\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-byt-match.c
+    blobname 'intel[/]sof-cht\(\.ri\|-\(rt5645\|rt5670\|max98090\|nau8824\|da7213\|es8316\|rt5640\|rt5651\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cht-match.c
+    blobname 'intel[/]sof-cnl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+    blobname 'intel[/]sof-glk\(\.ri\|-\(alc298\|da7219\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-glk-match.c
+    blobname 'intel[/]sof-hda-generic\.tplg' sound/soc/intel/common/soc-acpi-intel-hda-match.c
+    blobname 'intel[/]sof-hsw\(\.ri\|\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
+    blobname 'intel[/]sof-bdw\(\.ri\|-\(rt286\|rt5677\|rt5640\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
+    accept '[\t][\t]pr_err[(]["]%s:[ ]request_firmware[ ]error' drivers/net/wireless/quantenna/qtnfmac/pcie/topaz_pcie.c
+
     ;;
 
   */*freedo*.patch | */*logo*.patch)
