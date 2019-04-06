@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-02-11
+# deblob-check version 2019-04-06
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5303,6 +5303,9 @@ set_except () {
     blobname 'intel[/]sof-hsw\(\.ri\|\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
     blobname 'intel[/]sof-bdw\(\.ri\|-\(rt286\|rt5677\|rt5640\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
     accept '[\t][\t]pr_err[(]["]%s:[ ]request_firmware[ ]error' drivers/net/wireless/quantenna/qtnfmac/pcie/topaz_pcie.c
+
+    # New in 5.0.7.
+    accept '[\t]*[/]bin[/]bash[ ]["]tests[/][$][{]testname[}]\.sh["][ ][<][ ]["]tests[/][$][{]testname[}]\.vg\.out["]' tools/lib/lockdep/run_tests.sh
 
     ;;
 
