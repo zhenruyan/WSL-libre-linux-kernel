@@ -1879,7 +1879,11 @@ clean_mk CONFIG_BRCMSMAC drivers/net/wireless/broadcom/brcm80211/Makefile
 
 announce BRCMFMAC - "Broadcom IEEE802.11n embedded FullMAC WLAN driver"
 reject_firmware drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
-reject_firmware drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
+if grep -q firmware_request_nowarn drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c; then
+  reject_firmware_nowarn drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
+else
+  reject_firmware drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
+fi
 clean_blob drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c
 clean_blob drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h
 clean_kconfig drivers/net/wireless/broadcom/brcm80211/Kconfig BRCMFMAC
