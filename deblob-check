@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-04-28
+# deblob-check version 2019-04-29
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5352,6 +5352,8 @@ set_except () {
     blobname 'sof-bdw\(\.ri\|-\(rt286\|rt5677\|rt5640\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
     blobname 'sof-icl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-icl-match.c
     blobna '[/][*][ ]brcmfmac4366c-pcie\.\(ap\.\)\?bin[ ]from[ ]linux-firmware\.git[ ]commit[ ][0-9a-f]*[ ][*][/]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c
+    blobname 'iwlwifi-[^ ]*-[ab]0-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
+    blobname 'iwlwifi-\(\(QuZ-a0-hr\|QuQnj-b0-jf\|so-a0-\(jf\|hr\)\)-b0\|\(cc\|\(so\|ty\)-a0-gf\)-a0\)-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
 
     ;;
 
