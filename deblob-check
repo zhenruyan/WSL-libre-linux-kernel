@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-04-06
+# deblob-check version 2019-04-28
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -907,7 +907,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\)[\\]\?["]'
+  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\)[\\]\?["]'
   # Catch misdeblobbed fw extension.
   blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
@@ -5306,6 +5306,52 @@ set_except () {
 
     # New in 5.0.7.
     accept '[\t]*[/]bin[/]bash[ ]["]tests[/][$][{]testname[}]\.sh["][ ][<][ ]["]tests[/][$][{]testname[}]\.vg\.out["]' tools/lib/lockdep/run_tests.sh
+
+    # New in 5.1-rc6.
+    initnc '.Lbyteshift_table:' 'arch/arm/crypto/crct10dif-\(ce-core\|pcl-asm_64\)\.S'
+    defsc 'static[ ]const[ ]struct[ ]aead_testvec[ ]hmac_sha\(1\|256\|512\)_aes_cbc_tv_temp\[\][ ]=' crypto/testmgr.h
+    defsc 'static[ ]const[ ]struct[ ]aead_testvec[ ]hmac_sha\(1\|224\|256\|384\|512\)_des_cbc_tv_temp\[\][ ]=' crypto/testmgr.h
+    defsc 'static[ ]const[ ]struct[ ]aead_testvec[ ]hmac_sha\(1\|224\|256\|384\|512\)_des3_ede_cbc_tv_temp\[\][ ]=' crypto/testmgr.h
+    defsc 'static[ ]const[ ]struct[ ]aead_testvec[ ]\(aes_\(gcm_rfc4106\|ccm_rfc4309\)\|rfc7539\(\|esp\)\)_tv_template\[\][ ]=' crypto/testmgr.h
+    initnc '\t\.entries[ ]=' drivers/clk/tegra/clk-tegra124-dfll-fcpu.c
+    accept '[	][	]*gf100_gr_init_fw[(]gr->fecs\.falcon[,][ ][&]gr->fuc409c[,][ ][&]gr->fuc409d[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    accept '[	][	]*gf100_gr_init_fw[(]gr->gpccs\.falcon[,][ ][&]gr->fuc41ac[,][ ][&]gr->fuc41ad[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    defsnc 'static[ ]const[ ]struct[ ]kingdisplay_panel_cmd[ ]init_code\[\][ ]=' drivers/gpu/drm/panel/panel-kingdisplay-kd097d04.c
+    defsnc 'static[ ]const[ ]struct[ ]ov8856_reg[ ]mode_\(3280x2464\|1640x1232\)_regs\[\][ ]=' drivers/media/i2c/ov8856.c
+    defsnc 'static[ ]const[ ]u8[ ]hclge_hash_key\[\][ ]=' drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+    defsnc 'static[ ]const[ ]u8[ ]hclgevf_hash_key\[\][ ]=' drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+    defsnc 'static[ ]const[ ]u32[ ]max77651_sbb1_regulator_volt_table\[\][ ]=' drivers/regulator/max77650-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]pv88090_buck1_limits\[\][ ]=' drivers/regulator/pv88090-regulator.c
+    defsc '\t*imgu_css_bds_configs\[IMGU_BDS_CONFIG_LEN\][ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc 'const[ ]s16[ ]imgu_css_gdc_lut\[4\]\[256\][ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsc 'const[ ]struct[ ]ipu3_uapi_bnr_static_config[ ]imgu_css_bnr_defaults[ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc 'const[ ]struct[ ]ipu3_uapi_gamma_corr_lut[ ]imgu_css_gamma_lut[ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc '\t*imgu_css_tcc_gain_pcwl_lut[ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc 'const[ ]struct[ ]imgu_abi_anr_config[ ]imgu_css_anr_defaults[ ]=' drivers/staging/media/ipu3/ipu3-tables.c
+    defsnc 'static[ ]struct[ ]channel_list[ ]channel_array\[\][ ]=' drivers/staging/rtl8192e/dot11d.c
+    accept '\t*sprintf[(]fname[,][ ]["]hbm\.%d\.out["]' samples/bpf/hbm.c
+    accept '\tsnd_card_ro_proc_new[(]hdspm-[>]card[,][ ]["]ports\.out["]' sound/pci/rme9652/hdspm.c
+    defsnc 'static[ ]const[ ]struct[ ]cs35l36_pll_config[ ]cs35l36_pll_sysclk\[\][ ]=' sound/soc/codecs/cs35l36.c
+    defsnc 'static[ ]const[ ]u8[ ]table_msbc_silence\[SCO_PACKET_180\][ ]=' sound/soc/mediatek/common/mtk-btcvsd.c
+    accept '[#][ ]that[ ]of[ ]the[ ]specified[ ]litmus[ ]test[,][ ]but[ ]with[ ]["]\.out["][ ]appended' tools/memory-model/scripts/checkalllitmus.sh
+    accept '\t\.data[ ]=[ ][{]\([\n\t ]*0\(\|x08\|x06\|x10\)*[,]\)*\([ ]0x\(bf\|48\|d6\|43\)[,]\)*[ ]0xd6[,]' tools/testing/selftests/bpf/verifier/ld_abs.c
+    blobname 'habanalabs[/]goya[/]goya-\(u-boot\.bin\|fit\.itb\)' drivers/misc/habanalabs/goya/goya.c
+    blobname 'mrvl[/]sd8977_uapsta\.bin' 'drivers/bluetooth/btmrvl_sdio\.c\|drivers/net/wireless/marvell/mwifiex/sdio\.h'
+    blobname 'mediatek[/]mt766[38]pr2h\.bin' drivers/bluetooth/btmtkuart.c
+    blobname 'mt76\(03\|28\)_e[12]\.bin' drivers/net/wireless/mediatek/mt76/mt7603/mt7603.h
+    blobname 'gsl3676-chuwi-hi8-air\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'gsl1680-chuwi-hi10-air\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'gsl3692-pov-mobii-wintab-p1006w-v10\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'sof-apl\(\.ri\|-\(rt298\|da7219\|pcm512x\|wm8804\|tdf8532\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-bxt-match.c
+    blobname 'sof-byt\(\.ri\|-\(rt5670\|rt5640\|rt5651\|da7213\|es8316\|rt5645\|max98090\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-byt-match.c
+    blobname 'sof-cht\(\.ri\|-\(rt5645\|rt5670\|rt5645\|max98090\|nau8824\|da7213\|es8316\|rt5640\|rt5651\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cht-match.c
+    blobname 'sof-cnl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+    blobname 'sof-glk\(\.ri\|-\(alc298\|da7219\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-glk-match.c
+    blobname 'sof-hda-generic\.tplg' sound/soc/intel/common/soc-acpi-intel-hda-match.c
+    blobname 'sof-hsw\(\.ri\|\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
+    blobname 'sof-bdw\(\.ri\|-\(rt286\|rt5677\|rt5640\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
+    blobname 'sof-icl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-icl-match.c
+    blobna '[/][*][ ]brcmfmac4366c-pcie\.\(ap\.\)\?bin[ ]from[ ]linux-firmware\.git[ ]commit[ ][0-9a-f]*[ ][*][/]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c
 
     ;;
 
