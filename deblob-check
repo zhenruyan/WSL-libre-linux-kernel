@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-02-11 + 2019-04-06's r
+# deblob-check version 2019-04-06 + 2019-05-14's r16270:16272
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5306,6 +5306,11 @@ set_except () {
 
     # New in 5.0.7.
     accept '[\t]*[/]bin[/]bash[ ]["]tests[/][$][{]testname[}]\.sh["][ ][<][ ]["]tests[/][$][{]testname[}]\.vg\.out["]' tools/lib/lockdep/run_tests.sh
+
+    # New in 5.1.2, 5.0.16, 4.19.43, 4.14.119, and 4.9.176.
+    accept '[ ][ ]the[ ]CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' 'Documentation/\(admin-guide/\)\?hw-vuln/mds\.rst'
+    accept 'instruction[ ]in[ ]combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/x86/mds.rst
+    accept '[ \t]*scenarios[ ]where[ ]the[ ]host[ ]has[ ]the[ ]updated[ ]microcode[ ]but' Documentation/x86/mds.rst
 
     ;;
 
