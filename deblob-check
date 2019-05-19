@@ -3,13 +3,14 @@
 # deblob-check version 2017-10-23 + 2017-11-30's r14468
 #				  + 2017-12-01's r14470
 #				  + 2018-03-24's r14712 (partial)
+#                                 + 2019-05-14's r16270:16272
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2018 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2019 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -4927,6 +4928,12 @@ set_except () {
 
     # New in 4.16, backported to 4.15.13 and 4.14.30.
     accept '[ ][*][ ]@fw_get_done[\t]*flag[ ]set[ ]when[ ]request_firmware[(][)][ ]is[ ]complete' drivers/media/platform/s5p-mfc/s5p_mfc_common.h
+
+    # New in 5.1.2, 5.0.16, 4.19.43, 4.14.119, and 4.9.176.
+    accept '[ ][ ]the[ ]CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' 'Documentation/\(admin-guide/\)\?hw-vuln/mds\.rst'
+    accept 'instruction[ ]in[ ]combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/x86/mds.rst
+    accept '[ \t]*scenarios[ ]where[ ]the[ ]host[ ]has[ ]the[ ]updated[ ]microcode[ ]but' Documentation/x86/mds.rst
+
     ;;
 
   */*freedo*.patch | */*logo*.patch)
