@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-04-29
+# deblob-check version 2019-05-14
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5354,6 +5354,11 @@ set_except () {
     blobna '[/][*][ ]brcmfmac4366c-pcie\.\(ap\.\)\?bin[ ]from[ ]linux-firmware\.git[ ]commit[ ][0-9a-f]*[ ][*][/]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c
     blobname 'iwlwifi-[^ ]*-[ab]0-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
     blobname 'iwlwifi-\(\(QuZ-a0-hr\|QuQnj-b0-jf\|so-a0-\(jf\|hr\)\)-b0\|\(cc\|\(so\|ty\)-a0-gf\)-a0\)-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
+
+    # New in 5.1.2, 5.0.16, 4.19.43, 4.14.119, and 4.9.176.
+    accept '[ ][ ]the[ ]CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' 'Documentation/\(admin-guide/\)\?hw-vuln/mds\.rst'
+    accept 'instruction[ ]in[ ]combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/x86/mds.rst
+    accept '[ \t]*scenarios[ ]where[ ]the[ ]host[ ]has[ ]the[ ]updated[ ]microcode[ ]but' Documentation/x86/mds.rst
 
     ;;
 
