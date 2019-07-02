@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-05-14
+# deblob-check version 2019-07-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -907,7 +907,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\)[\\]\?["]'
+  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\|cyacd\)[\\]\?["]'
   # Catch misdeblobbed fw extension.
   blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
@@ -5285,7 +5285,9 @@ set_except () {
     blobname 'qtn[/]\(fmac\|uboot\)_qsr1000\.img' drivers/net/wireless/quantenna/qtnfmac/qtn_hw_ids.h
     accept '\(static[ ]inline[ ]void[ ]\|[\t]*\)pqi_request_firmware_feature[(]' drivers/scsi/smartpqi/smartpqi_init.c
     blobname 'intel[/]ipu3-fw\.bin' drivers/staging/media/ipu3/ipu3-css-fw.h
-    blobname 'intel[/]\(dsp_fw_icl\.bin\|sof-icl\(\.ri\|-rt274\.tplg\)\)' sound/soc/intel/common/soc-acpi-intel-icl-match.c
+    blobname 'intel[/]dsp_fw_icl\.bin' sound/soc/intel/common/soc-acpi-intel-icl-match.c
+    # SOF stands for Sound Open Firmware, and it is Free Software.
+    # blobname 'sof-icl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-icl-match.c
     blobname 'iwl-dbg-tlv\.ini' drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c
     accept '\(static[ ]int[ ]\|[\t]*\)brcmf_fw_request_firmware[(]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
     blobna 'snprintf[(]version[,][ ]ETHTOOL_FWVERS_LEN[,][ ]["][ ]storm[ ]%d\.%d\.%d\.%d["]\([,][ \t\n]*BCM_5710_FW_\(MAJOR\|MINOR\|REVISION\|ENGINEERING\)_VERSION\)\+[)]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
@@ -5293,15 +5295,15 @@ set_except () {
     # fails to match, catch the snprintf format string, since the FW
     # macros will be caught and dropped by other much earlier patterns.
     blobname '[ ]storm[ ]%d\.%d\.%d\.%d' drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-    # These are probably wolder, we did not check for .ri and .tplg before.
-    blobname 'intel[/]sof-apl\(\.ri\|-\(rt298\|da7219\|pcm512x\|wm8804\|tdf8532\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-bxt-match.c
-    blobname 'intel[/]sof-byt\(\.ri\|-\(rt5670\|rt5640\|rt5651\|da7213\|rt5645\|max98090\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-byt-match.c
-    blobname 'intel[/]sof-cht\(\.ri\|-\(rt5645\|rt5670\|max98090\|nau8824\|da7213\|es8316\|rt5640\|rt5651\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cht-match.c
-    blobname 'intel[/]sof-cnl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cnl-match.c
-    blobname 'intel[/]sof-glk\(\.ri\|-\(alc298\|da7219\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-glk-match.c
-    blobname 'intel[/]sof-hda-generic\.tplg' sound/soc/intel/common/soc-acpi-intel-hda-match.c
-    blobname 'intel[/]sof-hsw\(\.ri\|\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
-    blobname 'intel[/]sof-bdw\(\.ri\|-\(rt286\|rt5677\|rt5640\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
+    # These are probably older, we did not check for .ri and .tplg before.
+    # blobname 'intel[/]sof-apl\(\.ri\|-\(rt298\|da7219\|pcm512x\|wm8804\|tdf8532\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-bxt-match.c
+    # blobname 'intel[/]sof-byt\(\.ri\|-\(rt5670\|rt5640\|rt5651\|da7213\|rt5645\|max98090\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-byt-match.c
+    # blobname 'intel[/]sof-cht\(\.ri\|-\(rt5645\|rt5670\|max98090\|nau8824\|da7213\|es8316\|rt5640\|rt5651\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cht-match.c
+    # blobname 'intel[/]sof-cnl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+    # blobname 'intel[/]sof-glk\(\.ri\|-\(alc298\|da7219\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-glk-match.c
+    # blobname 'intel[/]sof-hda-generic\.tplg' sound/soc/intel/common/soc-acpi-intel-hda-match.c
+    # blobname 'intel[/]sof-hsw\(\.ri\|\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
+    # blobname 'intel[/]sof-bdw\(\.ri\|-\(rt286\|rt5677\|rt5640\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
     accept '[\t][\t]pr_err[(]["]%s:[ ]request_firmware[ ]error' drivers/net/wireless/quantenna/qtnfmac/pcie/topaz_pcie.c
 
     # New in 5.0.7.
@@ -5342,15 +5344,15 @@ set_except () {
     blobname 'gsl3676-chuwi-hi8-air\.fw' drivers/platform/x86/touchscreen_dmi.c
     blobname 'gsl1680-chuwi-hi10-air\.fw' drivers/platform/x86/touchscreen_dmi.c
     blobname 'gsl3692-pov-mobii-wintab-p1006w-v10\.fw' drivers/platform/x86/touchscreen_dmi.c
-    blobname 'sof-apl\(\.ri\|-\(rt298\|da7219\|pcm512x\|wm8804\|tdf8532\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-bxt-match.c
-    blobname 'sof-byt\(\.ri\|-\(rt5670\|rt5640\|rt5651\|da7213\|es8316\|rt5645\|max98090\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-byt-match.c
-    blobname 'sof-cht\(\.ri\|-\(rt5645\|rt5670\|rt5645\|max98090\|nau8824\|da7213\|es8316\|rt5640\|rt5651\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cht-match.c
-    blobname 'sof-cnl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cnl-match.c
-    blobname 'sof-glk\(\.ri\|-\(alc298\|da7219\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-glk-match.c
-    blobname 'sof-hda-generic\.tplg' sound/soc/intel/common/soc-acpi-intel-hda-match.c
-    blobname 'sof-hsw\(\.ri\|\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
-    blobname 'sof-bdw\(\.ri\|-\(rt286\|rt5677\|rt5640\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
-    blobname 'sof-icl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-icl-match.c
+    # blobname 'sof-apl\(\.ri\|-\(rt298\|da7219\|pcm512x\|wm8804\|tdf8532\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-bxt-match.c
+    # blobname 'sof-byt\(\.ri\|-\(rt5670\|rt5640\|rt5651\|da7213\|es8316\|rt5645\|max98090\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-byt-match.c
+    # blobname 'sof-cht\(\.ri\|-\(rt5645\|rt5670\|rt5645\|max98090\|nau8824\|da7213\|es8316\|rt5640\|rt5651\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cht-match.c
+    # blobname 'sof-cnl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+    # blobname 'sof-glk\(\.ri\|-\(alc298\|da7219\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-glk-match.c
+    # blobname 'sof-hda-generic\.tplg' sound/soc/intel/common/soc-acpi-intel-hda-match.c
+    # blobname 'sof-hsw\(\.ri\|\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
+    # blobname 'sof-bdw\(\.ri\|-\(rt286\|rt5677\|rt5640\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
+    # blobname 'sof-icl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-icl-match.c
     blobna '[/][*][ ]brcmfmac4366c-pcie\.\(ap\.\)\?bin[ ]from[ ]linux-firmware\.git[ ]commit[ ][0-9a-f]*[ ][*][/]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c
     blobname 'iwlwifi-[^ ]*-[ab]0-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
     blobname 'iwlwifi-\(\(QuZ-a0-hr\|QuQnj-b0-jf\|so-a0-\(jf\|hr\)\)-b0\|\(cc\|\(so\|ty\)-a0-gf\)-a0\)-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
@@ -5359,6 +5361,68 @@ set_except () {
     accept '[ ][ ]the[ ]CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' 'Documentation/\(admin-guide/\)\?hw-vuln/mds\.rst'
     accept 'instruction[ ]in[ ]combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/x86/mds.rst
     accept '[ \t]*scenarios[ ]where[ ]the[ ]host[ ]has[ ]the[ ]updated[ ]microcode[ ]but' Documentation/x86/mds.rst
+
+    # New in 5.2
+    blobname 'nvidia[/]%s[/]%s\(-%d\)\?\.bin' drivers/gpu/drm/nouveau/nvkm/core/firmware.c
+    accept '\(63\|31\|56\|24\|39\|32\|[0437][ ]\)\([ ]\([0-9 ][0-9 ]\)\)*[ ]\(56\|63\|32\|39\|24\|31\|[ ]\?[0437]\)\([\n]\(63\|31\|56\|24\|39\|32\|[0437][ ]\)\([ ]\([0-9 ][0-9 ]\)\)*[ ]\(56\|63\|32\|39\|24\|31\|[ ]\?[0437]\)\)*' Documentation/packing.txt
+    blobname 'amd-ucode[/]microcode_amd[*]\.bin' Documentation/x86/microcode.rst
+    accept '[ ][ ]CONFIG_EXTRA_FIRMWARE=["][/][*][(]DEBLOBBED[)][*][/][ ][/][*][(]DEBLOBBED[)][*][/]["]' Documentation/x86/microcode.rst
+    blobname 'imx[/]sdma[/]sdma-imx7d\.bin' arch/arm64/boot/dts/freescale/imx8mq.dtsi
+    # Still very suspicious, but it doesn't look like code, and the
+    # license, if it can be trusted, makes it acceptable for magic
+    # data numbers.
+    defsc 'static[ ]uint32_t[ ]onyx_images\[\]\[PCXU_IMAGE_SIZE[/]sizeof[(]uint32_t[)]\][ ]__ro_after_init[ ]=' arch/parisc/kernel/perf_images.h
+    defsc 'static[ ]uint32_t[ ]cuda_images\[\]\[PCXW_IMAGE_SIZE[/]sizeof[(]uint32_t[)]\][ ]__ro_after_init[ ]=' arch/parisc/kernel/perf_images.h
+    defsc '[\t]struct[ ]prng_parm[ ]prng[ ]=' arch/s390/boot/kaslr.c
+    defsc '[\t]u8[ ][*]pg[,][ ]pblock\[80\][ ]=' arch/s390/crypto/prng.c
+    defsnc '__visible[ ]const[ ]u32[ ]crypto_[fi][tl]_tab\[4\]\[256\][ ]____cacheline_aligned[ ]=' crypto/aes_generic.c
+    blobname 'mrvl[/]sd8987_uapsta\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
+    blobname 'mediatek[/]mt766[38]pr2h\.bin' drivers/bluetooth/btmtksdio.c
+    blobname 'amdgpu[/]%s_kicker_rlc\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
+    defsnc 'static[ ]struct[ ]profile_mode_setting[ ]smu7_profiling\[7\][ ]=' drivers/gpu/drm/amd/powerplay/hwmgr/smu7_hwmgr.c
+    blobname 'a630_zap\.mdt' drivers/gpu/drm/msm/adreno/adreno_device.c
+    accept '[\t]dsi_generic_write_seq[(]dsi[,][ ]ST7703_CMD_SET\(GIP[12]\|GAMMA\)\([, \t\n]*0x[0-9A-F][0-9A-F]\)*[)][;]' drivers/gpu/drm/panel/panel-rocktech-jh057n00900.c
+    blobname 'intel[/]%s' drivers/hid/intel-ish-hid/ishtp-fw-loader.c
+    defsnc 'const[ ]unsigned[ ]int[ ]wm831x_isinkv_values\[WM831X_ISINK_MAX_ISEL[ ][+][ ]1\][ ]=' drivers/mfd/wm831x-core.c
+    # File name is supplied through ethtool.
+    accept '[\t]*status[ ]=[ ]request_firmware[(][&]ddp_config[,][ ]profile_name[,]' drivers/net/ethernet/intel/i40e/i40e_ddp.c
+    defsnc 'static[ ]const[ ]u16[ ]iwl_\(ext\|uhb\)_nvm_channels\[\][ ]=' drivers/net/wireless/intel/iwlwifi/iwl-nvm-parse.c
+    blobname 'brcmfmac43012-sdio' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+    blobname 'mt7615_\(cr4\|n9\|rom_patch\)\.bin' drivers/net/wireless/mediatek/mt76/mt7615/mt7615.h
+    defsnc 'static[ ]const[ ]struct[ ]rf_channel[ ]rf_vals_3853\[\][ ]=' drivers/net/wireless/ralink/rt2x00/rt2800lib.c
+    accept '[\t]fw->firmware[ ]=[ ]firmware[;]' drivers/net/wireless/realtek/rtw88/main.c
+    defsnc 'static[ ]const[ ]u32[ ]db_invert_table\[12\]\[8\][ ]=' drivers/net/wireless/realtek/rtw88/phy.c
+    blobname 'rtw88[/]rtw8822b_fw\.bin' drivers/net/wireless/realtek/rtw88/rtw8822b.c
+    defsnc 'static[ ]const[ ]u32[ ]rtw8822b_\(mac\|agc\|bb\(\|_pg_type[25]\)\|rf_[ab]\)\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822b_table.c
+    defsnc 'static[ ]const[ ]u8[ ]rtw8822b_txpwr_lmt_type[25]\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822b_table.c
+    blobname 'rtw88[/]rtw8822c_fw\.bin' drivers/net/wireless/realtek/rtw88/rtw8822c.c
+    defsnc 'static[ ]const[ ]u32[ ]rtw8822c_\(agc\|bb\(\|_pg_type0\)\|rf_[ab]\|array_mp_cal_init\)\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822c_table.c
+    defsnc 'static[ ]const[ ]u8[ ]rtw8822c_txpwr_lmt_type0\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822c_table.c
+    blobname 'gsl3692-jumper-ezpad-6-pro-b\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'gsl1680-myria-my8307\.fw' drivers/platform/x86/touchscreen_dmi.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]max77651_sbb1_regulator_volt_table\[\][ ]=' drivers/regulator/max77650-regulator.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]isink_cur\[\][ ]=' drivers/regulator/wm8350-regulator.c
+    blobname 'ql2800_fw\.bin' drivers/scsi/qla2xxx/qla_os.c
+    accept 'static[ ]const[ ]struct[ ]tegra_xusb_soc[ ]tegra186_soc[ ]=[ ][{][\n][\t][.]firmware[ ]=' drivers/usb/host/xhci-tegra.c
+    blobname 'nvidia[/]tegra186[/]xusb\.bin' drivers/usb/host/xhci-tegra.c
+    blobname 'ccg_\(boot\|primary\|secondary\)\.cyacd' drivers/usb/typec/ucsi/ucsi_ccg.c
+    defsnc 'static[ ]const[ ]struct[ ]utf8data[ ]utf8nfdi\(cf\|\)data\[\][ ]=' fs/unicode/utf8data.h_shipped
+    defsc 'static[ ]const[ ]unsigned[ ]char[ ]utf8data\[64256\][ ]=' fs/unicode/utf8data.h_shipped
+    accept '[\t]*\.sof_fw_filename[ ]=[ ]["]\(intel[/]\)\?sof-[^" ;]*\.ri["]' sound/soc/intel/common/soc-acpi-intel-'\(b[xy]t\|cht\|cnl\|icl\|glk\|hda\|hsw-bdw\|kbl\|skl\)-match\.c'
+    accept '[\t]*\.sof_tplg_filename[ ]=[ ]["]\(intel[/]\)\?sof-[^" ;]*\.tplg["]' sound/soc/intel/common/soc-acpi-intel-'\(b[xy]t\|cht\|cnl\|icl\|glk\|hda\|hsw-bdw\|kbl\|skl\)-match\.c'
+    accept '[\t]*tplg_filename[ ]=[ ]devm_kasprintf[(]sdev->dev[,][ ]GFP_KERNEL[,][\n\t ]*["]%s-idisp\.tplg["][,][ ]split_ext[)]' sound/soc/sof/intel/hda.c
+    accept '[\t]ret[ ]=[ ]request_firmware[(][&]plat_data->fw[,][ ]fw_filename[,][ ]sdev->dev[)]' sound/soc/sof/loader.c
+    accept '[\t]*\.\(nocodec\|sof\)_fw_filename[ ]=[ ]["]sof-[^" ;]*\.ri["]' sound/soc/sof/sof-'\(acpi\|pci\)-dev\.c'
+    accept '[\t]*\.\(nocodec\|sof\)_tplg_filename[ ]=[ ]["]sof-[^" ;]*\.tplg["]' sound/soc/sof/sof-'\(acpi\|pci\)-dev\.c'
+    accept '[\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]file[,][ ]sdev->dev[)]' sound/soc/sof/topology.c
+    # blobname 'sof-byt-rt5682\.tplg' sound/soc/intel/common/soc-acpi-intel-byt-match.c
+    # blobname 'sof-cht-rt5682\.tplg' sound/soc/intel/common/soc-acpi-intel-cht-match.c
+    # blobname 'sof-cml-rt5682\(-max98357a\)\?\.tplg' sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+    # blobname 'sof-glk-rt5682\.tplg' sound/soc/intel/common/soc-acpi-intel-glk-match.c
+    # blobname 'sof-icl-rt5682\.tplg' sound/soc/intel/common/soc-acpi-intel-icl-match.c
+    # blobname '%s-idisp\.tplg' sound/soc/sof/intel/hda.c
+    # blobname 'sof-\(hsw\|bdw\|byt\|cht\)\(\.ri\|\(-nocodec\)\?\.tplg\)' sound/soc/sof/sof-acpi-dev.c
+    # blobname 'sof-\(apl\|glk\|cnl\|icl\|skl\|kbl\)\(\.ri\|\(-nocodec\)\?\.tplg\)' sound/soc/sof/sof-pci-dev.c
 
     ;;
 
