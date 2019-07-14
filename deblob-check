@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-07-01
+# deblob-check version 2019-07-14
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5423,6 +5423,9 @@ set_except () {
     # blobname '%s-idisp\.tplg' sound/soc/sof/intel/hda.c
     # blobname 'sof-\(hsw\|bdw\|byt\|cht\)\(\.ri\|\(-nocodec\)\?\.tplg\)' sound/soc/sof/sof-acpi-dev.c
     # blobname 'sof-\(apl\|glk\|cnl\|icl\|skl\|kbl\)\(\.ri\|\(-nocodec\)\?\.tplg\)' sound/soc/sof/sof-pci-dev.c
+
+    # New in 5.2.1, 5.1.18, and 4.19.58.
+    accept '[ ][ ][ ]the[ ]latest[ ]updated[ ]microcode\.' Documentation/admin-guide/hw-vuln/spectre.rst
 
     ;;
 
