@@ -3,6 +3,7 @@
 # deblob-check version 2018-10-14 + 2018-12-17's r15763
 #                                 + 2019-05-14's r16270:16272
 #                                 + 2019-07-14's r16565
+#                                 + 2019-07-26's r16604
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5220,6 +5221,9 @@ set_except () {
 
     # New in 5.2.1, 5.1.18, and 4.19.58.
     accept '[ ][ ][ ]the[ ]latest[ ]updated[ ]microcode\.' Documentation/admin-guide/hw-vuln/spectre.rst
+
+    # New in 5.2.3, 5.1.20, and 4.19.61.
+    defsnc 'static[ ]const[ ]u32[ ]runnable_avg_yN_inv\[\][ ]__maybe_unused[ ]=' kernel/sched/sched-pelt.h
 
     ;;
 
