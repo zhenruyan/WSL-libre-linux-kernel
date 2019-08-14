@@ -1,13 +1,14 @@
 #! /bin/sh
 
 # deblob-check version 2014-08-07 + 2015-09-22's r12444
+#                         + partial 2017-04-21's r13771
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2015 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2019 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -3760,6 +3761,10 @@ set_except () {
 
     # New in 4.2.1 and 4.1.8.
     defsnc '[}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
+
+    # New in 3.16.72.
+    defsnc 'static[ ]const[ ]u64[ ]test_vectors_siphash\[64\][ ]=' lib/test_siphash.c
+
     ;;
 
   */*freedo*.patch | */*logo*.patch)
