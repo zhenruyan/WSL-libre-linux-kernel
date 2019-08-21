@@ -3765,6 +3765,9 @@ set_except () {
     # New in 3.16.72.
     defsnc 'static[ ]const[ ]u64[ ]test_vectors_siphash\[64\][ ]=' lib/test_siphash.c
 
+    # New in 3.16.73.
+    defsnc 'static[ ]const[ ]u32[ ]test_vectors_hsiphash\[64\][ ]=' lib/test_siphash.c
+
     ;;
 
   */*freedo*.patch | */*logo*.patch)
