@@ -3,6 +3,7 @@
 # deblob-check version 2016-11-29 + 2017-01-09's r13475
 #   + partial 2017-02-05's r13539 + 2017-10-23's r14392
 #   + partial 2017-08-26's r14182 + 2019-05-14's r16270:16272
+#   + partial 2017-04-21's r13771
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4606,6 +4607,10 @@ set_except () {
     accept '[ ][ ]the[ ]CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' 'Documentation/\(admin-guide/\)\?hw-vuln/mds\.rst'
     accept 'instruction[ ]in[ ]combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/x86/mds.rst
     accept '[ \t]*scenarios[ ]where[ ]the[ ]host[ ]has[ ]the[ ]updated[ ]microcode[ ]but' Documentation/x86/mds.rst
+
+    # New in 4.9.190.
+    defsnc 'static[ ]const[ ]u64[ ]test_vectors_siphash\[64\][ ]=' lib/test_siphash.c
+    defsnc 'static[ ]const[ ]u32[ ]test_vectors_hsiphash\[64\][ ]=' lib/test_siphash.c
 
     ;;
 
