@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-07-26
+# deblob-check version 2019-09-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5362,7 +5362,7 @@ set_except () {
     accept 'instruction[ ]in[ ]combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/x86/mds.rst
     accept '[ \t]*scenarios[ ]where[ ]the[ ]host[ ]has[ ]the[ ]updated[ ]microcode[ ]but' Documentation/x86/mds.rst
 
-    # New in 5.2
+    # New in 5.2.
     blobname 'nvidia[/]%s[/]%s\(-%d\)\?\.bin' drivers/gpu/drm/nouveau/nvkm/core/firmware.c
     accept '\(63\|31\|56\|24\|39\|32\|[0437][ ]\)\([ ]\([0-9 ][0-9 ]\)\)*[ ]\(56\|63\|32\|39\|24\|31\|[ ]\?[0437]\)\([\n]\(63\|31\|56\|24\|39\|32\|[0437][ ]\)\([ ]\([0-9 ][0-9 ]\)\)*[ ]\(56\|63\|32\|39\|24\|31\|[ ]\?[0437]\)\)*' Documentation/packing.txt
     blobname 'amd-ucode[/]microcode_amd[*]\.bin' Documentation/x86/microcode.rst
@@ -5429,6 +5429,64 @@ set_except () {
 
     # New in 5.2.3, 5.1.20, and 4.19.61.
     defsnc 'static[ ]const[ ]u32[ ]runnable_avg_yN_inv\[\][ ]__maybe_unused[ ]=' kernel/sched/sched-pelt.h
+
+    # New in 5.3.
+    accept 'int[ ]rtl_fw_request_firmware[(]' drivers/net/ethernet/realtek/r8169_firmware.c
+    accept '[\t]if[ ][(]rtl_fw_request_firmware[(]' drivers/net/ethernet/realtek/r8169_main.c
+    defsnc 'static[ ]const[ ]struct[ ]phy_reg[ ]rtl8168d_1_phy_reg_init_0\[\][ ]=' drivers/net/ethernet/realtek/r8169_main.c
+    defsnc '[ ][ ]const[ ]char[ ]parity\[256\][ ]=' Documentation/driver-api/mtd/nand_ecc.rst
+    defsc 'static[ ]const[ ]struct[ ]si5341_reg_default[ ]si5341_reg_defaults\[\][ ]=' drivers/clk/clk-si5341.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_\([56789]\|1[012]\)tap_16p_\(upscale\|117\|150\|183\)\[\(45\|54\|63\|72\|81\|9[09]\|108\)\][ ]=' drivers/gpu/drm/amd/display/dc/dcn20/dcn20_dwb_scl.c
+    defsnc 'const[ ]qp_table[ \t]\+qp_table_4\(2[02]\|44\)_\(8\|1[02]\)bpc_m\(in\|ax\)[ ]=' drivers/gpu/drm/amd/display/dc/dsc/qp_tables.h
+    defsnc 'static[ ]const[ ]struct[ ]IP_BASE[ ]\(DCN\|RSMU\|VCN\)_BASE[ \t]\+=' drivers/gpu/drm/amd/include/navi10_ip_offset.h
+    defsnc 'rdma_dim_prof\[RDMA_DIM_PARAMS_NUM_PROFILES\][ ]=' drivers/infiniband/core/cq.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]applespi_scancodes\[\][ ]=' drivers/input/keyboard/applespi.c
+    defsc 'const[ ]u32[ ]isc_gamma_table\[GAMMA_MAX[ ][+][ ]1\]\[GAMMA_ENTRIES\][ ]=' drivers/media/platform/atmel/atmel-isc.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]cs47l92_reva_\(16\|32\)_patch\[\][ ]=' drivers/mfd/cs47l92-tables.c
+    defsc 'static[ ]const[ ]unsigned[ ]char[ ]hantro_jpeg_header\[JPEG_HEADER_SIZE\][ ]=' drivers/staging/media/hantro/hantro_jpeg.c
+    defsnc 'static[ ]const[ ]u8[ ]zigzag\[64\][ ]=' drivers/staging/media/hantro/hantro_mpeg2.c
+    defsnc 'static[ ]u64[ ]intervals[0124]\[\][ ]__initdata[ ]=' kernel/irq/timings.c
+    defsnc 'static[ ]struct[ ]etab[ ]Tab\[\][ ]=' lib/reed_solomon/test_rslib.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt1011_reg\[\][ ]=' sound/soc/codecs/rt1011.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt1308_reg\[\][ ]=' sound/soc/codecs/rt1308.c
+    for n in ptwrite cbr mwait pwre exstop pwrx context_switches; do
+	defsnc "$n"'_file[ \t]*=[ ]open_output_file[(]["]'"$n"'_table\.bin["][)]' tools/perf/scripts/python/export-to-postgresql.py
+    done
+    blobname 'nvm_00440302\.bin' Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+    blobname 'crnv21\.bin' Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+    accept 'bpp\([ ]\+[0-9]\+x[0-9]\+\)*[\n][ =]*\([\n][ ]*[0-9]\+\([ ]*0x[0-9A-F]*\)*\)*' Documentation/fb/matroxfb.rst
+    accept '[ ][ ]pct[ ]confidence[ ]steady[ ]dynamic[ ][(]compensation[)]\([\n][ ]*[0-9]\([ ]\+[0123]\)\+\)\+[\n][ ]*[.]*\([\n][ ]*[34][0-9]\([ ]\+[0123]\)\+\)\+' Documentation/thermal/intel_powerclamp.rst
+    blobname 'amdgpu[/]navi10_vcn\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
+    blobname 'amdgpu[/]%s_ta\.bin' drivers/gpu/drm/amd/amdgpu/psp_v11_0.c
+    blobname 'i915[/]\(["][ ][\\][\n][\t]__stringify[(]KEY##_GUC_FW_\(PREFIX\|MAJOR\|MINOR\|PATCH\)[)][ ]["][^"]*\)\+' drivers/gpu/drm/i915/intel_guc_fw.c
+    blobname 'a540_\(gpmu\.fw2\|zap\.mdt\)' drivers/gpu/drm/msm/adreno/adreno_device.c
+    blobname 'dvb-tuner-si2157-a30-01\.fw' drivers/media/tuners/si2157_priv.h
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[\n]cxusb_bluebird_\(lgh064f\|dee1601\|lgz201\|dtt7579\|nano2_needsfirmware\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/cxusb.c
+    blobname 'v4l-pvrusb2-160xxx-01\.fw' drivers/media/usb/pvrusb2/pvrusb2-devattr.c
+    blobname 'gsl1680-chuwi-hi10plus\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname '%s%pUL%s["][,][\n \t]*["]intel[/]dsp_fw_["][,][ ]guid[,][ ]["]\.bin' sound/soc/intel/skylake/skl-sst.c
+    blobname 'qcom[/]db845c[/]\(adsp\|cdsp\)\.mdt' arch/arm64/boot/dts/qcom/sdm845-db845c.dts
+    accept '[\t]rpi->firmware[ ]=[ ]' drivers/clk/bcm/clk-raspberrypi.c
+    blobname 'display_hdcp_srm\.bin' drivers/gpu/drm/drm_hdcp.c
+    accept '[ ][*][ ]SRM[ ]should[ ]be[ ]presented[ ]in[ ]the[ ]name[ ]of[ ]["][^"]*["]' drivers/gpu/drm/drm_hdcp.c
+    accept '[\t]s6e63m0_dcs_write_seq_static[(]ctx[,][ ]0xb[579]\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-samsung-s6e63m0.c
+    # The link to "source" for this and other firmware files in
+    # LibreELEC meson-firmware is broken, but I tracked it down and
+    # it's just a binary blob encoded as an array initializer.
+    blobname 'meson[/]vdec[/]gxl_mpeg12\.bin' drivers/staging/media/meson/vdec/vdec_platform.c
+    accept '[\t]echo[ ]-n[ ]["]Batched[ ]request_firmware\(_direct\|_nowait\)\?[(]' tools/testing/selftests/firmware/fw_filesystem.sh
+    # The firmware file name is supplied by the user.
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]file_name[,]\([^\n]*[\n]\+[^\n}]\)*return[ ]mlx5_firmware_flash[(]dev[,][ ]fw[,]' drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]flash->data[,]\([^\n]*[\n]\+[^\n}]\)*err[ ]=[ ]mlx5_firmware_flash[(]mdev[,][ ]fw[,]' drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+    # This firmware file name is supplied by the user,
+    # but there's another in the same source file (way above) that is hardcoded.
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]firmware[,][ ]\(fw_filename\|file_name\)[,]\([^\n]*[\n]\+[^\n}]\)*err[ ]=[ ]mlxsw_sp_firmware_flash[(]mlxsw_sp[,][ ]firmware[,]' drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+    blobname 'al5e\(_b\)\?\.fw' drivers/staging/media/allegro-dvt/allegro-core.c
+    # Sources are in cwsr_trap_handler_gfx10.asm.
+    defsnc 'static[ ]const[ ]uint32_t[ ]cwsr_trap_gfx10_hex\[\][ ]=' drivers/gpu/drm/amd/amdkfd/cwsr_trap_handler.h
+    blobname 'amdgpu[/]%s_mes\.bin' drivers/gpu/drm/amd/amdgpu/mes_v10_1.c
+    accept 'static[ ]int[ ]allegro_firmware_request_nowait[(]' drivers/staging/media/allegro-dvt/allegro-core.c
+    accept '[\t]ret[ ]=[ ]allegro_firmware_request_nowait[(]' drivers/staging/media/allegro-dvt/allegro-core.c
 
     ;;
 
