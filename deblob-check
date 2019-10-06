@@ -1,7 +1,8 @@
 #! /bin/sh
 
 # deblob-check version 2019-07-01 + 2019-07-14's r16565
-#                                 + 2019-07-26's r16604
+#           + 2019-07-26's r16604 + 2019-10-05's r16860
+#           + 2019-10-06's r16861
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5430,6 +5431,10 @@ set_except () {
 
     # New in 5.2.3, 5.1.20, and 4.19.61.
     defsnc 'static[ ]const[ ]u32[ ]runnable_avg_yN_inv\[\][ ]__maybe_unused[ ]=' kernel/sched/sched-pelt.h
+
+    # New in 5.3.4 and 5.2.19
+    defsnc '[\t]static[ ]const[ ]struct[ ]hda_alc298_mbxinit[ ]dac_init\[\][ ]=' sound/pci/hda/patch_realtek.c
+    blobname 'mediatek[/]mt7615_\(cr4\|n9\|rom_patch\)\.bin' drivers/net/wireless/mediatek/mt76/mt7615/mt7615.h
 
     ;;
 
