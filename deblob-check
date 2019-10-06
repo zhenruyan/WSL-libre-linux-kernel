@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-10-05
+# deblob-check version 2019-10-06
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5490,6 +5490,7 @@ set_except () {
 
     # New in 5.3.4 and 5.2.19
     defsnc '[\t]static[ ]const[ ]struct[ ]hda_alc298_mbxinit[ ]dac_init\[\][ ]=' sound/pci/hda/patch_realtek.c
+    blobname 'mediatek[/]mt7615_\(cr4\|n9\|rom_patch\)\.bin' drivers/net/wireless/mediatek/mt76/mt7615/mt7615.h
 
     ;;
 
