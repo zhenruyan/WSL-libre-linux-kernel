@@ -1,6 +1,7 @@
 #! /bin/sh
 
-# deblob-check version 2019-09-01
+# deblob-check version 2019-09-01 + 2019-10-05's r16860
+#           + 2019-10-06's r16861
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5487,6 +5488,10 @@ set_except () {
     blobname 'amdgpu[/]%s_mes\.bin' drivers/gpu/drm/amd/amdgpu/mes_v10_1.c
     accept 'static[ ]int[ ]allegro_firmware_request_nowait[(]' drivers/staging/media/allegro-dvt/allegro-core.c
     accept '[\t]ret[ ]=[ ]allegro_firmware_request_nowait[(]' drivers/staging/media/allegro-dvt/allegro-core.c
+
+    # New in 5.3.4 and 5.2.19
+    defsnc '[\t]static[ ]const[ ]struct[ ]hda_alc298_mbxinit[ ]dac_init\[\][ ]=' sound/pci/hda/patch_realtek.c
+    blobname 'mediatek[/]mt7615_\(cr4\|n9\|rom_patch\)\.bin' drivers/net/wireless/mediatek/mt76/mt7615/mt7615.h
 
     ;;
 
