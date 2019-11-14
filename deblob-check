@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2019-09-01 + 2019-10-05's r16860
-#           + 2019-10-06's r16861
+#           + 2019-10-06's r16861 + 2019-11-12's not-in-master
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5492,6 +5492,10 @@ set_except () {
     # New in 5.3.4 and 5.2.19
     defsnc '[\t]static[ ]const[ ]struct[ ]hda_alc298_mbxinit[ ]dac_init\[\][ ]=' sound/pci/hda/patch_realtek.c
     blobname 'mediatek[/]mt7615_\(cr4\|n9\|rom_patch\)\.bin' drivers/net/wireless/mediatek/mt76/mt7615/mt7615.h
+
+    # New in 5.3.11, 4.19.84 and 4.14.154.
+    accept 'CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' Documentation/admin-guide/hw-vuln/tsx_async_abort.rst
+    accept '[\t *]*-[ ]Updated[ ]microcode[ ]is[ ]present' arch/x86/kvm/x86.c
 
     ;;
 
