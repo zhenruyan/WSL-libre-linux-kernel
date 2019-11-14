@@ -4,6 +4,7 @@
 #				  + 2017-12-01's r14470
 #				  + 2018-03-24's r14712 (partial)
 #                                 + 2019-05-14's r16270:16272
+#                                 + 2019-11-12's not-in-master
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4933,6 +4934,10 @@ set_except () {
     accept '[ ][ ]the[ ]CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' 'Documentation/\(admin-guide/\)\?hw-vuln/mds\.rst'
     accept 'instruction[ ]in[ ]combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/x86/mds.rst
     accept '[ \t]*scenarios[ ]where[ ]the[ ]host[ ]has[ ]the[ ]updated[ ]microcode[ ]but' Documentation/x86/mds.rst
+
+    # New in 5.3.11, 4.19.84 and 4.14.154.
+    accept 'CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' Documentation/admin-guide/hw-vuln/tsx_async_abort.rst
+    accept '[\t *]*-[ ]Updated[ ]microcode[ ]is[ ]present' arch/x86/kvm/x86.c
 
     ;;
 
