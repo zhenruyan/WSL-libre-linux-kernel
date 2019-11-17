@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-10-06
+# deblob-check version 2019-11-17
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -908,6 +908,7 @@ set_except () {
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
   blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\|cyacd\)[\\]\?["]'
+  # WIP ends with [\\]\?[][}{)(><,;:.!?% \t\n"`\'"'"']'
   # Catch misdeblobbed fw extension.
   blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
   # Ideally we'd whitelist URLs that don't recommend non-Free
@@ -1767,7 +1768,7 @@ set_except () {
     blobname '\(ti_usb-v\(%04x\|[0-9a-f]*\)-p\(%04x\|[0-9a-f]*\)\|mts_\(cdma\|gsm\|edge\)\)\.\(bin\|fw\)' drivers/usb/serial/ti_usb_3410_5052.c
     blobname 'iw\?\(2400\|6050\)m\?-fw-\(sdio\|usb\)-\(\(["][ ]I2400M_FW_VERSION[ ]["]\|[0-9.]*\)\.sbcf\|[^". \n]*\)' 'drivers/net/wimax/i2400m/\(sdio\|usb\)\.c'
     blob '3\.[ ]Installing[ ]the[ ]firmware[^\n]*\([\n][\n]*[ ][ ][ ][^\n]*\)*[\n]*[$][^\n]*i2400m-fw[^\n]*\([\n][\n]*[ ][ ][ ][^\n]*\)*' Documentation/wimax/README.i2400m
-    blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*\([\n][\n]*\([ ][ ][ ]\|i2400m_usb\)[^\n]*\)*' Documentation/wimax/README.i2400m
+    blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*\([\n][\n]*\([ ][ ][ ]\|i2400m_usb\)[^\n]*\)\+' Documentation/wimax/README.i2400m
     accept '[	][	]ranges[ ]=[ ]<'"$blobpat*"'>[;]' 'arch/powerpc/boot/dts/\(mpc8572ds\|p2020ds\|katmai\)\.dts'
     accept '\(div_table_\(clz\|inv\|ix\)\|zero_l\):\([\n][	]\.\(byte[	]-\?[0-9]*\|long[	]0x[0-9A-F]*\)\)*' arch/sh/lib/udivsi3_i4i.S
     defsnc 'const[ ]u32[ ]crypto_[fi][tl]_tab\[4\]\[256\][ ]=' crypto/aes_generic.c
@@ -4863,7 +4864,7 @@ set_except () {
 
     # New in 4.14 (up to rc5).
     blobname 'amdgpu[/]vega10_acg_smc\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c
-    blobname 'netronome[/]\(serial-%pMF-%02hhx-%02hhx\|pci-%s\)\.nffw' drivers/net/ethernet/netronome/nfp/nfp_main.c
+    blobname '\(netronome[/]\)\?\(serial-\(%pMF-%02hhx-%02hhx\|[-0-9a-f]*\)\|pci-\(%s\|[0-9a-f:.]*\)\)\.nffw' drivers/net/ethernet/netronome/nfp/nfp_main.c
     blobname 'brcmfmac4373-sdio\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
     blobname 'brcmfmac4373\.bin' drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
     blobname 'iwlwifi-QuQnj-\([af]0-hr-a0\|a0-jf-b0\)-' drivers/net/wireless/intel/iwlwifi/cfg/a000.c
@@ -5491,6 +5492,200 @@ set_except () {
     # New in 5.3.4 and 5.2.19
     defsnc '[\t]static[ ]const[ ]struct[ ]hda_alc298_mbxinit[ ]dac_init\[\][ ]=' sound/pci/hda/patch_realtek.c
     blobname 'mediatek[/]mt7615_\(cr4\|n9\|rom_patch\)\.bin' drivers/net/wireless/mediatek/mt76/mt7615/mt7615.h
+
+    # WIP: False positives of suspicious extensions followed by anything
+    # other than quotes.
+    accept '\(BIN\|IHEX\)[\t]:=[ ][$][(]patsubst[ ]%\.S[,][ ]%\.bin\(\.ihex\)\?' Documentation/EDID/Makefile
+    accept '[\t]@rm[ ]-f[ ][*]\.o[ ][*]\.bin\.ihex[ ][*]\.bin[ ]' Documentation/EDID/Makefile
+    accept '%\.bin\(\.nocrc\|\.ihex\)\?:[\t]%\.[op]' Documentation/EDID/Makefile
+    accept '%\.crc:[\t]%\.bin\.nocrc' Documentation/EDID/Makefile
+    accept '[ ]*[(]e\.g\.[ ]support[ ]for[ ]RAM[ ]disks[,][ ]initrd[,][ ]a\.out[,]' Documentation/admin-guide/initrd.rst
+    accept '[\t]*System\.out\.println' Documentation/admin-guide/java.rst
+    accept '[\t]*edid[/]1024x768\.bin[,][ ]edid[/]1280x1024\.bin[,]' Documentation/admin-guide/kernel-parameters.txt
+    accept '[\t]*edid[/]1680x1050\.bin[,][ ]or[ ]edid[/]1920x1080\.bin[,]' Documentation/admin-guide/kernel-parameters.txt
+    accept '[ ]*disk[ ]=[ ]\[[ ][\'"'"']file:[/]root[/]rhel5\.img[,]' Documentation/ia64/xen.rst
+    accept '[\t]*[$][(]obj[)][/]vmlinux\.bin\.gz:[ ][$][(]vmlinux\.bin\.all-y[)]' Documentation/kbuild/makefiles.rst
+    accept 'raw2pnm[ ]-x2560[ ]-y1920[ ]-fNV12[ ][/]tmp[/]frames\.out[ ][/]tmp[/]frames\.out\.ppm' Documentation/media/v4l-drivers/ipu3.rst
+    accept 'the[ ]file[ ]is[ ]6pack\.bin\.' Documentation/networking/6pack.txt
+    accept 'CMAGIC[ ]*0x0111[ ]*user[ ]*``include[/]linux[/]a\.out\.h``' 'Documentation/\(process\|translations/\(it_IT\|zh_CN\)\)/magic-number\.rst'
+    accept '[ ]*[#][ ]\(echo[ ][\'"'"']\|trigger[ ]info:[ ]\)[!]\?hist:\(name=foo:\)\?keys=\(skbaddr\|call_site\)\.hex:' Documentation/trace/histogram.rst
+    accept '#include[ ][<]\(linux\|uapi[/]asm\)[/]a\.out\.h[>]' 'arch/\(alpha/\(boot/tools/objstrip\.c\|include/asm/a\.out\.h\|kernel/binfmt_loader\.c\)\|x86/ia32/ia32_aout\.c\)'
+    accept 'targets[ ]:=[ ]vmlinux\.bin[ ]vmlinux\.bin\.gz[ ]' arch/arc/boot/Makefile
+    accept 'extra-y[ ][+]=[ ]vmlinux\.bin\.\(gz\|lzma\)' arch/arc/boot/Makefile
+    accept '[$][(]obj[)][/]\(vmlinuz\.bin\(\.gz\|\.lzma\)\?\|uImage\.\(bin\|gz\|lzma\)\):[ ]\([$][(]obj[)][/]\)\?vmlinux\(\.bin\(\.gz\|\.lzma\)\?\)\?[ ]' arch/arc/boot/Makefile
+    accept '[\t][ ][*][ ]using[ ]flashwriter_nand\.out[,][ ]but' arch/arm/mach-davinci/board-dm644x-evm.c
+    accept '[\t]fw[ ]=[ ]am200_board\.fw[;]' arch/arm/mach-pxa/am200epd.c
+    accept '[#][ ]Default[ ]to[ ]vmlinuxz.bin[,][ ]override' arch/c6x/Makefile
+    accept 'vmlinux\.bin:[ ]vmlinux' 'arch/\(c6x\|ia64\)/Makefile'
+    accept '[$][(]obj[)][/]vmlinux\.bin:' 'arch/\(c6x\|mips\|nios2\|parisc\|s390\|sh\|x86\)/boot/\(compressed/\)\?Makefile'
+    accept 'vmlinux\.srec[ ]vmlinux\.bin[ ]zImage[ ]uImage\.bin:[ ]vmlinux' arch/h8300/Makefile
+    accept '[$][(]obj[)][/]vmlinux\.srec[ ][$][(]obj[)][/]vmlinux\.bin:' arch/h8300/boot/Makefile
+    accept '[$][(]obj[)][/]uImage\.bin:[ ][$][(]obj[)][/]vmlinux\.bin' arch/h8300/boot/Makefile
+    accept 'targets[\t]*:=[ ]vmlinux[ ]vmlinux\.bin[ ]vmlinux\.bin\.gz' arch/h8300/boot/compressed/Makefile
+    accept '[$][(]obj[)][/]\(vmlinux\.bin\(\.[$][(]suffix-y[)]\)\?\|piggy\.o\):\([ ]\([$][(]obj[)][/]\)\?vmlinux\(\.scr\|\.bin\(\.[$][(]suffix-y[)]\)\?\)\?\)*' arch/h8300/boot/compressed/Makefile
+    accept 'PHONY[ ][+]=[ ]linux\.bin[ ]linux\.bin\.gz[ ]linux\.bin\.ub' arch/microblaze/Makefile
+    accept 'linux\.bin\.ub[ ]linux\.bin\.gz:[ ]linux\.bin' arch/microblaze/Makefile
+    accept 'linux\.bin:[ ]vmlinux' arch/microblaze/Makefile
+    accept 'linux\.bin[ ]linux\.bin\.gz[ ]linux\.bin\.ub:' arch/microblaze/Makefile
+    accept '[ ]*echo[ ][\'"'"'][ ]*linux.bin.\(gz\|ub\)' arch/microblaze/Makefile
+    accept 'targets[ ]:=[ ]linux\.bin[ ]linux\.bin\.gz[ ]linux\.bin\.ub' arch/microblaze/boot/Makefile
+    accept '[$][(]obj[)][/]linux\.bin\(\.ub\|\.gz\)\?:[ ]\([$][(]obj[)][/]\|vm\)\?linux\(\.bin\)\?[ ]' arch/microblaze/boot/Makefile
+    accept '[\t]*[ ]*DTB[)][ ]appended[ ]to[ ]raw[ ]vmlinux\.bin[ ]or[ ]vmlinuz\.bin\.' arch/mips/Kconfig
+    accept '[\t]*[ ]*to[ ]vmlinux\.bin\.' arch/mips/Kconfig
+    accept 'extra-y[ ][+]=[ ]vmlinux\.bin\.\(bz2\|gz\|lzma\|lzo\)' arch/mips/boot/Makefile
+    accept '[$][(]obj[)][/]\(vmlinux\|uImage\)\(\.\(bin\|bz2\|gz\|lzma\|lzo\)\)\+:[ ][$][(]obj[)][/]vmlinux\.bin[ ]' arch/mips/boot/Makefile
+    accept '[\t][$][(]call[ ]if_changed[,]cpp_its_S[,]\(gzip\|bzip2\|lzma\|lzo\)[,]vmlinux\.bin\.\(gz\|bz2\|lzma\|lzo\)[)]' arch/mips/boot/Makefile
+    accept '[$][(]obj[)][/]vmlinux\(.%\)\?\.itb:[ ][$][(]obj[])[/]vmlinux\(.%\)\?\.its[ ][$][(]obj[)][/]vmlinux\(.%\)\?\.bin[ ]' arch/mips/boot/Makefile
+    accept 'targets[ ][+]=[ ]vmlinux\.bin\.z' arch/mips/boot/compressed/Makefile
+    accept '[$][(]obj[)][/]vmlinux\.bin\.z:[ ][$][(]obj[)][/]vmlinux\.bin[ ]' arch/mips/boot/compressed/Makefile
+    accept 'OBJCOPYFLAGS_piggy\.o[ ]:=[ ]--add-section=\.image=[$][(]obj[)][/]vmlinux\.bin\.z[ ]' arch/mips/boot/compressed/Makefile
+    accept '[$][(]obj[)][/]piggy\.o:\([ ][$][(]obj[)][/]\(dummy\.o\|vmlinux\.bin\.z\)\)*' arch/mips/boot/compressed/Makefile
+    accept 'vmlinuz\.bin:[ ]vmlinuz' arch/mips/boot/compressed/Makefile
+    accept 'uzImage\.bin:[ ]vmlinuz\.bin[ ]' arch/mips/boot/compressed/Makefile
+    accept '[\t]return[ ]read_cmd\.s\.dat[;]' arch/mips/cavium-octeon/executive/octeon-model.c
+    accept '[\t]*\(\(if\|switch\)[ ][(]\|opcode[ ]=[ ]\)\(inst_mips16e\|inst\|mips16inst\)\.ri\.opcode' 'arch/mips/kernel/\(branch\|unaligned\)\.c'
+    accept '[\t]*reg[ ]=[ ]reg16to32\[mips16inst\.ri\.rx\]' arch/mips/kernel/unaligned.c
+    accept '[\t]*switch[ ][(]mips16inst\.ri\.imm[ ]' arch/mips/kernel/unaligned.c
+    accept 'rom\.bin:[\t][$][(]obj[)][/]rom\.bin' arch/mips/lasat/image/Makefile
+    accept '[$][(]obj[)][/]\(rom\|kImage\)\.bin:' arch/mips/lasat/image/Makefile
+    accept 'targets[ ][:+]=\([ ]vmlinux\(\.\(lds\|bin\(\.\(gz\|bz2\|xz\|lzma\|lzo\|lz4\)\)\?\)\)\?\)*' 'arch/\(parisc\|s390\)/boot/compressed/Makefile'
+    accept 'vmlinux\.bin\.all-y[ ]:=[ ][$][(]obj[)][/]vmlinuz\.bin' 'arch/\(parisc\|s390\)/boot/compressed/Makefile'
+    accept '[$][(]obj[)][/]vmlinux\.bin\.\(gz\|bz2\|lz4\|lzma\|lzo\|xz\):[ ][$][(]vmlinux\.bin\.all-y[)]' 'arch/\(parisc\|s390\|sh\|x86\)/boot/compressed/Makefile'
+    accept '[$][(]obj[)][/]piggy\.o:\([ ][$][(]obj[)][/]vmlinux\.\(scr\|bin\.[$][(]suffix-y[)]\)\)*' 'arch/\(parisc\|sh\)/boot/compressed/Makefile'
+    accept '[\t][/][*][ ]vmlinux\.bin\.gz[ ]is[ ]here[ ][*][/]' arch/parisc/boot/compressed/vmlinux.lds.S
+    accept 'zImage\.bin\.[*]' arch/powerpc/boot/.gitignore
+    accept '[$][(]obj[)][/]spu_%\.bin:[ ][$][(]src[)][/]spu_%' arch/powerpc/platforms/cell/spufs/Makefile
+    accept '[$][(]obj[)][/]info.bin:' arch/s390/boot/compressed/Makefile
+    accept 'vmlinux\.bin\.all-y[ ]:=[ ][$][(]obj[)][/]vmlinux.bin' 'arch/\(s390\|sh\|x86\)/boot/compressed/Makefile'
+    accept 'OBJCOPYFLAGS_piggy\.o[ ]:=[ ]-I[ ]binary[ ]-O[ ]elf64-s390[ ]-B[ ]s390:64-bit[ ]--rename-section[ ]\.data=\.vmlinux\.bin\.compressed' arch/s390/boot/compressed/Makefile
+    accept '[\t]*[*][(]\.vmlinux\.bin\.compressed[)]' arch/s390/boot/compressed/vmlinux.lds.S
+    accept 'extra-y[ ][+]=\([ ]\([\\][\n][\t][ ]*\)\?vmlinux\.bin\(\.\(bz2\|gz\|lzma\|lzo\|xz\)\)\?\)*' arch/sh/boot/Makefile
+    accept '[$][(]obj[)][/]\(vmlinux\|uImage\)\(\.\(bin\|bz2\|gz\|lzma\|xz\|lzo\)\)\+:[ ][$][(]obj[)][/]vmlinux\.bin\(\.\(bz2\|gz\|lzma\|xz\|lzo\)\)\?' arch/sh/boot/Makefile
+    accept 'vmlinux\.bin\.[*]' arch/sh/boot/compressed/.gitignore
+    accept 'targets[ \t]*[:+]=\([ ][\\\n\t ]*vmlinux\(\.\(bin\(\.\(gz\|bz2\|xz\|lzma\|lzo\|lz4\)\)\?\)\)\?\)*' 'arch/\(parisc\|s390\|x86\)/boot/compressed/Makefile'
+    accept '[$][(]obj[)][/]zeropage.bin:' arch/sh/boot/compressed/Makefile
+    accept '[$][(]obj[)][/]\(image\|tftpboot\).bin:' arch/sparc/boot/compressed/Makefile
+    accept '[\t]*fprintf[ ][(]stderr[,][ ]["]Not[ ]a\.out\.' arch/sparc/boot/piggyback.c
+    accept '[$][(]obj[)][/]setup\.elf:' arch/x86/boot/Makefile
+    accept '[$][(]obj[)][/]setup\.bin:[ ][$][(]obj[)][/]setup\.elf[ ]' arch/x86/boot/Makefile
+    accept 'image_cmdline[ ]=[ ]default[ ]linux[ ][$][(]FDARGS[)][ ][$][(]if[ ][$][(]FDINITRD[)][,]initrd=initrd\.img[,][)]' arch/x86/boot/Makefile
+    accept 'vmlinux\.bin\.all' arch/x86/boot/compressed/.gitignore
+    accept '[#][ \t]*vmlinux\.bin\.\(all\|[(]gz\|bz2\|lzma\|\.\.\.[)]\)' arch/x86/boot/compressed/Makefile
+    accept '[#][\t]compressed[ ]vmlinux\.bin\.all[ ][+][ ]u32[ ]size[ ]of[ ]vmlinux\.bin\.all' arch/x86/boot/compressed/Makefile
+    accept 'targets[ ][+]=[ ][$][(]patsubst[ ][$][(]obj[)][/]%[,]%[,][$][(]vmlinux-objs-y[)][)][ ]vmlinux\.bin\.all[ ]vmlinux\.relocs' arch/x86/boot/compressed/Makefile
+    accept 'vmlinux\.bin\.all-[$][(]CONFIG_X86_NEED_RELOCS[)][ ][+]=[ ][$][(]obj[)][/]vmlinux\.relocs' arch/x86/boot/compressed/Makefile
+    accept '[$][(]obj[)][/]piggy\.S:[ ][$][(]obj[)][/]vmlinux\.bin\.[$][(]suffix-y[)]' arch/x86/boot/compressed/Makefile
+    accept '[$][(]obj[)][/]\(rm[/]\)\?realmode\.\(elf\|bin\):\([ ][$][(]obj[)][/]realmode\.\(lsd\|elf\|relocs\)\)*' arch/x86/realmode/Makefile
+    accept 'vmlinux\.bin\.gz:[ ]vmlinux\.bin' arch/xtensa/boot/Makefile
+    accept 'boot-redboot:[ ]vmlinux\.bin\.gz' arch/xtensa/boot/Makefile
+    accept '[$][(]obj[)][/]uImage:[ ]vmlinux\.bin\.gz' arch/xtensa/boot/Makefile
+    accept '[$][(]obj[)][/]\.\.[/]Image\.elf:[ ][$][(]obj[)][/]Image\.o[ ][$][(]obj[)][/]boot\.lds' arch/xtensa/boot/boot-elf/Makefile
+    accept '[$][(]obj[)][/]zImage\.o:[ ]vmlinux\.bin\.gz' arch/xtensa/boot/boot-redboot/Makefile
+    accept '[\t]*--add-section[ ]image=vmlinux\.bin\.gz[ ]' arch/xtensa/boot/boot-redboot/Makefile
+    accept '[$][(]obj[)][/]zImage\.elf:[ ][$][(]obj[)][/]zImage\.o' arch/xtensa/boot/boot-redboot/Makefile
+    accept '[\t]*[(]unsigned[ ]long[)]op\.out[,][ ][(]long[)]op\.outlen[)][;]' drivers/crypto/nx/nx-842-pseries.c
+    accept '[\t]*adev->firmware\.ucode\[AMDGPU_UCODE_ID_\(UVD1\?\|VC[EN]1\?\)\]\.fw[ ]=[ ]adev->\(uvd\|vc[en]\)\.fw[;]' drivers/gpu/drm/amd/amdgpu/'\(uvd_v7_0\|vce_v[124]_[05]\)\.c'
+    accept '[\t]*\(err[ ]=[ ]\)intel_uc_fw_fetch[(][&]uc->[gh]uc\.fw[,]' drivers/gpu/drm/i915/gt/uc/intel_uc.c
+    accept '[\t]*intel_uc_fw_dump[(][&]dev_priv->gt\.uc\.[hg]uc\.fw[,]' drivers/gpu/drm/i915/i915_debugfs.c
+    accept '[\t]memcpy[(][&]error_uc->[gh]uc_fw[,][ ][&]uc->[gh]uc\.fw[,][ ]sizeof[(]uc->[gh]uc\.fw[)][)][;]' drivers/gpu/drm/i915/i915_gpu_error.c
+    accept '[\t]error_uc->[gh]uc_fw\.path[ ]=[ ]kstrdup[(]uc->[gh]uc\.fw\.path[,]' drivers/gpu/drm/i915/i915_gpu_error.c
+    accept '[\t]return[ ]le16_to_cpu[(]dp\.fw\.family_code[)]' drivers/hid/hid-led.c
+    accept '[\t]*cmd->tx_buf[ ]=[ ]i3c_xfers\[i\]\.data\.out[;]' drivers/i3c/master/dw-i3c-master.c
+    accept '[\t]*ccmd->tx_buf[ ]=[ ]xfers\[i\]\.data\.out[;]' drivers/i3c/master/i3c-master-cdns.c
+    accept '[\t]*cmd\.valid\.out\.\(tf\|hob\)[ ][|]\?=' drivers/ide/'ide-.*\.c'
+    accept '[\t]*if[ ][(]cmd->valid\.out\.tf[ ][&]' drivers/ide/ide-taskfile.c
+    accept '[\t]*tp_ops->tf_load[(]drive[,][ ][&]cmd->\(tf\|hob\)[,][ ]cmd->valid\.out\.\(tf\|hob\)[)][;]' drivers/ide/ide-taskfile.c
+    accept '[\t]err[ ]=[ ]mlx5_cmd_exec[(]dev->mdev[,][ ]cmd\.in[,][ ]cmd\.inlen[,][ ]cmd\.out[,]' drivers/infiniband/hw/mlx5/devx.c
+    accept '[\t]devx_obj_build_destroy_cmd[(]cmd\.in[,][ ]cmd\.out[,]' drivers/infiniband/hw/mlx5/devx.c
+    accept '[\t]mlx5_cmd_exec[(]obj->mdev[,][ ]obj->dinbox[,][ ]obj->dinlen[,][ ]cmd\.out[,][ ]sizeof[(]cmd\.out[)][)][;]' drivers/infiniband/hw/mlx5/devx.c
+    accept '[\t]\(bl\(oc\)\?k_count\|num_of_containers\)[ ]=[ ]f34->v7\.img\.' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]f34->v7.config_\(data\|size\)[ ]=[ ]f34->v7\.img\.' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]return[ ]rmi_f34v7_write_f34v7_blocks[(]f34[,][ ]f34->v7\.img\.guest_code\.data[,][\n\t ]*f34->v7\.img\.guest_code\.size' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]return[ ]rmi_f34v7_write_f34v7_blocks[(]f34[,][ ]f34->v7\.img\.\(guest_code\|ui_firmware\)\.data[,][\n\t ]*f34->v7\.img\.\(guest_code\|ui_firmware\)\.size' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]\(if[ ][(]\|[ ]*\)f34->v7\.phyaddr\.\(ui_firmware\|ui_config\|dp_config\|guest_code\)[ ]!=[ ]f34->v7\.img\.phyaddr\.\(ui_firmware\|ui_config\|dp_config\|guest_code\)[)]' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]*addr[ ]=[ ]get_unaligned_le32[(]f34->v7\.img\.bootloader\.data[ ]' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]*[ ]*f34->v7\.img\.' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]rmi_dbg[(]RMI_DEBUG_FN[,][ ][&]f34->fn->dev[,][ ]["]%s:[ ]f34->v7\.img\.checksum' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]*__func__[,][ ]f34->v7\.img\.checksum[)]' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]memset[(][&]f34->v7\.img[,][ ]0x00[,][ ]sizeof[(]f34->v7\.img[)][)][;]' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]if[ ][(][!]f34->v7\.img\.' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]rmi_f34v7_parse_partition_table[(]f34[,][ ]f34->v7\.img\.' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]*[&]f34->v7\.img\.blkcount[,][ ][&]f34->v7\.img\.phyaddr[)][;]' drivers/input/rmi4/rmi_f34v7.c
+    accept '[\t]*if[ ][(]f34->v7\.has_\(guest_code\|display_cfg\)[ ][&][&][ ]f34->v7\.img\.contains_\(guest_code\|display_cfg\)[)]' drivers/input/rmi4/rmi_f34v7.c
+    blobname 'picasso_rlc\(_am4\)\?\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
+    blobna '[/][*][\n][\t][ ][*][ ]For[ ]Picasso[^*]*\([*]\+[^/*][^*]*\)*picasso_rlc[^*]*\([*]\+[^/*][^*]*\)*[*][*]*[/]' drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
+    # WIP: more to come here.
+
+    # New in 5.3.11, 4.19.84 and 4.14.154.
+    accept 'CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' Documentation/admin-guide/hw-vuln/tsx_async_abort.rst
+    accept '[\t *]*-[ ]Updated[ ]microcode[ ]is[ ]present' arch/x86/kvm/x86.c
+
+    # New in 5.4-rc*.
+    accept '[ ][ ]\(63\|31\|56\|24\|39\|32\|[0437][ ]\)\([ ]\([0-9 ][0-9 ]\)\)*[ ]\(56\|63\|32\|39\|24\|31\|[ ]\?[0437]\)\([\n][ ][ ]\(63\|31\|56\|24\|39\|32\|[0437][ ]\)\([ ]\([0-9 ][0-9 ]\)\)*[ ]\(56\|63\|32\|39\|24\|31\|[ ]\?[0437]\)\)*' Documentation/packing.txt
+    blobname 'linux-firmware\.git' Documentation/networking/device_drivers/netronome/nfp.rst
+    defsnc 'static[ ]u32[ ]vrate_adj_pct\[\][ ]=' block/blk-iocost.c
+    defsnc 'static[ ]const[ ]u32[ ]crypto_[fi]l_tab\[4\]\[256\][ ]____cacheline_aligned[ ]=' crypto/aes_generic.c
+    defsnc 'static[ ]const[ ]struct[ ]comp_testvec[ ]lzorle_\(de\)\?comp_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]cipher_testvec[ ]essiv_aes_cbc_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]aead_testvec[ ]essiv_hmac_sha256_aes_cbc_tv_temp\[\][ ]=' crypto/testmgr.h
+    blobname 'cnn55xx_ae\.fw' drivers/crypto/cavium/nitrox/nitrox_main.c
+    blobname 'amdgpu[/]\(arcturus\|renoir\|navi1[24]\)_vcn\.bin' drivers/gpu/dmr/amd/amdgpu/amdgpu_vcn.c
+    blobname 'amdgpu[/]\(renoir\|%s\)_asd\.bin' drivers/gpu/drm/amd/amdgpu/psp_v12_0.c
+    blobname 'amdgpu[/]%s_sdma%d\.bin' drivers/gpu/drm/amd/amdgpu/sdma_v4_0.C
+    defsnc '\(const[ ]uin32_t[\n]\)\?[ \t]*umc_v6_1_channel_idx_tbl\[UMC_V6_1_UMC_INSTANCE_NUM\]\[UMC_V6_1_CHANNEL_INSTANCE_NUM\][ ]=' drivers/gpu/drm/amd/amdgpu/umc_v6_1.c
+    # Sources are in cwsr_trap_handler_gfx9.asm.
+    defsnc 'static[ ]const[ ]uint32_t[ ]cwsr_trap_arcturus_hex\[\][ ]=' drivers/gpu/drm/amd/amdkfd/cwsr_trap_handler.h
+    defsnc 'static[ ]const[ ]struct[ ]abm_parameters[ ]abm_settings_config[01]\[abm_defines_max_level\][ ]=' drivres/gpu/drm/amd/display/modules/power/power_helpers.c
+    defsnc 'static[ ]const[ ]struct[ ]IP_BASE[ ]\(\(NBIF\|PCIE\)0\|SDMA[234567]\|DBGU_IO\)_BASE[ \t]*=' drivers/gpu/drm/amd/include/arct_ip_offset.h
+    defsnc 'static[ ]const[ ]struct[ ]IP_BASE[ ]\(DIO\|DMU\|DPCS\|HDA\|\(NBIF\|PCIE\)0\|SDMA\|USB0\|UVD0\)_BASE[ \t]*=' drivers/gpu/drm/amd/include/navi12_ip_offset.h
+    defsnc 'static[ ]const[ ]struct[ ]IP_BASE[ ]\(DIO\|DMU\|DPCS\|HDA\|\(NBIF\|PCIE\)0\|SDMA\|USB0\|UVD0\)_BASE[ \t]*=' drivers/gpu/drm/amd/include/navi14_ip_offset.h
+    defsnc 'static[ ]const[ ]struct[ ]IP_BASE[ ]\(ACP\|DBGU_IO0\|DIO\|DMU\|DPCS\|HDA\|IOHC0\|ISP\|L2IMU0\|\(NBIF\|PCIE\)0\|USB0\|UVD0\)_BASE[ \t]*=' drivers/gpu/drm/amd/include/renoir_ip_offset.h
+    blobname 'i915[/]tgl_dmc_ver2_04\.bin' drivers/gpu/drm/i915/intel_csr.c
+    defsnc '[\t][}][ ]init_data\[\][ ]=' drivers/gpu/drm/panel/panel-lg-lb035q02.c
+    defsnc '[\t][}][ ]nl8048_init_seq\[\][ ]=' drivers/gpu/drm/panel/panel-nec-nl8048hl11.c
+    defsnc 'static[ ]const[ ]struct[ ]cmd_set_entry[ ]manufacturer_cmd_set\[\][ ]=' drivers/gpu/drm/panel/panel-raydium-rm67191.c
+    defsnc 'static[ ]const[ ]char[ ]data_\(last_\)\?block_header\[DATA_BLOCK_HEADER_SIZE\][ ]=' drivers/gpu/drm/tiny/gm12u320.c
+    accept '[\t]mipi_dbi_command[(]dbi[,][ ]HX8357D_SETGAMMA\([,][\n][\t][\t][\t][ ]0x[0-9a-f][0-9a-fA-F]\)*[)][;]' drivers/gpu/drm/tiny/hx8357d.c
+    defsnc 'static[ ]const[ ]unsigned[ ]short[ ]creative_sb0540_codes\[\][ ]=' drivers/hid/hid-creative-sb0540.c
+    defsnc 'static[ ]const[ ]struct[ ]ov5675_reg[ ]mode_\(2592x1944\|1296x972\)_regs\[\][ ]=' drivers/media/i2c/ov5675.c
+    blobname 'rtl_nic[/]rtl8125a-3\.fw' drivers/net/ethernet/realtek/r8169_main.c
+    defsnc '[\t]static[ ]const[ ]u16[ ]ical\[\][ ]=' drivers/net/wireless/mediatek/mt76/mt7615/eeprom.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]channel_all\[TARGET_CHNL_NUM_2G_5G_8812\][ ]=' drivers/net/wireless/realtek/rtlwifi/rtl8821ae/phy.c
+    defsnc 'static[ ]const[ ]struct[ ]rtw_txpwr_lmt_cfg_pair[ ]rtw8822b_txpwr_lmt_type[25]\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822b_table.c
+    defsnc 'static[ ]const[ ]struct[ ]rtw_txpwr_lmt_cfg_pair[ ]rtw8822c_txpwr_lmt_type0\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822c_table.c
+    blobname 'gsl1680-chuwi-surbook-mini\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'gsl3680-irbis_tw90\.fw' drivers/platform/x86/touchscreen_dmi.c
+    defsnc 'static[ ]const[ ]u8[ ]aes_cipher_key_skeleton\[\][ ]=' drivers/s390/crypto/zcrypt_ccamisc.c
+    defsnc 'const[ ]u8[ ]uni_upcase\[NUM_UPCASE[ ]<<[ ]1\][ ]=' drivers/staging/exfat/exfat_upcase.c
+    defsnc 'static[ ]const[ ]u32[ ]h264_cabac_table\[\][ ]=' drivers/staging/media/hantro/hantro_h264.c
+    defsnc 'static[ ]const[ ]u32[ ]zig_zag_8x8\[\][ ]=' drivers/staging/media/hantro/hantro_h264.c
+    defsnc 'static[ ]volatile[ ]const[ ]u8[ ]__cacheline_aligned[ ]aes_\(inv_\)\?sbox\[\][ ]=' lib/crypto/aes.c
+    defsnc 'static[ ]const[ ]u16[ ]scarlett2_mixer_values\[173\][ ]=' sound/usb/mixer_scarlett_gen2.c
+    defsc 'vector[ ]int[ ]vsxs\[\][ ]=' tools/testing/selftests/powerpc/tm/tm-signal-context-chk-vsx.c
+    defsnc '[\t]static[ ]const[ ]struct[ ]ephy_info[ ]e_info_8125_[12]\[\][ ]=' drivers/net/ethernet/realtek/r8169_main.c
+    defsnc '[\t]static[ ]const[ ]u32[ ]wl_rx_low_gain_o\(n\|ff\)\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822b.c
+    accept '[ ][*][\t]request_firmware_into_buf[(][)]' lib/test_firmware.c
+    accept '[\t]*req->rc[ ]=[ ]request_firmware_into_buf[(][&]req->fw[,][\n]' lib/test_firmware.c
+    accept 'trap[ ]["]rm[ ]-f[ ][$]tmp_file\.o[ ][$]tmp_file[ ][$]tmp_file\.bin["]' scripts/tools-support-relr.sh
+    accept '[\t]*\(echo[ ]-n[ ]["]\)\?\(test_batched_\|Batched[ ]\)request_firmware_into_buf\(_nofile\)\?\([(][)]\|[ ]\)' tools/testing/selftests/firmware/fw_filesystem.sh
+    accept '#[ ]We[ ]need[ ]to[ ]load[ ]a[ ]different[ ]file[ ]to[ ]test[ ]request_firmware_into_buf' tools/testing/selftests/firmware/fw_lib.sh
+    accept '#[ ]To[ ]reproduce[ ]rename[ ]this[ ]to[ ]test-firmware\.bin' tools/testing/selftests/firmware/fw_lib.sh
+    # Since ar500X and ar92XX have Free firmware, I'm assuming this
+    # initialization data file is either Free Software or pure data.
+    accept '[\t]scnprintf[(]eeprom_name[,][ ]EEPROM_FILENAME_LEN[,][ ]["]ath9k-eeprom-pci-%s\.bin["]' drivers/net/wireless/ath/ath9k/ath9k_pci_owl_loader.c
+    accept '[\t]err[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]eeprom_name[,]' drivers/net/wireless/ath/ath9k/ath9k_pci_owl_loader.c
+    blobname 'i915[/]["]\([ ][\\][\n][\t]__stringify[(]\(prefix\|major\|minor\|patch\)_[)][ ]\(\(name\|separator\)_\)\?\)*["]\.bin' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
+    blobname 'intel[/]dsp_fw_%pUL\.bin' sound/soc/intel/skylake/skl-sst.c
+    accept '[\t]*tplg_filename[ ]=[ ]devm_kasprintf[(]sdev->dev[,][ ]GFP_KERNEL[,][\n][\t ]*["]%s%s%s\.tplg["][,]' sound/soc/sof/intel/hda.c
+    blobname 'intel[/]ice[/]ddp[/]' drivers/net/ethernet/intel/ice/ice_main.c
+    blobname '["]ice\.pkg["]' drivers/net/ethernet/intel/ice/ice_main.c
+    blobname '\(intel[/]ice[/]ddp[/]\|%s\)\?ice\(-%02x%02x%02x%02x%02x%02x%02x%02x\|-[0-9A-F]*\)\?\.pkg' drivers/net/ethernet/intel/ice/ice_main.c
+    accept '[\t]*marvell[,]caldata-txpwrlimit-\(2g\|5g-sub[012]\)[ ]=[ ][/]bits[/][ ]8[ ]<\([\n ]0x[0-9a-f][0-9a-f]\)*>[;]' arch/arm/boot/dts/rk3288-veyron-jerry.dts
+    blobname 'amdgpu[/]%s_\(pfp\|[mc]e\|mec2\?\)%s\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c
+    blobname 'amdgpu[/]navi14_\(pfp\|[mc]e\|mec2\?\)_wks\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c
+    blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*[\n]--*\([\n][\n]*\([ ][ ][ ]\|[\t]i2400m_usb\)[^\n]*\)\+' Documentation/admin-guide/wimax/i2400m.rst
+    # This is not new, just a new catch.
+    blobname 'inside-secure[/]%s[/]%s' drivers/crypto/inside-secure/safexcel.c
 
     ;;
 
@@ -6239,7 +6434,7 @@ s,^\\(.*\\)\$,falsepos = r'(?P<falsepos>\\1)',;\
 s,^\\(.*\\)\$,blob = r'(?P<blob>\\1)',;\
 "' p;}' >> "$scriptname"
 
-  echo "\\($initblob\\|$defineblob\\|$asmblob\\)" |
+  $echo "\\($initblob\\|$defineblob\\|$asmblob\\)" |
     ${SED-sed} -e "$adjust_rx" \
         -e "s,^\\(.*\\)\$,cblob = r'(?P<cblob>\\1)'," >> "$scriptname"
 
@@ -6445,7 +6640,7 @@ s,^\\(.*\\)\$,\$falsepos = qr'(?<falsepos>\\1)'ms;,;\
 s,^\\(.*\\)\$,my \$blob = qr'(?<blob>\\1)'ms;,;\
 "' p;}' >> "$scriptname"
 
-  echo "\\($initblob\\|$defineblob\\|$asmblob\\)" |
+  $echo "\\($initblob\\|$defineblob\\|$asmblob\\)" |
     ${SED-sed} -e "$adjust_rx" \
         -e "s,^\\(.*\\)\$,my \$cblob = qr'(?<cblob>\\1)'ms if \$with_context;," >> "$scriptname"
 
