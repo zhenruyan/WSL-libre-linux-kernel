@@ -882,6 +882,8 @@ reject_firmware drivers/gpu/drm/radeon/r600.c
 clean_blob drivers/gpu/drm/radeon/r600.c
 reject_firmware drivers/gpu/drm/radeon/ni.c
 clean_blob drivers/gpu/drm/radeon/ni.c
+reject_firmware drivers/gpu/drm/radeon/si.c
+clean_blob drivers/gpu/drm/radeon/si.c
 # Something like this might work on other radeon cards too.  If you
 # have such cards, please give it a try, and report back either way,
 # so that we can make more cards work, or at least add comments so
@@ -899,8 +901,12 @@ clean_sed '
 clean_sed '
 /r = ni_init_microcode(rdev);/,/}/ s,return r;,/*(DEBLOBBED)*/,
 ' drivers/gpu/drm/radeon/ni.c 'enable blobless activation'
-reject_firmware drivers/gpu/drm/radeon/si.c
-clean_blob drivers/gpu/drm/radeon/si.c
+clean_sed '
+/r = si_init_microcode(rdev);/,/}/ s,return r;,/*(DEBLOBBED)*/,
+' drivers/gpu/drm/radeon/si.c 'enable blobless activation'
+clean_sed '
+/if (!rdev->mc_fw) {/,/}/ s,return -EINVAL;,/*(DEBLOBBED)*/,
+' drivers/gpu/drm/radeon/si.c 'enable blobless activation'
 reject_firmware drivers/gpu/drm/radeon/cik.c
 clean_blob drivers/gpu/drm/radeon/cik.c
 reject_firmware drivers/gpu/drm/radeon/radeon_uvd.c
