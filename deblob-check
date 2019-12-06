@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2019-12-02
+# deblob-check version 2019-12-05
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2596,6 +2596,7 @@ set_except () {
     # New in 2.6.37, up to -rc5.
     defsnc 'static[ ]u32[ ]epll_div\[\]\[6\][ ]=' arch/arm/mach-s5pv210/clock.c
     defsnc 'static[ ]\(const[ ]\)\?struct[ ]titan_gpio_cfg[ ]titan_gpio_table\[\][ ]=' arch/mips/ar7/gpio.c
+    # GNUtoo found potential sources for these on 2019-12-05, checking.
     blobname 'sdma-%s-to%d\.bin' drivers/dma/imx-sdma.c
     defsnc '[	]static[ ]u8[ ]def_regs\[\][ ]=' drivers/media/common/tuners/tda18218.c
     accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]lme2510c\?_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\)[ ]*=[ ][^",]*,[\n]*\)*\([	]\.download_firmware[ ]=[ ]lme2510_download_firmware,[\n]\)\?[	]\.firmware[ ]*=[ ]' drivers/media/dvb/dvb-usb/lmedm04.c
