@@ -5,6 +5,7 @@
 #                                 + 2019-07-14's r16565
 #                                 + 2019-07-26's r16604
 #                                 + 2019-11-12's not-in-master
+#                                 + 2019-04-06's r15949 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5229,6 +5230,9 @@ set_except () {
     # New in 5.3.11, 4.19.84 and 4.14.154.
     accept 'CPUID[ ]to[ ]the[ ]guest[.][ ]If[ ]the[ ]host[ ]has[ ]updated[ ]microcode[ ]the[ ]protection' Documentation/admin-guide/hw-vuln/tsx_async_abort.rst
     accept '[\t *]*-[ ]Updated[ ]microcode[ ]is[ ]present' arch/x86/kvm/x86.c
+
+    # New in 4.19.89, backported from 5.0.
+    defsnc '[\t]static[ ]u8[ ]rss_key\[AQ_CFG_RSS_HASHKEY_SIZE\][ ]=' drivers/net/ethernet/aquantia/atlantic/aq_nic.c
 
     ;;
 
