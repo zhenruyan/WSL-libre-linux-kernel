@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2019-12-05
+# deblob-check version 2020-01-12
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2019 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2020 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -5687,6 +5687,70 @@ set_except () {
     blob '6\.1\.[ ]Driver[ ]complains[^\n]*i2400m-fw[^\n]*[\n]--*\([\n][\n]*\([ ][ ][ ]\|[\t]i2400m_usb\)[^\n]*\)\+' Documentation/admin-guide/wimax/i2400m.rst
     # This is not new, just a new catch.
     blobname 'inside-secure[/]%s[/]%s' drivers/crypto/inside-secure/safexcel.c
+
+    # New in 5.5-rc*.
+    initnc '\.Lpermute_table:' arch/arm64/crypto/ghash-ce-core.S
+    initnc 'SIGMA2\?:' arch/x86/crypto/blake2s-core.S
+    defsnc 'static[ ]const[ ]u8[ ]blake2b_sigma\[12\]\[16\][ ]=' crypto/blake2b_generic.c
+    defsc 'static[ ]const[ ]struct[ ]kpp_testvec[ ]curve25519_tv_template\[\][ ]=' crypto/testmgr.hpu
+    defsnc 'static[ ]const[ ]struct[ ]hash_testvec[ ]hmac_sm3_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]cipher_testvec[ ]sm4_ctr_rfc3686_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]char[ ]blake2_ordered_sequence\[\][ ]='
+    defsnc 'static[ ]const[ ]struct[ ]hash_testvec[ ]blake2b_\(256\|384\|512\)_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]hash_testvec[ ]blake2b_\(256\|384\|512\)_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]hash_testvec[ ]blakes2s_256_tv_template\[\][ ]=' crypto/testmgr.h
+    defsnc 'static[ ]const[ ]struct[ ]clk_div_table[ ]bm1880_div_table_[01234]\[\][ ]=' drivers/clk/clk-bm1880.c
+    blobname 'i915[/]icl_dmc_ver1_09\.bin' drivers/gpu/drm/i915/intel_csr.c
+    defsnc 'static[ ]const[ ]u8[ ]tegra1\(24\|32\|86\)_sor_\(voltage_swing\|pre_emphasis\|post_cursor\|tx_pu\)\[4\]\[4\]\[4\][ ]=' drivers/gpu/drm/tegra/sor.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]adux1020_def_conf\[\][ ]=' drivers/iio/light/adux1020.c
+    defsnc 'static[ ]const[ ]int[ ]adux1020_led_currents\[\]\[2\][ ]=' drivers/iio/light/adux1020.c
+    defsnc 'static[ ]const[ ]struct[ ]hi556_reg[ ]mipi_data_rate_874mbps\[\][ ]=' drivers/media/i2c/hi556.c
+    defsnc 'static[ ]const[ ]struct[ ]hi556_reg[ ]mode_\(2592x1944\|1296x972\)_regs\[\][ ]=' drivers/media/i2c/hi556.c
+    defsnc 'static[ ]const[ ]struct[ ]imx290_regval[ ]imx290_global_init_settings\[\][ ]=' drivers/media/i2c/imx290.c
+    defsc 'static[ ]const[ ]struct[ ]imx290_regval[ ]imx290_\(1080\|720\)p_settings\[\][ ]=' drivers/media/i2c/imx290.c
+    blobname 'rtl_nic[/]rtl8168fp-3\.fw' drivers/net/ethernet/realtek/r8169_main.c
+    blobname 'rtl_nic[/]rtl8153[ab]-[234]\.fw' drivers/net/usb/r8152.c
+    blobname 'iwl-debug-yoyo\.bin' drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c
+    defsnc 'static[ ]const[ ]struct[ ]rtw_phy_pg_cfg_pair[ ]rtw8822b_bb_pg_type[235]\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822b_table.c
+    defsnc 'static[ ]const[ ]struct[ ]rtw_txpwr_lmt_cfg_pair[ ]rtw8822b_txpwr_lmt_type0\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822b_table.c
+    defsnc 'static[ ]const[ ]struct[ ]rtw_phy_pg_cfg_pair[ ]rtw8822c_bb_pg_type0\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822b_table.c
+    defsnc '[\t][}][ ]timings\[\][ ]=' drivers/phy/rockchip/phy-rockchip-inno-dsidphy.c
+    defsnc 'static[ ]const[ ]struct[ ]msm_gpio_wakeirq_map[ ]sdm845_pdc_map\[\][ ]=' drivers/pinctrl/qcom/pinctrl-sdm845.c
+    blobname 'gsl3692-jumper-ezpad-6-m4\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'gsl1680-schneider-sct101ctm\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'idtcm\.bin' drivers/ptp/ptp_clockmatrix.h
+    defsc 'static[ ]const[ ]u32[ ]asv_arm_table\[\]\[ASV_ARM_DVFS_NUM\]\[ASV_GROUPS_NUM[ ][+][ ]1\][ ]=' drivers/soc/samsung/exynos5422-asv.c
+    defsc 'static[ ]const[ ]u32[ ]asv_kfc_table\[\]\[ASV_KFC_DVFS_NUM\]\[ASV_GROUPS_NUM[ ][+][ ]1\][ ]=' drivers/soc/samsung/exynos5422-asv.c
+    defsnc 'static[ ]const[ ]u8[ ]blake2s_sigma\[10\]\[16\][ ]=' lib/crypto/blake2s-generic.c
+    defsnc 'static[ ]const[ ]u8[ ]blake2s_\(hmac_\)\?testvecs\[\]\[BLAKE2S_HASH_SIZE\][ ]__initconst[ ]=' lib/crypto/blake2s-selftest.c
+    defsnc 'static[ ]const[ ]u8[ ]x\?\(enc\|dec\)_\(\(in\|out\)put\|key\|assoc\)[0-9]*\[\][ ]__initconst[ ]=' lib/crypto/chacha20poly1305-selftest.c
+    accept '[ ][*][ ][ ][ ][ ][ ]3[ ]3[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]2[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]1[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0[ ]0' net/tipc/crypto.h
+    defsnc '[\t]static[ ]const[ ]struct[ ]reg_val[ ]\(init_eee\|pre_init1\)\[\][ ]=' drivers/net/phy/mscc.c
+    defsnc 'static[ ]const[ ]u32[ ]rtw8822b_txscale_tbl[RTW_TXSCALE_SIZE][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822b_table.c
+    defsnc 'static[ ]const[ ]u8[ \n]rtw8822b_pwrtrk_5g[ba]_[np]\[RTW_PWR_TRK_5G_NUM\]\[RTW_PWR_TRK_TBL_SZ\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822b_table.c
+    defsnc 'static[ ]const[ ]u8[ \n]rtw8822c_pwrtrk_5g[ba]_[np]\[RTW_PWR_TRK_5G_NUM\]\[RTW_PWR_TRK_TBL_SZ\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8822c.c
+    accept 'static[ ]const[ ]struct[ ]tegra_xusb_soc[ ]tegra194_soc[ ]=[ ][{][\n][\t][.]firmware[ ]=' drivers/usb/host/xhci-tegra.c
+    blobname 'nvidia[/]tegra194[/]xusb\.bin' drivers/usb/host/xhci-tegra.c
+    blobname 'rt5677_elf_vad\([ ]file[ ][*][/]\)\?' sound/soc/codecs/rt5677.c
+    blobname 'i915[/]["]\([ ][\\][\n][\t]__stringify[(]\(prefix\|major\|minor\|patch\)_[)][ ]\(\(name_\|["][.]["]\)\)\?\)*["]\.bin' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
+    blobname 'mellanox[/]mlxsw_spectrum2-\(["][ ]__stringify[(]MLXSW_SP2_FWREV_[^)]*[)][ \\\n\t]*["]\.\)*mfa2' drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+    accept '[\t][ ][*][ ]per-cpu[ ]cpuinfo[ ]can[ ]be[ ]updated[ ]with[ ]right[ ]microcode' arch/x86/kernel/cpu/microcode/core.c
+    accept '\(static[ ]\)\?int[ ]bnxt_flash_\(firmware\|package\)_from_file[(][ \t\na-z0-9_,*]*[)][\n][{][\n]\([^}][^\n]*[\n]\+\)*[\t]rc[ ]=[ ]request_firmware[(][&]fw' drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+    accept 'static[ ]int[ ]rtl8152_request_firmware[(]' drivers/net/usb/r8152.c
+    accept '[\t]if[ ][(]rtl8152_request_firmware[(]' drivers/net/usb/r8152.c
+    accept '[\t][\t][/][*][ ]Delay[ ]execution[ ]in[ ]case[ ]request_firmware[(][)]' drivers/net/usb/r8152.c
+    blobname 'rtl_nic[/]rtl8153a-[234]\.fw' drivers/net/usb/r8152.c
+    blobname 'rtl_nic[/]rtl8153b-2\.fw' drivers/net/usb/r8152.c
+    accept '[\t][/][*][ ]Retry[ ]in[ ]case[ ]request_firmware[(]' drivers/net/usb/r8152.c
+    accept '[ ][*][ ]@context:[ ]pointer[ ]to[ ]firmware[ ]image[ ]returned[ ]from[ ]request_firmware\.' drivers/scsi/lpfc/lpfc_init.c
+    accept '[ ][*][ ]request_firmware[(][)][ ]allocate[ ]data[ ]using[ ]vmalloc[(]' drivers/staging/wfx/fwio.c
+    # This loads Platform Data Set pure data files.  Preconfigured
+    # files, templates and tools to compress the configuration files
+    # to the binary format are available.
+    accept '[\t]ret[ ]=[ ]request_firmware[(]&pds,[ ]wdev->pdata\.file_pds,' drivers/staging/wfx/main.c
+# .take5 rt5677.c
+    # ethtool-supplied firmware to flash the virtual device.
+    accept '[\t]if[ ][(]request_firmware[(]&fw[,][ ]efl->data[,][ ]&vdevice->pdev\.dev[)][)]' arch/um/drivers/vector_kern.c
 
     ;;
 
