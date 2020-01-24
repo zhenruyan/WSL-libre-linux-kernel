@@ -1,14 +1,15 @@
 #! /bin/sh
 
 # deblob-check version 2015-12-22 + 2017-10-23's r14392
-#   + partial 2017-04-21's r13771
+#   + partial 2017-04-21's r13771 + 2019-12-02's r17069
+#           + 2020-01-14's r17211
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2019 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2020 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -2703,7 +2704,7 @@ set_except () {
     blobname '%s%04x%s["][,][ ]["]fw_sst_["][,][ 	\n]*sst_drv_ctx->pci_id[,][ ]["]\.bin' drivers/staging/intel_sst/intel_sst_common.h
     accept '[ ]*[*][ ]*0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1' 'arch/x86/crypto/aesni-intel_asm\.S\|net/l2tp/l2tp_ip6\.c'
     defsnc 'static[ ]struct[ ]aead_testvec[ ]\(aes_gcm_rfc4106\)_\(enc\|dec\)_tv_template\[\][ ]=' 'crypto/testmgr.h'
-    blobname '\(sep[/]\)\?\extapp\.image\.bin' drivers/staging/sep/sep_driver.c
+    blobname '\(sep[/]\)\?extapp\.image\.bin' drivers/staging/sep/sep_driver.c
     blobname 'radeon[/]\(BARTS\|BTC\|TURKS\|CAICOS\|%s\)_\(pfp\|rlc\|[mc][ec]\)\.bin' 'drivers/gpu/drm/radeon/[ns]i\.c'
     defsnc 'static[ ]const[ ]u32[ ]\(barts\|turks\|caicos\)_io_mc_regs\[BTC_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/ni.c
     defsnc 'static[ ]int[ ]types\[0x80\][ ]=' drivers/gpu/drm/nouveau/nv50_vram.c
@@ -4222,7 +4223,7 @@ set_except () {
     accept '[\t ]*["]request_firmware_nowait[ ]error' drivers/net/wireless/mwifiex/main.c
     blobname 'atmel[/]wilc1000\(_ap\|_p2p\)\?_fw\.bin' drivers/staging/wilc1000/Makefile
     blobname 'wifi_firmware\(_ap\|_p2p_concurrency\)\?\.bin' drivers/staging/wilc1000/linux_wlan.c
-    blob 'This[ ]directory[ ]is[ ]_NOT_[ ]for[ ]adding[ ]arbitrary[ ]new[ ]firmware[ ]images.*git[ ]pull[ ]request[ ]to:[\n][^\n]*linux-firmware\@kernel\.org[\n][^\n]*mailing[ ]lists\.' firmware/README.AddingFirmware
+    blob 'This[ ]directory[ ]is[ ]_NOT_[ ]for[ ]adding[ ]arbitrary[ ]new[ ]firmware[ ]images.*git[ ]pull[ ]request[ ]to:[\n][^\n]*linux-firmware@kernel\.org[\n][^\n]*mailing[ ]lists\.' firmware/README.AddingFirmware
 
     # New in 4.2.1 and 4.1.8.
     defsnc '[}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
@@ -5897,7 +5898,7 @@ set_except () {
     accept '[*][ ]*0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1[ ]2[ ]3[ ]4[ ]5[ ]6[ ]7[ ]8[ ]9[ ]0[ ]1' arch/x86/crypto/aesni-intel_asm.S
     defsnc 'static[ ]struct[ ]aead_testvec[ ]\(aes_gcm_rfc4106\)_\(enc\|dec\)_tv_template\[\][ ]=' 'crypto/testmgr.h'
     defsnc 'const[ ]struct[ ]\(stk1160\|saa7113\)config[ ]\([{][^}]*[}][ ]\)\?\(stk1160\|saa7113\)config\(PAL\|NTSC\)\?\[256\][ ]=' drivers/staging/easycap/easycap_low.c
-    blobname '\(sep[/]\)\?\extapp\.image\.bin' drivers/staging/sep/sep_driver.c
+    blobname '\(sep[/]\)\?extapp\.image\.bin' drivers/staging/sep/sep_driver.c
     blobname 'radeon[/]\(BARTS\|BTC\|TURKS\|CAICOS\|%s\)_\(pfp\|rlc\|m[ec]\)\.bin' drivers/gpu/drm/radeon/ni.c
     defsnc 'static[ ]const[ ]u32[ ]\(barts\|turks\|caicos\)_io_mc_regs\[BTC_IO_MC_REGS_SIZE\]\[2\][ ]=' drivers/gpu/drm/radeon/ni.c
     defsnc 'static[ ]int[ ]types\[0x80\][ ]=' drivers/gpu/drm/nouveau/nv50_vram.c
