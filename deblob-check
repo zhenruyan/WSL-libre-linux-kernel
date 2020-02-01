@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-01-14
+# deblob-check version 2020-02-01
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5751,6 +5751,9 @@ set_except () {
 # .take5 rt5677.c
     # ethtool-supplied firmware to flash the virtual device.
     accept '[\t]if[ ][(]request_firmware[(]&fw[,][ ]efl->data[,][ ]&vdevice->pdev\.dev[)][)]' arch/um/drivers/vector_kern.c
+
+    # Already present in 5.0, harmless as firmware is the first field.
+    accept 'static[ ]const[ ]struct[ ]vic_config[ ]vic_t194_config[ ]=[ ][{][\n][\t]\.firmware[ ]=[ ]NVIDIA_TEGRA_194_VIC_FIRMWARE[,]' drivers/gpu/drm/tegra/vic.c
 
     ;;
 
