@@ -5756,8 +5756,8 @@ set_except () {
     accept 'static[ ]const[ ]struct[ ]vic_config[ ]vic_t194_config[ ]=[ ][{][\n][\t]\.firmware[ ]=[ ]NVIDIA_TEGRA_194_VIC_FIRMWARE[,]' drivers/gpu/drm/tegra/vic.c
 
     # New in 5.5.11 and 5.4.27.
-    blobname 'microcode[/]mscc_vsc8584_revb_int8051_fb48\.bin' drivers/net/phy/mscc.c
-    blobname 'microcode[/]mscc_vsc8574_revb_int8051_29e8\.bin' drivers/net/phy/mscc.c
+    blobname 'microchip[/]mscc_vsc8584_revb_int8051_fb48\.bin' drivers/net/phy/mscc.c
+    blobname 'microchip[/]mscc_vsc8574_revb_int8051_29e8\.bin' drivers/net/phy/mscc.c
 
     ;;
 
