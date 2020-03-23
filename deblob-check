@@ -4,6 +4,7 @@
 #                    + 2019-12-02's r17069
 #                    + 2020-01-14's r17211
 #                    + 2020-02-01's r17293
+#                    + 2020-03-21's r1738[12]
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5692,6 +5693,10 @@ set_except () {
 
     # Already present in 5.0, harmless as firmware is the first field.
     accept 'static[ ]const[ ]struct[ ]vic_config[ ]vic_t194_config[ ]=[ ][{][\n][\t]\.firmware[ ]=[ ]NVIDIA_TEGRA_194_VIC_FIRMWARE[,]' drivers/gpu/drm/tegra/vic.c
+
+    # New in 5.5.11 and 5.4.27.
+    blobname 'microchip[/]mscc_vsc8584_revb_int8051_fb48\.bin' drivers/net/phy/mscc.c
+    blobname 'microchip[/]mscc_vsc8574_revb_int8051_29e8\.bin' drivers/net/phy/mscc.c
 
     ;;
 
