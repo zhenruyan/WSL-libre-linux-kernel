@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-03-21
+# deblob-check version 2020-03-29
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5758,6 +5758,71 @@ set_except () {
     # New in 5.5.11 and 5.4.27.
     blobname 'microchip[/]mscc_vsc8584_revb_int8051_fb48\.bin' drivers/net/phy/mscc.c
     blobname 'microchip[/]mscc_vsc8574_revb_int8051_29e8\.bin' drivers/net/phy/mscc.c
+
+    # New in 5.6-rc7.
+    initnc '[ ]*[(]gdb[)][ ]x[/]100x[ ][$]25[\n]' Documentation/virt/uml/user_mode_linux.rst
+    blobname 'amdgpu[/]renoir_dmcub\.bin' drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+    accept '[\t][ ][*][ ]the[ ][/]lib[/]firmware[/]qcom[/]\.\.\.[ ]vs[ ][/]lib[/]firmware[/]\.\.\.[ ]case' drivers/gpu/drm/msm/adreno/adreno_gpu.c
+    accept '[\t]gr->firmware[ ]=[ ]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    accept '[\t]*snprintf[(]f[,][ ]sizeof[(]f[)][,][ ]["]nouveau[/]nv%02x_%s["][,][ ]device->chipset[,][ ]name[)][;][\n][\t]*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]f[,][ ]device->dev[)][;][\n][\t]*if[ ][(]ret[)][ ][{][\n][\t]*snprintf[(]f[,][ ]sizeof[(]f[)][,][ ]["]nouveau[/]%s["][,][ ]name[)][;][\n][\t]*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]f[,][ ]device->dev[)][;]' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    accept '[	]\(if[ ][(]\|[ ][ ][ ][ ]\)gf100_gr_load_fw[(]gr[,][ ]["]fuc4\(09\|1a\)[cd]["][,][ ][&]gr->\(fecs\|gpccs\)' drivers/gpu/drm/nouveau/nvkm/engine/gr/gf100.c
+    defsnc 'static[ ]const[ ]struct[ ]panel_cmd[ ]boe_himax8279d\(8\|10\)p_on_cmds\[\][ ]=' drivers/gpu/drm/panel/panel-boe-himax8279d.c
+    defsnc 'static[ ]const[ ]struct[ ]ltk500hd1829_cmd[ ]init_code\[\][ ]=' drivers/gpu/drm/panel/panel-leadtek-ltk500hd1829.c
+    accept '[\t]dsi_generic_write_seq[(]dsi[,][ ]XPP055C272_CMD_SET\(GIP[12]\|GAMMA\)\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-xinpeng-xpp055c272.c
+    defsc 'static[ ]const[ ]unsigned[ ]char[ ]\(luma\|chroma\)_ac\[16[ ][+][ ]162[ ][+][ ]2\]' drivers/media/platform/coda/coda-jpeg.c
+    defsnc 'static[ ]const[ ]u32[ ]ice_ptypes_\(ipv[46]\|udp\|tcp\|sctp\)_\(ofos\|il\)\[\][ ]=' drivers/net/ethernet/intel/ice/ice_flow.c
+    defsnc 'static[ ]const[ ]u32[ ]iro_arr\[\][ ]=' drivers/net/ethernet/qlogic/qed/qed_hsi.h
+    defsnc 'static[ ]const[ ]u8[ ]dscp_tid_map\[DSCP_TID_MAP_TBL_ENTRY_SIZE\][ ]=' drivers/net/wireless/ath/ath11k/hal_tx.c
+    blobname 'rtw88[/]rtw8822c_wow_fw\.bin' drivers/pinctrl/qcom/pinctrl-sc7180.c
+    defsnc 'static[ ]const[ ]struct[ ]msm_gpio_wakeirq_map[ ]sc7180_pdc_map\[\][ ]=' drivers/pinctrl/qcom/pinctrl-sc7180.c
+    blobname 'gsl1680-pipo-w11\.fw' drivers/platform/x86/touchscreen_dmi.c
+    defsnc 'static[ ]const[ ]struct[ ]hsfreq_range[ ]rk3399_mipidphy_hsfreq_ranges\[\][ ]=' drivers/staging/media/phy-rockchip-dphy-rx0/phy-rockchip-dphy-rx0.c
+    accept 'static[ ]int[ ]tegra_xusb_request_firmware[(]' drivers/usb/host/xhci-tegra.c
+    accept '[\t]err[ ]=[ ]tegra_xusb_request_firmware[(]tegra[)]' drivers/usb/host/xhci-tegra.c
+    defsc 'static[ ]const[ ]struct[ ]curve25519_test_vector[ ]curve25519_test_vectors\[\][ ]__initconst[ ]=' lib/crypto/curve25519-selftest.c
+    defsc 'static[ ]const[ ]u8[ ]tas3004_treble_table\[\][ ]=' sound/aoa/codecs/tas-basstreble.h
+    defsnc 'static[ ]const[ ]char[ ]opl3_volume_table\[128\][ ]=' sound/drivers/opl3/opl3_midi.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]snd_opl4_volume_table\[128\][ ]=' sound/drivers/opl4/opl4_synth.c
+    defsnc 'static[ ]const[ ]unsigned[ ]short[ ]init[1234]\[128\][ ]=' sound/isa/sb/emu8000.c
+    defsc 'static[ ]const[ ]unsigned[ ]short[ ]treble_parm\[12\]\[9\][ ]=' sound/isa/sb/emu8000.c
+    defsnc 'static[ ]const[ ]u16[ ]asEqCoefsZeros\[50\][ ]=' sound/pci/au88x0/au88x0_eqdata.c
+    defsnc 'static[ ]const[ ]u16[ ]asEqCoefsPipes\[64\][ ]=' sound/pci/au88x0/au88x0_eqdata.c
+    defsnc 'static[ ]const[ ]auxxEqCoeffSet_t[ ]asEqCoefsNormal[ ]=' sound/pci/au88x0/au88x0_eqdata.c
+    defsnc 'static[ ]const[ ]u16[ ]asEqOutStateZeros\[48\][ ]=' sound/pci/au88x0/au88x0_eqdata.c
+    defsnc 'static[ ]const[ ]u16[ ]eq_levels\[64\][ ]=' sound/pci/au88x0/au88x0_eqdata.c
+    defsnc '[\t]static[ ]const[ ]u32[ ]logMagTable\[128\][ ]=' sound/pci/emu10k1/io.c
+    defsnc '[\t]static[ ]const[ ]char[ ]logSlopeTable\[128\][ ]=' sound/pci/emu10k1/io.c
+    defsnc 'static[ ]const[ ]char[ ]coefficients\[NM_TOTAL_COEFF_COUNT[ ][*][ ]4\][ ]=' sound/pci/nm256/nm256_coef.c
+    defsnc 'static[ ]const[ ]char[ ]channel_map_unity_ss\[HDSPM_MAX_CHANNELS\][ ]=' sound/pci/rme9652/hdspm.c
+    defsnc 'static[ ]const[ ]short[ ]beep_wform\[256\][ ]=' sound/ppc/beep.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(master\|\(snapper_\)\?\(treble\|bass\|mixer\)\)_volume_table\[\][ ]=' sound/ppc/tumbler_volume.h
+    defsnc 'static[ ]const[ ]u8[ ]jz4770_codec_reg_defaults\[\][ ]=' sound/soc/codecs/jz4770.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt1015_reg\[\][ ]=' sound/soc/codecs/rt1015.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt1308_reg_defaults\[\][ ]=' sound/soc/codecs/rt1308-sdw.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt700_reg_defaults\[\][ ]=' sound/soc/codecs/rt700-sdw.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt711_reg_defaults\[\][ ]=' sound/soc/codecs/rt711-sdw.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt715_reg_defaults\[\][ ]=' sound/soc/codecs/rt715-sdw.h
+    defsnc 'static[ ]unsigned[ ]char[ ]\(in\|out\)put_clk_map_imx35\[ASRC_CLK_MAP_LEN\][ ]=' sound/soc/fsl/fsl_asrc.c
+    defsc 'static[ ]unsigned[ ]char[ ]\(in\|out\)put_clk_map_imx53\[ASRC_CLK_MAP_LEN\][ ]=' sound/soc/fsl/fsl_asrc.c
+    defsnc 'static[ ]unsigned[ ]char[ ]clk_map_imx8q\(m\|xp\)\[2\]\[ASRC_CLK_MAP_LEN\][ ]=' sound/soc/fsl/fsl_asrc.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]pan_volumes\[256\][ ]=' sound/synth/emux/emux_synth.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]\(voltab[12]\|expressiontab\)\[128\][ ]=' sound/synth/emux/emux_synth.c
+    defsnc 'static[ ]const[ ]int[ ]log_tbl\[129\][ ]=' sound/synth/emux/soundfont.c
+    defsnc 'static[ ]const[ ]short[ ]\(attack\|decay\)_time_tbl\[128\][ ]=' sound/synth/emux/soundfont.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]bcd2000_init_sequence\[\][ ]=' sound/usb/bcd2000/bcd2000.c
+    defsc 'static[ ]const[ ]struct[ ]s_c2[ ]SetRate48000\[\][ ]=' sound/usb/usx2y/usbusx2yaudio.c
+    accept '[\t]*\.default_fw_filename[ ]=[ ]["]sof-[^" ;]*\.ri["]' sound/soc/sof/sof-'\(acpi\|pci\)-dev\.c'
+    accept '[\t]*tplg_filename[ ]=[ ]devm_kasprintf[(]sdev->dev[,][ ]GFP_KERNEL[,][\n][\t ]*["]%s-%s\.tplg["][,]' sound/soc/sof/intel/byt.c
+    accept '[\t]*dev_dbg[(]sdev->dev[,][ ]["]request_firmware[ ]%s[ ]successful' sound/soc/sof/loader.c
+    accept '[\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]file[,][ ]scomp->dev[)]' sound/soc/sof/topology.c
+    blobname '\(board-2\|bdwlan\|caldata\)\.bin' 'drivers/net/wireless/ath/ath11k/\(hw\|qmi\)\.h'
+    blobname 'board\.bin' ddrivers/net/wireless/ath/ath11k/core.c
+    blobname 'scp\.img' drivers/remoteproc/mtk_scp.c
+    blobname '%s[/]%08x-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x\.bin' drivers/tee/amdtee/core.c
+    blobname 'qcom[/]sdm845[/]\([ac]dsp\.mdt\|\(mba\|modem\)\.mbn\)' arch/arm64/boot/dts/qcom/sdm845-db845c.dts
+    blobname 'brcmfmac\(43456\|4359\)-sdio' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(voice_focus\|mic_svm\|equalizer\)_vals_lookup\[\][ ]=' sound/pci/hda/patch_ca0132.c
+    defsnc 'static[ ]const[ ]struct[ ]hda_verb[ ]ca0132_init_verbs[01]\[\][ ]=' sound/pci/hda/patch_ca0132.c
 
     ;;
 
