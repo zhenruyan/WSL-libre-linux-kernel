@@ -5,6 +5,7 @@
 #                    + 2020-01-14's r17211
 #                    + 2020-02-01's r17293
 #                    + 2020-03-21's r1738[12]
+#                    + 2020-04-22's r17437
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5697,6 +5698,10 @@ set_except () {
     # New in 5.5.11 and 5.4.27.
     blobname 'microchip[/]mscc_vsc8584_revb_int8051_fb48\.bin' drivers/net/phy/mscc.c
     blobname 'microchip[/]mscc_vsc8574_revb_int8051_29e8\.bin' drivers/net/phy/mscc.c
+
+    # New variation in 5.6.6, 5.5.19, and 5.4.34.
+    # The firmware file name is supplied by the user.
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]file_name[,]\([^\n]*[\n]\+[^\n}]\)*err[ ]=[ ]mlx5_firmware_flash[(]' drivers/net/ethernet/mellanox/mlx5/core/devlink.c
 
     ;;
 
