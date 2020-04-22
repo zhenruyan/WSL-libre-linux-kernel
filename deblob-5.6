@@ -867,6 +867,11 @@ clean_blob drivers/gpu/drm/nouveau/nvkm/engine/gr/gv100.c
 clean_blob drivers/gpu/drm/nouveau/nvkm/engine/gr/tu102.c
 clean_blob drivers/gpu/drm/nouveau/nvkm/engine/sec2/gp102.c
 clean_blob drivers/gpu/drm/nouveau/nvkm/engine/sec2/gp108.c
+if grep MODULE_FIRMWARE \
+	drivers/gpu/drm/nouveau/nvkm/engine/sec2/tu102.c > /dev/null; then
+  # Added in 5.6.6.
+  clean_blob drivers/gpu/drm/nouveau/nvkm/engine/sec2/tu102.c
+fi
 clean_blob drivers/gpu/drm/nouveau/nvkm/subdev/acr/gm200.c
 clean_blob drivers/gpu/drm/nouveau/nvkm/subdev/acr/gm20b.c
 clean_blob drivers/gpu/drm/nouveau/nvkm/subdev/acr/gp102.c
