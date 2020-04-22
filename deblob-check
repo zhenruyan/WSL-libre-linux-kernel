@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-03-29
+# deblob-check version 2020-04-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5823,6 +5823,10 @@ set_except () {
     blobname 'brcmfmac\(43456\|4359\)-sdio' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
     defsnc 'static[ ]const[ ]unsigned[ ]int[ ]\(voice_focus\|mic_svm\|equalizer\)_vals_lookup\[\][ ]=' sound/pci/hda/patch_ca0132.c
     defsnc 'static[ ]const[ ]struct[ ]hda_verb[ ]ca0132_init_verbs[01]\[\][ ]=' sound/pci/hda/patch_ca0132.c
+
+    # New variation in 5.6.6, 5.5.19, and 5.4.34.
+    # The firmware file name is supplied by the user.
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]file_name[,]\([^\n]*[\n]\+[^\n}]\)*err[ ]=[ ]mlx5_firmware_flash[(]' drivers/net/ethernet/mellanox/mlx5/core/devlink.c
 
     ;;
 
