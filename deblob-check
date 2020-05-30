@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-04-22
+# deblob-check version 2020-05-29
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -685,10 +685,10 @@ accept(
 1, 2, 3, 4
 }" \
   ; do
-    case `echo "$string" | $0 $targs -C` in
+    case `$echo "$string" | $0 $targs -C` in
     "::: - :::
 $string") ;;
-    *) echo "failed $test test for:
+    *) $echo "failed $test test for:
 $string" >&2
        pass=false;;
     esac
@@ -703,7 +703,7 @@ $string" >&2
     "accept(1, 2, 3,
 4, 5, 6)" \
   ; do
-    case `echo "$string" | $0 $targs` in
+    case `$echo "$string" | $0 $targs` in
     "") ;;
     *) echo "failed $test test for:
 $string" >&2
@@ -785,11 +785,11 @@ x" \
       input=$string odd=false
       continue
     fi
-    case `echo "$input" | $0 $targs -B` in
+    case `$echo "$input" | $0 $targs -B` in
     "::: - :::
 $string") ;;
     *)
-      echo "failed $test test for:
+      $echo "failed $test test for:
 $input" >&2
       pass=false
       ;;
@@ -865,11 +865,11 @@ x" \
       input=$string odd=false
       continue
     fi
-    case `echo "$input" | $0 $targs -b` in
+    case `$echo "$input" | $0 $targs -b` in
     "::: - :::
 $string") ;;
     *)
-      echo "failed $test test for:
+      $echo "failed $test test for:
 $input" >&2
       pass=false
       ;;
@@ -893,31 +893,6 @@ fi
 # false positives.  Takes the input filename in $1.
 
 set_except () {
-  blob "$blobseq"
-  # We leave out the initial and final letters of request_firmware so
-  # that deblobbing turns them into r/*DEBLOBBED*/e, a syntax error.
-  blobna 'equest_firmwar'
-  blobna 'equest_ihex_firmwar'
-  blobna 'irmware_reques' # catch _nowarn; also caches _cache, but that's ok.
-  # Catch request_firmare misdeblobbed by the above.
-  blobname 'r[/][*][(]DEBLOBBED[)][*][/]e' 
-  blobname 'f[/][*][(]DEBLOBBED[)][*][/]t' 
-  blobna '[Uu]p\(date\|grade\)[^\n]*[Mm]icrocode'
-  blobna 'MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\([ 	\n]*MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\)*'
-  blobna 'DEFAULT_FIRMWARE'
-  blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
-  blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\|cyacd\)[\\]\?["]'
-  # WIP ends with [\\]\?[][}{)(><,;:.!?% \t\n"`\'"'"']'
-  # Catch misdeblobbed fw extension.
-  blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
-  # Ideally we'd whitelist URLs that don't recommend non-Free
-  # Software, but there are just too many URLs in Linux, and most are
-  # fine, so we just blacklist when we find undesirable URLs.
-  # Please report if you find any inappropriate URL in Linux-libre
-  # deblobbed documentation, sources or run-time log messages.
-  # blobna '\(f\|ht\)tp:[/]\([/]\+[^/ \n ]\+\)\+'
-
   case $prefix$1 in
   */*linux*.tar* | */*kernel*.tar* | */*linux-*.*/*)
     # false alarms, contain source
@@ -5278,7 +5253,7 @@ set_except () {
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]\(luma\|chroma\)_\(q\|ac\)_table\[\][ ]=' drivers/staging/media/rockchip/vpu/rockchip_vpu_jpeg.c
     defsc 'static[ ]const[ ]unsigned[ ]char[ ]rockchip_vpu_jpeg_header\[JPEG_HEADER_SIZE\][ ]=' drivers/staging/media/rockchip/vpu/rockchip_vpu_jpeg.c
     defsnc 'static[ ]const[ ]unsigned[ ]char[ ]fontdata_ter16x32\[FONTDATAMAX\][ ]=' lib/fonts/font_ter16x32.c
-    accept '[\t][\t]\([{][ ]timeout\|["]tests[/]\|[!][ ]grep[ ]-Eq\)[^\n]*[ ]["]tests\/\$\{testname\}\.vg\.out["]' tools/lib/lockdep/run_tests.sh
+    accept '[\t][\t]\([{][ ]timeout\|["]tests[/]\|[!][ ]grep[ ]-Eq\)[^\n]*[ ]["]tests\/\$[{]testname[}]\.vg\.out["]' tools/lib/lockdep/run_tests.sh
     blobname 'amdgpu[/]\(%s\|picasso\)_rlc\(_am4\)\?\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
     blobname 'amdgpu[/]\(%s\|vega20\)_ta\.bin' drivers/gpu/drm/amd/amdgpu/psp_v11_0.c
     blobname 'yamato_\(pm4\|pfp\)\.fw' drivers/gpu/drm/msm/adreno/adreno_device.c
@@ -5828,6 +5803,89 @@ set_except () {
     # The firmware file name is supplied by the user.
     accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]file_name[,]\([^\n]*[\n]\+[^\n}]\)*err[ ]=[ ]mlx5_firmware_flash[(]' drivers/net/ethernet/mellanox/mlx5/core/devlink.c
 
+    # New in 5.7-rc7.
+    accept '[\t ]*:\([ ]*[32][86420]0*\)*\([\n][ ]*[32][86420]0*:\([ ]*[012345]\)*\)*' Documentation/cpu-freq/cpufreq-stats.rst
+    accept '\(The[ ]\)\?firmware_request_platform[(][)][ ]function' Documentation/driver-api/firmware/fallback-mechanisms.rst
+    accept '[ ][ ][ ]request_firmware[\n]' Documentation/driver-api/firmware/index.rst
+    accept '[ ][ ]firmware_request_platform[(][)][ ]is[ ]used' Documentation/driver-api/firmware/lookup-order.rst
+    accept '\([ ][ ][ ]:functions:[ ]\)\?firmware_request_platform' Documentation/driver-api/firmware/request_firmware.rst
+    accept '\(typical[ ]data[ ]at[ ]NVRAM[ ]address[ ]0x100[ ][(]53c810a[ ]NVRAM[)]\|device[ ]set[ ]up[ ][(]up[ ]to[ ]16[ ]devices[ ]-[ ]includes[ ]controller[)]\)::\([\n]\+[ ][ ][ ]\([ ][0-9a-f][0-9a-f]\)\+\([ ]-[ ]id[ ]\(0\|15\)\)\?\)*' Documentation/scsi/'\(ncr53c8xx\|sym53c8xx_2\)\.rst'
+    accept 'default[ ]nvram[ ]data::\([\n]\+[ ][ ][ ]\([ ]0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]\)\+\)*' Documentation/scsi/'\(ncr53c8xx\|sym53c8xx_2\)\.rst'
+    defsnc 'static[ ]const[ ]u64[ ]table_ladder\[\][ ]=' arch/x86/crypto/curve25519-x86_64.c
+    defsnc 'static[ ]unsigned[ ]icx_cha_msr_offsets\[\][ ]=' arch/x86/events/intel/uncore_snbep.c
+    accept '[ ][*][ ]firmware_request_platform[(][)][ ]-' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]This[ ]function[ ]is[ ]similar[ ]in[ ]behaviour[ ]to[ ]request_firmware[,]' drivers/base/firmware_loader/main.c
+    accept 'int[ ]firmware_request_platform[(]' drivers/base/firmware_loader/main.c
+    accept 'EXPORT_SYMBOL_GPL[(]firmware_request_platform[)]' drivers/base/firmware_loader/main.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_2tap_16p\[18\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_3tap_16p_\(upscale\|116\|149\|183\)\[27\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_4tap_16p_\(upscale\|116\|149\|183\)\[36\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_2tap_64p\[66\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_3tap_64p_\(upscale\|116\|149\|183\)\[99\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_4tap_64p_\(upscale\|116\|149\|183\)\[132\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_5tap_64p_\(upscale\|116\|149\|183\)\[165\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_6tap_64p_\(upscale\|116\|149\|183\)\[198\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_7tap_64p_\(upscale\|116\|149\|183\)\[231\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    defsnc 'static[ ]const[ ]uint16_t[ ]filter_8tap_64p_\(upscale\|116\|149\|183\)\[264\][ ]=' drivers/gpu/drm/amd/display/dc/dce/dce_scl_filters.c
+    accept '#define[ ]NT35510_GAMMA_\(POS\|NEG\)_DEFAULT[ ]0x[0-9A-F][0-9A-F]\([,][ ]\([\\][\n][\t ]*\)\?0x[0-9A-F][0-9A-F]\)*' drivers/gpu/drm/panel/panel-novatek-nt35510.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]ad7124_reg_size\[\][ ]=' drivers/iio/adc/ad7124.c
+    defsnc 'static[ ]const[ ]u16[ ]gp2ap002_illuminance_table\[\][ ]=' drivers/iio/light/gp2ap002.c
+    defsnc 'static[ ]const[ ]struct[ ]imx219_reg[ ]mode_\(3280x2464\|1920_1080\|1640_1232\|640_480\)_regs\[\][ ]=' drivers/media/i2c/imx219.c
+    defsc 'static[ ]const[ ]u16[ ]mv88e6390_serdes_regs\[\][ ]=' drivers/net/dsa/mv88e6xxx/serdes.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]zigzag\[64\][ ]=' drivers/staging/media/hantro/hantro_jpeg.c
+    defsnc 'static[ ]const[ ]u32[ ]hw_reorder\[64\][ ]=' drivers/staging/media/hantro/hantro_jpeg.c
+    defsnc 'static[ ]const[ ]u8[ ]eos_sequence\[SZ_4K\][ ]=' drivers/staging/media/meson/vdec/codec_h264.c
+    defsnc 'static[ ]const[ ]struct[ ]v4l2_fract[ ]par_table\[\][ ]=' drivers/staging/media/meson/vdec/codec_h264.c
+    defsnc 'const[ ]u16[ ]vdec_hevc_parser_cmd\[\][ ]=' drivers/staging/media/meson/vdec/codec_hevc_common.c
+    defsnc 'static[ ]const[ ]unsigned[ ]short[ ]uni_def_upcase\[EXFAT_NUM_UPCASE\][ ]=' fs/exfat/nls.c
+    accept 'int[ ]firmware_request_platform[(]const[ ]struct[ ]firmware[ ][*][*]fw' include/linux/firmware.h
+    accept 'static[ ]inline[ ]int[ ]firmware_request_platform[(]const[ ]struct[ ]firmware[ ][*][*]fw' include/linux/firmware.h
+    defsnc '[\t]static[ ]const[ ]u8[ ]test_data\[\][ ]=' lib/test_firmware.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_table[ ]mt6660_setting_table\[\][ ]=' sound/soc/codecs/mt6660.c
+    accept '[\t]const[ ]char[ ][*]fw_name[ ]=[ ]["]test-firmware\.bin["]' tools/testing/selftests/firmware/fw_namespace.c
+    defsnc 'struct[ ]reuse_opts[ ]unreusable_opts\[12\][ ]=' tools/testing/selftests/net/reuseaddr_ports_exhausted.c
+    blob 'The[ ]card[ ]requires[ ]firmware.*[\n][\t]rm[ ]wd7296a\.sys' Documentation/scsi/wd719x.rst
+    blobname 'rtl_bt[/]rtl8822cs_fw\.bin' drivers/bluetooth/btrtl.c
+    # If this is code at all, it could use some assembly comments.
+    # Most of it is so regular that disassembly of the final irregular
+    # bits should suffice to make it all transparent.
+    defsnc 'static[ ]const[ ]u32[ ]vgpr_init_compute_shader_arcturus\[\][ ]=' drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]pre_computed_values\[\][ ]=' drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+    blobname 'i915[/]tgl_dmc_ver2_06\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'goodix_%s_cfg\.bin' drivers/input/touchscreen/goodix.c
+    blobname 'dvb-demod-m88ds3103b\.fw' drivers/media/dvb-frontends/m88ds3103_priv.h
+    blobname 'mediatek[/]mt8173[/]vpu_[pd]\.bin' drivers/media/platform/mtk-vpu/mtk_vpu.c
+    blobname 'qcom[/]venus-5\.4[/]venus\.mdt' drivers/media/platform/qcom/venus/core.c
+    blobname 'brcmfmac4364-pcie' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+    blobname 'mediatek[/]mt7622_\(n9\|rom_patch\)\.bin' drivers/net/wireless/mediatek/mt76/mt7615/mt7615.h
+    blobname 'mediatek[/]mt7663\(pr2h\|_n9\)_v3\.bin' drivers/net/wireless/mediatek/mt76/mt7615/mt7615.h
+    blobname 'silead[/]\(gsl3680-chuwi-hi8-pro\|gsl3670-cube-iwork8-air\|gsl3676-onda-v80-plus-v3\|gsl1680-pipo-w2s\)\.fw' drivers/platform/x86/touchscreen_dmi.c
+    accept '[\t]const[ ]char[ ][*]pathname[ ]=[ ]["][/]tmp[/]isst_cpu_topology\.dat["][;]' tools/power/x86/intel-speed-select/isst-config.c
+
+    blobname 'iqs620a\.bin' Documentation/devicetree/bindings/mfd/iqs62x.yaml
+    blobname 'iqs620a_coil\.bin' Documentation/devicetree/bindings/mfd/iqs62x.yaml
+    blobname 'imx[/]sdma[/]sdma-imx7d\.bin' arch/arm64/boot/dts/freescale/imx8mp.dtsi
+    blobname 'qcom[/]sdm845[/]\([ac]dsp\.mdt\|\(mba\|modem\)\.mbn\)' arch/arm64/boot/dts/qcom/sdm845-mtp.dts
+    blobname 'cpt8x-mc\.tar' drivers/crypto/marvell/octeontx/otx_cptpf_ucode.h
+    blobname 'amdgpu[/]navi12_dmcu\.bin' drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+    blobname 'iqs62\(0a\|[1245]\)\.bin' drivers/mfd/iqs62x.c
+    blobname 'ipa_fws\.mdt' drivers/net/ipa/ipa_main.c
+    blobname 'microchip[/]mscc_vsc8584_revb_int8051_fb48.bin' drivers/net/phy/mscc/mscc.h
+    blobname 'microchip[/]mscc_vsc8574_revb_int8051_29e8.bin' drivers/net/phy/mscc/mscc.h
+    # This driver enables the user to update the non-Free BIOS, but it
+    # only issues a firmware request if specifically told to.  It
+    # doesn't require any non-Free firwmare to function, and it
+    # doesn't actually recommend users to perform updates, so I'm
+    # leaving it in.
+    accept '[\t]*pr_err[(]["]request_firmware_nowait[ ]failed' drivers/platform/x86/dell_rbu.c
+    blobname 'idt82p33xxx\.bin' drivers/ptp/ptp_idt82p33.h
+    blobname 'meson[/]vdec[/]\(gxbb_h264\|gxl_vp9\|gxl_h264\|gxm_h264\|g12a_vp9\|g12a_h264\|sm1_vp9_mmu\)\.bin' drivers/staging/media/meson/vdec/vdec_platform.c
+    accept '[\t]rc[ ]=[ ]firmware_request_platform[(][&]firmware[,][ ]' lib/test_firmware.c
+    accept '[ ]*device[ ]name[ ]with[ ]["]\.bin["][ ]as' Documentation/devicetree/bindings/mfd/iqs62x.yaml
+    blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
+    accept '[\t][\t]\.sha256[\t ]=[ ][{][ ]0x[0-9a-f][0-9a-f]\([,][ \t\n]*0x[0-9a-f][0-9a-f]\)*[ ][}][,]' drivers/platform/x86/touchscreen_dmi.c
+    blobna '0x00000001[,][ ]0x26020128[,][ ]0x00000024[,][ ]0x00000000\([,][\n\t ]*0x[0-9a-f]*\)*[,]\?' drivers/gpu/drm/i915/gt/'\(hsw\|ivb\)_clear_kernel\.c'
+
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -5846,6 +5904,35 @@ set_except () {
     blobname 'blobeol[^\n]*[\n]'
     ;;
   esac
+
+  # Non-specific patterns come after the patch-specific ones so that,
+  # when using non-NDA left-to-right regexps (python, perl), the
+  # patterns above can override matches of those below.
+
+  blob "$blobseq"
+  # We leave out the initial and final letters of request_firmware so
+  # that deblobbing turns them into r/*DEBLOBBED*/e, a syntax error.
+  blobna 'equest_firmwar'
+  blobna 'equest_ihex_firmwar'
+  blobna 'irmware_reques' # catch _nowarn; also caches _cache, but that's ok.
+  # Catch request_firmare misdeblobbed by the above.
+  blobname 'r[/][*][(]DEBLOBBED[)][*][/]e' 
+  blobname 'f[/][*][(]DEBLOBBED[)][*][/]t' 
+  blobna '[Uu]p\(date\|grade\)[^\n]*[Mm]icrocode'
+  blobna 'MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\([ 	\n]*MODULE_FIRMWARE[ 	]*[(][^\n;]*[)][ 	]*[;]\)*'
+  blobna 'DEFAULT_FIRMWARE'
+  blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
+  blobna 'mod_firmware_load' # sound/
+  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\|cyacd\)[\\]\?["]'
+  # WIP ends with [\\]\?[][}{)(><,;:.!?% \t\n"`\'"'"']'
+  # Catch misdeblobbed fw extension.
+  blobname '["][^" \t\n]*[/][*][(]DEBLOBBED[)][*][/][^"\\]'
+  # Ideally we'd whitelist URLs that don't recommend non-Free
+  # Software, but there are just too many URLs in Linux, and most are
+  # fine, so we just blacklist when we find undesirable URLs.
+  # Please report if you find any inappropriate URL in Linux-libre
+  # deblobbed documentation, sources or run-time log messages.
+  # blobna '\(f\|ht\)tp:[/]\([/]\+[^/ \n ]\+\)\+'
 }
 
 # Regular expression that matches a literal constant.
