@@ -1,0 +1,21 @@
+GNU Linux-libre: <https://www.fsfla.org/selibre/linux-libre/>
+
+This repository contains the GNU Linux-libre release archive.
+
+It is a bit unusual as far as git repositories go, in that it pretty
+much does not contain branches, only tags.  The goal is not to reflect
+development history, but to preserve our release history in a far more
+compact form than a collection of tarballs.
+
+Most tags are initial commits, so that, in case we find releases
+containing non-Free Software, we can pull them back without affecting
+subsequent releases.
+
+For each release, there are three tags:
+
+- The tag under sources has cleaned-up source tarballs.
+
+- The tag under scripts has the cleaning-up scripts.
+
+- The tag under logs records the modifications made by the scripts,
+and GPG signatures of the verified tarballs.
