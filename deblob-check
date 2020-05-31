@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2014-12-07
+# deblob-check version 2014-12-07 + 2015-09-22's r12444
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3969,6 +3969,9 @@ set_except () {
     accept '[\t][\t]dev_err[(][&]dev->dev[,][ ]["]%d[,][ ]request_firmware[ ]failed' sound/pci/asihpi/hpidspcd.c
     accept 'static[ ]int[ ]snd_ymfpci_request_firmware[(]' sound/pci/ymfpci/ymfpci_main.c
     accept '[\t]err[ ]=[ ]snd_ymfpci_request_firmware[(]' sound/pci/ymfpci/ymfpci_main.c
+
+    # New in 4.2.1 and 4.1.8.
+    defsnc '[}][ ]common_modes\[\][ ]=' drivers/gpu/drm/qxl/qxl_display.c
     ;;
 
   */*freedo*.patch | */*logo*.patch)
