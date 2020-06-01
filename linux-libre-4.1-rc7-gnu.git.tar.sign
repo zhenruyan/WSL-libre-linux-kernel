@@ -1,0 +1,9 @@
+-----BEGIN PGP SIGNATURE-----
+Comment: This signature is for the .tar version of the archive
+Comment: git archive --format tar --prefix=linux-libre-4.1-rc7-gnu/ v4.1-rc7-gnu
+Comment: git version 2.25.4
+
+iF0EABECAB0WIQRHRALIxYLa++OJxCe8t8+Hfn1HpwUCXtRWcAAKCRC8t8+Hfn1H
+p3ZLAJ9OzLmTyHGqSfU5obx7QLLttf2a9ACfZZVZWHO2JwD1FI3k7gmSOUd+hBE=
+=hmGg
+-----END PGP SIGNATURE-----
