@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-05-29
+# deblob-check version 2020-07-09
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5884,7 +5884,9 @@ set_except () {
     accept '[ ]*device[ ]name[ ]with[ ]["]\.bin["][ ]as' Documentation/devicetree/bindings/mfd/iqs62x.yaml
     blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     accept '[\t][\t]\.sha256[\t ]=[ ][{][ ]0x[0-9a-f][0-9a-f]\([,][ \t\n]*0x[0-9a-f][0-9a-f]\)*[ ][}][,]' drivers/platform/x86/touchscreen_dmi.c
-    blobna '0x00000001[,][ ]0x26020128[,][ ]0x00000024[,][ ]0x00000000\([,][\n\t ]*0x[0-9a-f]*\)*[,]\?' drivers/gpu/drm/i915/gt/'\(hsw\|ivb\)_clear_kernel\.c'
+    # Sources added to 5.7.8, but they were available elsewhere before..
+    defsnc 'static[ ]const[ ]u32[ ]ivb_clear_kernel\[\][ ]=' drivers/gpu/drm/i915/gt/ivb_clear_kernel.c
+    defsnc 'static[ ]const[ ]u32[ ]hsw_clear_kernel\[\][ ]=' drivers/gpu/drm/i915/gt/hsw_clear_kernel.c
 
     ;;
 

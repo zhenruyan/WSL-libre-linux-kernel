@@ -268,6 +268,12 @@ for f in \
     drivers/gpu/drm/amd/amdkfd/cwsr_trap_handler_gfx10.asm \
   drivers/gpu/drm/amd/amdkfd/cwsr_trap_handler.h \
 \
+    drivers/gpu/drm/i915/gt/shaders/README \
+    drivers/gpu/drm/i915/gt/shaders/clear_kernel/hsw.asm \
+  drivers/gpu/drm/i915/gt/hsw_clear_kernel.c \
+    drivers/gpu/drm/i915/gt/shaders/clear_kernel/ivb.asm \
+  drivers/gpu/drm/i915/gt/ivb_clear_kernel.c \
+\
     drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/com.fuc \
     drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf100.fuc3 \
   drivers/gpu/drm/nouveau/nvkm/engine/ce/fuc/gf100.fuc3.h \
@@ -847,13 +853,6 @@ reject_firmware drivers/gpu/drm/i915/display/intel_opregion.c
 reject_firmware drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
 clean_blob drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
 clean_blob drivers/gpu/drm/i915/gt/uc/intel_uc_fw.h
-# Hmm, these are quite sparse, and a little too regular to be code of
-# significant complexity, but being a little on the too-big side, and
-# due to the inclusion as X11/MIT-licensed without comments or links
-# to corresponding sources, I'm conservatively assuming they are
-# binary blobs.  If you know otherwise, please let me know.
-clean_blob drivers/gpu/drm/i915/gt/hsw_clear_kernel.c
-clean_blob drivers/gpu/drm/i915/gt/ivb_clear_kernel.c
 clean_kconfig drivers/gpu/drm/i915/Kconfig DRM_I915
 clean_mk CONFIG_DRM_I915 drivers/gpu/drm/i915/Makefile
 
@@ -3375,7 +3374,7 @@ clean_blob sound/pci/echoaudio/mona.c
 clean_kconfig sound/pci/Kconfig SND_MONA
 clean_mk CONFIG_SND_MONA sound/pci/echoaudio/Makefile
 
-announce SND_'<(Echoaudio)>' - "(Echoaudio) all of the above "
+announce SND_'<(Echoaudio)>' - "(Echoaudio) all of the above"
 reject_firmware sound/pci/echoaudio/echoaudio.c
 clean_blob sound/pci/echoaudio/echoaudio.c
 
