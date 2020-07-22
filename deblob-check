@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-07-20
+# deblob-check version 2020-07-21
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4663,7 +4663,7 @@ set_except () {
     defsnc 'static[ ]yyconst[ ]YY_CHAR[ ]yy_meta\[48\][ ]=' scripts/dtc/dtc-lexer.lex.c_shipped
     defsnc 'static[ ]yyconst[ ]flex_uint16_t[ ]yy_base\[180\][ ]=' scripts/dtc/dtc-lexer.lex.c_shipped
     defsnc 'static[ ]yyconst[ ]flex_uint16_t[ ]yy_nxt\[449\][ ]=' scripts/dtc/dtc-lexer.lex.c_shipped
-    accept '0x1B[,][ ]0x5E[,][ ]0x78[,][ ]0x3D[,][ ]0x00[,][ ]0x00[,][ ]0x00[,][ ]0x18[,][ ][0x1-9A-F, ]*' security/apparmor/nulldfa.in
+    accept '0x1B[,][ ]0x5E[,][ ]0x78[,][ ]0x3D[,][ ]0x00[,][ ]0x00[,][ ]0x00[,][ ]0x18[,][ ][0x1-9A-F, \n]*' security/apparmor/nulldfa.in
     defsnc '[\t]struct[ ]sock_filter[ ]bpf_filter\[\][ ]=' tools/testing/selftests/net/psock_lib.h
     blobname 'cpt8x-mc-[as]e\.out' drivers/crypto/cavium/cpt/cptpf_main.c
     blobname 'i915[/]["][ ]__stringify[(]platform[)][ ]["]_huc_ver["][ ]__stringify[(]major[)][ ]["]_["][ \\\n\t]*__stringify[(]minor[)][ ]["]_["][ ]__stringify[(]bld_num[)][ ]["]\.bin' drivers/gpu/drm/i915/intel_huc.c
