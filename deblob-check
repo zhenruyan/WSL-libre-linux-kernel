@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-07-21
+# deblob-check version 2020-07-25
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -81,6 +81,16 @@
 #		false positive patterns.  It might have been a fast
 #		regular expression processor if only the flex program
 #		completed in reasonable time.
+
+
+# For reference, as of 5.8-rc6-gnu, checking the full tarball (with
+# -B, not -C) takes up:
+
+# Engine            top mem   time
+# GNU awk 5.0.1     1.7GB       1x
+# Python 3.8.3         48MB    14x
+# Perl 5.30.3          22MB    45x
+# GNU sed 4.5      10+GB      ???
 
 
 # The default sensitivity is 32 constants.
