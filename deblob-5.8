@@ -3272,6 +3272,7 @@ clean_mk CONFIG_MFD_IQS62X drivers/mfd/Makefile
 announce PTP_1588_CLOCK_IDTCM - "IDT CLOCKMATRIX as PTP clock"
 reject_firmware drivers/ptp/ptp_clockmatrix.c
 clean_blob drivers/ptp/ptp_clockmatrix.h
+clean_blob Documentation/driver-api/ptp.rst
 clean_kconfig drivers/ptp/Kconfig PTP_1588_CLOCK_IDTCM
 clean_mk CONFIG_PTP_1588_CLOCK_IDTCM drivers/ptp/Makefile
 
