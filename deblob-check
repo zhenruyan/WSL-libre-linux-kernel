@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-07-25
+# deblob-check version 2020-07-26
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -87,10 +87,10 @@
 # -B, not -C) takes up:
 
 # Engine            top mem   time
-# GNU awk 5.0.1     1.7GB       1x
+# GNU awk 5.0.1     2.2GB       1x
 # Python 3.8.3         48MB    14x
 # Perl 5.30.3          22MB    45x
-# GNU sed 4.5      10+GB      ???
+# GNU sed 4.5      24GB         4x
 
 
 # The default sensitivity is 32 constants.
