@@ -1,0 +1,87 @@
+#! /bin/bash
+archive=$HOME/linux-libre/releases # $(ls -d /media/p0?/linux-libre-releases)
+key=474402C8C582DAFBE389C427BCB7CF877E7D47A7
+pubase=public/logs/v5.6-gnu
+tmp=. # /tmp/prep
+
+success=:
+
+for tag
+do
+  rel=${tag##jxself/v}
+  rup=${rel%%-[gl][ni][ub]*}
+
+  git rev-parse --verify -q incr/v$rel &&
+  git rev-parse --verify -q public/sources/v$rel &&
+  git rev-parse --verify -q public/logs/v$rel &&
+  continue
+
+ (if test ! -d $archive/$rel; then
+    echo $archive/$rel/ does not exist >& 2
+    exit 1
+  fi &&
+
+  tb=$archive/$rel/linux-libre-$rel &&
+  tar=$tb.tar.bz2 &&
+  trd=linux-$rup &&
+
+  tagid=$(git rev-parse $tag) &&
+  noteid=$(echo $tagid | sed 's,^..,&/,') &&
+  git rev-parse --verify -q stable/v$rup &&
+
+  DATE=$(git cat-file -p $tagid |
+             gawk '/^(author|tagger)/ {
+                        print strftime(PROCINFO["strftime"], $(NF-1))
+                   }') &&
+  export GIT_COMMITTER_DATE=$DATE GIT_AUTHOR_DATE=$DATE &&
+
+  test -f $tb.log &&
+  test -f notes/logs/$noteid &&
+  test -f notes/tars/$noteid &&
+  diff -b $tb.log notes/logs/$noteid &&
+
+  git archive --format tar --prefix=linux-libre-$rel/ $tag |
+  gpg -q --verify notes/tars/$noteid - &&
+
+  git worktree add --detach log-$rel $pubase &&
+
+  cd log-$rel &&
+  git rm -f linux* &&
+  cp -p $tb.log $tb.tar.sign . &&
+  cp ../notes/tars/$noteid $(basename $tb).git.tar.sign &&
+  git add linux* &&
+  git commit --amend --reset-author -S$key -m "GNU Linux-libre $rel logs" &&
+  cd .. &&
+
+  gpg -q --verify $tar.sign &&
+
+  git worktree add --detach $tmp/$trd master &&
+  rm -f $tmp/$trd/* &&
+
+ (cd $tmp/$trd &&
+  git reset -q $tag &&
+  tar -xf $tar -C .. &&
+
+  if git status -su | grep .; then
+    exit 1
+  fi &&
+
+  git reset --soft stable/v$rup &&
+  git commit -m "GNU Linux-libre $rel incremental" &&
+
+  git tag -f incr/v$rel &&
+
+  git fetch file://$(pwd) refs/tags/$tag:refs/tags/public/sources/v$rel
+ ) &&
+
+  git worktree remove $tmp/$trd &&
+
+  cd log-$rel &&
+  git tag -f -m "GNU Linux-libre $rel logs" -s -u $key public/logs/v$rel &&
+  cd .. &&
+  git worktree remove log-$rel
+
+ ) || { echo $tag failed >&2; success=false; }
+done
+
+$success
