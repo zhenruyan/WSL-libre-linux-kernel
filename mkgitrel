@@ -99,7 +99,37 @@ fi &&
 { scripts/v$rel/deblob-check --use-awk linux-libre-$rel.tar ||
     scripts/v$rel/deblob-check --use-awk -C linux-libre-$rel.tar \
       > linux-libre-$rel.check ||
-    { success=false; continue; }; } &&
+    { success=false; continue; }; }
+
+done &&
+
+$success && echo all revs cleaned up, awaiting manual check results... &&
+
+for rel
+do
+    
+rup=$(echo "$rel" | sed 's,-gnu[0-9]*$,,')
+cbr=$(echo "$rup" | sed 's,\(\.\|-rc\)[0-9]*$,,')
+
+if test -d $reldir/$rel; then
+  echo $reldir/$rel exists >&2
+  continue
+fi
+
+if test -h $reldir/LATEST-$cbr.0; then
+  prev0=$(readlink $reldir/LATEST-$cbr.0)
+  prevn=$(readlink $reldir/LATEST-$cbr.N)
+else
+  cbr=$rup
+  prev0=$(readlink $reldir/LATEST-$cbr.0)
+  prevn=$(readlink $reldir/LATEST-$cbr.N)
+fi
+
+DATE=$(git cat-file -p incr/v$rel |
+       gawk '/^(author|tagger)/ {
+               print strftime(PROCINFO["strftime"], $(NF-1))
+             }') &&
+export GIT_COMMITTER_DATE=$DATE GIT_AUTHOR_DATE=$DATE &&
 
 while test -f linux-libre-$rel.patck; do
   echo please verify linux-libre-$rel.patck and move it away to complete the release
@@ -135,7 +165,37 @@ for x in scripts sources logs; do
     git tag public/$x/v$rel $x/v$rel &&
     git tag -d $x/v$rel
   fi
+done
+
 done &&
+
+$success && echo all git tagging done, now compressing... &&
+
+for rel
+do
+    
+rup=$(echo "$rel" | sed 's,-gnu[0-9]*$,,')
+cbr=$(echo "$rup" | sed 's,\(\.\|-rc\)[0-9]*$,,')
+
+if test -d $reldir/$rel; then
+  echo $reldir/$rel exists >&2
+  continue
+fi
+
+if test -h $reldir/LATEST-$cbr.0; then
+  prev0=$(readlink $reldir/LATEST-$cbr.0)
+  prevn=$(readlink $reldir/LATEST-$cbr.N)
+else
+  cbr=$rup
+  prev0=$(readlink $reldir/LATEST-$cbr.0)
+  prevn=$(readlink $reldir/LATEST-$cbr.N)
+fi
+
+DATE=$(git cat-file -p incr/v$rel |
+       gawk '/^(author|tagger)/ {
+               print strftime(PROCINFO["strftime"], $(NF-1))
+             }') &&
+export GIT_COMMITTER_DATE=$DATE GIT_AUTHOR_DATE=$DATE &&
 
 plist="patch-$prev0-$rel" &&
 if test "$prev0" != "$prevn"; then
