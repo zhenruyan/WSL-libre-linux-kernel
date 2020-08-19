@@ -8,6 +8,7 @@
 #                                 + 2019-04-06's r15949 (partial)
 #                                 + 2019-12-02's r17069
 #                                 + 2020-01-14's r17211
+#                                 + 2020-08-19's r17613
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5235,6 +5236,10 @@ set_except () {
 
     # New in 4.19.89, backported from 5.0.
     defsnc '[\t]static[ ]u8[ ]rss_key\[AQ_CFG_RSS_HASHKEY_SIZE\][ ]=' drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+
+    # New in 5.8.2, 5.7.16, 5.4.59, and 4.19.140.
+    blobname 'mrvl[/]sdsd8977_combo_v2\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
+    blobname 'mrvl[/]sdsd8997_combo_v4\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
 
     ;;
 
