@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-07-26
+# deblob-check version 2020-07-26 + 2020-08-19's r17613
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5964,6 +5964,10 @@ set_except () {
     accept '[\t]*dev_err[(][&]pdev->dev[,][ ]["]request_firmware[ ]failed' drivers/usb/host/xhci-pci-renesas.c
     accept 'EXPORT_SYMBOL_GPL[(]load_msr_list[)]' drivers/staging/media/atomisp/i2c/atomisp-libmsrlisthelper.c
     blobna 'for[ ]the[ ]WinTV[/]PVR[^:.]*firmware[^:.]*:[\n ][`][`]hcwamc\.rbf[^\n]*\([\n][^\n][^\n]*\)*' Documentation/admin-guide/media/bttv.rst
+
+    # New in 5.8.2, 5.7.16, 5.4.59, and 4.19.140.
+    blobname 'mrvl[/]sdsd8977_combo_v2\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
+    blobname 'mrvl[/]sdsd8997_combo_v4\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
 
     ;;
 
