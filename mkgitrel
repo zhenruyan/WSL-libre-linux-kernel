@@ -212,6 +212,7 @@ mkdir -v $rel &&
 
 for f in $(ls scripts/v$rel); do
   if cmp scripts/v$rel/$f $reldir/$prevn/$f; then
+    gpg --verify $reldir/$prevn/$f.sign &&
     ln -v $reldir/$prevn/$f $reldir/$prevn/$f.sign $rel/
   else
     ln -v scripts/v$rel/$f $rel/ &&
