@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-07-09
+# deblob-check version 2020-07-09 + 2020-08-19's r17613
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5887,6 +5887,10 @@ set_except () {
     # Sources added to 5.7.8, but they were available elsewhere before..
     defsnc 'static[ ]const[ ]u32[ ]ivb_clear_kernel\[\][ ]=' drivers/gpu/drm/i915/gt/ivb_clear_kernel.c
     defsnc 'static[ ]const[ ]u32[ ]hsw_clear_kernel\[\][ ]=' drivers/gpu/drm/i915/gt/hsw_clear_kernel.c
+
+    # New in 5.8.2, 5.7.16, 5.4.59, and 4.19.140.
+    blobname 'mrvl[/]sdsd8977_combo_v2\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
+    blobname 'mrvl[/]sdsd8997_combo_v4\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
 
     ;;
 
