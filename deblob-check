@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-08-19
+# deblob-check version 2020-09-26
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5968,6 +5968,53 @@ set_except () {
     # New in 5.8.2, 5.7.16, 5.4.59, and 4.19.140.
     blobname 'mrvl[/]sdsd8977_combo_v2\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
     blobname 'mrvl[/]sdsd8997_combo_v4\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
+
+    # New in 5.9-rc6.
+    accept '[ ][ ]For[ ]pm\(8841\|8916\|8941\|8994\|8994\|a8084\|i8994\|i8998\|s405\)\([,][ \n][ ]*[slv0-9]*\)*' Documentation/devicetree/bindings/regulator/qcom,smd-rpm-regulator.yaml
+    initnc '[ ][ ][ ][ ][$][ ]devlink[ ]region[ ]dump[ ]pci[/][^ ]*[ ]snapshot' Documentation/networking/devlink/ice.rst
+    blobname 'nvm_00440302_i2s_eu\.bin' arch/arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi
+    initnc '[\t][\t]temperature-lookup-table[ ]=[ ]<' arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi
+    blobname 'nvm_00440302_i2s\.bin' arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi
+    defsnc 'static[ ]const[ ]u64[ ]inst\[\][ ]=' drivers/crypto/qat/qat_common/qat_hal.c
+    defsnc 'static[ ]u8[ ]mci_cbc_\(enc\|dec\)_\(no_iv_\)\?array\[3\]\[MODE_CONTROL_BYTES\][ ]=' drivers/crypto/sa2ul.c
+    defsnc 'static[ ]u8[ ]mci_ecb_\(enc\|dec\)_\(no_iv_\)\?array\[3\]\[27\][ ]=' drivers/crypto/sa2ul.c
+    blobname 'amdgpu[/]\(tahiti\|verde\|pitcairn\|oland\)_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
+    blobname 'amdgpu[/]\(sienna_cichlid\|navy_flounder\)_vcn\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
+    blobname 'amdgpu[/]\(sienna_cichlid\|navy_flounder\|%s\)_sdma\(%d\)\?\.bin' drivers/gpu/drm/amd/amdgpu/sdma_v5_2.c
+    # Sources are in cwsr_trap_handler_gfx10.asm.
+    defsnc 'static[ ]const[ ]uint32_t[ ]cwsr_trap_nv1x_hex\[\][ ]=' drivers/gpu/drm/amd/amdkfd/cwsr_trap_handler.h
+    blobname 'amdgpu[/]\(sienna_cichlid\|navy_flounder\|%s\)_dmcub\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_dm.c
+    blobname 'i915[/]rkl_dmc_ver2_01\.bin' drivers/gpu/drm/i915/display/intel_csr.c
+    initnc '[\t]dsi_dcs_write_seq[(]dsi[,][ ]ST7703_CMD_SET\(GIP[12]\|GAMMA\)[,]' drivers/gpu/drm/panel/panel-sitronix-st7703.c
+    defsnc 'static[ ]const[ ]struct[ ]vadc_map_pt[ ]adcmap7_100k\[\][ ]=' drivers/iio/adc/qcom-vadc-common.c
+    defsc '[}][ ]ov10635_regs_wizard\[\][ ]=' drivers/media/i2c/rdacm20.c
+    accept '[\t][/][*][ ]get[ ]reference[ ]of[ ]pdev[ ]for[ ]request_firmware[ ][*][/]' drivers/misc/ti-st/st_kim.c
+    accept '[ ][*][ ]@path:[ ]the[ ]path[ ]of[ ]the[ ]firmware[ ]file[ ]to[ ]use[ ]via[ ]request_firmware' drivers/net/ethernet/intel/ice/ice_devlink.c
+    blobname 'mellanox[/]mlxsw_spectrum3-\(["][ ]__stringify[(]MLXSW_SP3_FWREV_[^)]*[)][ \\\n\t]*["]\.\)*mfa2' drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+    blobname 'rtl_nic[/]rtl8125b-2\.fw' drivers/net/ethernet/realtek/r8169_main.c
+    defsnc 'static[ ]const[ ]u8[ ]rtl88\(12\|21\)ae_delta_swing_table_idx_5g[ba]_[np]\[\]\[DEL_SW_IDX_SZ\][ ]=' drivers/net/wireless/realtek/rtlwifi/rtl8821ae/dm.c
+    defsnc 'static[ ]const[ ]u32[ ]rtw8821c_txscale_tbl\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8821c.c
+    defsnc 'static[ ]const[ ]u8[ ]rtw8821c_pwrtrk_5g[ba]_[np]\[\]\[RTW_PWR_TRK_TBL_SZ\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8821c.c
+    blobname 'rtw88[/]rtw8821c_fw\.bin' drivers/net/wireless/realtek/rtw88/rtw8821c.c
+    defsnc 'static[ ]const[ ]u32[ ]rtw8821c_\(mac\|agc\|bb\|rf_a\)\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8821c_table.c
+    defsnc 'static[ ]const[ ]struct[ ]rtw_phy_pg_cfg_pair[ ]rtw8821c_bb_pg_type0\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8821c_table.c
+    defsnc 'static[ ]const[ ]struct[ ]rtw_txpwr_lmt_cfg_pair[ ]rtw8821c_txpwr_lmt_type0\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8821c_table.c
+    defsnc 'static[ ]const[ ]struct[ ]xpsgtr_ssc[ ]ssc_lookup\[\][ ]=' drivers/phy/xilinx/phy-zynqmp.c
+    accept '[\t]*dev_err[(]dev[,][ ]["]request_firmware[ ]failed' drivers/remoteproc/remoteproc_core.c
+    defsnc 'const[ ]unsigned[ ]char[ ]\(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\|IPA_PDU_HEADER\)\[\][ ]=' drivers/s390/net/qeth_core_mpc.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]sbox_table\[256\][ ]=' drivers/staging/rtl8723bs/core/rtw_security.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]rx_hash_toeplitz_key\[\][ ]=' drivers/vdpa/mlx5/net/mlx5_vnet.c
+    defsnc 'static[ ]struct[ ]test_bitmap_cut[ ]test_cut\[\][ ]=' lib/test_bitmap.c
+    defsnc 'static[ ]__maybe_unused[ ]const[ ]a3d_Hrtf_t[ ]A3dHrir\(Impulse\|Ones\|SatTest\|DImpulse\)[ ]=' sound/pci/au88x0/au88x0_a3ddata.c
+    defsnc 'static[ ]__maybe_unused[ ]xtalk_dline_t[ ]const[ ]alXtalkDlineTest[ ]=' sound/pci/au88x0/au88x0_xtalk.c
+    accept '[\t]const[ ]char[ ][*]pathname[ ]=[ ]["][/]var[/]run[/]isst_cpu_topology\.dat["]' tools/power/x86/intel-speed-select/isst-config.c
+    # The firmware file name is supplied by the user.
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]file_name[,][\n\t ]*[&]priv->hwdev->hwif->pdev->dev[)]' drivers/net/ethernet/huawei/hinic/hinic_devlink.c
+    accept '[\t]err[ ]=[ ]ice_check_for_pending_update[(]pf[,][ ]component[,][ ]extack[)][;][\n][\t]if[ ][(]err[)][\n][\t][\t]return[ ]err[;][\n][\n][\t]err[ ]=[ ]request_firmware[(][&]fw[,][ ]path[,][ ]dev[)]' drivers/net/ethernet/intel/ice/ice_devlink.c
+    blobname 'atmel[/]wilc1000_wifi_firmware-\([0-9]\+\.bin\)\?' drivers/net/wireless/microchip/wilc1000/netdev.c
+    # We massage the file with undefine_macro before clean_blob.
+    blobname '[/][*][(]DEBLOBBED[)][*][/]["][ ][#]api[ ]["]\.bin' drivers/net/wireless/microchip/wilc1000/netdev.c
+    defsnc '[\t]static[ ]const[ ]struct[ ]ephy_info[ ]e_info_8125a_[12]\[\][ ]=' drivers/net/ethernet/realtek/r8169_main.c
 
     ;;
 
