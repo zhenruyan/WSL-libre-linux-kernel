@@ -1,0 +1,91 @@
+#! /bin/bash
+
+reldir=$HOME/linux-libre/releases
+
+key=474402C8C582DAFBE389C427BCB7CF877E7D47A7
+
+success=:
+for rel
+do
+    
+rup=$(echo "$rel" | sed 's,-gnu[0-9]*$,,')
+cbr=$(echo "$rup" | sed 's,\(\.\|-rc\)[0-9]*$,,')
+
+if test -d $reldir/$rel; then
+  echo $reldir/$rel exists >&2
+  continue
+fi
+
+if test -h $reldir/LATEST-$cbr.0; then
+  prev0=$(readlink $reldir/LATEST-$cbr.0)
+  prevn=$(readlink $reldir/LATEST-$cbr.N)
+elif test -h $reldir/LATEST-$rup.N; then
+  cbr=$rup
+  prev0=$(readlink $reldir/LATEST-$cbr.0)
+  prevn=$(readlink $reldir/LATEST-$cbr.N)
+else
+  echo Neither $reldir/LATEST-$cbr.0 nor $reldir/LATEST-$rup.N exist >&2
+  exit 1
+fi
+
+DATE=$(git cat-file -p incr/v$rel |
+       gawk '/^(author|tagger)/ {
+               print strftime(PROCINFO["strftime"], $(NF-1))
+             }') &&
+export GIT_COMMITTER_DATE=$DATE GIT_AUTHOR_DATE=$DATE &&
+
+plist="patch-$prev0-$rel" &&
+if test "$prev0" != "$prevn"; then
+  plist="$plist patch-$prevn-$rel"
+fi &&
+
+list="linux-libre-$rel.tar $plist" &&
+
+bzip2 -k9 $list &&
+xz -k9 $list &&
+lzip -k9s64MiB $list &&
+
+mkdir -v $rel &&
+
+for f in $(ls scripts/v$rel); do
+  if cmp scripts/v$rel/$f $reldir/$prevn/$f; then
+    gpg --verify $reldir/$prevn/$f.sign &&
+    ln -v $reldir/$prevn/$f $reldir/$prevn/$f.sign $rel/
+  else
+    ln -v scripts/v$rel/$f $rel/ &&
+    gpg --armor --detach-sign $rel/$f &&
+    mv -v $rel/$f.asc $rel/$f.sign
+  fi
+done &&
+
+ln -v logs/v$rel/linux-libre-$rel.* $rel/ &&
+
+for f in $plist; do
+  gpg --armor --detach-sign $f &&
+  mv -v $f.asc $rel/$f.sign
+done &&
+
+for ext in .bz2 .xz .lz; do
+  for f in $list; do
+    mv -v $f$ext $rel/ &&
+    gpg --armor --detach-sign $rel/$f$ext &&
+    mv -v $rel/$f$ext.asc $rel/$f$ext.sign
+  done
+done &&
+
+rm -vf $list &&
+
+mv -v $rel $reldir/$rel &&
+ln -snfv $rel $reldir/LATEST-$cbr.N &&
+if test "$rup" = "$cbr"; then
+  ln -nfv $reldir/LATEST-$cbr.N $reldir/LATEST-$cbr.0 &&
+  ln -nfv $reldir/LATEST-$cbr.N $reldir/LATEST-${cbr%.*}.N
+fi &&
+
+git worktree remove logs/v$rel &&
+git worktree remove scripts/v$rel &&
+git worktree remove --force sources/v$rel
+
+done &&
+
+$success

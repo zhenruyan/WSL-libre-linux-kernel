@@ -1,0 +1,76 @@
+#! /bin/bash
+
+reldir=$HOME/linux-libre/releases
+
+key=474402C8C582DAFBE389C427BCB7CF877E7D47A7
+
+success=:
+for rel
+do
+    
+rup=$(echo "$rel" | sed 's,-gnu[0-9]*$,,')
+cbr=$(echo "$rup" | sed 's,\(\.\|-rc\)[0-9]*$,,')
+
+if test -d $reldir/$rel; then
+  echo $reldir/$rel exists >&2
+  continue
+fi
+
+if test -h $reldir/LATEST-$cbr.0; then
+  prev0=$(readlink $reldir/LATEST-$cbr.0)
+  prevn=$(readlink $reldir/LATEST-$cbr.N)
+elif test -h $reldir/LATEST-$rup.N; then
+  cbr=$rup
+  prev0=$(readlink $reldir/LATEST-$cbr.0)
+  prevn=$(readlink $reldir/LATEST-$cbr.N)
+else
+  echo Neither $reldir/LATEST-$cbr.0 nor $reldir/LATEST-$rup.N exist >&2
+  exit 1
+fi
+
+DATE=$(git cat-file -p incr/v$rel |
+       gawk '/^(author|tagger)/ {
+               print strftime(PROCINFO["strftime"], $(NF-1))
+             }') &&
+export GIT_COMMITTER_DATE=$DATE GIT_AUTHOR_DATE=$DATE &&
+
+while test -f linux-libre-$rel.patck; do
+  echo please verify linux-libre-$rel.patck and move it away to complete the release
+  sleep 30
+done &&
+
+(
+  cd scripts/v$rel &&
+  { { git reset --soft -q scripts/$cbr &&
+      otop=$(git rev-parse --verify -q HEAD); } ||
+    echo $rel | grep -q -e -rc; } &&
+  { git commit -a -S$key -m "GNU Linux-libre $rel scripts" ||
+    if git status -su | grep .; then
+      success=false
+      continue
+    fi; } &&
+  case $rup:$(git rev-parse --verify -q HEAD) in
+  *-rc*:* | "$cbr":*) forcetag=: ;;
+  *:"$otop") forcetag=false ;;
+  *) forcetag=: ;;
+  esac &&
+  if $forcetag; then
+    git tag -m "GNU Linux-libre $rel scripts" -s -u $key \
+	-f \
+      scripts/v$rel &&
+    git checkout scripts/$cbr &&
+    git reset --hard scripts/v$rel &&
+    git checkout HEAD
+  fi
+) &&
+
+for x in scripts sources logs; do
+  if git rev-parse --verify -q $x/v$rel > /dev/null ; then
+    git tag public/$x/v$rel $x/v$rel &&
+    git tag -d $x/v$rel
+  fi
+done
+
+done &&
+
+$success
