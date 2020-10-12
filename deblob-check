@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-09-26
+# deblob-check version 2020-10-11
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6015,6 +6015,10 @@ set_except () {
     # We massage the file with undefine_macro before clean_blob.
     blobname '[/][*][(]DEBLOBBED[)][*][/]["][ ][#]api[ ]["]\.bin' drivers/net/wireless/microchip/wilc1000/netdev.c
     defsnc '[\t]static[ ]const[ ]struct[ ]ephy_info[ ]e_info_8125a_[12]\[\][ ]=' drivers/net/ethernet/realtek/r8169_main.c
+
+    # New in 5.9 final.
+    blobname 'gsl1680-mpman-converter9.fw' drivers/platform/x86/touchscreen_dmi.c
+    defsc 'static[ ]struct[ ]font_data[ ]fontdata_ter16x32[ ]=' lib/fonts/font_ter16x32.c
 
     ;;
 
