@@ -7,6 +7,7 @@
 #                    + 2020-03-21's r1738[12]
 #                    + 2020-04-22's r17437
 #                    + 2020-08-19's r17613
+#                    + 2020-10-11's r17709 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5707,6 +5708,9 @@ set_except () {
     # New in 5.8.2, 5.7.16, 5.4.59, and 4.19.140.
     blobname 'mrvl[/]sdsd8977_combo_v2\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
     blobname 'mrvl[/]sdsd8997_combo_v4\.bin' 'drivers/\(bluetooth/btmrvl_sdio\.c\|net/wireless/marvell/mwifiex/sdio\.h\)'
+
+    # New in 5.9 final, 5.8.15, and 5.4.71.
+    defsc 'static[ ]struct[ ]font_data[ ]fontdata_ter16x32[ ]=' lib/fonts/font_ter16x32.c
 
     ;;
 
