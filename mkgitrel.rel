@@ -34,6 +34,12 @@ DATE=$(git cat-file -p incr/v$rel |
              }') &&
 export GIT_COMMITTER_DATE=$DATE GIT_AUTHOR_DATE=$DATE &&
 
+if test -f linux-libre-$rel.check; then
+    success=false
+    git worktree remove logs/v$rel
+    continue
+fi &&
+
 plist="patch-$prev0-$rel" &&
 if test "$prev0" != "$prevn"; then
   plist="$plist patch-$prevn-$rel"
@@ -83,8 +89,7 @@ if test "$rup" = "$cbr"; then
 fi &&
 
 git worktree remove logs/v$rel &&
-git worktree remove scripts/v$rel &&
-git worktree remove --force sources/v$rel
+git worktree remove scripts/v$rel
 
 done &&
 
