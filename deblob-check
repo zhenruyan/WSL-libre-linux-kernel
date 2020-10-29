@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-10-11
+# deblob-check version 2020-10-11 + 2020-10-29's r17739
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6019,6 +6019,9 @@ set_except () {
     # New in 5.9 final.
     blobname 'gsl1680-mpman-converter9.fw' drivers/platform/x86/touchscreen_dmi.c
     defsc 'static[ ]struct[ ]font_data[ ]fontdata_ter16x32[ ]=' lib/fonts/font_ter16x32.c
+
+    # New in 5.9.2 and 5.8.17.
+    accept '[\t][\t]\.driver_data[ ]=[ ]["]sof-[^" ;]*\.tplg["]' sound/soc/sof/sof-pci-dev.c
 
     ;;
 
