@@ -28,17 +28,18 @@ else
   exit 1
 fi
 
+if test -f linux-libre-$rel.check; then
+    success=false
+    git worktree remove logs/v$rel
+    git worktree remove --force sources/v$rel
+    continue
+fi &&
+
 DATE=$(git cat-file -p incr/v$rel |
        gawk '/^(author|tagger)/ {
                print strftime(PROCINFO["strftime"], $(NF-1))
              }') &&
 export GIT_COMMITTER_DATE=$DATE GIT_AUTHOR_DATE=$DATE &&
-
-if test -f linux-libre-$rel.check; then
-    success=false
-    git worktree remove logs/v$rel
-    continue
-fi &&
 
 plist="patch-$prev0-$rel" &&
 if test "$prev0" != "$prevn"; then
