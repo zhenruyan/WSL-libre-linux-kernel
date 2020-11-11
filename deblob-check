@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-10-29
+# deblob-check version 2020-11-10
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -4192,11 +4192,12 @@ set_except () {
     blobname 'brcm[/]brcmfmac4358-pcie\.bin' drivers/net/wireless/brcm80211/brcmfmacpcie.c
     blobname 'brcm[/]brcmfmac43241b5-sdio\.bin' drivers/net/wireless/brcm80211/brcmfmac/sdio.c
     # http://arago-project.org/git/projects/?p=am33x-cm3.git contains
-    # source code and the license even looks like a Free Software
-    # license, but there are provisions about trade secrets that might
-    # be contained in blobs therein.  Furthermore, the license hasn't
-    # been reviewed by the FSF.  So let's keep on assuming it's
-    # non-Free, until we get a definitive answer.
+    # source code and the Texas Instruments, Inc Software License
+    # Agreeent even looks like a Free Software license, but there are
+    # provisions about trade secrets that might be contained in blobs
+    # therein.  Furthermore, the license hasn't been reviewed by the
+    # FSF.  So let's keep on assuming it's non-Free, until we get a
+    # definitive answer.
     blobname 'am335x-pm-firmware\.elf' Documentation/devicetree/bindings/remoteproc/wkup_m3_rproc.txt
     blobname 'rtl_bt[/]rtl\(8723[ab]\|8821a\|8761a\)_fw\.bin' drivers/bluetooth/btrtl.c
     blobname 'radeon[/]\(bonaire\|kabini\|kaveri\|hawaii\|mullins\)_uvd\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
@@ -6022,6 +6023,9 @@ set_except () {
 
     # New in 5.9.2 and 5.8.17.
     accept '[\t][\t]\.driver_data[ ]=[ ]["]sof-[^" ;]*\.tplg["]' sound/soc/sof/sof-pci-dev.c
+
+    # New in 5.9.7 and 5.4.76.
+    defsc 'static[ ]const[ ]struct[ ]font_data[ ]fontdata_ter16x32[ ]=' lib/fonts/font_ter16x32.c
 
     ;;
 
