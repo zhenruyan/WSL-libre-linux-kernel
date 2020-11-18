@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-11-10
+# deblob-check version 2020-11-18
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6026,6 +6026,9 @@ set_except () {
 
     # New in 5.9.7 and 5.4.76.
     defsc 'static[ ]const[ ]struct[ ]font_data[ ]fontdata_ter16x32[ ]=' lib/fonts/font_ter16x32.c
+
+    # New in 5.9.9.
+    defsnc 'static[ ]const[ ]struct[ ]msm_gpio_wakeirq_map[ ]sm8250_pdc_map\[\][ ]=' drivers/pinctrl/qcom/pinctrl-sm8250.c
 
     ;;
 
