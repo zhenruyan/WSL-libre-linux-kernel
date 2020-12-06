@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2020-11-18
+# deblob-check version 2020-12-05
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6030,6 +6030,64 @@ set_except () {
     # New in 5.9.9.
     defsnc 'static[ ]const[ ]struct[ ]msm_gpio_wakeirq_map[ ]sm8250_pdc_map\[\][ ]=' drivers/pinctrl/qcom/pinctrl-sm8250.c
 
+    # New in 5.10-rc.
+    defsc '\([/][*]\)\?static[ ]unsigned[ ]int[ ]\(No\)\?DbiPrbs7\[\][ ]=' drivers/gpu/drm/amd/pm/inc/smu_11_0_cdr_table.h
+    defsnc 'static[ ]const[ ]struct[ ]phy_settings[ ]vc5_hdmi_phy_settings\[\][ ]=' drivers/gpu/drm/vc4/vc4_hdmi_phy.c
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]ad9434_scale_table\[\]\[2\][ ]=' drivers/iio/adc/ad9467.c
+    defsc 'static[ ]const[ ]struct[ ]reg_default[ ]lp50\(24\|36\)_reg_defs\[\][ ]=' drivers/leds/leds-lp50xx.c
+    defsc 'static[ ]const[ ]struct[ ]SMap[I2 ]\?[ ]m_\(RF_Cal\|\(Main\|Cal\)_PLL\|GainTaper\|RF_Cal_DC_Over_DT\|CID_Target\)_Map\[\][ ]=' drivers/media/dvb-frontends/tda18271c2dd_maps.h
+    defsnc 'static[ ]const[ ]struct[ ]ov8856_reg[ ]mode_\(3264x2448\|1632x1224\)_regs\[\][ ]=' drivers/media/i2c/ov8856.c
+    defsc 'static[ ]const[ ]u32[ ]CRC_LUT\[256\][ ]=' drivers/media/test-drivers/vidtv/vidtv_psi.c
+    defsc 'static[ ]const[ ]u8[ ]reverse\[256\][ ]=' drivers/media/test-drivers/vidtv/vidtv_s302m.c
+    defsnc 'static[ ]const[ ]u8[ ]r8a779\(6\(5\|_es13\)\|90\)_calib_table\[2\]\[SDHI_CALIB_TABLE_MAX\][ ]=' drivers/mmc/host/renesas_sdhi_core.c
+    defsnc 'static[ ]const[ ]u16[ ]mcp251xfd_crc16_table\[\][ ]=' drivers/net/can/spi/mcp251xfd/mcp251xfd-crc16.c
+    defsnc 'static[ ]const[ ]u32[ ]ice_ipv[46]_\(ofos\|il\)_no_l4\[\][ ]=' drivers/net/ethernet/intel/ice/ice_flow.c
+    defsc 'static[ ]const[ ]struct[ ]ath10k_mem_section[ ]qca6174_hw30_sdio_register_sections\[\][ ]=' drivers/net/wireless/ath/ath10k/coredump.c
+    accept 'const[ ]struct[ ]firmware[ ][*]ath11k_core_firmware_request[(]' drivers/net/wireless/ath/ath11k/'core\.[ch]'
+    accept '[\t]*\(bd->fw\|fw_entry\|fw\)[ ]=[ ]ath11k_core_firmware_request[(]' drivers/net/wireless/ath/ath11k/qmi.c
+    blobname '\(amss\|m3\)\.bin' drivers/net/wireless/ath/ath11k/hw.h
+    blobname 'gsl1680-irbis-tw118\.fw' drivers/net/wireless/intel/iwlwifi/fw/pnvm.c
+    blobname 'gsl3680-predia-basic\.fw' drivers/net/wireless/intel/iwlwifi/fw/pnvm.c
+    accept '[\t]s->data_sz[ ][=][ ][0-9]*[;][\n][\t]s->data[ ]=[ ][(]void[ ][*][)]["]\([\\]\([0-7][0-7]*\|x[0-9a-f][0-9a-f]\|[\n]\)\)*["][;]' kernel/bpf/preload/iterators/iterators.skel.h
+    accept '[ ][*][ ]@file_offset:[ ]file[ ]offset[ ]to[ ]request[ ]when[ ]calling[ ]request_firmware_into_buf' lib/test_firmware.c
+    accept '[ ][*][ ]@partial:[ ]partial[ ]read[ ]opt[ ]when[ ]calling[ ]request_firmware_into_buf' lib/test_firmware.c
+    accept '[\t]*req->rc[ ]=[ ]request_\(partial_\|\)firmware_into_buf[\n][\t]*[(][&]req->fw[,][\n][\t]*[ ]req->name' lib/test_firmware.c
+    blobname 'qcom[/]sc7180-trogdor[/]modem[/]\(mba\|qdsp6sw\)\.mbn' arch/arm64/boot/dts/qcom/sc7180-trogdor-lte-sku.dtsi
+    blobname 'qcom[/]sc7180-trogdor[/]modem-nolte[/]\(mba\|qdsp6sw\)\.mbn' arch/arm64/boot/dts/qcom/sc7180-trogdor.dtsi
+    blobname 'qcom[/]sdm845[/][ac]dsp\.mdt' arch/arm64/boot/dts/qcom/sdm845-xiaomi-beryllium.dts
+    blobname 'qcom[/]sdm845[/]mba\.mbn' arch/arm64/boot/dts/qcom/sdm845-xiaomi-beryllium.dts
+    blobname 'qcom[/]sdm845[/]modem\.mdt' arch/arm64/boot/dts/qcom/sdm845-xiaomi-beryllium.dts
+    accept '[ ][*][ ]request_partial_firmware_into_buf[(][)][ ]-[ ]load' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]This[ ]function[ ]works[ ]pretty[ ]much[ ]like[ ]request_firmware_into_buf[ ]except' drivers/base/firmware_loader/main.c
+    accept 'request_partial_firmware_into_buf[(]const[ ]struct[ ]firmware' drivers/base/firmware_loader/main.c
+    accept 'EXPORT_SYMBOL[(]request_partial_firmware_into_buf[)]' drivers/base/firmware_loader/main.c
+    accept '\(static[ ]inline[ ]\)\?int[ ]request_partial_firmware_into_buf\([(]const[ ]struct[ ]firmware\|[\n]\)' include/linux/firmware.h
+    accept '[\t]retval0[ ]=[ ]report_missing_free_firmware[^\n]*[\n][\t]retval[ ]=[ ]request_partial_firmware_into_buf[(][&]xfw[,][ ]NONFREE_FIRMWARE' include/linux/firmware.h
+    accept '[\t]if[ ][(]is_nonfree_firmware[^\n]*[\n][\t][\t]return[ ]reject_partial_firmware_into_buf[^\n]*[\n][\t]else[\n][\t][\t]return[ ]request_partial_firmware_into_buf[(]firmware_p[,][ ]name[,]' include/linux/firmware.h
+    accept 'test_request_partial_firmware_into_buf\(_nofile\)\?\([(][)]\|[ ][0-9]\)' tools/testing/selftests/firmware/fw_filesystem.sh
+    accept '[\t]echo[ ]-n[ ]["]Test[ ]request_partial_firmware_into_buf[(][)]' tools/testing/selftests/firmware/fw_filesystem.sh
+    blobname 'amdgpu[/]green_sardine_vcn\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
+    blobname 'amdgpu[/]green_sardine_dmcub\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_dm.c
+    blobname 'cadence[/]mhdp8546\.bin' drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.h
+    blobname 'i915[/]rkl_dmc_ver2_02\.bin' drivers/gpu/drm/i915/display/intel_csr.c
+    blobname 'i915[/]tgl_dmc_ver2_08\.bin' drivers/gpu/drm/i915/intel_csr.c
+    blobname 'mrvl[/]prestera[/]mvsw_prestera_fw-v%u\.%u\.img' drivers/net/ethernet/marvell/prestera/prestera_pci.c
+    # The firmware file name is supplied by the user.
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]params->file_name' drivers/net/ethernet/huawei/hinic/hinic_devlink.c
+    accept '[\t]err[ ]=[ ]request_firmware[(][&]fw[,][ ]params->file_name[,][ ]dev[)]' drivers/net/ethernet/intel/ice/ice_devlink.c
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]fw[,][ ]params->file_name' drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+    accept '[\t]err[ ]=[ ]request_firmware[(][&]fw[,][ ]fw_name[,][ ]ionic->dev[)]' drivers/net/ethernet/pensando/ionic/ionic_fw.c
+    accept '[\t]err[ ]=[ ]request_firmware_direct[(][&]firmware[,][ ]params->file_name' drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+    blobname 'intel[/]ibt-%u-%u-%u\.sfi' drivers/bluetooth/hci_intel.c
+    blobname '[^ ]*[:][/][/][^ ]*linux-can[/]can-firmware' drivers/net/can/softing/Kconfig
+    blobna 'which[ ]you[ ]can[ ]get[ ]at[\n][	][ ][ ]http[^\n]*[/]linux-can[/][\n][^-]*firmware[ ]version[^\n]*' drivers/net/can/softing/Kconfig
+    defsnc 'static[ ]const[ ]unsigned[ ]int[ ]ca0113_mmio_init_\(address\|data\)_ae5\[\][ ]=' sound/pci/hda/patch_ca0132.c
+    blobname 'qcom[/]LENOVO[/]81F1[/]qcdsp\(1v\)\?28998.mbn' arch/arm64/boot/dts/qcom/msm8998-lenovo-miix-630.dts
+    blobname 'qcom[/]sdm845[/]a630_zap\.mbn' arch/arm64/boot/dts/qcom/'sdm845-\(db845c\|mtp\|xiaomi-beryllium\)\.dts'
+    blobname 'qcom[/]LENOVO[/]81JL[/]qc\([ac]dsp\|dsp\(1v\)\?2\)850\.mbn' arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts
+    blobname 'qcom[/]LENOVO[/]81JL[/]qcdxkmsuc850\.mbn' 'Documentation/devicetree/bindings/display/msm/gpu.txt\|arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts'
+    blobname 'qcom[/]sm8250[/]\([ac]dsp\|slpi\).mbn' arch/arm64/boot/dts/qcom/sm8250-mtp.dts
+
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -6057,6 +6115,7 @@ set_except () {
   # We leave out the initial and final letters of request_firmware so
   # that deblobbing turns them into r/*DEBLOBBED*/e, a syntax error.
   blobna 'equest_firmwar'
+  blobna 'equest_partial_firmwar'
   blobna 'equest_ihex_firmwar'
   blobna 'irmware_reques' # catch _nowarn; also caches _cache, but that's ok.
   # Catch request_firmare misdeblobbed by the above.
@@ -6067,7 +6126,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\|cyacd\|mdt\|tlv\)[\\]\?["]'
+  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\|cyacd\|mbn\|tlv\|sfi\)[\\]\?["]'
   # WIP ends with [\\]\?[][}{)(><,;:.!?% \t\n"`\'"'"']'
   # Catch misdeblobbed fw extension.
   blobname '["]\([^" \t\n/]*[/][/]*\)*[*][(]DEBLOBBED[)][*][/][^"\\]'
