@@ -3748,7 +3748,7 @@ clean_mk CONFIG_KEYSTONE_NAVIGATOR_QMSS drivers/soc/ti/Makefile
 announce BRCMSTB_DPFE - "Broadcom STM DPFE driver"
 reject_firmware_nowarn drivers/memory/brcmstb_dpfe.c
 clean_blob drivers/memory/brcmstb_dpfe.c
-clean_kconfig drivers/memory/Kconfig/Kconfig BRCMSTB_DPFE
+clean_kconfig drivers/memory/Kconfig BRCMSTB_DPFE
 clean_mk CONFIG_BRCMSTB_DPFE drivers/memory/Makefile
 
 announce ARCH_MEDIATEK - "MediaTek SoC Support"
