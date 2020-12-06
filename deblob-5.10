@@ -3554,7 +3554,7 @@ announce SND_SOC_INTEL_CATPT - undocumented
 reject_firmware sound/soc/intel/catpt/loader.c
 clean_blob sound/soc/intel/catpt/loader.c
 clean_kconfig sound/soc/intel/Kconfig SND_SOC_INTEL_CATPT
-clean_mk CONFIG_SND_SOC_INTEL_CATPT sound/soc/intel/haswell/Makefile
+clean_mk CONFIG_SND_SOC_INTEL_CATPT sound/soc/intel/catpt/Makefile
 
 announce SND_SOC_INTEL_SKYLAKE - "All Skylake/SST Platforms"
 reject_firmware sound/soc/intel/skylake/skl-sst.c
@@ -3572,12 +3572,12 @@ announce SND_SST_ATOM_HIFI2_PLATFORM - "HiFi2 Platforms"
 reject_firmware sound/soc/intel/atom/sst/sst.c
 reject_firmware sound/soc/intel/atom/sst/sst_loader.c
 clean_kconfig sound/soc/intel/Kconfig SND_SST_ATOM_HIFI2_PLATFORM
-clean_mk CONFIG_SND_ATOM_HIFI2_PLATFORM sound/soc/intel/atom/sst/Makefile
+clean_mk CONFIG_SND_SST_ATOM_HIFI2_PLATFORM sound/soc/intel/atom/sst/Makefile
 
 announce SND_SST_ATOM_HIFI2_PLATFORM_PCI - "PCI HiFi2 (Merrifield) Platforms"
 clean_blob sound/soc/intel/atom/sst/sst_pci.c
 clean_kconfig sound/soc/intel/Kconfig SND_SST_ATOM_HIFI2_PLATFORM_PCI
-clean_mk CONFIG_SND_ATOM_HIFI2_PLATFORM_PCI sound/soc/intel/atom/sst/Makefile
+clean_mk CONFIG_SND_SST_ATOM_HIFI2_PLATFORM_PCI sound/soc/intel/atom/sst/Makefile
 
 announce SND_SOC_RT5514 - undocumented
 reject_firmware sound/soc/codecs/rt5514.c
@@ -3748,7 +3748,7 @@ clean_mk CONFIG_KEYSTONE_NAVIGATOR_QMSS drivers/soc/ti/Makefile
 announce BRCMSTB_DPFE - "Broadcom STM DPFE driver"
 reject_firmware_nowarn drivers/memory/brcmstb_dpfe.c
 clean_blob drivers/memory/brcmstb_dpfe.c
-clean_kconfig arch/arm/mach-bcm/Kconfig BRCMSTB_DPFE
+clean_kconfig drivers/memory/Kconfig/Kconfig BRCMSTB_DPFE
 clean_mk CONFIG_BRCMSTB_DPFE drivers/memory/Makefile
 
 announce ARCH_MEDIATEK - "MediaTek SoC Support"
