@@ -1,5 +1,22 @@
 #! /bin/bash
 
+success=:
+for rel
+do
+  case $rel in
+  v*)
+    echo $rel starts with v, that is unexpected >&2
+    success=false
+    ;;
+  *.*-gnu)
+    ;;
+  *)
+    echo $rel does not end with -gnu, that is unexpected >&2
+    success=false
+    ;;
+  esac
+done && $success &&
+
 $0.cln "$@" &&
 
 echo all revs cleaned up, awaiting manual check results... &&
