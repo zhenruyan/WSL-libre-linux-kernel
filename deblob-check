@@ -9,7 +9,8 @@
 #                    + 2020-08-19's r17613
 #                    + 2020-10-11's r17709 (partial)
 #                    + 2020-07-20's r17568 (partial)
-#                    + 2020-11-10's r17757
+#                    + 2020-11-10's r17761
+#                    + 2020-12-06's r17785 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5719,6 +5720,10 @@ set_except () {
 
     # New in 5.9.7 and 5.4.76.
     defsc 'static[ ]const[ ]struct[ ]font_data[ ]fontdata_ter16x32[ ]=' lib/fonts/font_ter16x32.c
+
+
+    # New in 5.10, 5.9.15, and 5.4.84.
+    blobname 'gsl1680-irbis-tw118\.fw' drivers/net/wireless/intel/iwlwifi/fw/pnvm.c
 
     ;;
 
