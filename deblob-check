@@ -2,6 +2,7 @@
 
 # deblob-check version 2020-10-11 + 2020-10-29's r17739
 #           + 2020-11-10's r17761 + 2020-11-18's r17766
+# + 2020-12-06's r17785 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6029,6 +6030,11 @@ set_except () {
 
     # New in 5.9.9.
     defsnc 'static[ ]const[ ]struct[ ]msm_gpio_wakeirq_map[ ]sm8250_pdc_map\[\][ ]=' drivers/pinctrl/qcom/pinctrl-sm8250.c
+
+    # New in 5.10, 5.9.15, and 5.4.84.
+    blobname 'gsl1680-irbis-tw118\.fw' drivers/net/wireless/intel/iwlwifi/fw/pnvm.c
+    # New in 5.10 and 5.9.15.
+    blobname 'gsl3680-predia-basic\.fw' drivers/net/wireless/intel/iwlwifi/fw/pnvm.c
 
     ;;
 
