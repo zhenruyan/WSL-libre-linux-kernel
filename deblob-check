@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2021-01-06
+# deblob-check version 2021-03-04
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6129,6 +6129,9 @@ set_except () {
     blobname 'qcom[/]sm8150[/]\([ac]dsp\|slpi\)\.mbn' arch/arm64/boot/dts/qcom/sm8150-hdk.dts
     blobname 'qcom[/]sm8150[/]\([ac]dsp\|modem\|slpi\)\.mdt' arch/arm64/boot/dts/qcom/sm8150-mtp.dts
     blobname 'imx[/]xcvr[/]xcvr-imx8mp\.bin' sound/soc/fsl/fsl_xcvr.c
+
+    # New in 5.11.3
+    accept '[\t]s6e63m0_dcs_write_seq_static[(]ctx[,][ ]MCS_[^ ,\t\n)]*\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-samsung-s6e63m0.c
 
     ;;
 
