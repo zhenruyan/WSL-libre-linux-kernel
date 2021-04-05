@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2021-03-04
+# deblob-check version 2021-04-04
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6130,8 +6130,43 @@ set_except () {
     blobname 'qcom[/]sm8150[/]\([ac]dsp\|modem\|slpi\)\.mdt' arch/arm64/boot/dts/qcom/sm8150-mtp.dts
     blobname 'imx[/]xcvr[/]xcvr-imx8mp\.bin' sound/soc/fsl/fsl_xcvr.c
 
-    # New in 5.11.3
+    # New in 5.11.3.
     accept '[\t]s6e63m0_dcs_write_seq_static[(]ctx[,][ ]MCS_[^ ,\t\n)]*\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-samsung-s6e63m0.c
+
+    # New in 5.12-rc5.
+    blobname 'ice\.pkg' drivers/net/ethernet/intel/ice/ice_main.c
+    blob 'Dynamic[ ]Device[ ]Personalization[\n]-\+[\n]\([^\n]\+[\n][\n]\?\)*of[ ]the[ ]default[ ]DDP[ ]package[ ]file[ ][(]ice\.pkg[)]\.' Documentation/networking/device_drivers/ethernet/intel/ice.rst
+    initnc '[ \t]*[.]active_vlans[ ]=[ ][(]unsigned[ ]long[ ]\[64\][)]' Documentation/networking/device_drivers/qlogic/qlge.rst
+    accept '[ \t]*["]values["]:[ ]\[[ ]0\([,]0\)*[ ]\]' Documentation/networking/device_drivers/qlogic/qlge.rst
+    blobname 'qcom[/]sm8250[/][ac]dsp\.mbn' arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
+    blobname 'qcom[/]sm8250[/]a650_zap\.mbn' arch/arm64/boot/dts/qcom/'qrb5165-rb5\|sm8250-mtp\.'dts
+    blobname 'qcom[/]sdm845[/]oneplus6[/]\([ac]dsp\|a630_zap\|mba\|modem\)\.mbn' arch/arm64/boot/dts/qcom/sdm845-oneplus-common.dtsi
+    blobname 'oneplus6[/]crnv21\.bin' arch/arm64/boot/dts/qcom/sdm845-oneplus-common.dtsi
+    blobname 'mediatek[/]BT_RAM_CODE_MT%04x_1_%x_hdr\.bin' drivers/bluetooth/btusb.c
+    blobname 'mrvl[/]cpt%02d[/]%s\.out' drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+    blobname 'a5\(08\|12\)_zap\.mdt' drivers/gpu/drm/msm/adreno/adreno_device.c
+    defsc 'static[ ]const[ ]struct[ ]khadas_ts050_panel_cmd[ ]init_code\[\][ ]=' drivers/gpu/drm/panel/panel-khadas-ts050.c
+    blobname 'dvb-demod-mxl692\.fw' drivers/media/dvb-frontends/mxl692.h
+    defsnc 'static[ ]const[ ]struct[ ]imx334_reg[ ]mode_3840x2160_regs\[\][ ]=' drivers/media/i2c/imx334.c
+    defsnc 'static[ ]struct[ ]regval_list[ ]ov5647_\(2592x1944\|1080p30\|2x2binned\|640x480\)_10bpp\[\][ ]=' drivers/media/i2c/ov5647.c
+    defsc 'static[ ]const[ ]struct[ ]ov8865_register_value[ ]ov8865_\(register_values_\(native\|binning\)\|init_sequence\)\[\][ ]=' drivers/media/i2c/ov8865.c
+    blobname 'v\(k\(_[ab]0\|\)\|p\)-boot[12]\.bin' drivers/misc/bcm-vk/bcm_vk_dev.c
+    defsc 'static[ ]const[ ]u8[ ]mv88e6xxx_lag_mask_table\[8\]\[8\][ ]=' drivers/net/dsa/mv88e6xxx/chip.c
+    defsnc 'static[ ]const[ ]struct[ ]rtl8366rb_jam_tbl_entry[ ]rtl8366rb_init_jam_\(ver_[0123]\|f5d8235\)\[\][ ]=' drivers/net/dsa/rtl8366rb.c
+    blobname 'mediatek[/]WIFI_RAM_CODE_MT7961_1\.bin' drivers/net/wireless/mediatek/mt76/mt7921/mt7921.h
+    blobname 'mediatek[/]WIFI_MT7961_patch_mcu_1_2_hdr\.bin' drivers/net/wireless/mediatek/mt76/mt7921/mt7921.h
+    defsnc 'static[ ]const[ ]u32[ ]rtw8821c_agc_btg_type2\[\][ ]=' drivers/net/wireless/realtek/rtw88/rtw8821c_table.c
+    defsnc 'static[ ]const[ ]struct[ ]msm_gpio_wakeirq_map[ ]sc8180x_pdc_map\[\][ ]=' drivers/pinctrl/qcom/pinctrl-sc8180x.c
+    blobname 'gsl3680-jumper-ezpad-7\.fw' drivers/platform/x86/touchscreen_dmi.c
+    defsnc '\(static[ ]\)\?unsigned[ ]short[ ]\(plain\|shift\|altgr\|ctrl\|shift_ctrl\|alt\|ctrl_alt\)_map\[NR_KEYS\][ ]=' drivers/tty/vt/defkeymap.c_shipped
+    defsnc 'static[ ]const[ ]struct[ ]xr_txrx_clk_mask[ ]xr21v141x_txrx_clk_masks\[\][ ]=' drivers/usb/serial/xr_serial.c
+    defsc '[\t]static[ ]const[ ]u32[ ]base\[4\]\[12\][ ]=' net/wireless/util.c
+    defsnc 'static[ ]const[ ]struct[ ]comp_coeff_val[ ]comp_coeff_table\[HPH_MODE_MAX\]\[COMP_MAX_COEFF\][ ]=' sound/soc/codecs/lpass-rx-macro.c
+    accept 'ROOTFS_IMAGE=["]root\.img["]' tools/testing/selftests/bpf/vmtest.sh
+    accept '[\t]img_fd[ ]=[ ]openat[(]-EBADF[,][ ]["][/]mnt[/]C[/]ext4\.img["]' tools/testing/selftests/mount_setattr/mount_setattr_test.c
+    accept '[\t]ASSERT_EQ[(]system[(]["]mkfs\.ext4[ ]-q[ ][/]mnt[/]C[/]ext4\.img["][)]' tools/testing/selftests/mount_setattr/mount_setattr_test.c
+    accept '[\t]echo[ ]["][ ]---[ ]make[ ]\(clean\|allmodconfig\|\)["][ ][>]\+[ ]["][$]amcdir[/]Make\.out["]' tools/testing/selftests/rcutorture/bin/torture.sh
+    accept '[\t]make[ ]-j[$]MAKE_ALLOTED_CPUS[ ]\(clean[ ]\|allmodconfig[ ]\|\)[>][>][ ]["][$]amcdir[/]Make\.out["]' tools/testing/selftests/rcutorture/bin/torture.sh
 
     ;;
 
