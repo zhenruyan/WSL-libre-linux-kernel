@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#    Copyright (C) 2008-2020 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2021 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -387,6 +387,12 @@ What is GNU Linux-libre?\
   contribution to the entire system, so its mascot deserves more\
   promotion.  See our web page for their images.\
   http://linux-libre.fsfla.org/\
+\
+  If you are the author of an awesome program and want to join us in\
+  writing Free (libre) Software, please consider making it an official\
+  GNU program and become a GNU Maintainer.  You can find instructions\
+  on how to do so at https://www.gnu.org/help/evaluation.  We look\
+  forward to hacking with you! :)\
 
 ' Documentation/admin-guide/README.rst 'added blurb about GNU Linux-libre'
 
