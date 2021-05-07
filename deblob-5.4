@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#    Copyright (C) 2008-2019 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2021 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -126,42 +126,10 @@ clean_blob () {
     else
       die failed removing blobs from $name
     fi
-    check_changed $name && echo $name: removed blobs
+    check_changed $name && echo $name: removed blobs or mentions thereof
   else
     clean_file $1
   fi
-}
-
-dummy_blob () {
-  #$1 = filename
-  if test -f $1; then
-    die $1 exists, something is wrong && return 0
-  elif test ! -f firmware/Makefile; then
-    die firmware/Makefile does not exist, something is wrong && return 0
-  fi
-
-  clean_sed "s,`echo $1 | sed s,^firmware/,,`,\$(DEBLOBBED),g" \
-    firmware/Makefile "dropped $1"
-}
-
-clean_fw () {
-  #$1 = firmware text input, $2 = firmware output
-  filetest $1 || return 0
-  if test -f $2; then
-    die $2 exists, something is wrong && return 0
-  fi
-  clean_blob $1 -s 4
-  dummy_blob $2
-}
-
-drop_fw_file () {
-  #$1 = firmware text input, $2 = firmware output
-  filetest $1 || return 0
-  if test -f $2; then
-    die $2 exists, something is wrong && return 0
-  fi
-  clean_file $1
-  dummy_blob $2
 }
 
 clean_kconfig () {
@@ -410,6 +378,12 @@ What is GNU Linux-libre?\
   contribution to the entire system, so its mascot deserves more\
   promotion.  See our web page for their images.\
   http://linux-libre.fsfla.org/\
+\
+  If you are the author of an awesome program and want to join us in\
+  writing Free (libre) Software, please consider making it an official\
+  GNU program and become a GNU Maintainer.  You can find instructions\
+  on how to do so at https://www.gnu.org/help/evaluation.  We look\
+  forward to hacking with you! :)\
 
 ' Documentation/admin-guide/README.rst 'added blurb about GNU Linux-libre'
 
@@ -748,7 +722,7 @@ clean_mk CONFIG_MOXA_INTELLIO drivers/tty/Makefile
 
 # gpu drm
 
-announce DRM - "irect Rendering Manager (XFree86 4.1.0 and higher DRI support)"
+announce DRM - "Direct Rendering Manager (XFree86 4.1.0 and higher DRI support)"
 reject_firmware drivers/gpu/drm/drm_hdcp.c
 clean_blob drivers/gpu/drm/drm_hdcp.c
 clean_kconfig drivers/gpu/drm/Kconfig DRM
@@ -810,7 +784,7 @@ clean_blob drivers/gpu/drm/amd/amdgpu/gmc_v7_0.c
 clean_kconfig drivers/gpu/drm/amd/amdgpu/Kconfig DRM_AMDGPU_CIK
 clean_mk CONFIG_DRM_AMDGPU_CIK drivers/gpu/drm/amd/amdgpu/Makefile
 
-announce DRM_AMDGPU_SI - "Enable amdgpu support for CIK parts"
+announce DRM_AMDGPU_SI - "Enable amdgpu support for SI parts"
 reject_firmware drivers/gpu/drm/amd/amdgpu/si_dpm.c
 clean_blob drivers/gpu/drm/amd/amdgpu/si_dpm.c
 reject_firmware drivers/gpu/drm/amd/amdgpu/gfx_v6_0.c
@@ -882,8 +856,6 @@ reject_firmware drivers/gpu/drm/radeon/r600.c
 clean_blob drivers/gpu/drm/radeon/r600.c
 reject_firmware drivers/gpu/drm/radeon/ni.c
 clean_blob drivers/gpu/drm/radeon/ni.c
-reject_firmware drivers/gpu/drm/radeon/si.c
-clean_blob drivers/gpu/drm/radeon/si.c
 # Something like this might work on other radeon cards too.  If you
 # have such cards, please give it a try, and report back either way,
 # so that we can make more cards work, or at least add comments so
@@ -901,12 +873,8 @@ clean_sed '
 clean_sed '
 /r = ni_init_microcode(rdev);/,/}/ s,return r;,/*(DEBLOBBED)*/,
 ' drivers/gpu/drm/radeon/ni.c 'enable blobless activation'
-clean_sed '
-/r = si_init_microcode(rdev);/,/}/ s,return r;,/*(DEBLOBBED)*/,
-' drivers/gpu/drm/radeon/si.c 'enable blobless activation'
-clean_sed '
-/if (!rdev->mc_fw) {/,/}/ s,return -EINVAL;,/*(DEBLOBBED)*/,
-' drivers/gpu/drm/radeon/si.c 'enable blobless activation'
+reject_firmware drivers/gpu/drm/radeon/si.c
+clean_blob drivers/gpu/drm/radeon/si.c
 reject_firmware drivers/gpu/drm/radeon/cik.c
 clean_blob drivers/gpu/drm/radeon/cik.c
 reject_firmware drivers/gpu/drm/radeon/radeon_uvd.c
@@ -3269,7 +3237,7 @@ clean_blob sound/pci/echoaudio/mona.c
 clean_kconfig sound/pci/Kconfig SND_MONA
 clean_mk CONFIG_SND_MONA sound/pci/echoaudio/Makefile
 
-announce SND_'<(Echoaudio)>' - "(Echoaudio) all of the above "
+announce SND_'<(Echoaudio)>' - "(Echoaudio) all of the above"
 reject_firmware sound/pci/echoaudio/echoaudio.c
 clean_blob sound/pci/echoaudio/echoaudio.c
 
