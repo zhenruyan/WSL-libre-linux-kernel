@@ -1,13 +1,13 @@
 #! /bin/sh
 
-# deblob-check version 2020-12-05
+# deblob-check version 2020-12-05 + 2021-06-03's r18106
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2020 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2021 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -6087,6 +6087,9 @@ set_except () {
     blobname 'qcom[/]LENOVO[/]81JL[/]qc\([ac]dsp\|dsp\(1v\)\?2\)850\.mbn' arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts
     blobname 'qcom[/]LENOVO[/]81JL[/]qcdxkmsuc850\.mbn' 'Documentation/devicetree/bindings/display/msm/gpu.txt\|arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts'
     blobname 'qcom[/]sm8250[/]\([ac]dsp\|slpi\).mbn' arch/arm64/boot/dts/qcom/sm8250-mtp.dts
+
+    # New in 5.12.9, 5.10.42.
+    blobname '\(silead[/]\)\?gsl1680-chuwi-hi10-pro\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
