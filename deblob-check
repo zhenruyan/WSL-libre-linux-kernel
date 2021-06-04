@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2021-04-04
+# deblob-check version 2021-06-03
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6167,6 +6167,9 @@ set_except () {
     accept '[\t]ASSERT_EQ[(]system[(]["]mkfs\.ext4[ ]-q[ ][/]mnt[/]C[/]ext4\.img["][)]' tools/testing/selftests/mount_setattr/mount_setattr_test.c
     accept '[\t]echo[ ]["][ ]---[ ]make[ ]\(clean\|allmodconfig\|\)["][ ][>]\+[ ]["][$]amcdir[/]Make\.out["]' tools/testing/selftests/rcutorture/bin/torture.sh
     accept '[\t]make[ ]-j[$]MAKE_ALLOTED_CPUS[ ]\(clean[ ]\|allmodconfig[ ]\|\)[>][>][ ]["][$]amcdir[/]Make\.out["]' tools/testing/selftests/rcutorture/bin/torture.sh
+
+    # New in 5.12.9, 5.10.42.
+    blobname '\(silead[/]\)\?gsl1680-chuwi-hi10-pro\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
