@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2021-06-03
+# deblob-check version 2021-06-19
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6170,6 +6170,46 @@ set_except () {
 
     # New in 5.12.9, 5.10.42.
     blobname '\(silead[/]\)\?gsl1680-chuwi-hi10-pro\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 5.13-rc.
+    # Sources are in cwsr_trap_handler_gfx9.asm.
+    defsnc 'static[ ]const[ ]uint32_t[ ]cwsr_trap_aldebaran_hex\[\][ ]=' drivers/gpu/drm/amd/amdkfd/cwsr_trap_handler.h
+    defsnc '[\t]static[ ]const[ ]uint16_t[ ]prime_numbers\[\][ ]=' drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c
+    defsnc 'static[ ]const[ ]struct[ ]IP_BASE[ ]\(\(IO\(AGR\|APIC\)\|L1IMU\(IOAGR\|PCIE\)\)0\|WAFL[01]\|XGMI[012]\)_BASE[ ]='
+    defsnc '[\t]const[ ]struct[ ]reg_sequence[ ]seq\[\][ ]=' drivers/gpu/drm/bridge/lontium-lt8912b.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]jpeg_d[qh]t\[\][ ]=' drivers/media/platform/imx-jpeg/mxc-jpeg.c
+    accept '[ ][*][ ]@fw_get_done:[\t]flag[ ]set[ ]when[ ]request_firmware[(][)]' drivers/media/platform/s5p-mfc/s5p_mfc_common.h
+    defsnc 'static[ ]const[ ]u8[ ]ice_fdir_\(\(udp\|tcp\|icmp\|ipv\)4_gtpu4\|ipv[46]_\(l2tpv3\|\(nat_t_\)\?esp\|ah\|pfcp_\(session\|node\)\)\)_pkt\[\][ ]=' drivers/net/ethernet/intel/ice/ice_fdir.c
+    defsnc 'static[ ]const[ ]u32[ ]ice_ptypes_\(mac_ofos\|macvlan_il\|ipv[46]_ofos_all\|\(arp\|icmp\)_of\|ipv[46]_\(ofos\|il\)_no_l4\|icmp_\(of\|il\)\|mac_il\|gtpc\(_tid\)\?\|gtpu\|pppoe\|pfcp_\(node\|session\)\|l2tpv3\|\(nat_t_\)\?esp\|ah\|mac_non_ip_ofos\)\[\][ ]=' drivers/net/ethernet/intel/ice/ice_flow.c
+    defsnc '[\t]static[ ]const[ ]u8[ ]chan_list_5ghz\[\][ ]=' drivers/net/wireless/mediatek/mt76/mt76_connac_mcu.c
+    defsnc 'static[ ]const[ ]struct[ ]msm_gpio_wakeirq_map[ ]sc7280_pdc_map\[\][ ]=' drivers/pinctrl/gcom/pinctrl-sc7280.c
+    defsnc 'static[ ]const[ ]struct[ ]msm_gpio_wakeirq_map[ ]sm8350_pdc_map\[\][ ]=' drivers/pinctrl/gcom/pinctrl-sc8350.c
+    defsnc 'static[ ]const[ ]int[ ]bd7181x_wled_currents\[\][ ]=' drivers/regulator/bd71815-regulator.c
+    accept '[ ][*][ ]lpfc_request_firmware_upgrade_store[ ]-[ ]Request[ ]for[ ]Linux[ ]generic[ ]firmware[ ]upgrade' drivers/scsi/lpfc/lpfc_attr.c
+    defsnc 'static[ ]const[ ]unsigned[ ]char[ ]by_vt3253_init_tab_rfmd\[CB_VT3253_INIT_FOR_RFMD\]\[2\][ ]=' drivers/staging/vt6655/baseband.c
+    defsnc '[}][ ]test_div64_results\[SIZE_DIV64_DIVISORS\]\[SIZE_DIV64_DIVIDENDS\][ ]=' lib/math/test_div64.c
+    defsnc 'static[ ]const[ ]struct[ ]cs8409_i2c_param[ ]cs42l42_init_reg_seq\[\][ ]=' sound/pci/hda/patch_cirrus.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt1019_reg\[\][ ]=' sound/soc/codecs/rt1019.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt1316_reg_defaults\[\][ ]=' sound/soc/codecs/rt1316-sdw.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]rt1316_blind_write\[\][ ]=' sound/soc/codecs/rt1316-sdw.c
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt711_sdca_reg_defaults\[\][ ]=' sound/soc/codecs/rt711-sdca-sdw.h
+    defsnc 'static[ ]const[ ]struct[ ]reg_default[ ]rt715_reg_defaults_sdca\[\][ ]=' sound/soc/codecs/rt715-sdca-sdw.h
+    defsnc 'static[ ]const[ ]char[ ][*]mips_gpr_names\[32\][ ]=' tools/perf/arch/mips/util/dwarf-regs.c
+    accept '[\t]unlink[(]["][/]var[/]run[/]isst_cpu_topology\.dat["][)]' tools/power/x86/intel-speed-select/isst-config.c
+    defsnc 'const[ ]struct[ ]vm_guest_mode_params[ ]vm_guest_mode_params\[\][ ]=' tools/testing/selftests/kvm/lib/kvm_util.c
+    accept '[\t]rpipwm->firmware[ ]=[ ]firmware[;]' drivers/pwm/pwm-raspberrypi-poe.c
+    blobname 'qcom[/]sdm845[/][ac]dsp\.mbn' arch/arm64/boot/dts/qcom/sdm845-db845c.dts
+    blobname 'qcom[/]sm8350[/]\([ac]dsp\|modem\|slpi\|\)\.mbn' arch/arm64/boot/dts/qcom/sm8350-'\(hdk\|mtp\)\.dts'
+    blobname 'qcom[/]sdx65m[/]xbl\.elf' drivers/bus/mhi/pci_generic.c
+    blobname 'qcom[/]sdx65m[/]edl\.mbn' drivers/bus/mhi/pci_generic.c
+    blobname 'qcom[/]prog_firehose_sdx24\.mbn' drivers/bus/mhi/pci_generic.c
+    blobname 'amdgpu[/]aldebaran_vcn\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
+    blobname 'amdgpu[/]aldebaran_\(sos\|ta\)\.bin' drivers/gpu/drm/amd/amdgpu/psp_v13_0.c
+    blobname 'amdgpu[/]\(aldebaran\|%s\)_smc\.bin' drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c
+    blobname 'i915[/]adls_dmc_ver2_01\.bin' drivers/gpu/drm/i915/display/intel_csr.c
+    blobname 'qcom[/]vpu-1\.0[/]venus\.mdt' drivers/media/platform/qcom/venus/core.c
+    blobname 'rtl_nic[/]rtl815\(3c-1\|6[ab]-2\)\.fw' drivers/net/usb/r8152.c
+    blobname '\(silead[/]\)\?gsl3692-teclast-tbook11\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
