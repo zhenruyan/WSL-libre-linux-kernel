@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2021-06-03 + 2021-07-14's r18159
+#           + 2021-07-20's r18170
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6174,6 +6175,12 @@ set_except () {
     # New in 5.13.2, 5.12.17, 5.10.50.
     blobname 'amd[/]amd_sev_fam1[79]h_model[03]xh\.sbin' drivers/crypto/ccp/sev-dev.c
     blobname 'gt912-glavey-tm800a550l.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 5.13.4, 5.12.19.
+    defsnc 'static[ ]unsigned[ ]char[ ]screen_bits\[\][ ]=' arch/m68k/68000/screen.h
+    # New in 5.13.4, 5.12.19, 5.10.52.
+    defsc '[\t]setrate_44100\[\][ ]=' sound/usb/usx2y/usbusx2yaudio.c
+    defsc 'static[ ]const[ ]struct[ ]s_c2[ ]setrate_48000\[\][ ]=' sound/usb/usx2y/usbusx2yaudio.c
 
     ;;
 
