@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2021-07-22
+# deblob-check version 2021-07-26
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6220,6 +6220,9 @@ set_except () {
     # New in 5.13.4, 5.12.19, 5.10.52.
     defsc '[\t]setrate_44100\[\][ ]=' sound/usb/usx2y/usbusx2yaudio.c
     defsc 'static[ ]const[ ]struct[ ]s_c2[ ]setrate_48000\[\][ ]=' sound/usb/usx2y/usbusx2yaudio.c
+
+    # New in 5.13.5 and 5.10.53.
+    blobna 'and[ ]booted[ ]am335x-pm-firmware\.elf\.[\n][ ][*][/]' Documentation/devicetree/bindings/remoteproc/wkup_m3_rproc.txt
 
     ;;
 

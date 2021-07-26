@@ -3238,6 +3238,9 @@ announce WKUP_M3_RPROC - "AMx3xx Wakeup M3 remoteproc support"
 clean_blob Documentation/devicetree/bindings/remoteproc/wkup_m3_rproc.txt
 clean_blob arch/arm/boot/dts/am33xx.dtsi
 clean_blob arch/arm/boot/dts/am4372.dtsi
+if grep -q 'Block system suspend' arch/arm/mach-omap2/pm33xx-core.c; then
+  clean_blob arch/arm/mach-omap2/pm33xx-core.c
+fi
 clean_kconfig drivers/remoteproc/Kconfig WKUP_M3_RPROC
 clean_mk CONFIG_WKUP_M3_RPROC drivers/remoteproc/Makefile
 
