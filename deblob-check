@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2021-07-20
+# deblob-check version 2021-07-22
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -1183,7 +1183,7 @@ set_except () {
     defsnc 'const[ ]unsigned[ ]int[ ]TimonRomTable[ ]\[16\]\[2\]\[16\]\[8\][ ]=' drivers/media/video/pwc/pwc-timon.c
     defsnc '[	]static[ ]const[ ]struct[ ]struct_initData[ ]initData\[\][ ]=' drivers/media/video/usbvideo/ibmcam.c
     defsnc 'static[ ]const[ ]u8[ ]rtl8187b_reg_table\[\]\[3\][ ]=' drivers/net/wireless/rtl8187_dev.c
-    defsnc 'unsigned[ ]char[ ]\(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\|IPA_PDU_HEADER\|\(READ\|WRITE\)_CCW\)\[\][ ]=' drivers/net/qeth_core_mpc.c
+    defsnc 'unsigned[ ]char[ ]\(IDX_ACTIVATE_\(READ\|WRITE\)\|\(CM\|ULP\)_\(ENABLE\|SETUP\)\|DM_ACT\|IPA_PDU_HEADER\|\(READ\|WRITE\)_CCW\)\[\][ ]\?=' drivers/net/qeth_core_mpc.c
     defsnc 'static[ ]unsigned[ ]char[ ]camera_ncm03j_magic\[\][ ]=' 'arch/sh/boards/\(board-ap325rxa\.c\|mach-ap325rxa/setup\.c\)'
     defsnc 'static[ ]const[ ]unsigned[ ]short[ ]\(sync\|magic[0-3]\)_data\[\][ ]=' arch/sh/boards/mach-migor/lcd_qvga.c
     defsnc 'static[ ]unsigned[ ]char[ ]camera_ov772x_magic\[\][ ]=' arch/sh/boards/mach-migor/setup.c
@@ -1266,7 +1266,7 @@ set_except () {
 
     blobname 'dabusb[/]\(firmware\.fw\|bitstream\.bin\)' drivers/media/video/dabusb.c
 
-    blob 'static[ ]u32[ ]tigon2\?Fw\(Text\|Rodata\|Data\)\[[(]MAX_\(TEXT\|RODATA\|DATA\)_LEN[/]4[)][ ][+][ ]1\][ ]__devinitdata[ ]=[ ][{][^}]*[}][;]\([\n]static[ ]u32[ ]tigon2\?Fw\(Text\|Rodata\|Data\)\[[(]MAX_\(TEXT\|RODATA\|DATA\)_LEN[/]4[)][ ][+][ ]1\][ ]__devinitdata[ ]=[ ][{][^}]*[}][;]\)*' drivers/net/acenic_firwmare.h
+    blob 'static[ ]u32[ ]tigon2\?Fw\(Text\|Rodata\|Data\)\[[(]MAX_\(TEXT\|RODATA\|DATA\)_LEN[/]4[)][ ][+][ ]1\][ ]__\(dev\)\?initdata[ ]=[ ][{][^}]*[}][;]\([\n]static[ ]u32[ ]tigon2\?Fw\(Text\|Rodata\|Data\)\[[(]MAX_\(TEXT\|RODATA\|DATA\)_LEN[/]4[)][ ][+][ ]1\][ ]__\(dev\)\?initdata[ ]=[ ][{][^}]*[}][;]\)*' drivers/net/acenic_firwmare.h
     blob '#define[ ]tigon2\?Fw[^ ]*\(Addr\|Len\)[ ]0x[^\n]*\([\n]#define[ ]tigon2\?Fw[^ ]*\(Addr\|Len\)[ ]0x[^\n]*\)\+' drivers/net/acenic_firmware.h
     blob '\([/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*Do[ ]not[ ]try[ ]to[ ]clear[^*]*\([*]\+[^/*][^*]*\)*[*]\+[/][\n][	]\)\?ace_clear[^;]*[;][\n]\([^}]*[{][^}]*ace_copy[^}]*tigon2\?Fw[^}]*[}]\)*[\n]\+[	]return[ ]0[;][\n][}]' drivers/net/acenic.c
     blob 'if[ ][(]\(ACE_IS_TIGON_I[(]ap[)]\|ap->version[ ]==[ ]2\)[)][\n][	][	]writel[(]tigon2\?FwStartAddr,[ ][&]regs->Pc[)][;]\([\n][	]if[ ][(]\(ACE_IS_TIGON_I[(]ap[)]\|ap->version[ ]==[ ]2\)[)][\n][	][	]writel[(]tigon2\?FwStartAddr,[ ][&]regs->Pc[)][;]\)*' drivers/net/acenic.c
@@ -1303,7 +1303,7 @@ set_except () {
 
     blob '[ ][*][ ]Firmware[ ]is:[\n][ ][*][	]Derived[ ]from[ ]proprietary[^/]*notice[ ]is[ ]accompanying[ ]it\.[\n][ ][*][/]' drivers/net/tg3.c
     blobna 'Derived[ ]from[ ]proprietary[ ]unpublished[ ]source[ ]code' drivers/net/tg3.c
-    blob '\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\([\n][\n]*\(static[ ]const[ ]u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\|#if[ ]0\([ ][/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\)\?[\n]\(static[ ]const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;][\n]#endif\)\)*' drivers/net/tg3.c
+    blob '\(static[ ]\)\?\(const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\([\n][\n]*\(static[ ]\)\?\(const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;]\|#if[ ]0\([ ][/][*][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]\)\?[\n]\(static[ ]\)\?\(const[ ]\)\?u32[ ]tg3\(Tso5\?\)\?Fw\(Text\|Rodata\|Data\)\[[^{]*\][ ]=[ ][{][^}]*[}][;][\n]#endif\)\)*' drivers/net/tg3.c
 
     blob 'static[ ]const[ ]u8[ ]typhoon_firmware_image\[\][ ]=[ ][{][^}]*[}][;]' drivers/net/typhoon-firmware.h
 
