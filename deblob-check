@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2021-07-26a
+# deblob-check version 2021-08-15
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5055,7 +5055,7 @@ set_except () {
     # We require a semicolon after MODULE_FIRMWARE, which this
     # in-macro occurrence does not have, so take the semicolon from
     # the previous in-macro declaration.
-    blobname '[;][ ]\\[\n]MODULE_FIRMWARE[(]BRCMF_FW_DEFAULT_PATH[^)]*[)]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h
+    blobname '\([;][ ]\\[\n]MODULE_FIRMWARE[(]BRCMF_FW_DEFAULT_PATH[^)]*[)]\)\+' drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h
 
     # Adjust for catching firmware_request
     accept 'static[ ]int[ ]coda_firmware_request[(]' drivers/media/platform/code/coda-common.c
@@ -6224,6 +6224,42 @@ set_except () {
     # New in 5.13.5 and 5.10.53.
     blobna 'and[ ]booted[ ]am335x-pm-firmware\.elf\.[\n][ ][*][/]' Documentation/devicetree/bindings/remoteproc/wkup_m3_rproc.txt
 
+    # New in 5.14-rc.
+    accept '[	 ]*nvidia,emc-registers[ ]=[ 	]*<\(0x[0-9a-f]*[ 	\n]*\)*>[;]' Documentation/devicetree/bindings/memory-controllers/nvidia,tegra20-emc.yaml
+    blobname 'msnv11\.bin' Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
+    blobname 'qcom[/]sm8150[/]microsoft[/]\([ac]dsp\|modem\|slpi\)\.mdt' arch/arm64/boot/dts/qcom/sm8150-microsoft-surface-duo.dts
+    blobname 'qca[/]msbtfw%02x\.\(tlv\|mbn\)' drivers/bluetooth/btqca.c
+    blobname 'qca[/]msnv%02x\.bin' drivers/bluetooth/btqca.c
+    blobname 'rtl_bt[/]rtl8761bu_fw\.bin' drivers/bluetooth/btrtl.c
+    blobname 'amdgpu[/]\(beige_goby\|yellow_carp\)_vcn\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
+    defsnc 'static[ ]const[ ]u32[ ]\(vgpr\|sgpr\(112\|96\|64\)\)_init_compute_shader_aldebaran\[\][ ]=' drivers/gpu/drm/amd/amdgpu/gfx_v9_4_2.c
+    blobname 'amdgpu[/]\(beige_goby\|yellow_carp\)_dmcub\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_dm.c
+    defsnc 'static[ ]const[ ]struct[ ]IP_BASE[ ]PCIE_BASE[ ]=' drivers/gpu/drm/amd/include/yellow_carp_offset.h
+    blobname 'i915[/]["][ \t\\\n]*__stringify[(]platform[)][ ]["]_dmc_ver["][ \t\\\n]*__stringify[(]major[)][ ]["]_["][ \t\\\n]*__stringify[(]minor[)][ ]["]\.bin' drivers/gpu/drm/i915/display/intel_dmc.c
+    defsnc 'static[ ]const[ ]u8[ ]rc_range_\(min\|max\)qp444_8bpc\[DSC_NUM_BUF_RANGES\]\[RC_RANGE_QP444_8BPC_MAX_NUM_BPP\][ ]=' drivers/gpu/drm/i915/display/intel_qp_tables.c
+    defsnc 'static[ ]const[ ]u8[ ]rc_range_\(min\|max\)qp444_10bpc\[DSC_NUM_BUF_RANGES\]\[RC_RANGE_QP444_10BPC_MAX_NUM_BPP\][ ]=' drivers/gpu/drm/i915/display/intel_qp_tables.c
+    defsnc 'static[ ]const[ ]u8[ ]rc_range_\(min\|max\)qp444_12bpc\[DSC_NUM_BUF_RANGES\]\[RC_RANGE_QP444_12BPC_MAX_NUM_BPP\][ ]=' drivers/gpu/drm/i915/display/intel_qp_tables.c
+    blobname 'a660_sqe\.fw' drivers/gpu/drm/msm/adreno/adreno_device.c
+    blobname 'a660_gmu\.bin' drivers/gpu/drm/msm/adreno/adreno_device.c
+    blobname 'a660_zap\.mdt' drivers/gpu/drm/msm/adreno/adreno_device.c
+    defsnc '[\t]static[ ]const[ ]unsigned[ ]int[ ]coeffs\[192\][ ]=' drivers/gpu/drm/tegra/hub.c
+    defsnc 'static[ ]const[ ]struct[ ]imx208_reg[ ]mode_\(1936x1096\|968_548\)_60fps_regs\[\][ ]=' drivers/media/i2c/imx208.c
+    defsnc 'static[ ]const[ ]struct[ ]ov8856_reg[ ]lane_[24]_mode_\(3280x2464\|1640x1232\)\[\][ ]=' drivers/media/i2c/ov8856.c
+    defsnc 'static[ ]const[ ]struct[ ]ov8856_reg[ ]lane_4_mode_\(3264x2448\|1632x1224\)\[\][ ]=' drivers/media/i2c/ov8856.c
+    defsc 'static[ ]const[ ]u32[ ]isc_sama\(5d2\|7g5\)_gamma_table\[\]\[GAMMA_ENTRIES\][ ]=' drivers/media/platform/atmel/atmel-sama5d2-isc.c
+    defsnc 'static[ ]const[ ]u8[ ]mpeg2_intra_quant_matrix\[64\][ ]=' drivers/media/v4l2-core/v4l2-ctrls-core.c
+    defsnc 'static[ ]u32[ ]sparx5_taxi_ports\[SPX5_DSM_CAL_TAXIS\]\[SPX5_DSM_CAL_MAX_DEVS_PER_TAXI\][ ]=' drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
+    defsnc '[\t]const[ ]u32[ ]taxi_dist\[SPX5_PORTS_ALL\][ ]=' drivers/net/ethernet/microchip/sparx5/sparx5_port.c
+    defsnc 'static[ ]const[ ]struct[ ]hsfreq_range[ ]rk1808_mipidphy_hsfreq_ranges\[\][ ]=' drivers/phy/rockchip/phy-rockchip-inno-csidphy.c
+    defsnc 'static[ ]const[ ]struct[ ]tsadc_table[ ]rk3568_code_table\[\][ ]=' drivers/thermal/rockchip_thermal.c
+    defsnc 'static[ ]const[ ]u16[ ]scarlett2_mixer_values\[SCARLETT2_MIXER_VALUE_COUNT\][ ]=' sound/usb/mixer_scarlett_gen2.c
+    defsnc 'static[ ]const[ ]struct[ ]s_c2[ ]setrate_44100\[\][ ]=' sound/usb/usx2y/usbusx2yaudio.c
+    accept '[\t]rc[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]FW_ACTION_NOUEVENT[,][ ]name[,][\n\t ]*dev[,][ ]GFP_KERNEL[,][ ]NULL[,][\n\t ]*trigger_async_request_cb[)][;]' lib/test_firmware.c
+    # kpu_profile is derived from a user-supplied parameter
+    accept '[\t]if[ ][(]!request_firmware[(][&]fw[,][ ]kpu_profile[,][ ]rvu->dev[)][)]' drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+    accept '\(static[ ]int[ ]\|[\t]*\)\?efct_request_firmware_update[(]\(struct[ ]efct[ ][*]\)\?efct[)][;]\?' drivers/scsi/elx/efct/efct_driver.c
+    blobname '%s\.grp' drivers/scsi/elx/efct/efct_driver.c
+
     ;;
 
   */*freedo*.patch | */*logo*.patch)
@@ -6262,7 +6298,7 @@ set_except () {
   blobna 'DEFAULT_FIRMWARE'
   blobna '\([.]\|->\)firmware[ 	\n]*=[^=]'
   blobna 'mod_firmware_load' # sound/
-  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\|cyacd\|mbn\|tlv\|sfi\)[\\]\?["]'
+  blobname '[.]\(\(fw\|bin\)[0-9]*\|hex\|frm\|co[dx]\|dat\|elf\|xlx\|rfb\|ucode\|img\|sbcf\|ctx\(prog\|vals\)\|z77\|wfw\|inp\|dlmem\|cld\|tftf\|out\|nffw\|mdt\|mfa2\?\|ri\|tplg\|itb\|cyacd\|mbn\|tlv\|sfi\|grp\)[\\]\?["]'
   # WIP ends with [\\]\?[][}{)(><,;:.!?% \t\n"`\'"'"']'
   # Catch misdeblobbed fw extension.
   blobname '["]\([^" \t\n/]*[/][/]*\)*[*][(]DEBLOBBED[)][*][/][^"\\]'
