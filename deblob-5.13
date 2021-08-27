@@ -440,6 +440,10 @@ clean_sed '
 /Provides: kernel-/{p;s,kernel-,&libre-,;}
 ' scripts/package/mkspec '-libre provides'
 
+clean_sed '
+s,linux-upstream,linux-libre,
+' scripts/Makefile.package 'libre, not upstream'
+
 # Add reject_firmware and maybe_reject_firmware
 grep -q _LINUX_LIBRE_FIRMWARE_H include/linux/firmware.h ||
 clean_sed '$i\
