@@ -8,7 +8,7 @@ do
     echo $rel starts with v, that is unexpected >&2
     success=false
     ;;
-  *.*-gnu)
+  *.*-gnu*)
     ;;
   *)
     echo $rel does not end with -gnu, that is unexpected >&2
