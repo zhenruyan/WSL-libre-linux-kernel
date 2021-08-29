@@ -38,6 +38,16 @@ git verify-tag $up/v$rup &&
   git worktree add --detach scripts/v$rel scripts/$cbr
 } &&
 
+case $(sed -n 's,^kver=\(.*\) extra=\(.*\),\1-gnu\2,p' \
+	   scripts/v$rel/deblob-$cbr) in
+"$cbr$(echo $rel | sed -n 's,.*\(-gnu\),\1,p')") ;;
+*) echo $rel mismatches release implied by scripts/v$rel/deblob-$cbr >&2
+   echo "$cbr$(echo $rel | sed -n 's,.*\(-gnu\),\1,p')" vs \
+	$(sed -n 's,^kver=\(.*\) extra=\(.*\),\1-gnu\2,p' \
+	   scripts/v$rel/deblob-$cbr) >&2
+   continue;;
+esac &&
+
 git worktree add --detach sources/v$rel $up/v$rup &&
 
 git worktree add --detach logs/v$rel public/logs/v$prevn &&
