@@ -48,7 +48,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=4.19 extra=
+kver=4.19 extra=1
 
 case $1 in
 --force)
@@ -623,16 +623,31 @@ clean_mk CONFIG_MICROCODE_AMD arch/x86/kernel/cpu/microcode/Makefile
 announce MICROCODE_INTEL - "Intel microcode patch loading support"
 reject_firmware arch/x86/kernel/cpu/microcode/intel.c
 clean_blob arch/x86/kernel/cpu/microcode/intel.c
-clean_blob arch/x86/events/intel/core.c
 clean_kconfig arch/x86/Kconfig MICROCODE_INTEL
 clean_mk CONFIG_MICROCODE_INTEL arch/x86/kernel/cpu/microcode/Makefile
 
 announce MICROCODE - "CPU microcode loading support"
 clean_blob Documentation/x86/microcode.txt
-clean_blob arch/x86/kernel/apic/apic.c
-clean_blob drivers/hwmon/coretemp.c
 clean_kconfig arch/x86/Kconfig MICROCODE
 clean_mk CONFIG_MICROCODE arch/x86/kernel/cpu/Makefile
+
+# Do no recommend non-Free microcode update.
+announce X86_LOCAL_APIC - Undocumented
+clean_blob arch/x86/kernel/apic/apic.c
+clean_kconfig arch/x86/Kconfig X86_LOCAL_APIC
+clean_mk CONFIG_X86_LOCAL_APIC arch/x86/kernel/apic/Makefile
+
+# Do no recommend non-Free microcode update.
+announce CPU_SUP_INTEL - "Support Intel processors"
+clean_blob arch/x86/events/intel/core.c
+clean_kconfig arch/x86/Kconfig.cpu CPU_SUP_INTEL
+clean_mk CONFIG_CPU_SUP_INTEL arch/x86/events/intel/Makefile
+
+# Do no recommend non-Free microcode update.
+announce SENSORS_CORETEMP - "Intel Core/Core2/Atom temperature sensor"
+clean_blob drivers/hwmon/coretemp.c
+clean_kconfig drivers/hwmon/Kconfig SENSORS_CORETEMP
+clean_mk CONFIG_SENSORS_CORETEMP drivers/hwmon/Makefile
 
 # arm
 
@@ -660,6 +675,22 @@ clean_blob arch/arm/boot/dts/sun8i-a23-polaroid-mid2809pxe04.dts
 clean_blob arch/arm/boot/dts/sun8i-a33-ga10h-v1.1.dts
 clean_kconfig arch/arm/mach-sunxi/Kconfig MACH_SUN8I
 clean_mk CONFIG_MACH_SUN8I arch/arm/boot/dts/Makefile
+
+# ppc
+
+announce UCODE_PATCH - "ppc microcode"
+clean_blob arch/powerpc/sysdev/micropatch.c
+clean_kconfig arch/powerpc/platforms/8xx/Kconfig UCODE_PATCH
+clean_mk CONFIG_UCODE_PATCH arch/powerpc/sysdev/Makefile
+
+announce USB_SOF_UCODE_PATCH - "USB SOF patch"
+clean_kconfig arch/powerpc/platforms/8xx/Kconfig USB_SOF_UCODE_PATCH
+
+announce I2C_SPI_UCODE_PATCH - "I2C/SPI relocation patch"
+clean_kconfig arch/powerpc/platforms/8xx/Kconfig I2C_SPI_UCODE_PATCH
+
+announce I2C_SPI_SMC1_UCODE_PATCH - "I2C/SPI/SMC1 relocation patch"
+clean_kconfig arch/powerpc/platforms/8xx/Kconfig I2C_SPI_SMC1_UCODE_PATCH
 
 #######
 # ATM #
@@ -1511,6 +1542,11 @@ reject_firmware drivers/media/i2c/s5k5baf.c
 clean_blob drivers/media/i2c/s5k5baf.c
 clean_kconfig drivers/media/i2c/Kconfig VIDEO_S5K5BAF
 clean_mk CONFIG_VIDEO_S5K5BAF drivers/media/i2c/Makefile
+
+announce VIDEO_VS6624 - "ST VS6624 sensor support"
+clean_blob drivers/media/i2c/vs6624.c
+clean_kconfig drivers/media/i2c/Kconfig VIDEO_VS6624
+clean_mk CONFIG_VIDEO_VS6624 drivers/media/i2c/Makefile
 
 announce VIDEO_SAMSUNG_S5P_MFC - "Samsung S5P MFC 5.1 Video Codec"
 reject_firmware drivers/media/platform/s5p-mfc/s5p_mfc_ctrl.c
@@ -2823,6 +2859,7 @@ announce SCSI_LPFC - "Emulex LightPulse Fibre Channel Support"
 # this is the hardware or the software inducing to the installation of
 # non-Free firmware.
 reject_firmware drivers/scsi/lpfc/lpfc_init.c
+clean_blob drivers/scsi/lpfc/lpfc_init.c
 clean_kconfig drivers/scsi/Kconfig SCSI_LPFC
 clean_mk CONFIG_SCSI_LPFC drivers/scsi/lpfc/Makefile
 
