@@ -1,0 +1,13 @@
+This is an erratum, not a release proper, so the usual logs and
+signatures are not here.
+
+Unlike releases, this hasn't gone through the release process, it's
+just a record of the fix for an error introduced by a cleaning up bug.
+
+The scripts-* patch file holds the change to the cleaning-up scripts.
+Applying it to the scripts used to create the release should get you
+the corrected scripts, that have been tagged with the erratum identifier.
+
+The sources-* patch file holds the changes the scripts bring about to
+the sources.  Applying it to the sources of the release should get you 
+corrected sources, that have been tagged with the erratum identifier.

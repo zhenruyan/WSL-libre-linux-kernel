@@ -1,0 +1,27 @@
+diff --git scripts/linux-libre-4.4-gnu1/deblob-4.4 scripts/linux-libre-4.4-gnu1/deblob-4.4
+index 084e6eec5f2c..7fe38ad5097f 100755
+--- scripts/linux-libre-4.4-gnu1/deblob-4.4
++++ scripts/linux-libre-4.4-gnu1/deblob-4.4
+@@ -1751,14 +1751,20 @@ clean_sed '
+ 		goto error;\
+ 	}
+ }' drivers/net/wireless/b43/main.c 'double-check and reject non-Free firmware'
+-# Major portions of firmware filenames not deblobbed.
++clean_sed '
++/^[\t]*filename = "\(ucode\|b0g0\(bs\)\?initvals\)5";$/! {
++	s,^\([\t]*filename = "\)\(ucode\|pcm\|[^ "]*initvals\)[0-9][^ ."]*";,\1/*(DEBLOBBED)*/";,g
++}' drivers/net/wireless/b43/main.c 'cleaned up blob basenames'
+ clean_blob drivers/net/wireless/b43/main.c
+ clean_kconfig drivers/net/wireless/b43/Kconfig B43
+ clean_mk CONFIG_B43 drivers/net/wireless/b43/Makefile
+ 
+ announce B43LEGACY - "Broadcom 43xx-legacy wireless support (mac80211 stack)"
+ reject_firmware drivers/net/wireless/b43legacy/main.c
+-# Major portions of firwmare filenames not deblobbed.
++clean_sed '
++{
++	s,^\([\t]*filename = "\)\(ucode\|pcm\|[^ "]*initvals\)[0-9][^ ."]*";,\1/*(DEBLOBBED)*/";,g
++}' drivers/net/wireless/b43legacy/main.c 'cleaned up blob basenames'
+ clean_blob drivers/net/wireless/b43legacy/main.c
+ clean_kconfig drivers/net/wireless/b43legacy/Kconfig B43LEGACY
+ clean_mk CONFIG_B43LEGACY drivers/net/wireless/b43legacy/Makefile
