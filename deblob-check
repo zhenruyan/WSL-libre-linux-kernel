@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2021-08-15
+# deblob-check version 2021-08-29
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2544,11 +2544,6 @@ set_except () {
     defsnc 'static[ ]const[ ]struct[ ]chs_entry[ ]chs_table\[\][ ]=' drivers/mtd/sm_ftl.c
     blobname 'asihpi[/]dsp\(%04x\|[0-9a-f][0-9a-f][0-9a-f][0-9a-f]\)\.bin' sound/pci/asihpi/hpidspcd.c
     defsnc 'static[ ]unsigned[ ]long[ ]ident_map\[32\][ ]=' kernel/exec_domain.c
-    defsnc 'static[ ]uint[ ]patch_2000\[\][ ]__initdata[ ]=' arch/powerpc/sysdev/micropatch
-    # Are these ucode patches really data?!?  They were taken as such
-    # since gNewSense started cleaning up Linux, but they look awfully
-    # suspicious to me.
-    defsnc '\(static[ ]\)\?uint[ ]patch_2[0ef]00\[\][ ]\(__initdata[ ]\)\?=' arch/powerpc/sysdev/micropatch.c
     defsnc 'static[ ]u32[ ]epll_div\[\]\[4\][ ]=' arch/arm/mach-s5pc100/clock.c
     blobname 'iwlwifi-6000g2[ab]-' drivers/net/iwlwifi/iwl-6000.c
     blobna '[/][*][^*]*\([*]\+[^/*][^*]*\)*[*]*[(]f2255usb\.bin[)][^*]*\([*]\+[^/*][^*]*\)*[*]\+[/]' drivers/media/video/s2255drv.c
@@ -3035,7 +3030,6 @@ set_except () {
     defsnc '[	]static[ ]u8[ ]bw_params1\[3\]\[34\][ ]=' drivers/media/dvb/frontends/rtl2830.c
     blobname 'dvb-demod-drxk-pctv\.fw' drivers/media/video/em28xx/em28xx-dvb.c
     defsnc 'static[ ]const[ ]u8[ ]\(start\|page3\)_7302\[\][ ]=' drivers/media/video/gspca/pac7302.c
-    defsnc 'static[ ]const[ ]u16[ ]vs6624_p1\[\][ ]=' drivers/media/video/vs6624.c
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]oob_\(2048\|4096\)_ecc[48][ ]=' drivers/mtd/nand/fsl_ifc_nand.c
     defsnc 'static[ ]struct[ ]nand_ecclayout[ ]fsmc_ecc4_\(256\|224\|128\|64\)_layout[ ]=' drivers/mtd/nand/fsmc_nand.c
     defsnc '[	]static[ ]const[ ]u8[ ]dhcp_\(pattern\|mask\)\[\][ ]=' drivers/net/wireless/ath/ath6kl/cfg80211.c
@@ -4398,7 +4392,7 @@ set_except () {
     blobname 'rtlwifi[/]rtl8192eu_nic\.bin' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.c
     blobname 'intel[/]dsp_fw_bxtn\.bin' sound/soc/intel/skylake/skl.c
     accept 'CONFIG_EXTRA_FIRMWARE=["][/][*][(]DEBLOBBED' Documentation/x86/early-microcode.txt
-    blob '[/]lib[/]firmware[/]\([\n][^\n][^\n]*\)*\.\.\.' Documentation/x86/early-microcode.txt
+    blob '[/]lib[/]firmware[/]\([\n][^\n][^\n]*\)*[\n][ ]*\.\.\.' Documentation/x86/'\(early-microcode\.txt\|microcode\.\(txt\|rst\)\)'
     blobname 'https[:][/][/]01\.org[/]linuxgraphics[/]intel-[^"\n]*' drivers/gpu/drm/i915/intel_csr.c
     accept '[\t ]*["]genroms[/]kvmvapic\.bin' Documentation/ABI/testing/sysfs-firmware-qemu_fw_cfg
     accept '#define[ ]XCHAL_BYTE0_FORMAT_LENGTHS[ \t238,\\\n]*' arch/xtensa/variants/test_kc705_hifi/include/variant/tie.h
@@ -4957,12 +4951,12 @@ set_except () {
     accept '[\t]err[ ]=[ ]request_firmware[(][&]clm[,][ ]clm_name[,][ ]dev[)][;]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
     accept '[\t]*DRM_DEBUG_DRIVER[(]["]%s[ ]fw[ ]request_firmware[ ]err=%d[\\]n["][,]' drivers/gpu/drm/i915/intel_uc_fw.c
 
-    accept 'The[ ]kernel[ ]can[ ]update[ ]microcode' Documentation/x86/microcode.txt
+    accept '\(The[ ]k\|K\)ernel[ ]can[ ]update[ ]microcode' Documentation/x86/microcode.txt
     accept 'requires[ ]rebuilding[ ]the[ ]kernel[ ]each[ ]time[ ]updated[ ]microcode' Documentation/x86/microcode.txt
     accept '[\t][ ][ ]If[ ]you[ ]say[ ]Y[ ]here[,][ ]you[ ]will[ ]be[ ]able[ ]to[ ]update[ ]the[ ]microcode' arch/x86/Kconfig
     blobna '[,][ ]please[ ]upgrade[ ]microcode' arch/x86/events/intel/core.c
     blobna 'please[ ]update[ ]microcode[ ]to[ ]version:[ ]0x%x[ ][(]or[ ]later[)]' arch/x86/kernel/apic/apic.c
-    accept '[ ][*][ ]*This[ ]driver[ ]allows[ ]to[ ]upgrade[ ]microcode' arch/x86/kernel/cpu/microcode/'\(amd\|core\)\.c'
+    accept '[ ][*][ \t]*This[ ]driver[ ]allows[ ]to[ ]upgrade[ ]microcode' arch/x86/kernel/cpu/microcode/'\(amd\|core\)\.c'
     accept '[\t][ ][*][ ]operation[ ]-[ ]when[ ]the[ ]other[ ]hyperthread[ ]has[ ]updated[ ]the[ ]microcode' arch/x86/kernel/cpu/microcode/core.c
     accept '[ ][*][ ]mc_bp_resume[ ]-[ ]Update[ ]boot[ ]CPU[ ]microcode[ ]during[ ]resume' arch/x86/kernel/cpu/microcode/core.c
     blobna '[,][ ]update[ ]BIOS[ ]or[ ]microcode[ ]of[ ]the[ ]CPU[!]' drivers/hwmon/coretemp.c
@@ -5048,9 +5042,9 @@ set_except () {
     blobname 's5p-mfc-v10\.fw' drivers/media/platform/s5p-mfc/s5p_mfc.c
     blobname 'example[ ]file[ ]wl1251-nvs\.bin[,][^*]*[*][/]' drivers/net/wireless/ti/wl1251/main.c
     blobname '["]brcm[/]["]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h
-    blobname 'brcmfmac43\(143\|241b[045]\|29\|3[0459]\|340\|362\|430\(a0\)\?\|455\|5[46]\|73\)-sdio' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-    blobname 'brcmfmac43\(602\|50\(c2\)\?\|56\|570\|5[89]\|65[bc]\|66[bc]\|71\)-pcie' drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
-    blobname 'brcmfmac43\(143\|236b\|242a\|569\|73\)' drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+    blobname '\(brcm[/]\)\?brcmfmac43\(143\|241b[045]\|29\|3[0459]\|340\|362\|430\(a0\)\?\|455\|5[46]\|73\)-sdio\(\.bin\|\.txt\)\?' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+    blobname '\(brcm[/]\)\?brcmfmac43\(602\|50\(c2\)\?\|56\|570\|5[89]\|65[bc]\|66[bc]\|71\)-pcie\(\.bin\|\.txt\)\?' drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+    blobname '\(brcm[/]\)\?brcmfmac43\(143\|236b\|242a\|569\|73\)\(\.bin\|\.txt\)\?' drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
     accept '[\t]struct[ ]brcmf_fw_name[ ]fwnames\[\][ ]=[ ][{][\n][\t][\t][{][ ]["]\.bin["]' 'drivers/net/wireless/broadcom/brcm80211/brcmfmac/\(pcie\|sdio\|usb\)\.c'
     # We require a semicolon after MODULE_FIRMWARE, which this
     # in-macro occurrence does not have, so take the semicolon from
@@ -5957,8 +5951,8 @@ set_except () {
     # than code.  That ought to be acceptable, but let's make sure no
     # unwanted use slips through.
     blobna 'load_msr_list' drivers/staging/media/atomisp/i2c/atomisp-libmsrlisthelper.c
-    accept 'int[ ]load_msr_list[(][^)]*[)][\n][{][\n][\t]int[ ]ret[ ]=[ ]request_firmware[(]' drivers/staging/media/atomisp/i2c/atomisp-libmsrlisthelper.c
-    accept 'int[ ]load_msr_list[(][^)]*[)][;]' drivers/staging/media/atomisp/include/linux/libmsrlisthelper.h
+    accept 'int[ ]load_msr_list[(][^)]*[)][\n][{][\n][\t]*int[ ]ret[ ]=[ ]request_firmware[(]' drivers/staging/media/atomisp/i2c/atomisp-libmsrlisthelper.c
+    accept '\(extern[ ]\)\?int[ ]load_msr_list[(][^)]*[)][;]' drivers/staging/media/atomisp/include/linux/libmsrlisthelper.h
     blobname 'qca[/]crbtfw%02x\.tlv' drivers/bluetooth/btqca.c
     blobname 'qca[/]htbtfw%02x\.tlv' drivers/bluetooth/btqca.c
     blobname 'qca[/]%s' drivers/bluetooth/btqca.c
@@ -6258,7 +6252,33 @@ set_except () {
     # kpu_profile is derived from a user-supplied parameter
     accept '[\t]if[ ][(]!request_firmware[(][&]fw[,][ ]kpu_profile[,][ ]rvu->dev[)][)]' drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
     accept '\(static[ ]int[ ]\|[\t]*\)\?efct_request_firmware_update[(]\(struct[ ]efct[ ][*]\)\?efct[)][;]\?' drivers/scsi/elx/efct/efct_driver.c
-    blobname '%s\.grp' drivers/scsi/elx/efct/efct_driver.c
+    blobname '%s\.grp' 'drivers/scsi/\(lpfc/lpfc_init\.c\|elx/efct/efct_driver\.c\)'
+
+    # Blobs that we mistakenly retained up to 5.14-rc7-gnu.
+    # Thanks to Legimet for bringing them to our attention!
+    blob '\(static[ ]\)\?uint[ ]patch_2[0ef]00\[\][ ]\(__initdata[ ]\)\?=[ ][{][0-9xa-fA-F, \t\n]*[}][;]' 'arch/powerpc/\(sysdev\|platforms/8xx\)/micropatch\.c'
+    blobna 'cpm_write_patch[(]cp[,][ ]0[xef0]*[,][ ]patch_2[0ef]00[,][ ]sizeof[(]patch_2[0ef]00[)][)][;]' 'arch/powerpc/\(sysdev\|platforms/8xx\)/micropatch\.c'
+    blob 'static[ ]const[ ]u16[ ]vs6624_p1\[\][ ]=[ ][{][0-9xa-fA-F, \t\n]*[}][;]' 'drivers/media/\(video\|i2c\)/vs6624\.c'
+    blobna 'vs6624_writeregs[(]sd[,][ ]vs6624_p1[)][;]' 'drivers/media/\(video\|i2c\)/vs6624\.c'
+
+    # Here's some inducement of non-Free stuff that we clean up better now.
+    blobname 'GenuineIntel\.bin' 'Documentation/x86/microcode\.\(rst\|txt\)'
+    blobna 'cat[ ][/]lib[/]firmware[/]\(amd\|intel\)-ucode[/][^ ]*[ ][>][^\n]*' 'Documentation/x86/microcode\.\(rst\|txt\)'
+    blobna 'cp[ ]\.\.[/]microcode\.bin[ ][^\n]*' Documentation/x86/early_microcodetxt
+    blobname '[/]lib[/]firmware[/][{]intel-ucode[,]amd-ucode[}]' 'Documentation/x86/microcode\.\(rst\|txt\)'
+    blobname 'microcode_amd_fam15h\.bin' 'Documentation/x86/microcode\.\(rst\|txt\)'
+
+    # Present in 4.19, matches a later-added firmware extension pattern.
+    accept '[\t]if[ ][(]!strcmp[(]last4[,][ ]["]\.tlv["][)][)]' drivers/fmc/fmc-write-eeprom.c
+    # Present in 4.14, matches a later-added firmware loader interface.
+    accept '[\t][\t]ret[ ]=[ ]load_msr_list[(]client[,]' drivers/staging/media/atomisp/i2c/imx/imx.c
+    # Present in 4.9 and 4.4, matches a later-added firmware loader interface.
+    accept '[\t]*\(return[ ]\)\?coda_firmware_request[(]' drivers/media/platform/code/coda-common.c
+    # Present in 4.9 and 4.4, harmless occurrence of update.*microcode.
+    accept '[ ][*][ ]Returns[:][ ]The[ ]updated[ ]number[ ]@num_saved[ ]of[ ]saved[ ]microcode[ ]patches\.' arch/x86/kernel/cpu/microcode/intel.c
+    # Present in 4.9, links to Free Software.
+    accept 'ARM[ ]assembly[ ]source[ ]code[ ]available[ ]at[ ]https[:][/][/]linuxtv\.org[/]downloads[/]firmware[/]Boot\.S' firmware/WHENCE
+
 
     ;;
 

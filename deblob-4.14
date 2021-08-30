@@ -48,7 +48,7 @@
 
 # For each kver release, start extra with an empty string, then count
 # from 1 if changes are needed that require rebuilding the tarball.
-kver=4.14 extra=
+kver=4.14 extra=1
 
 case $1 in
 --force)
@@ -558,6 +558,24 @@ clean_blob Documentation/x86/microcode.txt
 clean_kconfig arch/x86/Kconfig MICROCODE
 clean_mk CONFIG_MICROCODE arch/x86/kernel/cpu/Makefile
 
+# Do no recommend non-Free microcode update.
+announce X86_LOCAL_APIC - Undocumented
+clean_blob arch/x86/kernel/apic/apic.c
+clean_kconfig arch/x86/Kconfig X86_LOCAL_APIC
+clean_mk CONFIG_X86_LOCAL_APIC arch/x86/kernel/apic/Makefile
+
+# Do no recommend non-Free microcode update.
+announce CPU_SUP_INTEL - "Support Intel processors"
+clean_blob arch/x86/events/intel/core.c
+clean_kconfig arch/x86/Kconfig.cpu CPU_SUP_INTEL
+clean_mk CONFIG_CPU_SUP_INTEL arch/x86/events/intel/Makefile
+
+# Do no recommend non-Free microcode update.
+announce SENSORS_CORETEMP - "Intel Core/Core2/Atom temperature sensor"
+clean_blob drivers/hwmon/coretemp.c
+clean_kconfig drivers/hwmon/Kconfig SENSORS_CORETEMP
+clean_mk CONFIG_SENSORS_CORETEMP drivers/hwmon/Makefile
+
 # arm
 
 announce IXP4XX_NPE - "IXP4xx Network Processor Engine support"
@@ -584,6 +602,22 @@ clean_blob arch/arm/boot/dts/sun8i-a23-polaroid-mid2809pxe04.dts
 clean_blob arch/arm/boot/dts/sun8i-a33-ga10h-v1.1.dts
 clean_kconfig arch/arm/mach-sunxi/Kconfig MACH_SUN8I
 clean_mk CONFIG_MACH_SUN8I arch/arm/boot/dts/Makefile
+
+# ppc
+
+announce UCODE_PATCH - "ppc microcode"
+clean_blob arch/powerpc/sysdev/micropatch.c
+clean_kconfig arch/powerpc/platforms/8xx/Kconfig UCODE_PATCH
+clean_mk CONFIG_UCODE_PATCH arch/powerpc/sysdev/Makefile
+
+announce USB_SOF_UCODE_PATCH - "USB SOF patch"
+clean_kconfig arch/powerpc/platforms/8xx/Kconfig USB_SOF_UCODE_PATCH
+
+announce I2C_SPI_UCODE_PATCH - "I2C/SPI relocation patch"
+clean_kconfig arch/powerpc/platforms/8xx/Kconfig I2C_SPI_UCODE_PATCH
+
+announce I2C_SPI_SMC1_UCODE_PATCH - "I2C/SPI/SMC1 relocation patch"
+clean_kconfig arch/powerpc/platforms/8xx/Kconfig I2C_SPI_SMC1_UCODE_PATCH
 
 #######
 # ATM #
@@ -1291,11 +1325,6 @@ clean_blob drivers/staging/media/atomisp/i2c/ap1302.c
 clean_kconfig drivers/staging/media/atomisp/i2c/Kconfig VIDEO_AP1302
 clean_mk CONFIG_VIDEO_AP1302 drivers/staging/media/atomisp/i2c/Makefile
 
-announce VIDEO_MSRLIST_HELPER - "Helper library to load, parse and apply large register lists."
-reject_firmware drivers/staging/media/atomisp/i2c/libmsrlisthelper.c
-clean_kconfig drivers/staging/media/atomisp/i2c/Kconfig VIDEO_MSRLIST_HELPER
-clean_mk CONFIG_VIDEO_MSRLIST_HELPER drivers/staging/media/atomisp/i2c/Makefile
-
 announce VIDEO_ATOMISP - "Intel Atom Image Signal Processor Driver"
 reject_firmware drivers/staging/media/atomisp/pci/atomisp2/atomisp_v4l2.c
 clean_blob drivers/staging/media/atomisp/pci/atomisp2/atomisp_v4l2.c
@@ -1439,6 +1468,11 @@ reject_firmware drivers/media/i2c/s5k5baf.c
 clean_blob drivers/media/i2c/s5k5baf.c
 clean_kconfig drivers/media/i2c/Kconfig VIDEO_S5K5BAF
 clean_mk CONFIG_VIDEO_S5K5BAF drivers/media/i2c/Makefile
+
+announce VIDEO_VS6624 - "ST VS6624 sensor support"
+clean_blob drivers/media/i2c/vs6624.c
+clean_kconfig drivers/media/i2c/Kconfig VIDEO_VS6624
+clean_mk CONFIG_VIDEO_VS6624 drivers/media/i2c/Makefile
 
 announce VIDEO_SAMSUNG_S5P_MFC - "Samsung S5P MFC 5.1 Video Codec"
 reject_firmware drivers/media/platform/s5p-mfc/s5p_mfc_ctrl.c
@@ -2723,6 +2757,7 @@ announce SCSI_LPFC - "Emulex LightPulse Fibre Channel Support"
 # this is the hardware or the software inducing to the installation of
 # non-Free firmware.
 reject_firmware drivers/scsi/lpfc/lpfc_init.c
+clean_blob drivers/scsi/lpfc/lpfc_init.c
 clean_kconfig drivers/scsi/Kconfig SCSI_LPFC
 clean_mk CONFIG_SCSI_LPFC drivers/scsi/lpfc/Makefile
 
@@ -2900,6 +2935,11 @@ announce REMOTEPROC - "Support for Remote Processor subsystem"
 maybe_reject_firmware drivers/remoteproc/remoteproc_core.c
 clean_kconfig drivers/remoteproc/Kconfig REMOTEPROC
 clean_mk CONFIG_REMOTEPROC drivers/remoteproc/Makefile
+
+announce KEYSTONE_REMOTEPROC - "Keystone Remoteproc support"
+clean_blob drivers/remoteproc/keystone_remoteproc.c
+clean_kconfig drivers/remoteproc/Kconfig KEYSTONE_REMOTEPROC
+clean_mk CONFIG_KEYSTONE_REMOTEPROC drivers/remoteproc/Makefile
 
 announce WKUP_M3_RPROC - "AMx3xx Wakeup M3 remoteproc support"
 clean_blob Documentation/devicetree/bindings/remoteproc/wkup_m3_rproc.txt
@@ -3101,11 +3141,7 @@ clean_blob sound/pci/rme9652/hdsp.c
 clean_kconfig sound/pci/Kconfig SND_HDSP
 clean_mk CONFIG_SND_HDSP sound/pci/rme9652/Makefile
 
-announce SND_AICA - "Dreamcast Yamaha AICA sound"
-reject_firmware sound/sh/aica.c
-clean_blob sound/sh/aica.c
-clean_kconfig sound/sh/Kconfig SND_AICA
-clean_mk CONFIG_SND_AICA sound/sh/Makefile
+# SND_AICA is no longer disabled, its firmware is Free Software.
 
 announce SND_MSND_PINNACLE - "Support for Turtle Beach MultiSound Pinnacle"
 clean_blob sound/isa/msnd/msnd_pinnacle.h
