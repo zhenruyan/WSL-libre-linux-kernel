@@ -1751,7 +1751,10 @@ clean_sed '
 		goto error;\
 	}
 }' drivers/net/wireless/b43/main.c 'double-check and reject non-Free firmware'
-# Major portions of firmware filenames not deblobbed.
+clean_sed '
+/^[\t]*filename = "\(ucode\|b0g0\(bs\)\?initvals\)5";$/! {
+	s,^\([\t]*filename = "\)\(ucode\|pcm\|[^ "]*initvals\)[0-9][^ ."]*";,\1/*(DEBLOBBED)*/";,g
+}' drivers/net/wireless/b43/main.c 'cleaned up blob basenames'
 clean_blob drivers/net/wireless/b43/main.c
 clean_kconfig drivers/net/wireless/b43/Kconfig B43
 clean_mk CONFIG_B43 drivers/net/wireless/b43/Makefile
