@@ -2306,60 +2306,60 @@ static int b43_try_request_fw(struct b43_request_fw_context *ctx)
 	switch (rev) {
 	case 42:
 		if (phy->type == B43_PHYTYPE_AC)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 40:
 		if (phy->type == B43_PHYTYPE_AC)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 33:
 		if (phy->type == B43_PHYTYPE_LCN40)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 30:
 		if (phy->type == B43_PHYTYPE_N)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 29:
 		if (phy->type == B43_PHYTYPE_HT)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 26:
 		if (phy->type == B43_PHYTYPE_HT)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 28:
 	case 25:
 		if (phy->type == B43_PHYTYPE_N)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (phy->type == B43_PHYTYPE_LCN)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 24:
 		if (phy->type == B43_PHYTYPE_LCN)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 23:
 		if (phy->type == B43_PHYTYPE_N)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 16 ... 19:
 		if (phy->type == B43_PHYTYPE_N)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (phy->type == B43_PHYTYPE_LP)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case 15:
-		filename = /*(DEBLOBBED)*/;
+		filename = "/*(DEBLOBBED)*/";
 		break;
 	case 14:
-		filename = /*(DEBLOBBED)*/;
+		filename = "/*(DEBLOBBED)*/";
 		break;
 	case 13:
-		filename = /*(DEBLOBBED)*/;
+		filename = "/*(DEBLOBBED)*/";
 		break;
 	case 11 ... 12:
-		filename = /*(DEBLOBBED)*/;
+		filename = "/*(DEBLOBBED)*/";
 		break;
 	case 5 ... 10:
 		filename = "ucode5";
@@ -2373,7 +2373,7 @@ static int b43_try_request_fw(struct b43_request_fw_context *ctx)
 
 	/* Get PCM code */
 	if ((rev >= 5) && (rev <= 10))
-		filename = /*(DEBLOBBED)*/;
+		filename = "/*(DEBLOBBED)*/";
 	else if (rev >= 11)
 		filename = NULL;
 	else
@@ -2392,53 +2392,53 @@ static int b43_try_request_fw(struct b43_request_fw_context *ctx)
 	switch (dev->phy.type) {
 	case B43_PHYTYPE_G:
 		if (rev == 13)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev >= 5 && rev <= 10)
 			filename = "b0g0initvals5";
 		break;
 	case B43_PHYTYPE_N:
 		if (rev == 30)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 28 || rev == 25)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 24)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 23)
-			filename = /*(DEBLOBBED)*/; /*(DEBLOBBED)*/
+			filename = "/*(DEBLOBBED)*/"; /*(DEBLOBBED)*/
 		else if (rev >= 16 && rev <= 18)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev >= 11 && rev <= 12)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_LP:
 		if (rev >= 16 && rev <= 18)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 15)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 14)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 13)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_HT:
 		if (rev == 29)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 26)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_LCN:
 		if (rev == 24)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_LCN40:
 		if (rev == 33)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_AC:
 		if (rev == 42)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 40)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	}
 	if (!filename)
@@ -2452,53 +2452,53 @@ static int b43_try_request_fw(struct b43_request_fw_context *ctx)
 	switch (dev->phy.type) {
 	case B43_PHYTYPE_G:
 		if (rev == 13)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev >= 5 && rev <= 10)
 			filename = "b0g0bsinitvals5";
 		break;
 	case B43_PHYTYPE_N:
 		if (rev == 30)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 28 || rev == 25)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 24)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 23)
-			filename = /*(DEBLOBBED)*/; /*(DEBLOBBED)*/
+			filename = "/*(DEBLOBBED)*/"; /*(DEBLOBBED)*/
 		else if (rev >= 16 && rev <= 18)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev >= 11 && rev <= 12)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_LP:
 		if (rev >= 16 && rev <= 18)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 15)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 14)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 13)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_HT:
 		if (rev == 29)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 26)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_LCN:
 		if (rev == 24)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_LCN40:
 		if (rev == 33)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	case B43_PHYTYPE_AC:
 		if (rev == 42)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 40)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		break;
 	}
 	if (!filename)
