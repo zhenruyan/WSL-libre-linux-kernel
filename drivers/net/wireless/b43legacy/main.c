@@ -1598,20 +1598,20 @@ static void b43legacy_request_firmware(struct work_struct *work)
 
 	if (!fw->ucode) {
 		if (rev == 2)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else if (rev == 4)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else
-			filename = "ucode5";
+			filename = "/*(DEBLOBBED)*/";
 		err = do_request_fw(dev, filename, &fw->ucode, true);
 		if (err)
 			goto err_load;
 	}
 	if (!fw->pcm) {
 		if (rev < 5)
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		else
-			filename = /*(DEBLOBBED)*/;
+			filename = "/*(DEBLOBBED)*/";
 		err = do_request_fw(dev, filename, &fw->pcm, false);
 		if (err)
 			goto err_load;
@@ -1621,9 +1621,9 @@ static void b43legacy_request_firmware(struct work_struct *work)
 		case B43legacy_PHYTYPE_B:
 		case B43legacy_PHYTYPE_G:
 			if ((rev >= 5) && (rev <= 10))
-				filename = "b0g0initvals5";
+				filename = "/*(DEBLOBBED)*/";
 			else if (rev == 2 || rev == 4)
-				filename = /*(DEBLOBBED)*/;
+				filename = "/*(DEBLOBBED)*/";
 			else
 				goto err_no_initvals;
 			break;
@@ -1639,7 +1639,7 @@ static void b43legacy_request_firmware(struct work_struct *work)
 		case B43legacy_PHYTYPE_B:
 		case B43legacy_PHYTYPE_G:
 			if ((rev >= 5) && (rev <= 10))
-				filename = "b0g0bsinitvals5";
+				filename = "/*(DEBLOBBED)*/";
 			else if (rev >= 11)
 				filename = NULL;
 			else if (rev == 2 || rev == 4)
