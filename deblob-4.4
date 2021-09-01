@@ -1761,7 +1761,10 @@ clean_mk CONFIG_B43 drivers/net/wireless/b43/Makefile
 
 announce B43LEGACY - "Broadcom 43xx-legacy wireless support (mac80211 stack)"
 reject_firmware drivers/net/wireless/b43legacy/main.c
-# Major portions of firwmare filenames not deblobbed.
+clean_sed '
+{
+	s,^\([\t]*filename = "\)\(ucode\|pcm\|[^ "]*initvals\)[0-9][^ ."]*";,\1/*(DEBLOBBED)*/";,g
+}' drivers/net/wireless/b43legacy/main.c 'cleaned up blob basenames'
 clean_blob drivers/net/wireless/b43legacy/main.c
 clean_kconfig drivers/net/wireless/b43legacy/Kconfig B43LEGACY
 clean_mk CONFIG_B43LEGACY drivers/net/wireless/b43legacy/Makefile
