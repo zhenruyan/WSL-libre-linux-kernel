@@ -3140,7 +3140,11 @@ clean_mk CONFIG_USB_UEAGLEATM drivers/usb/atm/Makefile
 # host
 
 announce USB_XHCI_PCI_RENESAS - "Support for additional Renesas xHCI controller with firwmare"
-reject_firmware drivers/usb/host/xhci-pci-renesas.c
+if grep -q 'firmware_request_nowarn' drivers/usb/host/xhci-pci-renesas.c; then
+  reject_firmware_nowarn drivers/usb/host/xhci-pci-renesas.c
+else
+  reject_firmware drivers/usb/host/xhci-pci-renesas.c
+fi
 clean_kconfig drivers/usb/host/Kconfig USB_XHCI_PCI_RENESAS
 clean_mk CONFIG_USB_XHCI_PCI_RENESAS drivers/usb/host/Makefile
 
