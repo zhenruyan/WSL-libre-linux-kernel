@@ -476,7 +476,7 @@ clean_sed '$i\
 static inline int\
 is_nonfree_firmware(const char *name)\
 {\
-  return strstr(name, NONFREE_FIRMWARE) != 0;\
+	return strstr(name, NONFREE_FIRMWARE) != 0;\
 }\
 \
 static inline int\
