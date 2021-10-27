@@ -409,7 +409,7 @@ clean_sed '$i\
 static inline int\
 is_nonfree_firmware(const char *name)\
 {\
-  return strstr(name, NONFREE_FIRMWARE) != 0;\
+	return strstr(name, NONFREE_FIRMWARE) != 0;\
 }\
 \
 static inline int\
@@ -417,18 +417,20 @@ report_missing_free_firmware(const char *name, const char *what)\
 {\
 	printk(KERN_ERR "%s: Missing Free %s (non-Free firmware loading is disabled)\\n", name,\
 	       what ? what : "firmware");\
-	return -EINVAL;\
+	return -ENOENT;\
 }\
 static inline int\
 reject_firmware(const struct firmware **fw,\
 		const char *name, struct device *device)\
 {\
 	const struct firmware *xfw = NULL;\
-	int retval;\
-	report_missing_free_firmware(dev_name(device), NULL);\
+	int retval, retval0;\
+	retval0 = report_missing_free_firmware(dev_name(device), NULL);\
 	retval = request_firmware(&xfw, NONFREE_FIRMWARE, device);\
-	if (!retval)\
+	if (!retval) {\
 		release_firmware(xfw);\
+		retval = retval0;\
+	}\
 	return -EINVAL;\
 }\
 static inline int\
@@ -445,17 +447,15 @@ reject_firmware_direct(const struct firmware **fw,\
 		const char *name, struct device *device)\
 {\
 	const struct firmware *xfw = NULL;\
-	int retval;\
-	report_missing_free_firmware(dev_name(device), NULL);\
+	int retval, retval0;\
+	if (fw) *fw = xfw;\
+	retval0 = report_missing_free_firmware(dev_name(device), NULL);\
 	retval = request_firmware_direct(&xfw, NONFREE_FIRMWARE, device);\
-	if (!retval)\
+	if (!retval) {\
 		release_firmware(xfw);\
-	return -EINVAL;\
-}\
-static inline void\
-discard_rejected_firmware(const struct firmware *fw, void *context)\
-{\
-	release_firmware(fw);\
+		retval = retval0;\
+	}\
+	return retval;\
 }\
 static inline int\
 reject_firmware_nowait(struct module *module, int uevent,\
@@ -464,14 +464,10 @@ reject_firmware_nowait(struct module *module, int uevent,\
 		       void (*cont)(const struct firmware *fw,\
 				    void *context))\
 {\
-	int retval;\
 	report_missing_free_firmware(dev_name(device), NULL);\
-	retval = request_firmware_nowait(module, uevent, NONFREE_FIRMWARE,\
-					 device, gfp, NULL,\
-					 discard_rejected_firmware);\
-	if (retval)\
-		return retval;\
-	return -EINVAL;\
+	/* We assume NONFREE_FIRMWARE will not be found; how could it?  */\
+	return request_firmware_nowait(module, uevent, NONFREE_FIRMWARE,\
+				       device, gfp, context, cont);\
 }\
 static inline int\
 maybe_reject_firmware_nowait(struct module *module, int uevent,\
@@ -492,12 +488,15 @@ reject_firmware_into_buf(const struct firmware **firmware_p, const char *name,\
 			 struct device *device, void *buf, size_t size)\
 {\
 	const struct firmware *xfw = NULL;\
-	int retval;\
-	report_missing_free_firmware(dev_name(device), NULL);\
+	int retval, retval0;\
+	if (firmware_p) *firmware_p = xfw;\
+	retval0 = report_missing_free_firmware(dev_name(device), NULL);\
 	retval = request_firmware_into_buf(&xfw, NONFREE_FIRMWARE, device, buf, size);\
-	if (!retval)\
+	if (!retval) {\
 		release_firmware(xfw);\
-	return -EINVAL;\
+		retval = retval0;\
+	}\
+	return retval;\
 }\
 static inline int\
 maybe_reject_firmware_into_buf(const struct firmware **firmware_p, const char *name,\
@@ -521,7 +520,7 @@ static inline int\
 maybe_reject_ihex_firmware(const struct firmware **fw,\
 			   const char *name, struct device *device)\
 {\
-	if (strstr (name, NONFREE_FIRMWARE))\
+	if (is_nonfree_firmware(name))\
 		return reject_firmware(fw, name, device);\
 	else\
 		return request_ihex_firmware(fw, name, device);\
@@ -3403,6 +3402,15 @@ clean_sed s,usb8388,whatever,g drivers/base/Kconfig 'removed blob name'
 
 if $errors; then
   echo errors above were ignored because of --force >&2
+else
+  echo cleaning up has completed successfully, without verification >&2
+  # Verification is largely manual, comparing the changes with
+  # those of a previous known (presumed) good version, e.g.
+  # git merge the previous known good version onto the current base
+  # version, and then git diff with this cleaned-up version.
+  # Creating a tarball of this version, named linux-*.*.tar,
+  # and running deblob-check on it may also help catch cleaning-up
+  # errors: .../deblob-check --use-awk -B linux-*.*.tar.
 fi
 
 exit 0
