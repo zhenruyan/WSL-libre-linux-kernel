@@ -407,9 +407,12 @@ clean_sed '
 s,git://git\..*torvalds/linux\.git,/*(DEBLOBBED)*/,
 ' scripts/package/mkdebian 'upstream development repo'
 
-clean_sed '
-s,Name: kernel,&-libre,
-' scripts/package/mkspec 'package name'
+# The tarball name and its expansion do not include -libre.
+# We could change KERNELPATH and keep this, but what else would break?
+# Enabling this would require the other commented-out mkspec bits below.
+# clean_sed '
+# s,Name: kernel,&-libre,
+# ' scripts/package/mkspec 'package name'
 
 clean_sed '
 s,The Linux,The GNU Linux-libre,
@@ -423,13 +426,22 @@ clean_sed '
 s,https\?://www\.kernel\.org,https://linux-libre.fsfla.org,
 ' scripts/package/mkspec 'home page'
 
+# clean_sed '
+# s,\(%description\) -n kernel-,\1 ,
+# ' scripts/package/mkspec '-libre subpackages'
+
+# clean_sed '
+# /Provides: kernel-/{p;s,kernel-,&libre-,;}
+# ' scripts/package/mkspec '-libre provides'
+
+# As with rpms, we leave the package name as kernel.
 clean_sed '
-s,\(%description\) -n kernel-,\1 ,
-' scripts/package/mkspec '-libre subpackages'
+s,The upstream Linux kernel,The GNU Linux-libre kernel,
+' scripts/package/snapcraft.template 'description'
 
 clean_sed '
-/Provides: kernel-/{p;s,kernel-,&libre-,;}
-' scripts/package/mkspec '-libre provides'
+s,Linux kernel,GNU Linux-libre,
+' scripts/package/snapcraft.template 'summary'
 
 # Add reject_firmware and maybe_reject_firmware
 grep -q _LINUX_LIBRE_FIRMWARE_H include/linux/firmware.h ||
@@ -444,7 +456,7 @@ clean_sed '$i\
 static inline int\
 is_nonfree_firmware(const char *name)\
 {\
-  return strstr(name, NONFREE_FIRMWARE) != 0;\
+	return strstr(name, NONFREE_FIRMWARE) != 0;\
 }\
 \
 static inline int\
@@ -460,6 +472,7 @@ firmware_reject_nowarn(const struct firmware **fw,\
 {\
 	const struct firmware *xfw = NULL;\
 	int retval, retval0 = -ENOENT;\
+	if (fw) *fw = xfw;\
 	retval = firmware_request_nowarn(&xfw, NONFREE_FIRMWARE, device);\
 	if (!retval) {\
 		release_firmware(xfw);\
@@ -494,6 +507,7 @@ reject_firmware_direct(const struct firmware **fw,\
 {\
 	const struct firmware *xfw = NULL;\
 	int retval, retval0;\
+	if (fw) *fw = xfw;\
 	retval0 = report_missing_free_firmware(dev_name(device), NULL);\
 	retval = request_firmware_direct(&xfw, NONFREE_FIRMWARE, device);\
 	if (!retval) {\
@@ -534,6 +548,7 @@ reject_firmware_into_buf(const struct firmware **firmware_p, const char *name,\
 {\
 	const struct firmware *xfw = NULL;\
 	int retval, retval0;\
+	if (firmware_p) *firmware_p = xfw;\
 	retval0 = report_missing_free_firmware(dev_name(device), NULL);\
 	retval = request_firmware_into_buf(&xfw, NONFREE_FIRMWARE, device, buf, size);\
 	if (!retval) {\
@@ -3580,6 +3595,15 @@ clean_sed s,usb8388,whatever,g drivers/base/firmware_loader/Kconfig 'removed blo
 
 if $errors; then
   echo errors above were ignored because of --force >&2
+else
+  echo cleaning up has completed successfully, without verification >&2
+  # Verification is largely manual, comparing the changes with
+  # those of a previous known (presumed) good version, e.g.
+  # git merge the previous known good version onto the current base
+  # version, and then git diff with this cleaned-up version.
+  # Creating a tarball of this version, named linux-*.*.tar,
+  # and running deblob-check on it may also help catch cleaning-up
+  # errors: .../deblob-check --use-awk -B linux-*.*.tar.
 fi
 
 exit 0
