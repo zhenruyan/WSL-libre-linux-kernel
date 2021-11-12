@@ -1,0 +1,32 @@
+
+	DO NOT ADD FIRMWARE TO THIS DIRECTORY.
+	======================================
+
+This directory is only here to contain firmware images extracted from old
+device drivers which predate the common use of request_firmware().
+
+As we update those drivers to use request_firmware() and keep a clean
+separation between code and firmware, we put the extracted firmware
+here.
+
+/*(DEBLOBBED)*/
+
+Your commit should include an update to the WHENCE file clearly
+identifying the licence under which the firmware is available, and
+that it is redistributable. If the licence is long and involved, it's
+permitted to include it in a separate file and refer to it from the
+WHENCE file.
+And if it were possible, a changelog of the firmware itself.
+
+Ideally, your commit should contain a Signed-Off-By: from someone
+authoritative on the licensing of the firmware in question (i.e. from
+within the company that owns the code).
+
+
+WARNING:
+=======
+
+Don't send any "CONFIDENTIALITY STATEMENT" in your e-mail, patch or
+request. Otherwise your firmware _will never be accepted_.
+
+Maintainers are really busy, so don't expect a prompt reply.
