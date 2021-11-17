@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2021-08-29 + 2021-10-09's r18376
+#                                 + 2021-11-17's r18471
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6281,6 +6282,9 @@ set_except () {
 
     # New in 5.14.11, 5.10.72.
     blobname '\(silead[/]\)\?gsl1680-chuwi-hi\(10plus\|book\)\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 5.14.19-gnu.
+    blobna '[/][*][ ]linux-firmware\.git[ ]hash[ ][0-9a-f]*[ ][*][/]' drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
 
     ;;
 
