@@ -62,10 +62,22 @@ if test -f linux-libre-$rel.check; then
     continue
 fi &&
 
-while test -f linux-libre-$rel.patck; do
+while test -f linux-libre-$rel.patck && test ! -f linux-libre-$rel.check; do
   echo please verify linux-libre-$rel.patck and move it away to complete the release
   sleep 30
 done &&
+
+# Look for .check again, maybe it was created manually while we waited
+# for .patck to be removed.  In this case, we have to duplicate the
+# cleanups that .rel would have already done.
+if test -f linux-libre-$rel.check; then
+    echo linux-libre-$rel.check exists, abandoning this release
+    git tag -d incr/v$rel logs/v$rel sources/v$rel |&
+      tee -a linux-libre-$rel.dtags
+    git worktree remove logs/v$rel
+    git worktree remove --force sources/v$rel
+    continue
+fi &&
 
 (
   cd scripts/v$rel &&
