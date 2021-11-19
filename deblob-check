@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2021-10-23
+# deblob-check version 2021-11-18
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6306,6 +6306,13 @@ set_except () {
     blobname 'brcmfmac43\(430b0\|752\)-sdio' drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
     # Catch other names likely to appear in BRCMF_FW*_DEF strings in these files.
     blobna 'brcmfmac43[^";) \t\n]*\(-sdio\|-pcie\)\?' drivers/net/wireless/broadcom/brcm80211/brcmfmac/'\(sdio\|pcie\|usb\)\.c'
+
+    # New in 5.15.3-gnu and 5.14.19-gnu.
+    blobna '[/][*][ ]linux-firmware\.git[ ]hash[ ][0-9a-f]*[ ][*][/]' drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+
+    # New in 5.15.3-gnu.
+    defsnc 'static[ ]const[ ]u32[ ]____cacheline_aligned[ ]ck\[32\][ ]=' lib/crypto/sm4.c
+    defsnc 'static[ ]const[ ]u8[ ]____cacheline_aligned[ ]sbox\[256\][ ]=' lib/crypto/sm4.c
 
     ;;
 
