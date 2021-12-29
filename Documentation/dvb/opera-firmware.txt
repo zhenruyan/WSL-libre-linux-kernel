@@ -1,0 +1,8 @@
+/*(DEBLOBBED)*/
+
+After that the driver can load the firmware
+(if you have enabled firmware loading
+in kernel config and have hotplug running).
+
+
+Marco Gittler <g.marco@freenet.de>
