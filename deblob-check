@@ -1,13 +1,14 @@
 #! /bin/sh
 
-# deblob-check version 2021-12-20
+# deblob-check version 2021-12-20 r18515
+#        modified with 2022-01-27 r18550
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2021 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2022 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -6394,6 +6395,9 @@ set_except () {
     accept '[\t]*\(ret[ ]=[ ]\)\?wm_adsp_request_firmware_files\?[(]' sound/soc/codecs/wm_adsp.c
     blobname 'qcom[/]%s[/]%s-tplg\.bin' sound/soc/qcom/qdsp6/topology.c
     blobname '%s-%s-%s\.%s' sound/soc/codecs/wm_adsp.c
+
+    # New in 5.16.3, 5.15.17, 5.10.94, 5.4.174, 4.19.226, 4.14.263.
+    accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]\(p1100\|s660\|p7500\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\|size_of_priv\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/usb/dvb-usb/dw2102.c
 
     ;;
 
