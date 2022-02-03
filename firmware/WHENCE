@@ -1,0 +1,61 @@
+             **********
+             * WHENCE *
+             **********
+
+This file attempts to document the origin and licensing information,
+if known, for each piece of firmware distributed for use with the Linux
+kernel.
+
+--------------------------------------------------------------------------
+
+/*(DEBLOBBED)*/
+
+--------------------------------------------------------------------------
+
+Driver: keyspan_pda -- USB Keyspan PDA single-port serial device
+
+File: keyspan_pda/keyspan_pda.fw
+Source: keyspan_pda/keyspan_pda.S
+
+File: keyspan_pda/xircom_pgs.fw
+Source: keyspan_pda/xircom_pgs.S
+
+Licence: GPLv2+
+
+Compiled from original 8051 source into Intel HEX, used in our binary ihex form.
+
+--------------------------------------------------------------------------
+
+/*(DEBLOBBED)*/
+
+--------------------------------------------------------------------------
+
+Driver: ATARI_DSP56K - Atari DSP56k support
+
+File: dsp56k/bootstrap.bin
+Source: dsp56k/bootstrap.asm
+
+Licence: GPLv2 or later
+
+DSP56001 assembler, possibly buildable with a56 from 
+http://www.zdomain.com/a56.html
+
+--------------------------------------------------------------------------
+
+/*(DEBLOBBED)*/
+
+--------------------------------------------------------------------------
+
+Driver: DVB AV7110 -- AV7110 cards
+
+File: av7110/bootcode.bin
+
+Licence: GPLv2 or later
+
+ARM assembly source code available at http://www.linuxtv.org/downloads/firmware/Boot.S
+
+--------------------------------------------------------------------------
+
+/*(DEBLOBBED)*/
+
+--------------------------------------------------------------------------
