@@ -1,0 +1,45 @@
+:/*(DEBLOBBED)*/
+/*****************************************************************************
+ *
+ *      whiteheat.h  --  ConnectTech WhiteHEAT Firmware.
+ *
+ *      Copyright (C) 2000-2002  ConnectTech Inc (http://www.connecttech.com/)
+ *
+ *      This program is free software; you can redistribute it and/or modify
+ *      it under the terms of the GNU General Public License as published by
+ *      the Free Software Foundation; either version 2 of the License, or
+ *      (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
+ *
+ *      You should have received a copy of the GNU General Public License
+ *      along with this program; if not, write to the Free Software
+ *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * (10/09/2002) Stuart MacDonald
+ *	Firmware 4.06
+ *
+ * (04/09/2000) gkh
+ *	Updated the firmware with the latest provided by ConnectTech.
+ *
+ * (01/16/2000) gkh
+ *	Fixed my intel hex processing tool, so now the firmware actually
+ *	matches the original file (this was causing a few problems...)
+ *
+ * (01/15/2000) gkh
+ *	Added debug loader firmware if DEBUG is #defined:
+ *		Port 1 LED flashes when the vend_ax program is running
+ *		Port 2 LED flashes when any SETUP command arrives
+ *		Port 3 LED flashes when any valid VENDOR request occurs
+ *		Port 4 LED flashes when the EXTERNAL RAM DOWNLOAD request occurs
+ *
+ * version 1.0 (01/09/2000) gkh
+ *	Original firmware from ConnectTech massaged a little to be program
+ *	readable.
+ *
+ *****************************************************************************/
+
+#define whiteheat_DATE "20000106"
