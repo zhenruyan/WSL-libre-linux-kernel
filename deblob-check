@@ -6,6 +6,7 @@
 #        modified with 2022-01-27 r18550
 #        modified with 2022-01-29 r18573
 #        modified with 2022-02-23 r18607
+#        modified with 2021-12-20 r18515 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6336,6 +6337,9 @@ set_except () {
 
     # New in 5.16.11, 5.15.25, 5.10.102.
     blobname 'gsl1680-rwc-nanote-p8\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 5.15.27.
+    defsc 'static[ ]const[ ]u16[ ]amdgpu_unsupported_pciidlist\[\][ ]=' drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
 
     ;;
 
