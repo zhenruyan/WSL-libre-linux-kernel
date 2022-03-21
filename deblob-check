@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2022-03-11 r18628
+# deblob-check version 2022-03-20 r18637
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6457,6 +6457,9 @@ set_except () {
     blobname 'qcom[/]sm7225[/]fairphone4[/]\(adsp\|cdsp\|modem\)\.mdt' arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts
     blobname 'qcom[/]sm8350[/]microsoft[/]\(adsp\|cdsp\|modem\|slpi\)\.mbn' arch/arm64/boot/dts/qcom/sm8350-microsoft-surface-duo2.dts
     blobname 'qcom[/]\(adsp\|cdsp\|ipa_fws\|modem\|slpi\)\.mbn' arch/arm64/boot/dts/qcom/sm8350-sony-xperia-sagami.dtsi
+
+    # New in 5.17.
+    blobna 'if[ ][(]loaded_fw_\(major\|minor\|eng\|rev\)[ ]\(!=\|<\)[ ]BCM_5710_FW_\(MAJOR\|MINOR\|ENGINEERING\|REVISION\)_VERSION\(_V15\)\?\([ ][|][|][\n][\t ]*loaded_fw_\(major\|minor\|eng\|rev\)[ ]\(!=\|<\)[ ]BCM_5710_FW_\(MAJOR\|MINOR\|ENGINEERING\|REVISION\)_VERSION\(_V15\)\?\)*[)]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
 
     ;;
 

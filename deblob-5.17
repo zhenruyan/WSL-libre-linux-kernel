@@ -1781,17 +1781,7 @@ clean_sed '
 	  -EINVAL)
 }' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c 'report missing Free firmware'
 clean_blob drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-clean_sed '
-/^int bnx2x_compare_fw_ver/,/^}$/{
-  /^		u32 my_fw = /i\
-		/*(DEBLOBBED)*/
-  /^		u32 my_fw = /,/<< 24);/d;
-  /^		u32 loaded_fw = /,/^$/{
-    /^$/i\
-\
-		u32 my_fw = ~loaded_fw;
-  }
-}' drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c 'fail already-loaded test'
+clean_blob drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
 clean_blob drivers/net/ethernet/broadcom/bnx2x/bnx2x_hsi.h
 clean_sed '
 /static void bnx2x_init_wr_wb/{
@@ -2879,6 +2869,7 @@ clean_mk CONFIG_NET_DSA_LANTIQ_GSWIP drivers/net/dsa/Makefile
 
 announce MICROSEMI_PHY - "Microsemi PHYs"
 reject_firmware drivers/net/phy/mscc/mscc_main.c
+clean_blob drivers/net/phy/mscc/mscc_main.c
 clean_blob drivers/net/phy/mscc/mscc.h
 clean_kconfig drivers/net/phy/Kconfig MICROSEMI_PHY
 clean_mk CONFIG_MICROSEMI_PHY drivers/net/phy/mscc/Makefile
