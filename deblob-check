@@ -5,6 +5,7 @@
 #        modified with 2022-01-27 r18550
 #        modified with 2022-01-29 r18573
 #        modified with 2022-02-23 r18607
+#        modified with 2022-03-20 r18637
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6303,6 +6304,9 @@ set_except () {
 
     # New in 5.16.11, 5.15.25, 5.10.102.
     blobname 'gsl1680-rwc-nanote-p8\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 5.16.17, 5.15.31, 5.10.108.
+    blobna 'if[ ][(]loaded_fw_\(major\|minor\|eng\|rev\)[ ]\(!=\|<\)[ ]BCM_5710_FW_\(MAJOR\|MINOR\|ENGINEERING\|REVISION\)_VERSION\(_V15\)\?\([ ][|][|][\n][\t ]*loaded_fw_\(major\|minor\|eng\|rev\)[ ]\(!=\|<\)[ ]BCM_5710_FW_\(MAJOR\|MINOR\|ENGINEERING\|REVISION\)_VERSION\(_V15\)\?\)*[)]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
 
     ;;
 
