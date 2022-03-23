@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#    Copyright (C) 2008-2021 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2022 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -1780,7 +1780,10 @@ clean_sed '
 	  -EINVAL)
 }' drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c 'report missing Free firmware'
 clean_blob drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-clean_sed '
+if grep -q loaded_fw_major drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c; then
+  clean_blob drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+else
+  clean_sed '
 /^int bnx2x_compare_fw_ver/,/^}$/{
   /^		u32 my_fw = /i\
 		/*(DEBLOBBED)*/
@@ -1791,6 +1794,7 @@ clean_sed '
 		u32 my_fw = ~loaded_fw;
   }
 }' drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c 'fail already-loaded test'
+fi
 clean_blob drivers/net/ethernet/broadcom/bnx2x/bnx2x_hsi.h
 clean_sed '
 /static void bnx2x_init_wr_wb/{
@@ -2871,6 +2875,9 @@ clean_mk CONFIG_NET_DSA_LANTIQ_GSWIP drivers/net/dsa/Makefile
 
 announce MICROSEMI_PHY - "Microsemi PHYs"
 reject_firmware drivers/net/phy/mscc/mscc_main.c
+if grep -q MODULE_FIRMWARE drivers/net/phy/mscc/mscc_main.c; then
+  clean_blob drivers/net/phy/mscc/mscc_main.c
+fi
 clean_blob drivers/net/phy/mscc/mscc.h
 clean_kconfig drivers/net/phy/Kconfig MICROSEMI_PHY
 clean_mk CONFIG_MICROSEMI_PHY drivers/net/phy/mscc/Makefile
