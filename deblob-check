@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2022-03-20 r18637
+#        modified with 2022-04-20 r18680
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6460,6 +6461,9 @@ set_except () {
 
     # New in 5.17.
     blobna 'if[ ][(]loaded_fw_\(major\|minor\|eng\|rev\)[ ]\(!=\|<\)[ ]BCM_5710_FW_\(MAJOR\|MINOR\|ENGINEERING\|REVISION\)_VERSION\(_V15\)\?\([ ][|][|][\n][\t ]*loaded_fw_\(major\|minor\|eng\|rev\)[ ]\(!=\|<\)[ ]BCM_5710_FW_\(MAJOR\|MINOR\|ENGINEERING\|REVISION\)_VERSION\(_V15\)\?\)*[)]' drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+
+    # New in 5.17.4 and 5.15.35.
+    accept '[ ][*][ ]enabled[ ]with[ ]updated[ ]microcode[.]' arch/x86/kernel/cpu/tsx.c
 
     ;;
 
