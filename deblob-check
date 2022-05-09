@@ -2,6 +2,7 @@
 
 # deblob-check version 2021-08-29 r18269
 #        modified with 2022-01-27 r18550
+#        modified with 2022-05-09 r18697
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6283,6 +6284,9 @@ set_except () {
 
     # New in 5.16.3, 5.15.17, 5.10.94, 5.4.174, 4.19.226, 4.14.263.
     accept 'static[ ]struct[ ]dvb_usb_device_properties[ ]\(p1100\|s660\|p7500\)_properties[ ]=[ ][{][\n]\([	]\.\(caps\|usb_ctrl\|size_of_priv\)[ ]*=[ ][^",]*,[\n]*\)*[	]\.firmware[ ]*=[ ]' drivers/media/usb/dvb-usb/dw2102.c
+
+    # New in 5.17.6, 5.15.38, 5.10.114, 5.4.192.
+    accept '[ ][*][ ]microcode_bsp_resume[ ]-[ ]Update[ ]boot[ ]CPU[ ]microcode[ ]during[ ]resume' arch/x86/kernel/cpu/microcode/core.c
 
     ;;
 
