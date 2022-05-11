@@ -45,8 +45,22 @@ elif test -h $reldir/LATEST-$rup.N; then
   prev0=$(readlink $reldir/LATEST-$cbr.0)
   prevn=$(readlink $reldir/LATEST-$cbr.N)
 else
-  echo Neither $reldir/LATEST-$cbr.0 nor $reldir/LATEST-$rup.N exist >&2
-  exit 1
+  case $rup in
+  *-rc*)
+    prevbase=$(echo "$cbr" | sed 's,\.[0-9]*$,,')
+    if test -h $reldir/LATEST-$prevbase.N; then
+      prev0=$(readlink $reldir/LATEST-$prevbase.N)
+      prevn=$prev0
+    else
+      echo $reldir/LATEST-$prevbase.N does not exit >&2
+      exit 1
+    fi
+    ;;
+  *)
+    echo Neither $reldir/LATEST-$cbr.0 nor $reldir/LATEST-$rup.N exist >&2
+    exit 1
+    ;;
+  esac
 fi
 
 if test -f linux-libre-$rel.check; then
@@ -108,6 +122,8 @@ ln -snfv $rel $reldir/LATEST-$cbr.N &&
 if test "$rup" = "$cbr"; then
   ln -nfv $reldir/LATEST-$cbr.N $reldir/LATEST-$cbr.0 &&
   ln -nfv $reldir/LATEST-$cbr.N $reldir/LATEST-${cbr%.*}.N
+elif test -n "$prevbase" && test ! -h $reldir/LATEST-$cbr.0; then
+  ln -nfv $reldir/LATEST-$prevbase.N $reldir/LATEST-$cbr.0
 fi &&
 
 git worktree remove logs/v$rel &&
