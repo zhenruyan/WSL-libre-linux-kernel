@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2021-08-29 r18269
+#        modified with 2022-05-09 r18697
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6279,6 +6280,9 @@ set_except () {
     # Present in 4.9, links to Free Software.
     accept 'ARM[ ]assembly[ ]source[ ]code[ ]available[ ]at[ ]https[:][/][/]linuxtv\.org[/]downloads[/]firmware[/]Boot\.S' firmware/WHENCE
 
+
+    # New in 5.17.6, 5.15.38, 5.10.114, 5.4.192, 4.19.242, 4.14.278, 4.9.313.
+    accept '[ ][*][ ]microcode_bsp_resume[ ]-[ ]Update[ ]boot[ ]CPU[ ]microcode[ ]during[ ]resume' arch/x86/kernel/cpu/microcode/core.c
 
     ;;
 
