@@ -10,6 +10,7 @@
 #        modified with 2022-03-20 r18637
 #        modified with 2022-04-20 r18680
 #        modified with 2022-05-09 r18697
+#        modified with 2022-06-09 r18767
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6352,6 +6353,9 @@ set_except () {
 
     # New in 5.17.6, 5.15.38, 5.10.114, 5.4.192.
     accept '[ ][*][ ]microcode_bsp_resume[ ]-[ ]Update[ ]boot[ ]CPU[ ]microcode[ ]during[ ]resume' arch/x86/kernel/cpu/microcode/core.c
+
+    # New in 5.18.3, 5.17.14, 5.15.46, 5.10.121.
+    accept 'MODULE_FIRMWARE[(]["]regulatory\.db\(\.p7s\)\?["][)][;]' net/wireless/reg.c
 
     ;;
 
