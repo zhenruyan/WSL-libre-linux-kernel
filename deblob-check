@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2022-05-10 r18711
+#        modified with 2022-06-09 r18767
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6517,6 +6518,9 @@ set_except () {
     accept '[\t]*tplg_filename[ ]=[ ]devm_kasprintf[(]sdev->dev[,][ ]GFP_KERNEL[,][\n][\t ]*["]%s%s["][,][\n][\t ]*sof_pdata->tplg_filename[,][\n][\t ]*["]\.tplg["]' sound/soc/sof/intel/hda.c
     blobname '%s\.sec' drivers/staging/wfx/fwio.c
     blobname '%s%s-%s-%s\(-%s\)*\.%s' sound/soc/codecs/wm_adsp.c
+
+    # New in 5.18.3, 5.17.14, 5.15.46, 5.10.121.
+    accept 'MODULE_FIRMWARE[(]["]regulatory\.db\(\.p7s\)\?["][)][;]' net/wireless/reg.c
 
     ;;
 
