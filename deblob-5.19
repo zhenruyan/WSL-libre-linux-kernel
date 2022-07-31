@@ -4015,7 +4015,7 @@ clean_blob arch/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi
 clean_kconfig arch/arm/mach-mediatek/Kconfig ARCH_MEDIATEK
 clean_mk CONFIG_ARCH_MEDIATEK arch/arm64/boot/dts/mediatek/Makefile
 
-announce INTEL_IFS - "Inntel In Field Scan"
+announce INTEL_IFS - "Intel In Field Scan"
 # The .scan file loaded here contains CPU tests.  It's not clear
 # whether it's code or pure data, but I'm conservatively disabling it
 # because it's most certainly proprietary.
