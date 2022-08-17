@@ -12,6 +12,7 @@
 #        modified with 2022-05-09 r18697
 #        modified with 2022-06-09 r18767
 #        modified with 2022-06-16 r18782
+#        modified with 2022-07-10 r18820 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6360,6 +6361,9 @@ set_except () {
 
     # New in 5.18.5, 5.15.48, 5.10.123, 5.4.199, 4.19.248, 4.14.284, 4.9.319.
     accept 'combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/admin-guide/hw-vuln/processor_mmio_stale_data.rst
+
+    # New in 5.18.18, 5.15.61.
+    defsnc '[\t]static[ ]u8[ ]p\[\]\[2\][ ]=' drivers/tty/serial/8250/8250_pci.c
 
     ;;
 
