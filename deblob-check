@@ -13,6 +13,7 @@
 #        modified with 2022-06-09 r18767
 #        modified with 2022-06-16 r18782
 #        modified with 2022-07-10 r18820 (partial)
+#        modified with 2022-08-25 r18881
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6364,6 +6365,9 @@ set_except () {
 
     # New in 5.18.18, 5.15.61.
     defsnc '[\t]static[ ]u8[ ]p\[\]\[2\][ ]=' drivers/tty/serial/8250/8250_pci.c
+
+    # New in 5.19.4, 5.15.63.
+    accept '[\t]if[ ][(]!request_firmware_direct[(][&]fw[,][ ]kpu_profile[,][ ]rvu->dev[)][)]' drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
 
     ;;
 
