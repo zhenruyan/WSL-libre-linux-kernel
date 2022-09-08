@@ -1848,9 +1848,7 @@ clean_kconfig drivers/net/ethernet/cavium/Kconfig LIQUIDIO
 clean_mk CONFIG_LIQUIDIO drivers/net/ethernet/cavium/liquidio/Makefile
 
 announce MLXSW_CORE - "Mellanox Technologies Switch ASICs support"
-reject_firmware drivers/net/ethernet/mellanox/mlxsw/core.c '
-/request_firmware_direct.*[ ]params->fw/{p;d;};
-'
+reject_firmware drivers/net/ethernet/mellanox/mlxsw/core.c
 reject_firmware drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
 clean_blob drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
 clean_kconfig drivers/net/ethernet/mellanox/mlxsw/Kconfig MLXSW_CORE
@@ -2543,6 +2541,10 @@ clean_mk CONFIG_RTL8188EE drivers/net/wireless/realtek/rtlwifi/rtl8188ee/Makefil
 announce R8188EU - "Realtek RTL8188EU Wireless LAN NIC driver"
 reject_firmware drivers/staging/r8188eu/core/rtw_fw.c
 clean_blob drivers/staging/r8188eu/core/rtw_fw.c
+# Added in 5.19.8.
+if grep -q MODULE_FIRMWARE drivers/staging/r8188eu/os_dep/os_intfs.c; then
+  clean_blob drivers/staging/r8188eu/os_dep/os_intfs.c
+fi
 clean_kconfig drivers/staging/r8188eu/Kconfig R8188EU
 clean_mk CONFIG_R8188EU drivers/staging/r8188eu/Makefile
 
@@ -3441,7 +3443,7 @@ clean_blob arch/arm/boot/dts/am43x-epos-evm.dts
 clean_kconfig drivers/soc/ti/Kconfig WKUP_M3_IPC
 clean_mk CONFIG_WKUP_M3_IPC drivers/soc/ti/Makefile
 
-announce QCOM_Q6V5_ADSP - "Qualcomm Technology Inc ADSP Peripherial Image Loader"
+announce QCOM_Q6V5_ADSP - "Qualcomm Technology Inc ADSP Peripheral Image Loader"
 clean_blob drivers/remoteproc/qcom_q6v5_adsp.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_Q6V5_ADSP
 clean_mk CONFIG_QCOM_Q6V5_ADSP drivers/remoteproc/Makefile
@@ -3452,7 +3454,7 @@ clean_blob drivers/remoteproc/qcom_q6v5_mss.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_Q6V5_MSS
 clean_mk CONFIG_QCOM_Q6V5_MSS drivers/remoteproc/Makefile
 
-announce QCOM_Q6V5_PAS - "Qualcomm Hexagon V5 Peripherial Authentication Service support"
+announce QCOM_Q6V5_PAS - "Qualcomm Hexagon V5 Peripheral Authentication Service support"
 clean_blob drivers/remoteproc/qcom_q6v5_pas.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_Q6V5_PAS
 clean_mk CONFIG_QCOM_Q6V5_PAS drivers/remoteproc/Makefile
@@ -3462,7 +3464,7 @@ clean_blob drivers/remoteproc/qcom_q6v5_wcss.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_Q6V5_WCSS
 clean_mk CONFIG_QCOM_Q6V5_WCSS drivers/remoteproc/Makefile
 
-announce QCOM_WCNSS_PIL - "Qualcomm WCNSS Peripherial Image Loader"
+announce QCOM_WCNSS_PIL - "Qualcomm WCNSS Peripheral Image Loader"
 clean_blob drivers/remoteproc/qcom_wcnss.c
 clean_blob Documentation/devicetree/bindings/remoteproc/qcom,wcnss-pil.txt
 clean_blob Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.yaml
