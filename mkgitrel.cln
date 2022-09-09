@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright 2021 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2021-2022 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -21,51 +21,18 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
 # USA
 
-reldir=$HOME/linux-libre/releases
-
-key=474402C8C582DAFBE389C427BCB7CF877E7D47A7
+scriptdir=$(dirname "$0")
+. $scriptdir/mkgitrel.gcfg
 
 success=:
 for rel
 do
 
-rup=$(echo "$rel" | sed 's,-gnu[0-9]*$,,')
-cbr=$(echo "$rup" | sed 's,\(\.\|-rc\)[0-9]*$,,')
-
-if test -d $reldir/$rel; then
-  echo $reldir/$rel exists >&2
-  continue
-fi
-
-if test -h $reldir/LATEST-$cbr.0; then
-  prev0=$(readlink $reldir/LATEST-$cbr.0)
-  prevn=$(readlink $reldir/LATEST-$cbr.N)
-elif test -h $reldir/LATEST-$rup.N; then
-  cbr=$rup
-  prev0=$(readlink $reldir/LATEST-$cbr.0)
-  prevn=$(readlink $reldir/LATEST-$cbr.N)
-else
-  case $rup in
-  *-rc*)
-    prevbase=$(echo "$cbr" | sed 's,\.[0-9]*$,,')
-    if test -h $reldir/LATEST-$prevbase.N; then
-      prev0=$(readlink $reldir/LATEST-$prevbase.N)
-      prevn=$prev0
-    else
-      echo $reldir/LATEST-$prevbase.N does not exit >&2
-      exit 1
-    fi
-    ;;
-  *)
-    echo Neither $reldir/LATEST-$cbr.0 nor $reldir/LATEST-$rup.N exist >&2
-    exit 1
-    ;;
-  esac
-fi
+. $scriptdir/mkgitrel.setprev &&
 
 for up in linus stable; do
   git rev-parse --verify -q $up/v$rup && break
-done
+done &&
 
 git verify-tag $up/v$rup &&
 
@@ -96,11 +63,7 @@ git worktree add --detach logs/v$rel public/logs/v$prevn &&
   git tag incr/v$rel
 ) &&
 
-DATE=$(git cat-file -p incr/v$rel |
-       gawk '/^(author|tagger)/ {
-               print strftime(PROCINFO["strftime"], $(NF-1))
-             }') &&
-export GIT_COMMITTER_DATE=$DATE GIT_AUTHOR_DATE=$DATE &&
+. $scriptdir/mkgitrel.setdate &&
 
 (
   cd sources/v$rel &&
@@ -147,7 +110,11 @@ fi &&
 { scripts/v$rel/deblob-check --use-awk linux-libre-$rel.tar ||
     scripts/v$rel/deblob-check --use-awk -C linux-libre-$rel.tar \
       > linux-libre-$rel.check ||
-    { success=false; continue; }; }
+    { success=false; continue; }; } &&
+
+continue
+
+success=false
 
 done &&
 
