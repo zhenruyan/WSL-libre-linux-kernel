@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2022-09-07 r18895
+# deblob-check version 2022-09-11 r18905
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6638,6 +6638,7 @@ set_except () {
     blobname 'polaris[/]crnv21\.bin' arch/arm64/boot/dts/qcom/sdm845-xiaomi-polaris.dts
     blobname 'habanalabs[/]gaudi2[/]gaudi2-\(boot-\|\)fit\.itb' drivers/misc/habanalabs/gaudi2/gaudi2P.h
     accept '\(static[ ]int[ ]\|[\t][\t]*\(ret\(urn\|[ ]=\)[ ]\|\)\)cs35l41_request_firmware_file\(\|s\(\|_spkid\)\)[(]' sound/pci/hda/cs35l41_hda.c
+    defsnc '[\t]unsigned[ ]char[ ]modified_gray_code\[\][ ]=' arch/arm/mach-at91/pm.c
 
     ;;
 

@@ -1849,9 +1849,7 @@ clean_kconfig drivers/net/ethernet/cavium/Kconfig LIQUIDIO
 clean_mk CONFIG_LIQUIDIO drivers/net/ethernet/cavium/liquidio/Makefile
 
 announce MLXSW_CORE - "Mellanox Technologies Switch ASICs support"
-reject_firmware drivers/net/ethernet/mellanox/mlxsw/core.c '
-/request_firmware_direct.*[ ]params->fw/{p;d;};
-'
+reject_firmware drivers/net/ethernet/mellanox/mlxsw/core.c
 reject_firmware drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
 clean_blob drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
 clean_kconfig drivers/net/ethernet/mellanox/mlxsw/Kconfig MLXSW_CORE
