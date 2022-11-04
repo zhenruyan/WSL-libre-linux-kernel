@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2022-10-02 r18939
+#        modified with 2022-11-03 r18976
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6642,6 +6643,10 @@ set_except () {
 
     # New in 6.0.
     blobname 'qcom[/]sc8280xp[/]LENOVO[/]21BX[/]qc[ac]dsp8280\.mbn' arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+
+    # New in 6.0.7.
+    accept '[\t][\t]\[SOF_INTEL_IPC4\][ ]=[ ]["]sof-mtl\.ri["]' sound/soc/sof/intel/pci-mtl.c
+    accept '[\t][\t]\[SOF_IPC\][ ]=[ ]["]sof-\(adl-n\|rpl\(-s\)\?\)\.ri["]' sound/soc/sof/intel/pci-tgl.c
 
     ;;
 
