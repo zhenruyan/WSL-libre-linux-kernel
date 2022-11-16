@@ -9,6 +9,7 @@
 #        modified with 2022-05-09 r18697
 #        modified with 2022-06-09 r18767
 #        modified with 2022-06-16 r18782
+#        modified with 2022-11-16 r18984
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6319,6 +6320,9 @@ set_except () {
 
     # New in 5.18.5, 5.15.48, 5.10.123, 5.4.199, 4.19.248, 4.14.284, 4.9.319.
     accept 'combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/admin-guide/hw-vuln/processor_mmio_stale_data.rst
+
+    # New in 6.0.9, 5.15.79, and 5.10.155.
+    accept '[\t]err[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]["]regulatory\.db["][,]' net/wireless/reg.c
 
     ;;
 
