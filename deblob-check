@@ -15,6 +15,7 @@
 #        modified with 2022-07-10 r18820 (partial)
 #        modified with 2022-08-25 r18881
 #        modified with 2022-09-11 r18905
+#        modified with 2022-11-16 r18984
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6372,6 +6373,9 @@ set_except () {
 
     # New in 6.0-rc5, 5.19.9, 5.15.68.
     defsnc '[\t]unsigned[ ]char[ ]modified_gray_code\[\][ ]=' arch/arm/mach-at91/pm.c
+
+    # New in 6.0.9, 5.15.79, and 5.10.155.
+    accept '[\t]err[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]["]regulatory\.db["][,]' net/wireless/reg.c
 
     ;;
 
