@@ -2,6 +2,7 @@
 
 # deblob-check version 2022-10-02 r18939
 #        modified with 2022-11-03 r18976
+#        modified with 2022-11-16 r18984
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6647,6 +6648,9 @@ set_except () {
     # New in 6.0.7.
     accept '[\t][\t]\[SOF_INTEL_IPC4\][ ]=[ ]["]sof-mtl\.ri["]' sound/soc/sof/intel/pci-mtl.c
     accept '[\t][\t]\[SOF_IPC\][ ]=[ ]["]sof-\(adl-n\|rpl\(-s\)\?\)\.ri["]' sound/soc/sof/intel/pci-tgl.c
+
+    # New in 6.0.9, 5.15.79, and 5.10.155.
+    accept '[\t]err[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]["]regulatory\.db["][,]' net/wireless/reg.c
 
     ;;
 
