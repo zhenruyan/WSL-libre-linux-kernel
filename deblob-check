@@ -3,6 +3,7 @@
 # deblob-check version 2022-10-02 r18939
 #        modified with 2022-11-03 r18976
 #        modified with 2022-11-16 r18984
+#        modified with 2022-11-27 r18997 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6651,6 +6652,9 @@ set_except () {
 
     # New in 6.0.9, 5.15.79, and 5.10.155.
     accept '[\t]err[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]["]regulatory\.db["][,]' net/wireless/reg.c
+
+    # New in 6.1-rc, 6.0.11, 5.15.81, 5.10.157.
+    blobname 'gsl1680-rca-cambio-w101-v2\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
