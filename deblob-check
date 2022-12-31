@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2022-11-27 r18997
+#        modified with 2022-12-31 r19025
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6677,6 +6678,9 @@ set_except () {
     accept '[\t][$][(]Q[)]\(qemu-system\|grep\)[^\n]*[$][(]CURDIR[)][/]run\.out' tools/testing/selftests/nolibc/Makefile
     blobna '%s[ ]firmware[ ]%s[ ]\([(]%d\.%d[)][ ]\)\?is[ ]recommended[,][ ]but[ ]only[ ]%s[ ]\([(]%d\.%d[)][ ]\)\?was[ ]found' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
     blobna 'Consider[ ]updating[ ]your[ ]linux-firmware[ ]pkg[ ]or[ ]downloading[ ]from[ ]%s' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
+
+    # New in 6.1.2.
+    initnc '\.LKtable[:]' arch/arm64/crypto/sm3-neon-core.S
 
     ;;
 
