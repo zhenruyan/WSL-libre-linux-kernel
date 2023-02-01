@@ -11,13 +11,14 @@
 #        modified with 2022-06-16 r18782
 #        modified with 2022-11-16 r18984
 #        modified with 2022-11-27 r18997 (partial)
+#        modified with 2023-02-01 r19031
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2022 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2023 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -6327,6 +6328,9 @@ set_except () {
 
     # New in 6.1-rc, 6.0.11, 5.15.81, 5.10.157.
     blobname 'gsl1680-rca-cambio-w101-v2\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 6.1.9, 5.15.91, 5.10.166.
+    blobname 'gsl1680-csl-panther-tab-hd\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
