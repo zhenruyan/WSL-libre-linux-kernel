@@ -2,13 +2,14 @@
 
 # deblob-check version 2022-11-27 r18997
 #        modified with 2022-12-31 r19025
+#        modified with 2023-02-01 r19031
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2022 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2023 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -6681,6 +6682,9 @@ set_except () {
 
     # New in 6.1.2.
     initnc '\.LKtable[:]' arch/arm64/crypto/sm3-neon-core.S
+
+    # New in 6.1.9, 5.15.91, 5.10.166.
+    blobname 'gsl1680-csl-panther-tab-hd\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
