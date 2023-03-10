@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2023-02-05 r19039
+#        modified with 2023-03-10 r19100
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6772,6 +6773,10 @@ set_except () {
     defsnc 'static[ ]const[ ]struct[ ]rtl8xxxu_reg32val[ ]rtl8188ru_\(phy\|radioa\)_1t_highpa_table\[\][ ]=' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu_core.c
     defsnc '\(static[ ]\)\?const[ ]struct[ ]rtl8xxxu_reg8val[ ]rtl8xxxu_gen1_mac_init_table\[\][ ]=' drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu_core.c
     defsnc 'static[ ]const[ ]struct[ ]drm_edid[ ][*]edid_load[(][^)]*[)][\n][{]\([\n]\+[^\n}][^\n]*\)*[^\n]*err[ ]=[ ]request_firmware[(][&]fw[,][ ]name[,][ ]connector' drivers/gpu/drm/drm_edid_load.c
+
+    # New in 6.2.3.
+    blobname 'qcom[/]sm8450[/]Sony[/]nagara[/]\(adsp\|cdsp\|slpi\)\.mbn' arch/arm64/boot/dts/qcom/sm8450-sony-xperia-nagara.dtsi
+    blobname 'brcmfmac89459-pcie' drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
 
     ;;
 
