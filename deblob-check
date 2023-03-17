@@ -5,13 +5,14 @@
 #        modified with 2022-05-09 r18697
 #        modified with 2022-06-16 r18782
 #        modified with 2022-11-16 r18984
+#        modified with 2023-03-17 r19120
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2022 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2023 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -6295,6 +6296,9 @@ set_except () {
 
     # New in 6.0.9, 5.15.79, and 5.10.155.  Also 5.4.225 and 4.19.267.
     accept '[\t]err[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]true[,][ ]["]regulatory\.db["][,]' net/wireless/reg.c
+
+    # New in 6.2.7, 6.1.20, 5.15.103, 5.10.175, 5.4.237, 4.19.278, 4.14.310.
+    accept '[\t][ ][*][ ]updated[ ]microcode[ ]at[ ]the[ ]time' arch/x86/kernel/cpu/amd.c
 
     ;;
 
