@@ -4,13 +4,14 @@
 #        modified with 2022-01-27 r18550
 #        modified with 2022-05-09 r18697
 #        modified with 2022-06-16 r18782
+#        modified with 2023-03-17 r19120
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2022 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2023 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -6291,6 +6292,9 @@ set_except () {
 
     # New in 5.18.5, 5.15.48, 5.10.123, 5.4.199, 4.19.248, 4.14.284, 4.9.319.
     accept 'combination[ ]with[ ]a[ ]microcode[ ]update[.][ ]The[ ]microcode[ ]clears' Documentation/admin-guide/hw-vuln/processor_mmio_stale_data.rst
+
+    # New in 6.2.7, 6.1.20, 5.15.103, 5.10.175, 5.4.237, 4.19.278, 4.14.310.
+    accept '[\t][ ][*][ ]updated[ ]microcode[ ]at[ ]the[ ]time' arch/x86/kernel/cpu/amd.c
 
     ;;
 
