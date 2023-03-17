@@ -18,6 +18,7 @@
 #        modified with 2022-11-16 r18984
 #        modified with 2022-11-27 r18997 (partial)
 #        modified with 2023-02-01 r19031
+#        modified with 2023-03-17 r19120
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6384,6 +6385,9 @@ set_except () {
 
     # New in 6.1.9, 5.15.91, 5.10.166.
     blobname 'gsl1680-csl-panther-tab-hd\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 6.2.7, 6.1.20, 5.15.103, 5.10.175, 5.4.237, 4.19.278, 4.14.310.
+    accept '[\t][ ][*][ ]updated[ ]microcode[ ]at[ ]the[ ]time' arch/x86/kernel/cpu/amd.c
 
     ;;
 
