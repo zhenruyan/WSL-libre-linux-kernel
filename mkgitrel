@@ -35,22 +35,7 @@
 # for manual verification before preparing tags and tarballs for
 # publishing.
 
-success=:
-for rel
-do
-  case $rel in
-  v*)
-    echo $rel starts with v, that is unexpected >&2
-    success=false
-    ;;
-  *.*-gnu*)
-    ;;
-  *)
-    echo $rel does not end with -gnu, that is unexpected >&2
-    success=false
-    ;;
-  esac
-done && $success &&
+$0.pre "$@" &&
 
 $0.cln "$@" &&
 

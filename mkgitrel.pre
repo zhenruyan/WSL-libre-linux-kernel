@@ -1,0 +1,110 @@
+#! /bin/bash
+
+# pre-check to stop early in case of typos and other mistakes
+#
+# Copyright 2021-2023 Alexandre Oliva <lxoliva@fsfla.org>
+#
+# This program is part of GNU Linux-libre, a GNU project that
+# publishes scripts to clean up Linux so as to make it suitable for
+# use in the GNU Project and in Free System Distributions.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+# USA
+
+scriptdir=$(dirname "$0")
+. $scriptdir/mkgitrel.gcfg
+
+success=:
+for rel
+do
+
+. $scriptdir/mkgitrel.setprev &&
+
+  case $rel in
+  v*)
+    echo $rel starts with v, that is unexpected >&2
+    success=false
+    ;;
+  *.*-gnu*)
+    if test -d scripts/v$rel &&
+       git -C scripts/v$rel status | grep -q Untracked; then
+      echo scripts/v$rel exists and contains untracked files >&2
+      success=false
+    fi
+    ;;
+  *)
+    echo $rel does not end with -gnu, that is unexpected >&2
+    success=false
+    ;;
+  esac &&
+
+if for up in linus stable; do
+     git rev-parse --verify -q $up/v$rup && break
+   done &&
+   git verify-tag $up/v$rup; then
+  :
+else
+  echo could not find a $rup tag on which to base this release >&2
+  success=false
+  continue
+fi &&
+
+for d in sources/v$rel logs/v$rel; do
+  if test -d $d; then
+    echo directory $d already exists, it needs to be cleaned up first >&2
+    success=false
+  fi
+done &&
+
+for f in linux-libre-$rel.check linux-libre-$rel.patck; do
+  if test -f $f; then
+    echo warning: file $f already exists >&2
+  fi
+done &&
+
+{ test -d scripts/v$rel ||
+  git worktree add --detach scripts/v$rel scripts/$cbr
+} &&
+
+case $(sed -n 's,^kver=\(.*\) extra=\(.*\),\1-gnu\2,p' \
+	   scripts/v$rel/deblob-$cbr) in
+"$cbr$(echo $rel | sed -n 's,.*\(-gnu\),\1,p')") ;;
+*) echo $rel mismatches release implied by scripts/v$rel/deblob-$cbr >&2
+   echo "$cbr$(echo $rel | sed -n 's,.*\(-gnu\),\1,p')" vs \
+	$(sed -n 's,^kver=\(.*\) extra=\(.*\),\1-gnu\2,p' \
+	   scripts/v$rel/deblob-$cbr) >&2
+   continue;;
+esac &&
+
+for f in scripts/v$rel/.* scripts/v$rel/*; do
+  case $f in
+  scripts/"v$rel"/. | \
+  scripts/"v$rel"/.. | \
+  scripts/"v$rel"/.gitx | \
+  scripts/"v$rel"/COPYING | \
+  scripts/"v$rel"/deblob-"$cbr" | \
+  scripts/"v$rel"/deblob-check) ;;
+  *) echo unexpected file $f exists >&2
+     success=false;;
+  esac
+done &&
+
+continue
+
+success=false
+
+done &&
+
+$success
