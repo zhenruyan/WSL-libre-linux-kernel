@@ -92,7 +92,7 @@ for f in scripts/v$rel/.* scripts/v$rel/*; do
   case $f in
   scripts/"v$rel"/. | \
   scripts/"v$rel"/.. | \
-  scripts/"v$rel"/.gitx | \
+  scripts/"v$rel"/.git | \
   scripts/"v$rel"/COPYING | \
   scripts/"v$rel"/deblob-"$cbr" | \
   scripts/"v$rel"/deblob-check) ;;
