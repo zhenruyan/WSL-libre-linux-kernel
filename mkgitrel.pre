@@ -68,6 +68,23 @@ for d in sources/v$rel logs/v$rel; do
   fi
 done &&
 
+for d in $reldir/$rel; do
+  if test -d $d; then
+    echo directory $d already exists, cannot proceed >&2
+    success=false
+  fi
+done &&
+
+for d in sources logs scripts incr; do
+  if git rev-parse --verify -q $d/v$rel >&2; then
+    echo tag $d/v$rel already exists, it needs to be cleaned up first >&2
+    success=false
+  elif git rev-parse --verify -q public/$d/v$rel >&2; then
+    echo tag public/$d/v$rel already exists, cannot proceed >&2
+    success=false
+  fi
+done &&
+
 for f in linux-libre-$rel.check linux-libre-$rel.patck; do
   if test -f $f; then
     echo warning: file $f already exists >&2
