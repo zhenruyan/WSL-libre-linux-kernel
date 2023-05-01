@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * SDM845 LG V35 (judyp) device tree.
+ *
+ * Copyright (c) 2022, The Linux Foundation. All rights reserved.
+ */
+
+/dts-v1/;
+
+#include "sdm845-lg-common.dtsi"
+
+/ {
+	model = "LG V35 ThinQ";
+	compatible = "lg,judyp", "qcom,sdm845";
+
+	chosen {
+		framebuffer@9d400000 {
+			compatible = "simple-framebuffer";
+			reg = <0x0 0x9d400000 0x0 (1440 * 2880 * 4)>;
+			width = <1440>;
+			height = <2880>;
+			stride = <(1440 * 4)>;
+			format = "a8r8g8b8";
+		};
+	};
+};
+
+&adsp_pas {
+	firmware-name = "/*(DEBLOBBED)*/";
+};
+
+&cdsp_pas {
+	firmware-name = "/*(DEBLOBBED)*/";
+};
+
+&gpu {
+	zap-shader {
+		firmware-name = "/*(DEBLOBBED)*/";
+	};
+};
+
+&mss_pil {
+	firmware-name = "/*(DEBLOBBED)*/", "/*(DEBLOBBED)*/";
+};
