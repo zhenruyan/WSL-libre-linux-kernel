@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2023-04-13 r19170
+#        modified with 2023-05-17 r19267
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6864,6 +6865,9 @@ set_except () {
     accept '[\t]*err[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->gmc\.fw[,][ ]fw_name[)]' drivers/gpu/drm/amd/amdgpu/gmc_v*_0.c
     accept '[\t]*err[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->gfx\.imu_fw[,][ ]fw_name[)]' drivers/gpu/drm/amd/amdgpu/imu_v11_0.c
     accept '[\t]*r[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->dm\.\(fw_dmcu\|dmub_fw\)[,][ ]fw_name_dm\(cu\|ub\)[)]' drivers/gpu/drm/amd/amdgpu/amdgpu_dm.c
+
+    # New in 6.3.3, 6.2.16, 5.15.112, 5.10.180, 5.4.243, 4.19.283.
+    blobname 'gsl1680-dexp-ursus-kx210i\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
