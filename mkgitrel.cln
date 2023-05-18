@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright 2021-2022 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2021-2023 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -56,9 +56,16 @@ git worktree add --detach logs/v$rel public/logs/v$prevn &&
 
 (cd logs/v$rel && git rm -f linux-*) &&
 
+if (cd sources/v$rel && ../../scripts/v$rel/deblob-$cbr) \
+       >& logs/v$rel/linux-libre-$rel.log; then
+  :
+else
+  grep -i error logs/v$rel/linux-libre-$rel.log > linux-libre-$rel.check
+  success=false; continue
+fi &&
+
 (
   cd sources/v$rel &&
-  ../../scripts/v$rel/deblob-$cbr >& ../../logs/v$rel/linux-libre-$rel.log &&
   git commit -m "GNU Linux-libre v$rel incremental" -a &&
   git tag incr/v$rel
 ) &&
@@ -114,8 +121,9 @@ fi &&
 
 continue
 
+echo something went wrong > linux-libre-$rel.check
 success=false
 
 done &&
 
-$success
+: $success

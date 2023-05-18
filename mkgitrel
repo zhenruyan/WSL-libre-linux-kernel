@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright 2021 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2021-2023 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
