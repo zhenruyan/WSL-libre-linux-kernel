@@ -3,7 +3,8 @@
 # deblob-check version 2023-02-05 r19039
 #        modified with 2023-03-10 r19100
 #        modified with 2023-03-17 r19120
-#        modified with 2023-04-13 r19170
+#        modified with 2023-04-13 r19170 (partial)
+#        modified with 2023-05-17 r19267
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6660,7 +6661,7 @@ set_except () {
     # The following is not new, it was just moved down to allow for
     # new patterns to match despite being prefixed by it, when using
     # non-NDA regexp engines.
-    blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
+    # blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     blobname 'i915[/]["]\([ ][\\][\n][\t]__stringify[(]\(prefix\|major\|minor\|patch\)_[)]\([ ]\(name_\|["][.]["]\)\)\?\)*[ ]["]\.bin' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
     defsc 'static[ ]struct[ ]convert_xrgb8888_case[ ]convert_xrgb8888_cases\[\][ ]=' drivers/gpu/drm/tests/drm_format_helper_test.c
     # bno055-caldata files are calibration data that can be saved from
@@ -6785,6 +6786,16 @@ set_except () {
 
     # New in 6.3-rc, 6.2.12.
     blobname 'qcom[/]sa8540p[/]cdsp0\.mbn' arch/arm64/boot/dts/qcom/sa8540p-ride.dts
+
+    # New in 6.2.16, 6.1.29.
+    accept '[ ][*][ ]This[ ]is[ ]a[ ]helper[ ]that[ ]will[ ]use[ ]request_firmware[ ]' drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c
+    blobname 'amdgpu[/]%s_mes%s\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_mes.c
+    # The following is not new, it was just moved down to allow for
+    # new patterns to match despite being prefixed by it, when using
+    # non-NDA regexp engines.
+    blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
+    # New in 6.3.3, 6.2.16, 6.1.29, 5.15.112, 5.10.180, 5.4.243, 4.19.283.
+    blobname 'gsl1680-dexp-ursus-kx210i\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 

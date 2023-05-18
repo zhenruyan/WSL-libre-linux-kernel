@@ -846,9 +846,16 @@ reject_firmware drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c
 reject_firmware drivers/gpu/drm/amd/amdgpu/imu_v11_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/imu_v11_0.c
-reject_firmware drivers/gpu/drm/amd/amdgpu/mes_v10_1.c
+if grep -q request_firmware drivers/gpu/drm/amd/amdgpu/mes_v10_1.c; then
+  reject_firmware drivers/gpu/drm/amd/amdgpu/mes_v10_1.c
+fi
+if grep -q request_firmware drivers/gpu/drm/amd/amdgpu/mes_v11_0.c; then
+  reject_firmware drivers/gpu/drm/amd/amdgpu/mes_v11_0.c
+fi
+if grep -q amdgpu_mes_init_microcode drivers/gpu/drm/amd/amdgpu/amdgpu_mes.c; then
+  clean_blob drivers/gpu/drm/amd/amdgpu/amdgpu_mes.c
+fi
 clean_blob drivers/gpu/drm/amd/amdgpu/mes_v10_1.c
-reject_firmware drivers/gpu/drm/amd/amdgpu/mes_v11_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/mes_v11_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/psp_v3_1.c
 reject_firmware drivers/gpu/drm/amd/amdgpu/psp_v10_0.c
@@ -882,6 +889,9 @@ reject_firmware drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
 clean_blob drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
 reject_firmware drivers/gpu/drm/amd/amdgpu/amdgpu_discovery.c
 clean_blob drivers/gpu/drm/amd/amdgpu/amdgpu_discovery.c
+if grep -q request_firmware drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c; then
+  reject_firmware drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c
+fi
 clean_kconfig drivers/gpu/drm/amd/amdgpu/Kconfig DRM_AMDGPU
 clean_mk CONFIG_DRM_AMDGPU drivers/gpu/drm/amd/amdgpu/Makefile
 
@@ -928,7 +938,6 @@ clean_sed '/uc_fw->file_selected\.path = blob->path/ i\
 			/* Avoid retrying forever when neighbor\
 			   entries point to the same path.  */\
 			continue;\
-\
 
 ' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c 'avoid infinite loop'
 clean_blob drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
