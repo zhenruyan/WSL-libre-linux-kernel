@@ -6,6 +6,7 @@
 #        modified with 2023-02-05 r19039 (partial)
 #        modified with 2023-03-17 r19120
 #        modified with 2023-05-17 r19267
+#        modified with 2023-05-24 r19297
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6704,6 +6705,9 @@ set_except () {
     blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     # New in 6.3.3, 6.2.16, 6.1.29, 5.15.112, 5.10.180, 5.4.243, 4.19.283.
     blobname 'gsl1680-dexp-ursus-kx210i\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 6.3.4, 6.1.30.
+    blobname 'rtl_bt[/]rtl\(8723cs_\(cg\|vf\|xx\)\|8851bu\)_\(config\|fw\)\.bin' drivers/bluetooth/btrtl.c
 
     ;;
 
