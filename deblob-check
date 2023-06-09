@@ -14,6 +14,7 @@
 #        modified with 2023-02-01 r19031
 #        modified with 2023-03-17 r19120
 #        modified with 2023-05-17 r19267
+#        modified with 2023-06-09 r19312
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6337,8 +6338,11 @@ set_except () {
     # New in 6.2.7, 6.1.20, 5.15.103, 5.10.175, 5.4.237, 4.19.278, 4.14.310.
     accept '[\t][ ][*][ ]updated[ ]microcode[ ]at[ ]the[ ]time' arch/x86/kernel/cpu/amd.c
 
-    # New in 6.3.3, 6.2.16, 5.15.112, 5.10.180, 5.4.243, 4.19.283.
+    # New in 6.3.3, 6.2.16, 6.1.29, 5.15.112, 5.10.180, 5.4.243, 4.19.283.
     blobname 'gsl1680-dexp-ursus-kx210i\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 6.3.7, 6.1.33, 5.15.115, 5.10.183, 5.4.246.
+    accept '[\t][\t]req->name[ ]=[ ]test_fw_config->name[;][\n][\t][\t]req->fw_buf[ ]=[ ]NULL[;][\n][\t][\t]req->fw[ ]=[ ]NULL[;][\n][\t][\t]req->idx[ ]=[ ]i[;][\n][\t][\t]init_completion[(][&]req->completion[)][;][\n][\t][\t]rc[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]\([^);, \t\n]*[,][ \t\n]*\)*trigger_batched_cb[)][;]' lib/test_firmware.c
 
     ;;
 
