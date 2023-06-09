@@ -7,6 +7,7 @@
 #        modified with 2023-03-17 r19120
 #        modified with 2023-05-17 r19267
 #        modified with 2023-05-24 r19297
+#        modified with 2023-06-09 r19312
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6708,6 +6709,9 @@ set_except () {
 
     # New in 6.3.4, 6.1.30.
     blobname 'rtl_bt[/]rtl\(8723cs_\(cg\|vf\|xx\)\|8851bu\)_\(config\|fw\)\.bin' drivers/bluetooth/btrtl.c
+
+    # New in 6.3.7, 6.1.33, 5.15.115, 5.10.183, 5.4.246.
+    accept '[\t][\t]req->name[ ]=[ ]test_fw_config->name[;][\n][\t][\t]req->fw_buf[ ]=[ ]NULL[;][\n][\t][\t]req->fw[ ]=[ ]NULL[;][\n][\t][\t]req->idx[ ]=[ ]i[;][\n][\t][\t]init_completion[(][&]req->completion[)][;][\n][\t][\t]rc[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]\([^);, \t\n]*[,][ \t\n]*\)*trigger_batched_cb[)][;]' lib/test_firmware.c
 
     ;;
 
