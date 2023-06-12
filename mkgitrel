@@ -22,7 +22,7 @@
 # USA
 
 
-# usage: mkgitrel 5.5.5-gnu 5.4.3-gnu 5.0.111-gnu1 ...
+# usage: mkgitrel [--force] 5.5.5-gnu 5.4.3-gnu 5.0.111-gnu1 ...
 
 # This is our release engineering script.  It's very tied to our
 # internal cleaning-up repository structure, as well as to our public
@@ -35,9 +35,11 @@
 # for manual verification before preparing tags and tarballs for
 # publishing.
 
+force= && case $1 in --force) force=$1; shift;; esac
+
 $0.pre "$@" &&
 
-$0.cln "$@" &&
+$0.cln $force "$@" &&
 
 echo all revs cleaned up, awaiting manual check results... &&
 

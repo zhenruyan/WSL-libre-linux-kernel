@@ -24,6 +24,8 @@
 scriptdir=$(dirname "$0")
 . $scriptdir/mkgitrel.gcfg
 
+force= && case $1 in --force) force=$1; shift;; esac
+
 success=:
 for rel
 do
@@ -56,7 +58,7 @@ git worktree add --detach logs/v$rel public/logs/v$prevn &&
 
 (cd logs/v$rel && git rm -f linux-*) &&
 
-if (cd sources/v$rel && ../../scripts/v$rel/deblob-$cbr) \
+if (cd sources/v$rel && ../../scripts/v$rel/deblob-$cbr $force) \
        >& logs/v$rel/linux-libre-$rel.log; then
   :
 else
@@ -118,6 +120,11 @@ fi &&
     scripts/v$rel/deblob-check --use-awk -C linux-libre-$rel.tar \
       > linux-libre-$rel.check ||
     { success=false; continue; }; } &&
+
+if test -n "$force"; then
+  echo --force is for testing only >> linux-libre-$rel.check
+  success=false
+fi &&
 
 continue
 
