@@ -59,7 +59,10 @@ git worktree add --detach logs/v$rel public/logs/v$prevn &&
 (cd logs/v$rel && git rm -f linux-*) &&
 
 if (cd sources/v$rel && ../../scripts/v$rel/deblob-$cbr $force) \
-       >& logs/v$rel/linux-libre-$rel.log; then
+       >& logs/v$rel/linux-libre-$rel.log &&
+   { test -z "$force" ||
+       test $(grep -i error logs/v$rel/linux-libre-$rel.log |
+		grep -c -v force) = 0; }; then
   :
 else
   grep -i error logs/v$rel/linux-libre-$rel.log > linux-libre-$rel.check
@@ -116,13 +119,14 @@ if test "$prev0" != "$prevn"; then
     public/sources/v$prevn sources/v$rel -- > patch-$prevn-$rel
 fi &&
 
-{ scripts/v$rel/deblob-check --use-awk linux-libre-$rel.tar ||
+{ { test -z "$force" &&
+      scripts/v$rel/deblob-check --use-awk linux-libre-$rel.tar; } ||
     scripts/v$rel/deblob-check --use-awk -C linux-libre-$rel.tar \
       > linux-libre-$rel.check ||
     { success=false; continue; }; } &&
 
 if test -n "$force"; then
-  echo --force is for testing only >> linux-libre-$rel.check
+  echo aborting, --force is for testing only >> linux-libre-$rel.check
   success=false
 fi &&
 
