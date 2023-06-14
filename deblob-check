@@ -5,6 +5,7 @@
 #        modified with 2023-05-24 r19297
 #        modified with 2023-05-25 r19300
 #        modified with 2023-06-09 r19312
+#        modified with 2023-06-12 r19329 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6879,6 +6880,9 @@ set_except () {
 
     # New in 6.3.7, 6.1.33, 5.15.115, 5.10.183, 5.4.246.
     accept '[\t][\t]req->name[ ]=[ ]test_fw_config->name[;][\n][\t][\t]req->fw_buf[ ]=[ ]NULL[;][\n][\t][\t]req->fw[ ]=[ ]NULL[;][\n][\t][\t]req->idx[ ]=[ ]i[;][\n][\t][\t]init_completion[(][&]req->completion[)][;][\n][\t][\t]rc[ ]=[ ]request_firmware_nowait[(]THIS_MODULE[,][ ]\([^);, \t\n]*[,][ \t\n]*\)*trigger_batched_cb[)][;]' lib/test_firmware.c
+
+    # New in 6.4-rc and 6.3.8.
+    blobname 'qcom[/]sm6375[/]Sony[/]murray[/][ac]dsp\.mbn' arch/arm64/boot/dts/qcom/sm6375-sony-xperia-murray-pdx225.dts
 
     ;;
 
