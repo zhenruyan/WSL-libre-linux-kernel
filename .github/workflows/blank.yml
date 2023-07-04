@@ -16,7 +16,7 @@ jobs:
       - name: sync  libre fsf la
         run: |
           echo Add other actions to build,
-          git remote add libre git://linux-libre.fsfla.org/releases.git linux
+          git remote add libre git://linux-libre.fsfla.org/releases.git --mirror=fetch
           git fetch libre
           git pull libre --all
           git push origin --all
