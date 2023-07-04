@@ -20,12 +20,13 @@ jobs:
       - name: sync  libre fsf la
         run: |
           echo Add other actions to build,
+          export mdy=`date`
           git config --local user.email "baiyangwangzhan@hotmail.com"
           git config --local user.name "zhenruyan"
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git pull --all
           git remote add libre git://linux-libre.fsfla.org/releases.git
           git fetch libre
-          git commit --allow-empty -m "sync libre kernel"
+          git commit --allow-empty -m "sync libre kernel ${mdy}"
           git push origin --all 
         
