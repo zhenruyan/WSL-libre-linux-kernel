@@ -25,7 +25,7 @@ jobs:
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git pull --all
           git remote add libre git://linux-libre.fsfla.org/releases.git
-          git pull libre
+          git fetch libre
           git commit --allow-empty -m "sync libre kernel"
           git push origin --all 
         
