@@ -23,7 +23,6 @@ jobs:
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git pull --all
           git remote add libre git://linux-libre.fsfla.org/releases.git
-          git fetch libre
-          git pull libre --all
-          git push origin --all
+          git pull libre --all > /dev/null
+          git push origin --all 
         
