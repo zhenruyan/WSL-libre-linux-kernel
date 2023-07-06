@@ -26,6 +26,10 @@ Exciting and delightful GNU Linux-libre, Free as in Freedo
 ![image](https://github.com/zhenruyan/WSL-libre-linux-kernel/assets/9253251/f7f8de26-7761-453f-90de-f6f44b9d7c63)
 
 
+##  All binaries were compiled using an E5 2689 engraved with a logo celebrating the 40th anniversary of GNU. Full of libre faith!
+
+![image](https://github.com/zhenruyan/WSL-libre-linux-kernel/assets/9253251/7de8fa88-8e5a-4f26-9a14-1df6126552d2)
+
 
 ##   Celebrate GNU's 40th anniversary with us, we hope to have 40 release announcements, discussions or presentations in one day!
 
