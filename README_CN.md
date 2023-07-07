@@ -5,6 +5,9 @@
 
 [English](https://github.com/zhenruyan/WSL-libre-linux-kernel/blob/master/README.md)
 
+[![General build kernel](https://github.com/zhenruyan/WSL-libre-linux-kernel/actions/workflows/blank.yml/badge.svg)](https://github.com/zhenruyan/WSL-libre-linux-kerne/actions/workflows/blank.yml)
+
+
 ## 再Windows的wsl里，使用完完全全自由的内核！ 超巨牛力！
 
 * 默认开启了f2fs模块
