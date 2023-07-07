@@ -3,6 +3,8 @@
 
 # 给WSL替换自由内核
 
+[English](https://github.com/zhenruyan/WSL-libre-linux-kernel/blob/master/README.md)
+
 ## 再Windows的wsl里，使用完完全全自由的内核！ 超巨牛力！
 
 * 默认开启了f2fs模块
