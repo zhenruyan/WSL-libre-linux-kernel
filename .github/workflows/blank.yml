@@ -30,7 +30,9 @@ jobs:
           git fetch libre
           git commit --allow-empty -m "sync libre kernel ${mdy}"
           git push origin --all 
-        
+          git checkout sources/v6.4.1-gnu
+          lcov -c -o kerneltest.info
+
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@v2
         with:
