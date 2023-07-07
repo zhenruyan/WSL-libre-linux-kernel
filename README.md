@@ -3,6 +3,8 @@
 
 # WSL replace libre linux kernel  100% libre!! 
 
+[简体中文](https://github.com/zhenruyan/WSL-libre-linux-kernel/blob/master/README_CN.md)
+
 ## You can also enjoy in windows, completely 100% free kernel
 
 * Modules such as f2fs.
