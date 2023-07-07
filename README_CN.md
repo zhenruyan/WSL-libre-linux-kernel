@@ -6,6 +6,7 @@
 [English](https://github.com/zhenruyan/WSL-libre-linux-kernel/blob/master/README.md)
 
 [![General build kernel](https://github.com/zhenruyan/WSL-libre-linux-kernel/actions/workflows/blank.yml/badge.svg)](https://github.com/zhenruyan/WSL-libre-linux-kerne/actions/workflows/blank.yml)
+[![Coverage Status](https://coveralls.io/repos/github/zhenruyan/WSL-libre-linux-kernel/badge.svg?branch=master)](https://coveralls.io/github/zhenruyan/WSL-libre-linux-kernel?branch=master)
 
 
 ## 再Windows的wsl里，使用完完全全自由的内核！ 超巨牛力！
