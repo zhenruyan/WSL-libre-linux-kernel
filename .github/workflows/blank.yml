@@ -14,9 +14,7 @@ jobs:
       contents: write
 
     steps:
-      - name: Coveralls GitHub Action
-        uses: coverallsapp/github-action@v2
-
+    
       - name: Clone repository
         uses: actions/checkout@v3
         
@@ -33,3 +31,5 @@ jobs:
           git commit --allow-empty -m "sync libre kernel ${mdy}"
           git push origin --all 
         
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v2
