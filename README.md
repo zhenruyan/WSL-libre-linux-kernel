@@ -13,6 +13,9 @@
 ![logo](https://www.fsfla.org/ikiwiki/selibre/linux-libre/100gnu+freedo.png)
 
 
+[install kernel](https://github.com/zhenruyan/WSL-libre-linux-kernel/wiki/install-kernel)
+
+[build kernel](https://github.com/zhenruyan/WSL-libre-linux-kernel/wiki/config-and-build-kernel)
 
 Exciting and delightful GNU Linux-libre, Free as in Freedo
 
