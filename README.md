@@ -7,7 +7,9 @@
 
 [![General build kernel](https://github.com/zhenruyan/WSL-libre-linux-kernel/actions/workflows/blank.yml/badge.svg)](https://github.com/zhenruyan/WSL-libre-linux-kerne/actions/workflows/blank.yml)
 [![Coverage Status](https://coveralls.io/repos/github/zhenruyan/WSL-libre-linux-kernel/badge.svg?branch=master)](https://coveralls.io/github/zhenruyan/WSL-libre-linux-kernel?branch=master)
-
+[![TODOs](https://badgen.net/https/api.tickgit.com/badgen/github.com/zhenruyan/WSL-libre-linux-kernel)](https://www.tickgit.com/browse?repo=github.com/zhenruyan/WSL-libre-linux-kernel)  
+IRC:
+`#WSL-libre-linux-kernel` on [Libera Chat](https://libera.chat), https://web.libera.chat/#WSL-libre-linux-kernel
 
 ## You can also enjoy in windows, completely 100% free kernel
 
