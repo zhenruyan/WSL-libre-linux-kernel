@@ -5,6 +5,8 @@
 
 [简体中文](https://github.com/zhenruyan/WSL-libre-linux-kernel/blob/master/README_CN.md)
 
+[![General build kernel](https://github.com/zhenruyan/WSL-libre-linux-kernel/actions/workflows/blank.yml/badge.svg)](https://github.com/zhenruyan/WSL-libre-linux-kerne/actions/workflows/blank.yml)
+
 ## You can also enjoy in windows, completely 100% free kernel
 
 * Modules such as f2fs.
