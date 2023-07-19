@@ -28,6 +28,8 @@ jobs:
           git pull --all
           git remote add libre git://linux-libre.fsfla.org/releases.git
           git fetch libre
+          git fetch libre --prune --tags
+          
           git commit --allow-empty -m "sync libre kernel ${mdy}"
           git push origin --all 
 
