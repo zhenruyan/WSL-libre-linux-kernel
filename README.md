@@ -13,6 +13,12 @@ IRC:
 
 ## You can also enjoy in windows, completely 100% free kernel
 
+* Optimization Async io
+* Optimization Scheduler
+* Optimize memory footprint
+*  Enhanced for real-time applications
+*  Modules such as ntfs.
+*  Modules such as exfat.
 * Modules such as f2fs.
 * Modules such as btrfs.
 * kvm are enabled by default. 
