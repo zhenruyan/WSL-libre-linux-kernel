@@ -32,4 +32,5 @@ jobs:
           
           git commit --allow-empty -m "sync libre kernel ${mdy}"
           git push origin --all 
+          git push origin --tags 
 
