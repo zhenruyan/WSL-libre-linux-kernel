@@ -3,7 +3,7 @@
 
 # WSL replace libre linux kernel  100% libre!! 
 
-[简体中文](https://github.com/zhenruyan/WSL-libre-linux-kernel/blob/master/README_CN.md)
+[ENGLISH](https://github.com/zhenruyan/WSL-libre-linux-kernel/blob/master/README.md)/[简体中文](https://github.com/zhenruyan/WSL-libre-linux-kernel/blob/master/README_CN.md)
 
 [![General build kernel](https://github.com/zhenruyan/WSL-libre-linux-kernel/actions/workflows/blank.yml/badge.svg)](https://github.com/zhenruyan/WSL-libre-linux-kerne/actions/workflows/blank.yml)
 [![Coverage Status](https://coveralls.io/repos/github/zhenruyan/WSL-libre-linux-kernel/badge.svg?branch=master)](https://coveralls.io/github/zhenruyan/WSL-libre-linux-kernel?branch=master)
