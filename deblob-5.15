@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#    Copyright (C) 2008-2022 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2023 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -3885,6 +3885,9 @@ clean_blob arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
 clean_blob arch/arm64/boot/dts/qcom/sdm845-oneplus-common.dtsi
 clean_blob arch/arm64/boot/dts/qcom/sm8350-hdk.dts
 clean_blob arch/arm64/boot/dts/qcom/sm8350-mtp.dts
+if grep -q '/apq8016/' arch/arm64/boot/dts/qcom/apq8016-sbc.dts; then
+  clean_blob arch/arm64/boot/dts/qcom/apq8016-sbc.dts
+fi
 clean_kconfig arch/arm/mach-qcom/Kconfig ARCH_QCOM
 clean_mk CONFIG_ARCH_QCOM arch/arm64/boot/dts/qcom/Makefile
 
