@@ -1,0 +1,7 @@
+#
+# SLAB allocator options
+#
+# CONFIG_SLAB is not set
+# CONFIG_SLUB is not set
+CONFIG_SLOB=y
+# end of SLAB allocator options
