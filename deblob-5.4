@@ -602,6 +602,9 @@ s,\(timeout = \)\(firmware_loading_timeout()\),\1is_nonfree_firmware(name) ? 1 :
 announce MICROCODE_AMD - "AMD microcode patch loading support"
 reject_firmware arch/x86/kernel/cpu/microcode/amd.c
 clean_blob arch/x86/kernel/cpu/microcode/amd.c
+if grep -q -i zenbleed.*microcode arch/x86/kernel/cpu/amd.c; then
+  clean_blob arch/x86/kernel/cpu/amd.c
+fi
 clean_kconfig arch/x86/Kconfig MICROCODE_AMD
 clean_mk CONFIG_MICROCODE_AMD arch/x86/kernel/cpu/microcode/Makefile
 
@@ -3140,7 +3143,7 @@ clean_blob arch/arm/boot/dts/am4372.dtsi
 clean_kconfig drivers/remoteproc/Kconfig WKUP_M3_RPROC
 clean_mk CONFIG_WKUP_M3_RPROC drivers/remoteproc/Makefile
 
-announce QCOM_Q6V5_ADSP - "Qualcomm Technology Inc ADSP Peripherial Image Loader"
+announce QCOM_Q6V5_ADSP - "Qualcomm Technology Inc ADSP Peripheral Image Loader"
 clean_blob drivers/remoteproc/qcom_q6v5_adsp.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_Q6V5_ADSP
 clean_mk CONFIG_QCOM_Q6V5_ADSP drivers/remoteproc/Makefile
@@ -3151,7 +3154,7 @@ clean_blob drivers/remoteproc/qcom_q6v5_mss.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_Q6V5_MSS
 clean_mk CONFIG_QCOM_Q6V5_MSS drivers/remoteproc/Makefile
 
-announce QCOM_Q6V5_PAS - "Qualcomm Hexagon V5 Peripherial Authentication Service support"
+announce QCOM_Q6V5_PAS - "Qualcomm Hexagon V5 Peripheral Authentication Service support"
 clean_blob drivers/remoteproc/qcom_q6v5_pas.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_Q6V5_PAS
 clean_mk CONFIG_QCOM_Q6V5_PAS drivers/remoteproc/Makefile
@@ -3161,7 +3164,7 @@ clean_blob drivers/remoteproc/qcom_q6v5_wcss.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_Q6V5_WCSS
 clean_mk CONFIG_QCOM_Q6V5_WCSS drivers/remoteproc/Makefile
 
-announce QCOM_WCNSS_PIL - "Qualcomm WCNSS Peripherial Image Loader"
+announce QCOM_WCNSS_PIL - "Qualcomm WCNSS Peripheral Image Loader"
 clean_blob drivers/remoteproc/qcom_wcnss.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_WCNSS_PIL
 clean_mk CONFIG_QCOM_WCNSS_PIL drivers/remoteproc/Makefile
