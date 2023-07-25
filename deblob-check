@@ -7,6 +7,7 @@
 #        modified with 2022-11-16 r18984
 #        modified with 2023-03-17 r19120
 #        modified with 2023-05-17 r19267
+#        modified with 2023-07-24 r19347
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6301,8 +6302,11 @@ set_except () {
     # New in 6.2.7, 6.1.20, 5.15.103, 5.10.175, 5.4.237, 4.19.278, 4.14.310.
     accept '[\t][ ][*][ ]updated[ ]microcode[ ]at[ ]the[ ]time' arch/x86/kernel/cpu/amd.c
 
-    # New in 6.3.3, 6.2.16, 5.15.112, 5.10.180, 5.4.243, 4.19.283.
+    # New in 6.3.3, 6.2.16, 6.1.29, 5.15.112, 5.10.180, 5.4.243, 4.19.283.
     blobname 'gsl1680-dexp-ursus-kx210i\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 6.4.6, 6.1.41, 5.15.122, 5.10.187, 5.4.250, 4.19.289.
+    blobna 'please[ ]update[ ]your[ ]microcode' arch/x86/kernel/cpu/amd.c
 
     ;;
 
