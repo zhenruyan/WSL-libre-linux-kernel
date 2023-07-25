@@ -22,6 +22,7 @@
 #        modified with 2023-05-17 r19267
 #        modified with 2023-06-09 r19312
 #        modified with 2021-12-20 r18515 (more partial)
+#        modified with 2023-07-24 r19347
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6400,6 +6401,9 @@ set_except () {
 
     # New in 5.15.121.
     blobname 'qcom[/]apq8016[/]\(\(mba\|modem\|wcnss\)\.mbn\|WCNSS_qcom_wlan_nv_sbc\.bin\)' arch/arm64/boot/dts/qcom/apq8016-sbc.dts
+
+    # New in 6.4.6, 6.1.41, 5.15.122, 5.10.187, 5.4.250, 4.19.289.
+    blobna 'please[ ]update[ ]your[ ]microcode' arch/x86/kernel/cpu/amd.c
 
     ;;
 
