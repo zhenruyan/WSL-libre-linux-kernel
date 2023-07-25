@@ -643,6 +643,9 @@ s,\(timeout = \)\(firmware_loading_timeout()\),\1is_nonfree_firmware(name) ? 1 :
 announce MICROCODE_AMD - "AMD microcode patch loading support"
 reject_firmware arch/x86/kernel/cpu/microcode/amd.c
 clean_blob arch/x86/kernel/cpu/microcode/amd.c
+if grep -q -i zenbleed.*microcode arch/x86/kernel/cpu/amd.c; then
+  clean_blob arch/x86/kernel/cpu/amd.c
+fi
 clean_kconfig arch/x86/Kconfig MICROCODE_AMD
 clean_mk CONFIG_MICROCODE_AMD arch/x86/kernel/cpu/microcode/Makefile
 

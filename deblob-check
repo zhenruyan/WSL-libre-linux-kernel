@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2023-06-12 r19329
+#        modified with 2023-07-24 r19347
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6941,6 +6942,9 @@ set_except () {
     accept '\([#][^\n]*\)\?[ \t]*rdesc=["\'"'"']\(05[ ]0[1d][ ]09\|06[ ]00[ ]ff\|75[ ]08[ ]15\)[ 0-9a-fA-F]*["\'"'"']' tools/testing/selftests/hid/tests/test_multitouch.py
     accept '[\t][\t][\t]tools[/]testing[/]selftests[/]rcutorture[/]bin[/]kvm\.sh[ ]--allcpus[ ]--duration[ ]5s[ ]--configs[ ]["]SRCU-P["][ ]--bootargs[ ]["]rcutorture\.test_srcu_lockdep=[$]val["][ ]--trust-make[ ]--datestamp[ ]["][$]ds[/][$]val["][ ]>[ ]["][$]T[/]kvm\.sh\.out["][ ]2>[&]1' tools/testing/selftests/rcutorture/bin/srcu_lockdep.sh
     accept '[\t][\t][\t]mv[ ]["][$]T[/]kvm\.sh\.out["][ ]["][$]RCUTORTURE[/]res[/][$]ds[/][$]val["]' tools/testing/selftests/rcutorture/bin/srcu_lockdep.sh
+
+    # New in 6.4.6, 6.1.41, 5.15.122, 5.10.187, 5.4.250, 4.19.289.
+    blobna 'please[ ]update[ ]your[ ]microcode' arch/x86/kernel/cpu/amd.c
 
     ;;
 
