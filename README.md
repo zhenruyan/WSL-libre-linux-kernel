@@ -24,6 +24,13 @@ IRC:
 * kvm are enabled by default. 
 * Better support for ssd and other devices.
 
+## todo
+
+- [x] Automatic synchronization of source codes
+- [ ] Automatic compilation based on tag
+- [ ] installation script
+- [ ] Published to scoop winget chocolatey and other windows package management platforms.
+
 ![logo](https://www.fsfla.org/ikiwiki/selibre/linux-libre/100gnu+freedo.png)
 
 
