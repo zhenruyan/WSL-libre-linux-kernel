@@ -2,6 +2,7 @@
 
 # deblob-check version 2023-06-12 r19329
 #        modified with 2023-07-24 r19347
+#        modified with 2023-08-03 r19361
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6945,6 +6946,11 @@ set_except () {
 
     # New in 6.4.6, 6.1.41, 5.15.122, 5.10.187, 5.4.250, 4.19.289.
     blobna 'please[ ]update[ ]your[ ]microcode' arch/x86/kernel/cpu/amd.c
+
+    # New in 6.4.8, 6.1.43.
+    blobname 'amphion[/]vpu[/]vpu_fw_imx8_\(enc\|dec\)\.bin' drivers/media/platform/amphion/vpu_core.c
+    defsnc '[\t]static[ ]const[ ]unsigned[ ]long[ ]range\[\][ ]=' lib/test_maple_tree.c
+    defsnc '[\t]static[ ]const[ ]unsigned[ ]long[ ]set\[\][ ]=' tools/testing/radix-tree/maple.c
 
     ;;
 
