@@ -10,6 +10,7 @@
 #        modified with 2023-06-09 r19312
 #        modified with 2023-07-24 r19347
 #        modified with 2023-08-03 r19361
+#        modified with 2023-08-08 r19366
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6722,6 +6723,11 @@ set_except () {
     blobname 'amphion[/]vpu[/]vpu_fw_imx8_\(enc\|dec\)\.bin' drivers/media/platform/amphion/vpu_core.c
     defsnc '[\t]static[ ]const[ ]unsigned[ ]long[ ]range\[\][ ]=' lib/test_maple_tree.c
     defsnc '[\t]static[ ]const[ ]unsigned[ ]long[ ]set\[\][ ]=' tools/testing/radix-tree/maple.c
+
+    # New in 6.4.9, 6.1.44, 5.15.125, 5.10.189, 5.4.252, 4.19.290, 4.14.320.
+    accept 'GDS[ ]can[ ]also[ ]be[ ]mitigated[ ]on[ ]systems[ ]that[ ]don.t[ ]have[ ]updated[ ]microcode' Documentation/admin-guide/hw-vuln/gather_data_sampling.rst
+    accept 'The[ ]updated[ ]microcode[ ]will[ ]enable[ ]the[ ]mitigation[ ]by[ ]default' Documentation/admin-guide/hw-vuln/gather_data_sampling.rst
+    accept '[\t]*This[ ]issue[ ]is[ ]mitigated[ ]by[ ]default[ ]in[ ]updated[ ]microcode' Documentation/admin-guide/kernel-parameters.txt
 
     ;;
 
