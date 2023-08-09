@@ -5,6 +5,7 @@
 #        modified with 2022-05-09 r18697
 #        modified with 2022-06-16 r18782
 #        modified with 2023-03-17 r19120
+#        modified with 2023-08-08 r19366
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6295,6 +6296,11 @@ set_except () {
 
     # New in 6.2.7, 6.1.20, 5.15.103, 5.10.175, 5.4.237, 4.19.278, 4.14.310.
     accept '[\t][ ][*][ ]updated[ ]microcode[ ]at[ ]the[ ]time' arch/x86/kernel/cpu/amd.c
+
+    # New in 6.4.9, 6.1.44, 5.15.125, 5.10.189, 5.4.252, 4.19.290, 4.14.320.
+    accept 'GDS[ ]can[ ]also[ ]be[ ]mitigated[ ]on[ ]systems[ ]that[ ]don.t[ ]have[ ]updated[ ]microcode' Documentation/admin-guide/hw-vuln/gather_data_sampling.rst
+    accept 'The[ ]updated[ ]microcode[ ]will[ ]enable[ ]the[ ]mitigation[ ]by[ ]default' Documentation/admin-guide/hw-vuln/gather_data_sampling.rst
+    accept '[\t]*This[ ]issue[ ]is[ ]mitigated[ ]by[ ]default[ ]in[ ]updated[ ]microcode' Documentation/admin-guide/kernel-parameters.txt
 
     ;;
 

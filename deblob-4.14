@@ -2958,7 +2958,7 @@ clean_blob drivers/remoteproc/qcom_q6v5_pil.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_Q6V5_PIL
 clean_mk CONFIG_QCOM_Q6V5_PIL drivers/remoteproc/Makefile
 
-announce QCOM_WCNSS_PIL - "Qualcomm WCNSS Peripherial Image Loader"
+announce QCOM_WCNSS_PIL - "Qualcomm WCNSS Peripheral Image Loader"
 clean_blob drivers/remoteproc/qcom_wcnss.c
 clean_kconfig drivers/remoteproc/Kconfig QCOM_WCNSS_PIL
 clean_mk CONFIG_QCOM_WCNSS_PIL drivers/remoteproc/Makefile
