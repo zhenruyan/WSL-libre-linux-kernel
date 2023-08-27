@@ -3767,9 +3767,22 @@ clean_mk CONFIG_I2C_SLAVE_EEPROM drivers/i2c/Makefile
 # fill in the required fw_image field of mhi_controller.  Let me know
 # if you find any uses in which the firmware is Free Software.
 announce MHI_BUS - "Modem Host Interface (MHI) bus"
-reject_firmware drivers/bus/mhi/core/boot.c
-clean_kconfig drivers/bus/mhi/Kconfig MHI_BUS
-clean_mk CONFIG_MHI_BUS drivers/bus/mhi/core/Makefile
+if test -f drivers/bus/mhi/host/boot.c; then
+  reject_firmware drivers/bus/mhi/host/boot.c
+  clean_kconfig drivers/bus/mhi/host/Kconfig MHI_BUS
+  clean_mk CONFIG_MHI_BUS drivers/bus/mhi/host/Makefile
+else  
+  reject_firmware drivers/bus/mhi/core/boot.c
+  clean_kconfig drivers/bus/mhi/Kconfig MHI_BUS
+  clean_mk CONFIG_MHI_BUS drivers/bus/mhi/core/Makefile
+fi
+
+if test -f drivers/bus/mhi/host/pci_generic.c; then
+  announce MHI_BUS_PCI_GENERIC - "MHI PCI controller driver"
+  clean_blob drivers/bus/mhi/host/pci_generic.c
+  clean_kconfig drivers/bus/mhi/host/Kconfig MHI_BUS_PCI_GENERIC
+  clean_mk CONFIG_MHI_BUS_PCI_GENERIC drivers/bus/mhi/host/Makefile
+fi
 
 # Greybus
 
