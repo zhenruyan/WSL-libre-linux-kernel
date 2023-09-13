@@ -4,6 +4,8 @@
 #        modified with 2023-07-24 r19347
 #        modified with 2023-08-03 r19361
 #        modified with 2023-08-08 r19366
+#        modified with 2023-09-13 r19402
+#        modified with 2023-09-13 r19403 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6957,6 +6959,15 @@ set_except () {
     accept 'GDS[ ]can[ ]also[ ]be[ ]mitigated[ ]on[ ]systems[ ]that[ ]don.t[ ]have[ ]updated[ ]microcode' Documentation/admin-guide/hw-vuln/gather_data_sampling.rst
     accept 'The[ ]updated[ ]microcode[ ]will[ ]enable[ ]the[ ]mitigation[ ]by[ ]default' Documentation/admin-guide/hw-vuln/gather_data_sampling.rst
     accept '[\t]*This[ ]issue[ ]is[ ]mitigated[ ]by[ ]default[ ]in[ ]updated[ ]microcode' Documentation/admin-guide/kernel-parameters.txt
+
+    # New in 6.5.3 and 6.4.16.
+    blobname '%s_v2\.bin' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8723\(a\|b\|bs\|cs_\(cg\|vf\|xx\)\|d\|ds\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8821\(a\|c\|cs\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8761\(a\|b\|bu\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8822\(cs\|cu\|b\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8852\(au\|bs\|bu\|cu\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8851\(bu\)_fw' drivers/bluetooth/btrtl.c
 
     ;;
 
