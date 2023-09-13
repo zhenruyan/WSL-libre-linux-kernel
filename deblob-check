@@ -1,6 +1,8 @@
 #! /bin/sh
 
 # deblob-check version 2023-08-19 r19387
+#        modified with 2023-09-13 r19402
+#        modified with 2023-09-13 r19403
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7040,6 +7042,17 @@ set_except () {
     blob 'Required[ ]firmware[\n][=]\+[\n][\n]The[ ]atomisp[ ]driver[ ]requires[^\n]*\([\n]\+[- ][^\n]\+\)*' drivers/staging/media/atomisp/TODO
     accept '[\t][\t]dev_err[(]tas_priv->dev[,][ ]["]request_firmware_nowait[ ]err' sound/soc/codecs/tas2781-comlib.c
     accept '[ ]*irq[/]29-iwlwifi-559' Documentation/trace/histogram.rst
+
+    # New in 6.5.3 and 6.4.16.
+    blobname '%s_v2\.bin' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8723\(a\|b\|bs\|cs_\(cg\|vf\|xx\)\|d\|ds\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8821\(a\|c\|cs\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8761\(a\|b\|bu\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8822\(cs\|cu\|b\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8852\(au\|bs\|bu\|cu\)_fw' drivers/bluetooth/btrtl.c
+    blobname 'rtl_bt[/]rtl8851\(bu\)_fw' drivers/bluetooth/btrtl.c
+    defsnc 'static[ ]const[ ]u16[ ]expected_results\[\][ ]=' lib/checksum_kunit.c
+    defsnc 'static[ ]const[ ]u32[ ]init_sums_no_overflow\[\][ ]=' lib/checksum_kunit.c
 
     ;;
 
