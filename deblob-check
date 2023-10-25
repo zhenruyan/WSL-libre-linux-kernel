@@ -3,6 +3,7 @@
 # deblob-check version 2023-08-19 r19387
 #        modified with 2023-09-13 r19402
 #        modified with 2023-09-13 r19403
+#        modified with 2023-10-23 r19416 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7053,6 +7054,9 @@ set_except () {
     blobname 'rtl_bt[/]rtl8851\(bu\)_fw' drivers/bluetooth/btrtl.c
     defsnc 'static[ ]const[ ]u16[ ]expected_results\[\][ ]=' lib/checksum_kunit.c
     defsnc 'static[ ]const[ ]u32[ ]init_sums_no_overflow\[\][ ]=' lib/checksum_kunit.c
+
+    # New in 6.6-rc, 6.5.9, 6.1.60, 5.15.137, 5.10.199.
+    blobname 'gsl1680-\(bush-bush-windows-tablet\|positivo-c4128b\)\.fw' drivers/platform/x86/otuchscreen_dmi.c
 
     ;;
 
