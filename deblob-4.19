@@ -1749,8 +1749,13 @@ clean_kconfig drivers/net/ethernet/qlogic/Kconfig QLCNIC
 clean_mk CONFIG_QLCNIC drivers/net/ethernet/qlogic/qlcnic/Makefile
 
 announce R8169 - "Realtek 8169 gigabit ethernet support"
-reject_firmware drivers/net/ethernet/realtek/r8169.c
-clean_blob drivers/net/ethernet/realtek/r8169.c
+if test -f drivers/net/ethernet/realtek/r8169_main.c; then
+  reject_firmware drivers/net/ethernet/realtek/r8169_main.c
+  clean_blob drivers/net/ethernet/realtek/r8169_main.c
+else
+  reject_firmware drivers/net/ethernet/realtek/r8169.c
+  clean_blob drivers/net/ethernet/realtek/r8169.c
+fi
 clean_kconfig drivers/net/ethernet/realtek/Kconfig R8169
 clean_mk CONFIG_R8169 drivers/net/ethernet/realtek/Makefile
 
