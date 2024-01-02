@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2023-10-23 r19416
+#        modified with 2023-12-26 r19450 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7106,6 +7107,9 @@ set_except () {
     defsnc 'static[ ]uint8_t[ ]frag\(_[01]\|6_[012]\)\[\][ ]=' tools/testing/selftests/bpf/ip_check_defrag_frags.h
     accept '[\t][$][(]Q[)]\.[/]\(no\)\?libc-test[ ][>][ ]["][$][(]CURDIR[)][/]run\.out["]' tools/testing/selftests/nolibc/Makefile
     accept '[\t][\t]echo[ ]["][ ]---[ ]Summary:[ ]Exit[ ]code[ ][$]retcode[ ]from[ ][$]flavor[,][ ]see[ ]Make\.out' tools/testing/selftests/rcutorture/bin/torture.sh
+
+    # New in 6.7-rc, 6.6.9 and 6.1.70.
+    accept '[/][*][ ]Chen-Yu[ ]Tsai[\'"'"']s[ ]regdb[ ]certificate[ ][*][/][\n0-9a-fx, ]*' net/wireless/certs/wens.hex
 
     ;;
 
