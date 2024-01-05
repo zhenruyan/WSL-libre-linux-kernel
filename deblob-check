@@ -18,6 +18,7 @@
 #        modified with 2023-07-24 r19347
 #        modified with 2023-08-08 r19366
 #        modified with 2023-10-23 r19416 (partial)
+#        modified with 2023-12-26 r19450 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6357,6 +6358,9 @@ set_except () {
 
     # New in 6.6-rc, 6.5.9, 6.1.60, 5.15.137, 5.10.199.
     blobname 'gsl1680-\(bush-bush-windows-tablet\|positivo-c4128b\)\.fw' drivers/platform/x86/otuchscreen_dmi.c
+
+    # New in 6.7-rc, 6.6.9, 6.1.70, 5.15.146, and 5.10.206.
+    accept '[/][*][ ]Chen-Yu[ ]Tsai[\'"'"']s[ ]regdb[ ]certificate[ ][*][/][\n0-9a-fx, ]*' net/wireless/certs/wens.hex
 
     ;;
 
