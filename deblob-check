@@ -6,6 +6,7 @@
 #        modified with 2022-06-16 r18782
 #        modified with 2023-03-17 r19120
 #        modified with 2023-08-08 r19366
+#        modified with 2023-12-26 r19450 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6301,6 +6302,9 @@ set_except () {
     accept 'GDS[ ]can[ ]also[ ]be[ ]mitigated[ ]on[ ]systems[ ]that[ ]don.t[ ]have[ ]updated[ ]microcode' Documentation/admin-guide/hw-vuln/gather_data_sampling.rst
     accept 'The[ ]updated[ ]microcode[ ]will[ ]enable[ ]the[ ]mitigation[ ]by[ ]default' Documentation/admin-guide/hw-vuln/gather_data_sampling.rst
     accept '[\t]*This[ ]issue[ ]is[ ]mitigated[ ]by[ ]default[ ]in[ ]updated[ ]microcode' Documentation/admin-guide/kernel-parameters.txt
+
+    # New in 6.7-rc, 6.6.9, 6.1.70, 5.15.146, and 5.10.206, 5.4.266, 4.19.304, and 4.14.335.
+    accept '[/][*][ ]Chen-Yu[ ]Tsai[\'"'"']s[ ]regdb[ ]certificate[ ][*][/][\n0-9a-fx, ]*' net/wireless/certs/wens.hex
 
     ;;
 
