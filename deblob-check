@@ -12,6 +12,7 @@
 #        modified with 2023-07-24 r19347
 #        modified with 2023-08-08 r19366
 #        modified with 2023-12-26 r19450 (partial)
+#        modified with 2021-10-23 r18408 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6325,6 +6326,9 @@ set_except () {
 
     # New in 6.7-rc, 6.6.9, 6.1.70, 5.15.146, and 5.10.206, 5.4.266, 4.19.304, and 4.14.335.
     accept '[/][*][ ]Chen-Yu[ ]Tsai[\'"'"']s[ ]regdb[ ]certificate[ ][*][/][\n0-9a-fx, ]*' net/wireless/certs/wens.hex
+
+    # New in 5.10.209, 5.4.268, 4.19.306.
+    defsnc 'static[ ]const[ ]u8[ ]channel_all\[59\][ ]=' drivers/net/wireless/realtek/rtlwifi/rtl8192de/phy.c
 
     ;;
 
