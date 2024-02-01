@@ -830,6 +830,9 @@ clean_blob drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v8_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c
+if grep -q request_firmware drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c; then
+  reject_firmware drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c
+fi
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v11_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c
