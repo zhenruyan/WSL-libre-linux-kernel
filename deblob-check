@@ -2,6 +2,7 @@
 
 # deblob-check version 2023-12-27 r19451
 #        modified with 2024-01-26 r19474
+#        modified with 2024-03-01 r19492
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7212,6 +7213,9 @@ set_except () {
 
     # New in 6.7.2.
     accept '[\t][\t]\[SOF_IPC_TYPE_4\][ ]=[ ]["]sof-arl-s\.ri["]' sound/soc/sof/intel/pci-mtl.c
+
+    # New in 6.7.7, 6.6.19, 6.1.80, and 5.15.150.
+    blobname '\(silead[/]\)\?gsl3692-teclast-x16-plus\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
