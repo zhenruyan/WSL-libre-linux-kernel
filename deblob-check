@@ -2,13 +2,14 @@
 
 # deblob-check version 2023-10-23 r19416
 #        modified with 2023-12-26 r19450 (partial)
+#        modified with 2024-03-01 r19492
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2023 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2024 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -7110,6 +7111,9 @@ set_except () {
 
     # New in 6.7-rc, 6.6.9 and 6.1.70.
     accept '[/][*][ ]Chen-Yu[ ]Tsai[\'"'"']s[ ]regdb[ ]certificate[ ][*][/][\n0-9a-fx, ]*' net/wireless/certs/wens.hex
+
+    # New in 6.7.7, 6.6.19, 6.1.80, and 5.15.150.
+    blobname '\(silead[/]\)\?gsl3692-teclast-x16-plus\.fw' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
