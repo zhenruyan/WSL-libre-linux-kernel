@@ -15,6 +15,8 @@
 #        modified with 2023-12-26 r19450 (partial)
 #        modified with 2023-04-13 r19170 (partial)
 #        modified with 2024-03-01 r19492
+#        modified with 2023-06-13 r19329 (partial)
+#        modified with 2023-10-23 r19416 (more partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6744,6 +6746,14 @@ set_except () {
 
     # New in 6.7.7, 6.6.19, 6.1.80, and 5.15.150.
     blobname '\(silead[/]\)\?gsl3692-teclast-x16-plus\.fw' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 6.1.81.
+    # New in 6.4-rc.
+    blobname 'qca[/]hpbtfw%02x\.tlv' drivers/bluetooth/btqca.c
+    blobname 'qca[/]hpnv%02x\.bin' drivers/bluetooth/btqca.c
+    # New in 6.6-rc.
+    blobname 'qca[/]\(ap\|hmt\)btfw%02x\.tlv' drivers/bluetooth/btqca.c
+    blobname 'qca[/]\(ap\|hmt\)nv%02x\.bin' drivers/bluetooth/btqca.c
 
     ;;
 
