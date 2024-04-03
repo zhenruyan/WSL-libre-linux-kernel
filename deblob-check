@@ -2,6 +2,8 @@
 
 # deblob-check version 2024-03-05 r19501
 #        modified with 2024-03-27 r19512
+#        modified with 2024-03-29 r19515
+#        modified with 2024-03-29 r19518
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7282,7 +7284,7 @@ set_except () {
     
     # New in 6.8.2, 6.7.11, 6.6.23, 6.1.83.
     accept '[\t]ret[ ]=[ ]request_firmware[(][&]\(sdev->basefw\.fw\|adata->fw_dbin\)[,][ ]fw_filename[,][ ]sdev->dev[)]' sound/soc/sof/amd/acp-loader.c
-    accept '[\t][\t][\t]adata->fw_\(code\|data\)_bin[ ]=[ ]devm_kasprintf[(]sdev->dev[,][ \n\t]*GFP_KERNEL[,][ \n\t]*["]sof-%s-\(code\|data\)\.bin["]' sound/soc/sof/amd/acp.c
+    accept '[\t][\t][\t]*adata->fw_\(code\|data\)_bin[ ]=[ ]devm_kasprintf[(]sdev->dev[,][ \n\t]*GFP_KERNEL[,][ \n\t]*["]\(%s[/]\)\?sof-%s-\(code\|data\)\.bin["]' sound/soc/sof/amd/acp.c
 
     ;;
 
