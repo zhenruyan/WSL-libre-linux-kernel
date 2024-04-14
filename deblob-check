@@ -20,6 +20,7 @@
 #        modified with 2024-03-27 r19512
 #        modified with 2024-03-29 r19515
 #        modified with 2024-03-29 r19518
+#        modified with 2024-04-14 r19529
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -5357,7 +5358,7 @@ set_except () {
     # blobname '\(sof\|reef\)-bdw\(\.ri\|-\(rt286\|rt5677\|rt5640\)\.tplg\)' sound/soc/intel/common/soc-acpi-intel-hsw-bdw-match.c
     # blobname '\(sof\|reef\)-icl\(\.ri\|-rt274\.tplg\)' sound/soc/intel/common/soc-acpi-intel-icl-match.c
     blobna '[/][*][ ]brcmfmac4366c-pcie\.\(ap\.\)\?bin[ ]from[ ]linux-firmware\.git[ ]commit[ ][0-9a-f]*[ ][*][/]' drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c
-    blobname 'iwlwifi-[^ ]*-[ab]0-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
+    # blobname 'iwlwifi-[^ ]*-[ab]0-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
     blobname 'iwlwifi-\(\(QuZ-a0-hr\|QuQnj-b0-jf\|so-a0-\(jf\|hr\)\)-b0\|\(cc\|\(so\|ty\)-a0-gf\)-a0\)-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
 
     # New in 5.1.2, 5.0.16, 4.19.43, 4.14.119, and 4.9.176.
@@ -6761,6 +6762,14 @@ set_except () {
     # New in 6.8.2, 6.7.11, 6.6.23, 6.1.83.
     accept '[\t]ret[ ]=[ ]request_firmware[(][&]\(sdev->basefw\.fw\|adata->fw_dbin\)[,][ ]fw_filename[,][ ]sdev->dev[)]' sound/soc/sof/amd/acp-loader.c
     accept '[\t][\t][\t]*adata->fw_\(code\|data\)_bin[ ]=[ ]devm_kasprintf[(]sdev->dev[,][ \n\t]*GFP_KERNEL[,][ \n\t]*["]\(%s[/]\)\?sof-%s-\(code\|data\)\.bin["]' sound/soc/sof/amd/acp.c
+
+    # New in 6.8.6, 6.6.27, 6.1.86
+    blobname 'mediatek[/]BT_RAM_CODE_MT7922_1_1_hdr\.bin' drivers/bluetooth/btmtk.h
+    blobname 'rt\(274\|5682\|1308\)-tplg\.bin' sound/soc/intel/avs/board_selection.c
+    blobname 'iwlwifi-sc2f\?-a0-\(fm-c0\|wh-a0\)' drivers/net/wireless/intel/iwlwifi/cfg/sc.c
+    # Moved from way above, so that the above matches first.
+    blobname 'iwlwifi-\(sc\)-[ab]0-\(fm\|hr\|gf4\?\|wh\)-[abc]0' drivers/net/wireless/intel/iwlwifi/cfg/sc.c
+    blobname 'iwlwifi-[^ ]*-[ab]0-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
 
     ;;
 
