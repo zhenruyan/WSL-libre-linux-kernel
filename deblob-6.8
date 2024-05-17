@@ -923,12 +923,15 @@ clean_blob drivers/gpu/drm/i915/display/intel_dmc.c
 reject_firmware drivers/gpu/drm/i915/display/intel_opregion.c
 reject_firmware drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
 clean_sed '/uc_fw->file_selected\.path = blob->path/ i\
-		else if (uc_fw->file_wanted.path == blob->path)\
-			/* Avoid retrying forever when neighbor\
-			   entries point to the same path.  */\
+		else if (blob->path == NONFREE_FIRMWARE)\
+			/* Never select an entry we would refuse to load.\
+			   If we find nothing, loading is disabled but the card\
+			   initialization proceeds as if the user had disabled\
+			   firmware, but if we found something that failed to load,\
+			   initialization would fail.  */\
 			continue;\
 
-' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c 'avoid infinite loop'
+' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c 'disable non-Free firmware'
 clean_sed '/Versionless file names must be unique/ i\
 	    if (fw_blobs[i].blob.path != NONFREE_FIRMWARE)
 ' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c 'avoid validation fails'
