@@ -7,6 +7,7 @@
 #        modified with 2024-03-29 r19515
 #        modified with 2024-03-29 r19518
 #        modified with 2024-04-14 r19529
+#        modified with 2023-12-26 r19450 (more partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7131,7 +7132,11 @@ set_except () {
     blobname 'iwlwifi-\(sc\)-[ab]0-\(fm\|hr\|gf4\?\|wh\)-[abc]0' drivers/net/wireless/intel/iwlwifi/cfg/sc.c
     blobname 'iwlwifi-[^ ]*-[ab]0-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
 
+    # New in 6.7-rc7, 6.6.31, 6.1.91.
+    blobname 'qca[/]hpnv%02x%s\.\(bin\|%x\)' drivers/bluetooth/btqca.c
+
     ;;
+
 
   */*freedo*.patch | */*logo*.patch)
     accept 'P[13]\([\n]#[^\n]*\)*[\n]*\([\n][0-9 ]*\)\+' drivers/video/logo/logo_libre_clut224.ppm
