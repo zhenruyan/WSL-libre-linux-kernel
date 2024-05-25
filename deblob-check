@@ -8,6 +8,7 @@
 #        modified with 2024-03-29 r19518
 #        modified with 2024-04-14 r19529
 #        modified with 2023-12-26 r19450 (more partial)
+#        modified with 2024-05-23 r19567
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6827,7 +6828,7 @@ set_except () {
     # The following is not new, it was just moved down to allow for
     # new patterns to match despite being prefixed by it, when using
     # non-NDA regexp engines.
-    blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
+    # blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     accept '[ ][*][ ]This[ ]is[ ]a[ ]helper[ ]that[ ]will[ ]use[ ]request_firmware[ ]' drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c
     accept '[\t]mipi_dsi_dcs_write_seq[(]dsi[,][ ]HX8394_CMD_[^ ,\t\n)]*\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-himax-hx8394.c
     accept '[\t]mipi_dsi_dcs_write_seq[(]dsi[,][ ]0xc8[^ ,\t\n)]*\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-leadtek-ltk050h3146w.c
@@ -6983,6 +6984,10 @@ set_except () {
     defsnc 'static[ ]char[ ]data_synd\[\][ ]=' drivers/edac/npcm_edac.c
     blobname 'amdgpu[/]vcn_4_0_3\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
     blobname 'amdgpu[/]%s_\(rlc\|mec\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c
+    # The following is not new, it was just moved down to allow for
+    # new patterns to match despite being prefixed by it, when using
+    # non-NDA regexp engines.
+    blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     defsnc 'static[ ]const[ ]struct[ ]dm_bl_data_point[ ]custom_backlight_curve0\[\][ ]=' drivers/gpu/drm/amd/display/modules/power/power_helpers.c
     defsnc 'static[ ]unsigned[ ]short[ ]meson_encl_gamma_table\[256\][ ]=' drivers/gpu/drm/meson/meson_venc.c
     blobname 'a6[19]0_zap\.mdt' drivers/gpu/drm/msm/adreno/adreno_device.c
