@@ -1,6 +1,8 @@
 #! /bin/sh
 
 # deblob-check version 2024-04-28 r19540
+#        modified with 2024-05-23 r19567
+#        modified with 2024-05-23 r19568
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6820,7 +6822,7 @@ set_except () {
     # The following is not new, it was just moved down to allow for
     # new patterns to match despite being prefixed by it, when using
     # non-NDA regexp engines.
-    blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
+    # blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     accept '[ ][*][ ]This[ ]is[ ]a[ ]helper[ ]that[ ]will[ ]use[ ]request_firmware[ ]' drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c
     accept '[\t]mipi_dsi_dcs_write_seq[(]dsi[,][ ]HX8394_CMD_[^ ,\t\n)]*\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-himax-hx8394.c
     accept '[\t]mipi_dsi_dcs_write_seq[(]dsi[,][ ]0xc8[^ ,\t\n)]*\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-leadtek-ltk050h3146w.c
@@ -6976,6 +6978,10 @@ set_except () {
     defsnc 'static[ ]char[ ]data_synd\[\][ ]=' drivers/edac/npcm_edac.c
     blobname 'amdgpu[/]vcn_4_0_3\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
     blobname 'amdgpu[/]%s_\(rlc\|mec\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c
+    # The following is not new, it was just moved down to allow for
+    # new patterns to match despite being prefixed by it, when using
+    # non-NDA regexp engines.
+    # blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     defsnc 'static[ ]const[ ]struct[ ]dm_bl_data_point[ ]custom_backlight_curve0\[\][ ]=' drivers/gpu/drm/amd/display/modules/power/power_helpers.c
     defsnc 'static[ ]unsigned[ ]short[ ]meson_encl_gamma_table\[256\][ ]=' drivers/gpu/drm/meson/meson_venc.c
     blobname 'a6[19]0_zap\.mdt' drivers/gpu/drm/msm/adreno/adreno_device.c
@@ -7309,6 +7315,10 @@ set_except () {
     blobname 'mediatek[/]BT_RAM_CODE_MT%04x_1a_%x_hdr\.bin' drivers/bluetooth/btusb.c
     blobname 'amdgpu[/]vcn_\(4_0_6\(_1\)\?\|5_0_0\)\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
     blobname 'amdgpu[/]%s_%d\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
+    # The following is not new, it was just moved down to allow for
+    # new patterns to match despite being prefixed by it, when using
+    # non-NDA regexp engines.
+    blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     accept '[\t][\t]r[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->vcn\.fw\[i\][,][ ]fw_name[)]' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
     blobname 'amdgpu[/]dcn_3_5_1_dmcub\.bin' drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
     defsnc 'template<>[ ]constexpr[ ]inline[ ]uint16_t[ ]\(CMD\|RP_BLIT\)_REGS<A[67]XX>\[\][ ]=' drivers/gpu/drm/msm/adreno/a6xx.xml.h

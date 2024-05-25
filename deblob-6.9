@@ -309,6 +309,9 @@ for f in \
     kernel/bpf/preload/iterators/iterators.bpf.c \
   kernel/bpf/preload/iterators/iterators.lskel-big-endian.h \
     kernel/bpf/preload/iterators/iterators.bpf.c \
+\
+  tools/testing/selftests/tc-testing/action-ebpf \
+    tools/testing/selftests/tc-testing/action.c \
 ; do
   filetest $f || :
 done
