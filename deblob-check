@@ -28,6 +28,8 @@
 #        modified with 2023-12-26 r19450 (partial)
 #        modified with 2024-03-01 r19492
 #        modified with 2023-06-12 r19329 (partial)
+#        modified with 2023-12-26 r19450 (more partial)
+#        modified with 2023-10-23 r19416 (more partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6427,6 +6429,11 @@ set_except () {
     # New in 5.15.153.
     blobname 'qca[/]hpbtfw%02x\.tlv' drivers/bluetooth/btqca.c
     blobname 'qca[/]hpnv%02x\.bin' drivers/bluetooth/btqca.c
+
+    # New in 5.15.162.
+    blobname 'qca[/]hpnv%02x%s\.\(bin\|%x\)' drivers/bluetooth/btqca.c
+    blobname 'qca[/]\(ap\|hmt\)btfw%02x\.tlv' drivers/bluetooth/btqca.c
+    blobname 'qca[/]\(ap\|hmt\)nv%02x\.bin' drivers/bluetooth/btqca.c
 
     ;;
 
