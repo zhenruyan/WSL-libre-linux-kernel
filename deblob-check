@@ -22,6 +22,7 @@
 #        modified with 2024-03-29 r19518
 #        modified with 2024-04-14 r19529
 #        modified with 2023-12-26 r19450 (more partial)
+#        modified with 2024-07-05 r19593 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6774,6 +6775,10 @@ set_except () {
 
     # New in 6.7-rc7, 6.6.31, 6.1.91.
     blobname 'qca[/]hpnv%02x%s\.\(bin\|%x\)' drivers/bluetooth/btqca.c
+
+    # New in 6.10-rc, 6.9.9, 6.6.39, 6.1.98.
+    blobname 'gsl1680-globalspace-solt-ivw116\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'E\.WSA116_8\.E1\.042\.bin' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
