@@ -1,0 +1,43 @@
+diff --git scripts/linux-libre-6.10-gnu/deblob-6.10 scripts/linux-libre-6.10-gnu/deblob-6.10
+index b8e39342b47a..ecdb90efcf58 100755
+--- scripts/linux-libre-6.10-gnu/deblob-6.10
++++ scripts/linux-libre-6.10-gnu/deblob-6.10
+@@ -927,7 +927,11 @@ reject_firmware drivers/gpu/drm/i915/display/intel_dmc.c
+ clean_blob drivers/gpu/drm/i915/display/intel_dmc.c
+ reject_firmware drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
+ clean_sed '/uc_fw->file_selected\.path = blob->path/ i\
+-		else if (blob->path == NONFREE_FIRMWARE)\
++		/* If the compiler unifies string literals, as expected,\
++		   do not bother with strcmp.  */\
++		else if ((char const *)NONFREE_FIRMWARE == (char const *)NONFREE_FIRMWARE\
++			 ? blob->path == (char const *)NONFREE_FIRMWARE\
++			 : !strcmp (blob->path, NONFREE_FIRMWARE))\
+ 			/* Never select an entry we would refuse to load.\
+ 			   If we find nothing, loading is disabled but the card\
+ 			   initialization proceeds as if the user had disabled\
+@@ -937,7 +941,11 @@ clean_sed '/uc_fw->file_selected\.path = blob->path/ i\
+ 
+ ' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c 'disable non-Free firmware'
+ clean_sed '/Versionless file names must be unique/ i\
+-	    if (fw_blobs[i].blob.path != NONFREE_FIRMWARE)
++		/* If the compiler unifies string literals, as expected,\
++		   do not bother with strcmp.  */\
++		if ((char const *)NONFREE_FIRMWARE == (char const *)NONFREE_FIRMWARE\
++		    ? fw_blobs[i].blob.path != (char const *)NONFREE_FIRMWARE\
++		    : strcmp (fw_blobs[i].blob.path, NONFREE_FIRMWARE))
+ ' drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c 'avoid validation fails'
+ clean_blob drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c
+ clean_blob drivers/gpu/drm/i915/gt/uc/intel_uc_fw.h
+@@ -3294,9 +3302,9 @@ announce SCSI_QLA_FC - "QLogic QLA2XXX Fibre Channel Support"
+ reject_firmware drivers/scsi/qla2xxx/qla_os.c
+ clean_sed '
+ /^config SCSI_QLA_FC$/,/^config /{
+-  /By default, firmware/i\
+-	/*(DEBLOBBED)*/
+-  /By default, firmware/,/linux-firmware tree/d
++  /^	  By default, firmware/i\
++	  /*(DEBLOBBED)*/
++  /^	  By default, firmware/,/linux-firmware tree/d
+ }' drivers/scsi/qla2xxx/Kconfig 'removed firmware notes'
+ clean_blob drivers/scsi/qla2xxx/qla_os.c
+ clean_kconfig drivers/scsi/qla2xxx/Kconfig SCSI_QLA_FC
