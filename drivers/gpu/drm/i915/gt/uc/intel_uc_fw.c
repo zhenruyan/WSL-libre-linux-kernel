@@ -318,7 +318,11 @@ __uc_fw_auto_select(struct drm_i915_private *i915, struct intel_uc_fw *uc_fw)
 			continue;
 		}
 
-		else if (blob->path == NONFREE_FIRMWARE)
+		/* If the compiler unifies string literals, as expected,
+		   do not bother with strcmp.  */
+		else if ((char const *)NONFREE_FIRMWARE == (char const *)NONFREE_FIRMWARE
+			 ? blob->path == (char const *)NONFREE_FIRMWARE
+			 : !strcmp (blob->path, NONFREE_FIRMWARE))
 			/* Never select an entry we would refuse to load.
 			   If we find nothing, loading is disabled but the card
 			   initialization proceeds as if the user had disabled
@@ -361,7 +365,11 @@ static bool validate_fw_table_type(struct drm_i915_private *i915, enum intel_uc_
 
 	/* make sure the list is ordered as expected */
 	for (i = 1; i < fw_count; i++) {
-	    if (fw_blobs[i].blob.path != NONFREE_FIRMWARE)
+		/* If the compiler unifies string literals, as expected,
+		   do not bother with strcmp.  */
+		if ((char const *)NONFREE_FIRMWARE == (char const *)NONFREE_FIRMWARE
+		    ? fw_blobs[i].blob.path != (char const *)NONFREE_FIRMWARE
+		    : strcmp (fw_blobs[i].blob.path, NONFREE_FIRMWARE))
 		/* Versionless file names must be unique per platform: */
 		for (j = i + 1; j < fw_count; j++) {
 			/* Same platform? */
