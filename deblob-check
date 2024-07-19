@@ -20,6 +20,7 @@
 #        modified with 2023-10-23 r19416 (partial)
 #        modified with 2023-12-26 r19450 (partial)
 #        modified with 2021-10-23 r18408 (partial)
+#        modified with 2024-07-05 r19593 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6365,6 +6366,10 @@ set_except () {
 
     # New in 5.10.209, 5.4.268, 4.19.306.
     defsnc 'static[ ]const[ ]u8[ ]channel_all\[59\][ ]=' drivers/net/wireless/realtek/rtlwifi/rtl8192de/phy.c
+
+    # New in 6.10-rc, 6.9.9, 6.6.39, 6.1.98, 5.15.163, 5.10.222.
+    blobname 'gsl1680-globalspace-solt-ivw116\.fw' drivers/platform/x86/touchscreen_dmi.c
+    blobname 'E\.WSA116_8\.E1\.042\.bin' drivers/platform/x86/touchscreen_dmi.c
 
     ;;
 
