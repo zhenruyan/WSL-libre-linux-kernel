@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2024-07-05 r19593
+#        modified with 2024-08-04 r19619
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7388,6 +7389,9 @@ set_except () {
     blobname 'intel[/]ipu[/]irci_irci_ecr-master_20161208_0213_20170112_1500\.bin' drivers/staging/media/ipu3/ipu3-css-fw.h
     blobname '%s\(-i2c-%d-%udev\)\?\.bin' sound/soc/codecs/pcm6240.c
     blobname 'cirrus[/]\(%s-\)*%s\.%s' sound/pci/hda/cs35l41_hda.c
+
+    # New in 6.10.3, 6.6.44.
+    blobname 'qcom[/]sdm850[/]LENOVO[/]81JL[/]ipa_fws\.elf' arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts
 
     ;;
 
