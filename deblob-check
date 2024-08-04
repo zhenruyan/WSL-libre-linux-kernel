@@ -11,6 +11,7 @@
 #        modified with 2024-05-23 r19567
 #        modified with 2024-01-26 r19474
 #        modified with 2024-07-05 r19593 (partial)
+#        modified with 2024-08-04 r19619
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7148,6 +7149,9 @@ set_except () {
     # New in 6.10-rc, 6.9.9, 6.6.39, 6.1.98.
     blobname 'gsl1680-globalspace-solt-ivw116\.fw' drivers/platform/x86/touchscreen_dmi.c
     blobname 'E\.WSA116_8\.E1\.042\.bin' drivers/platform/x86/touchscreen_dmi.c
+
+    # New in 6.10.3, 6.6.44.
+    blobname 'qcom[/]sdm850[/]LENOVO[/]81JL[/]ipa_fws\.elf' arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts
 
     ;;
 
