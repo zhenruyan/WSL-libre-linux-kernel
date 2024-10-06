@@ -2,6 +2,7 @@
 
 # deblob-check version 2024-07-05 r19593
 #        modified with 2024-08-04 r19619
+#        modified with 2024-10-06 r19637
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7392,6 +7393,12 @@ set_except () {
 
     # New in 6.10.3, 6.6.44.
     blobname 'qcom[/]sdm850[/]LENOVO[/]81JL[/]ipa_fws\.elf' arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts
+
+    # New in 6.11.2, 6.10.13, 6.6.54.
+    accept '[ ][*][	]It[ ]must[ ]not[ ]contain[ ]any[ ]["]\.\.["][ ]path[ ]components[ ]-[ ]["]foo[/]bar\.\.bin["][ ]is[\n][ ][*][	]allowed[,][ ]but[ ]["]foo[/]\.\.[/]bar\.bin["][ ]is[ ]not\.' drivers/base/firmware_loader/main.c
+    # New in 6.11.2.
+    blobname 'qcom[/]sdx55m[/]foxconn[/]prog_firehose_sdx55\.mbn' drivers/bus/mhi/host/pci_generic.c
+    blobname 'qcom[/]sdx72m[/]foxconn[/]edl\.mbn' drivers/bus/mhi/host/pci_generic.c
 
     ;;
 
