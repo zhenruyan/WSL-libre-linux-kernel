@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2024-09-11 r19629
+#        modified with 2024-10-06 r19637
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7739,6 +7740,12 @@ set_except () {
     accept '[	][	][	]["]Firmware:' sound/soc/sof/ipc3-loader.c
     accept '[	][	][ ]["]Firmware:' sound/soc/sof/ipc3.c
     accept '[	][	][	]*["]unable[ ]to[ ]upload[ ]fpga[ ]firmware:' sound/usb/6fire/firmware.c
+
+    # New in 6.11.2, 6.10.13, 6.6.54.
+    accept '[ ][*][	]It[ ]must[ ]not[ ]contain[ ]any[ ]["]\.\.["][ ]path[ ]components[ ]-[ ]["]foo[/]bar\.\.bin["][ ]is[\n][ ][*][	]allowed[,][ ]but[ ]["]foo[/]\.\.[/]bar\.bin["][ ]is[ ]not\.' drivers/base/firmware_loader/main.c
+    # New in 6.11.2.
+    blobname 'qcom[/]sdx55m[/]foxconn[/]prog_firehose_sdx55\.mbn' drivers/bus/mhi/host/pci_generic.c
+    blobname 'qcom[/]sdx72m[/]foxconn[/]edl\.mbn' drivers/bus/mhi/host/pci_generic.c
 
     ;;
 
