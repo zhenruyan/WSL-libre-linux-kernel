@@ -1,0 +1,8 @@
+dumb_buffer@create-clear,Crash
+dumb_buffer@create-valid-dumb,Crash
+dumb_buffer@invalid-bpp,Crash
+dumb_buffer@map-invalid-size,Crash
+dumb_buffer@map-uaf,Crash
+dumb_buffer@map-valid,Crash
+panfrost_prime@gem-prime-import,Crash
+tools_test@tools_test,Crash
