@@ -2,6 +2,7 @@
 
 # deblob-check version 2024-09-11 r19629
 #        modified with 2024-10-06 r19637
+#        modified with 2024-10-10 r19644
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7746,6 +7747,10 @@ set_except () {
     # New in 6.11.2.
     blobname 'qcom[/]sdx55m[/]foxconn[/]prog_firehose_sdx55\.mbn' drivers/bus/mhi/host/pci_generic.c
     blobname 'qcom[/]sdx72m[/]foxconn[/]edl\.mbn' drivers/bus/mhi/host/pci_generic.c
+
+    # New in 6.11.3, 6.10.14, 6.6.55.
+    blobname 'gsl1680-rwc-nanote-next\.fw' drivers/platform/x86/touchscreen_dmi.c
+    defsnc 'alc298_samsung_v2_amp_desc_tbl\[\][ ]=' sound/pci/hda/patch_realtek.c
 
     ;;
 
