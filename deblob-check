@@ -4,6 +4,7 @@
 #        modified with 2024-10-06 r19637
 #        modified with 2024-10-10 r19644
 #        modified with 2024-10-18 r19651
+#        modified with 2024-11-08 r19664
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7755,6 +7756,9 @@ set_except () {
 
     # New in 6.11.4, 6.6.57, 6.1.113, 5.15.168, 5.10.227.
     defsc 'static[ ]const[ ]unsigned[ ]char[ ]utf8data\[64080\][ ]=' fs/unicode/utf8data.c_shipped
+
+    # New in 6.11.7.
+    blobname 'mediatek[/]mt7988[/]mt7988_wo_[01]\.bin' drivers/net/ethernet/mediatek/mtk_wed_wo.h
 
     ;;
 
