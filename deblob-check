@@ -13,13 +13,15 @@
 #        modified with 2023-08-08 r19366
 #        modified with 2023-12-26 r19450 (partial)
 #        modified with 2021-10-23 r18408 (partial)
+#        modified with 2024-10-06 r19637
+#        modified with 2024-10-18 r19651
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2023 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2024 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -6329,6 +6331,16 @@ set_except () {
 
     # New in 5.10.209, 5.4.268, 4.19.306.
     defsnc 'static[ ]const[ ]u8[ ]channel_all\[59\][ ]=' drivers/net/wireless/realtek/rtlwifi/rtl8192de/phy.c
+
+    # New in 6.11.2, 6.10.13, 6.6.54, 6.1.113, 5.15.168, 5.10.227,
+    # 5.4.285, 4.19.323.
+    accept '[ ][*][	]It[ ]must[ ]not[ ]contain[ ]any[ ]["]\.\.["][ ]path[ ]components[ ]-[ ]["]foo[/]bar\.\.bin["][ ]is[\n][ ][*][	]allowed[,][ ]but[ ]["]foo[/]\.\.[/]bar\.bin["][ ]is[ ]not\.' drivers/base/firmware_loader/main.c
+    # New in 6.11.2.
+    blobname 'qcom[/]sdx55m[/]foxconn[/]prog_firehose_sdx55\.mbn' drivers/bus/mhi/host/pci_generic.c
+    blobname 'qcom[/]sdx72m[/]foxconn[/]edl\.mbn' drivers/bus/mhi/host/pci_generic.c
+
+    # New in 6.11.4, 6.6.57, 6.1.113, 5.15.168, 5.10.227, 5.4.285.
+    defsc 'static[ ]const[ ]unsigned[ ]char[ ]utf8data\[64080\][ ]=' fs/unicode/utf8data.c_shipped
 
     ;;
 
