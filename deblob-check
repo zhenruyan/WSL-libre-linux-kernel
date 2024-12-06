@@ -5,6 +5,7 @@
 #        modified with 2024-10-10 r19644
 #        modified with 2024-10-18 r19651
 #        modified with 2024-11-08 r19664
+#        modified with 2024-12-05 r19676
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7759,6 +7760,9 @@ set_except () {
 
     # New in 6.11.7.
     blobname 'mediatek[/]mt7988[/]mt7988_wo_[01]\.bin' drivers/net/ethernet/mediatek/mtk_wed_wo.h
+
+    # New in 6.12.2, 6.11.11.
+    blobname 'qcom[/]qcs6490[/]modem\.mbn' arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
 
     ;;
 
