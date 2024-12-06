@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2024-11-11 r19671
+#        modified with 2024-12-05 r19676
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7832,6 +7833,9 @@ set_except () {
     accept '[\t]r[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->umsch_mm\.fw[,][ ]["]%s["][,][ ]fw_name[)]' drivers/gpu/drm/amd/amdgpu/amdgpu_umsch_mm.c
     accept '[\t]*r[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->uvd\.fw[,][ ]["]%s["][,][ ]fw_name[)]' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
     accept '[\t]*r[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->vce\.fw[,][ ]["]%s["][,][ ]fw_name[)]' drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c
+
+    # New in 6.12.2, 6.11.11.
+    blobname 'qcom[/]qcs6490[/]modem\.mbn' arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
 
     ;;
 
