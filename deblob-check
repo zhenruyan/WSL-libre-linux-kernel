@@ -2,6 +2,7 @@
 
 # deblob-check version 2024-11-11 r19671
 #        modified with 2024-12-05 r19676
+#        modified with 2024-12-15 r19681
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7836,6 +7837,10 @@ set_except () {
 
     # New in 6.12.2, 6.11.11.
     blobname 'qcom[/]qcs6490[/]modem\.mbn' arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
+
+    # New in 6.12.5.
+    # Sources in gfx_v9_4_2_cleaner_shader.asm
+    defsnc 'static[ ]const[ ]u32[ ]gfx_9_4_2_cleaner_shader_hex\[\][ ]=' drivers/gpu/drm/amd/amdgpu/gfx_v9_0_cleaner_shader.h
 
     ;;
 

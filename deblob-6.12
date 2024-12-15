@@ -884,6 +884,15 @@ clean_blob drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v8_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c
+if grep -q gfx_9_4_2_cleaner_shared drivers/gpu/drm/amd/amdgpu/gfx_v9_0_cleaner_shader.h; then
+  # Added in 6.12.5.
+  for f in \
+      drivers/gpu/drm/amd/amdgpu/gfx_v9_4_2_cleaner_shader.asm \
+    drivers/gpu/drm/amd/amdgpu/gfx_v9_0_cleaner_shader.h \
+  ; do
+    filetest $f || :
+  done  
+fi
 if grep -q request_firmware drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c; then
   reject_firmware drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c
 fi
