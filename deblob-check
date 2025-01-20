@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# deblob-check version 2025-01-12 r19700
+# deblob-check version 2025-01-19 r19703
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -3330,11 +3330,11 @@ set_except () {
 
     # New in 3.10
     accept '[ \t]*edid[ ]=[ ]\[00[ ]FF[ 0-9A-F\n\t]*\]' arch/powerpc/boot/dts/ac14xx.dts
-    accept 'K256:[\n][\t]\.long[ ]0x428a2f98[,][0-9a-f0x,]*\([\n][\t]\.long[ ][0-9a-f0x,]*\)*' arch/x86/crypto/sha256-avx-asm.S
-    accept 'K256:[\n][\t]\.long[\t]0x428a2f98[,][0-9a-f0x,]*\([\n][\t]\.long[\t][0-9a-f0x,]*\)*' arch/x86/crypto/sha256-avx2-asm.S
-    accept 'K256:[\n][ ]*\.long[ ]0x428a2f98[,][0-9a-f0x,]*\([\n][ ]*\.long[ ][0-9a-f0x,]*\)*' arch/x86/crypto/sha256-ssse3-asm.S
-    accept 'K512:[\n][\t]\.quad[ ]0x428a2f98d728ae22[,][0-9a-f0x,]*\([\n][\t]\.quad[ ][0-9a-f0x,]*\)*' 'arch/x86/crypto/sha512-\(avx\|ssse3\)-asm\.S'
-    accept 'K512:[\n][\t]\.quad[\t]0x428a2f98d728ae22[,][0-9a-f0x,]*\([\n][\t]\.quad[\t][0-9a-f0x,]*\)*' 'arch/x86/crypto/sha512-avx2-asm.S'
+    accept 'K256:[\n][\t]\.long[ ]0x428a2f98[,][0-9a-f0x,]*\([\n][\t]\.long[ ][0-9a-f0x,]*\)\+' arch/x86/crypto/sha256-avx-asm.S
+    accept 'K256:[\n][\t]\.long[\t]0x428a2f98[,][0-9a-f0x,]*\([\n][\t]\.long[\t][0-9a-f0x,]*\)\+' arch/x86/crypto/sha256-avx2-asm.S
+    accept 'K256:[\n][ ]*\.long[ ]0x428a2f98[,][0-9a-f0x,]*\([\n][ ]*\.long[ ][0-9a-f0x,]*\)\+' arch/x86/crypto/sha256-ssse3-asm.S
+    accept 'K512:[\n][\t]\.quad[ ]0x428a2f98d728ae22[,][0-9a-f0x,]*\([\n][\t]\.quad[ ][0-9a-f0x,]*\)\+' 'arch/x86/crypto/sha512-\(avx\|ssse3\)-asm\.S'
+    accept 'K512:[\n][\t]\.quad[\t]0x428a2f98d728ae22[,][0-9a-f0x,]*\([\n][\t]\.quad[\t][0-9a-f0x,]*\)\+' 'arch/x86/crypto/sha512-avx2-asm.S'
     defsnc 'static[ ]const[ ]uint32_t[ ]axi_clkgen_lock_table\[\][ ]=' drivers/clk/clk-axi-clkgen.c
     defsnc 'static[ ]const[ ]int[ ]arizona_micd_levels\[\][ ]=' drivers/extcon/extcon-arizona.c
     defsnc 'static[ ]const[ ]struct[ ]hdmiphy_config[ ]hdmiphy_v13_configs\[\][ ]=' drivers/gpu/drm/exynos/exynos_hdmi.c
@@ -4115,7 +4115,7 @@ set_except () {
     accept '[#][ ]cat[ ][/]sys[/]kernel[/]debug[/]zsmalloc[/]zram0[/]classes[\n][\n][ ]class[^\n]*\([\n][ ][0-9. \t]*\)*' Documentation/vm/zsmalloc.txt
     accept '[\t]*nvidia[,]emc-configuration[ ]=[ ][<][\n][\t]*\(0x[0-9a-f]*[\n][\t]*\)*[>][;]' 'arch/arm/boot/dts/tegra124-\(jetson-tk1\|nyan-\(big\|blaze\)\)-emc.dtsi'
     initnc '\.Lsha256_rcon:[\n][\t]\.word[\t]*' arch/arm64/crypto/sha2-ce-core.S
-    accept 'K256:[\n]\.word[\t]0x428a2f98[,][0-9a-f0x,]*\([\n]\.word[\t][0-9a-f0x,]*\)*' 'arch/arm/crypto/sha256-\(armv4\.pl\|core\.S_shipped\)'
+    accept 'K256:[\n]\.word[\t]0x428a2f98[,][0-9a-f0x,]*\([\n]\.word[\t][0-9a-f0x,]*\)\+' 'arch/arm/crypto/sha256-\(armv4\.pl\|core\.S_shipped\)'
     initnc 'PPC_AES_4K_DECTAB2:[\n][/][*][ ]decryption[ ]table[,][ ]same[ ]as[ ]crypto_il_tab[ ]in[ ]crypto[/]aes-generic\.c[ ][*][/]' arch/powerpc/crypto/aes-tab-4k.S
     initnc 'PPC_SPE_SHA256_K:' arch/powerpc/crypto/sha256-spe-asm.S
     defsnc 'static[ ]const[ ]u8[ ]initial_parm_block\[32\][ ]__initconst[ ]=' arch/s390/crypto/prng.c
@@ -4491,9 +4491,9 @@ set_except () {
     accept '[\t]*ranges[ ]=[ ]<[ \t\n0-9xa-f]*>[;]' arch/arm/boot/dts/ep7209.dtsi
     accept '[\t]*nvidia[,]emc-configuration[ ]=[ ]<[ \t\n0-9xa-f]*>[;]' arch/arm/boot/dts/tegra124-apalis-emc.dtsi
     accept '[\t]*bool[ ]["]vmlinux\.bin[ ]or[ ]vmlinuz\.bin["]' arch/mips/Kconfig
-    accept 'K256_8:\([\n][ 	]*\.octa[ 	]*0x[0-9a-f]*\)*' arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
-    accept 'K256:\([\n][ 	]*\.int[ 	]*0x[0-9a-f,x]*\)*' arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
-    accept 'K512_4:\([\n][ 	]*\.octa[ 	]*0[x0-9a-f,\\\t\n]*\)*' arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+    accept 'K256_8:\([\n][ 	]*\.octa[ 	]*0x[0-9a-f]*\)\+' arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+    accept 'K256:\([\n][ 	]*\.int[ 	]*0x[0-9a-f,x]*\)\+' arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+    accept 'K512_4:\([\n][ 	]*\.octa[ 	]*0[x0-9a-f,\\\t\n]*\)\+' arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
     accept '[ ][*][ ]request_firmware_into_buf[ ]-' drivers/base/firmware_class.c
     accept 'request_firmware_into_buf[(]const[ ]struct[ ]firmware[ ]' drivers/base/firmware_class.c
     accept 'EXPORT_SYMBOL[(]request_firmware_into_buf[)]' drivers/base/firmware_class.c
@@ -7310,8 +7310,8 @@ set_except () {
     blobname 'qcom[/]x1e80100[/][ac]dsp\(_dtb\)\?\.mbn' arch/arm64/boot/dts/qcom/x1e80100-'\(crd\|qcp\)'.dts
     blobname 'ti-pruss[/]am64x-sr2-\(\(\|tx\)pru\|rtu\)[01]-prueth-fw\.elf' arch/arm64/boot/dts/ti/k3-am642-evm.dts
     blobname 'ti-pruss[/]am65x-sr2-\(\(\|tx\)pru\|rtu\)[01]-prueth-fw\.elf' arch/arm64/boot/dts/ti/k3-am642-sr-som.dtsi
-    accept 'K256:\([\n][ 	]*\.word[ 	]*0x[0-9a-f]*\([,][ ]0x[0-9a-f]*\)*\)*' arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.S
-    accept 'K512:\([\n][ 	]*\.dword[ 	]*0x[0-9a-f]*\([,][ ]0x[0-9a-f]*\)*\)*' arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S
+    accept 'K256:\([\n][ 	]*\.word[ 	]*0x[0-9a-f]*\([,][ ]0x[0-9a-f]*\)*\)\+' arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.S
+    accept 'K512:\([\n][ 	]*\.dword[ 	]*0x[0-9a-f]*\([,][ ]0x[0-9a-f]*\)*\)\+' arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S
     blobname 'mediatek[/]BT_RAM_CODE_MT%04x_1a_%x_hdr\.bin' drivers/bluetooth/btusb.c
     blobname 'amdgpu[/]vcn_\(4_0_6\(_1\)\?\|5_0_0\)\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
     blobname 'amdgpu[/]%s_%d\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
@@ -7915,6 +7915,11 @@ set_except () {
     blobname 'qcom[/]qcs6490[/]a660_zap\.mbn' arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
     accept '[\t]ivpu_info[(]vdev[,][ ]["]Firmware[:][ ]%s' drivers/accel/ivpu/ivpu_fw.c
     blobname 'atmel[/]wilc3000_wifi_firmware-\([0-9]\+\.bin\)\?' drivers/net/wireless/microchip/wilc1000/netdev.c
+    # New in 6.13.
+    blobname 'https:[/][/]git[^"\n]*firmware\.git' Documentation/sound/codecs/cs35l56.rst
+    accept '[ ]*\[[ ]9\.[0-9]*\][ ]cs35l56[^\n]*:[ ]DSP1:[ ]Firmware[:]' Documentation/sound/codecs/cs35l56.rst
+    blobname 'cirrus[/]cs35l56-[^-"\n ]*-dsp1-misc[^"\n .]*\(\.\(wmfw\|bin\)\)\?' Documentation/sound/codecs/cs35l56.rst
+    blob 'Firmware[\n][=]\+[\n][\n]The[ ]amplifier.*internal[ ]speakers\.' Documentation/sound/codecs/cs35l56.rst
 
     ;;
 

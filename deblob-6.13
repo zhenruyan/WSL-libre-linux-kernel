@@ -3891,6 +3891,7 @@ clean_mk CONFIG_SND_HDA_SCODEC_CS35L41 sound/pci/hda/Makefile
 announce SND_HDA_SCODEC_CS35L56 - "CS35L56 HD-audio side codec support"
 reject_firmware sound/pci/hda/cs35l56_hda.c
 clean_blob sound/pci/hda/cs35l56_hda.c
+clean_blob Documentation/sound/codecs/cs35l56.rst
 clean_kconfig sound/pci/hda/Kconfig SND_HDA_SCODEC_CS35L56
 clean_mk CONFIG_SND_HDA_SCODEC_CS35L56 sound/pci/hda/Makefile
 
