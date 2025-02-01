@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+/*
+ * Copyright (c) 2021, Iskren Chernev <iskren.chernev@gmail.com>
+ */
+
+#include "sm6115.dtsi"
+
+&cpu0 {
+	compatible = "qcom,kryo240";
+};
+
+&cpu1 {
+	compatible = "qcom,kryo240";
+};
+
+&cpu2 {
+	compatible = "qcom,kryo240";
+};
+
+&cpu3 {
+	compatible = "qcom,kryo240";
+};
+
+&cpu4 {
+	compatible = "qcom,kryo240";
+};
+
+&cpu5 {
+	compatible = "qcom,kryo240";
+};
+
+&cpu6 {
+	compatible = "qcom,kryo240";
+};
+
+&cpu7 {
+	compatible = "qcom,kryo240";
+};
