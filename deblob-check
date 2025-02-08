@@ -3,13 +3,14 @@
 # deblob-check version 2024-11-11 r19671
 #        modified with 2024-12-05 r19676
 #        modified with 2024-12-15 r19681
+#        modified with 2025-02-08 r19708
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2024 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2025 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -7841,6 +7842,9 @@ set_except () {
     # New in 6.12.5.
     # Sources in gfx_v9_4_2_cleaner_shader.asm
     defsnc 'static[ ]const[ ]u32[ ]gfx_9_4_2_cleaner_shader_hex\[\][ ]=' drivers/gpu/drm/amd/amdgpu/gfx_v9_0_cleaner_shader.h
+
+    # New in 6.13.2, 6.12.13.
+    blobname 'qcom[/]x1e80100[/]microsoft[/]Romulus[/][ac]dsp_dtbs\.elf' arch/arm64/boot/dts/qcom/x1e80100-microsoft-romulus.dtsi
 
     ;;
 
