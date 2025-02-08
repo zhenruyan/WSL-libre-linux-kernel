@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2025-01-19 r19703
+#        modified with 2025-02-08 r19708
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7920,6 +7921,9 @@ set_except () {
     accept '[ ]*\[[ ]9\.[0-9]*\][ ]cs35l56[^\n]*:[ ]DSP1:[ ]Firmware[:]' Documentation/sound/codecs/cs35l56.rst
     blobname 'cirrus[/]cs35l56-[^-"\n ]*-dsp1-misc[^"\n .]*\(\.\(wmfw\|bin\)\)\?' Documentation/sound/codecs/cs35l56.rst
     blob 'Firmware[\n][=]\+[\n][\n]The[ ]amplifier.*internal[ ]speakers\.' Documentation/sound/codecs/cs35l56.rst
+
+    # New in 6.13.2, 6.12.13.
+    blobname 'qcom[/]x1e80100[/]microsoft[/]Romulus[/][ac]dsp_dtbs\.elf' arch/arm64/boot/dts/qcom/x1e80100-microsoft-romulus.dtsi
 
     ;;
 
