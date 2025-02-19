@@ -2223,7 +2223,7 @@ clean_blob drivers/net/wireless/intel/iwlwifi/cfg/2000.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/5000.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/6000.c
 clean_kconfig drivers/net/wireless/intel/iwlwifi/Kconfig IWLDVM
-clean_mk CONFIG_IWLMVM drivers/net/wireless/intel/iwlwifi/Makefile
+clean_mk CONFIG_IWLDVM drivers/net/wireless/intel/iwlwifi/Makefile
 
 announce IWLMVM - "Intel Wireless WiFi MVM Firmware support"
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/7000.c
@@ -2233,6 +2233,9 @@ clean_blob drivers/net/wireless/intel/iwlwifi/cfg/22000.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/ax210.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/bz.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/sc.c
+if test -f drivers/net/wireless/intel/iwlwifi/cfg/dr.c; then
+  clean_blob drivers/net/wireless/intel/iwlwifi/cfg/dr.c
+fi
 clean_kconfig drivers/net/wireless/intel/iwlwifi/Kconfig IWLMVM
 clean_mk CONFIG_IWLMVM drivers/net/wireless/intel/iwlwifi/Makefile
 
