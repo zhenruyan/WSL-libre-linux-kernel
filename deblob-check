@@ -4,6 +4,7 @@
 #        modified with 2024-12-05 r19676
 #        modified with 2024-12-15 r19681
 #        modified with 2025-02-08 r19708
+#        modified with 2025-02-19 r19717
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7298,7 +7299,8 @@ set_except () {
     blobname 'iwlwifi-sc2f\?-a0-\(fm-c0\|wh-a0\)' drivers/net/wireless/intel/iwlwifi/cfg/sc.c
     # Moved from way above, so that the above matches first.
     blobname 'iwlwifi-\(sc\)-[ab]0-\(fm\|hr\|gf4\?\|wh\)-[abc]0' drivers/net/wireless/intel/iwlwifi/cfg/sc.c
-    blobname 'iwlwifi-[^ ]*-[ab]0-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
+    # Moved down.
+    # blobname 'iwlwifi-[^ ]*-[ab]0-' drivers/net/wireless/intel/iwlwifi/cfg/22000.c
 
     # New in 6.9-rc
     accept '[ ]*to[ ]run[ ]with[ ]the[ ]latest[ ]updated[ ]microcode\.' Documentation/admin-guide/hw-vuln/spectre.rst
@@ -7845,6 +7847,10 @@ set_except () {
 
     # New in 6.13.2, 6.12.13.
     blobname 'qcom[/]x1e80100[/]microsoft[/]Romulus[/][ac]dsp_dtbs\.elf' arch/arm64/boot/dts/qcom/x1e80100-microsoft-romulus.dtsi
+
+    # New in 6.13.3, 6.12.14.
+    blobname 'iwlwifi-[db]r-a0-pe\(tc\)\?-a0' drivers/net/wireless/intel/iwlwifi/cfg/dr.c
+    blobname 'iwlwifi-[^ ]*-[ab]0-' 'drivers/net/wireless/intel/iwlwifi/cfg/[^/]*\.c'
 
     ;;
 

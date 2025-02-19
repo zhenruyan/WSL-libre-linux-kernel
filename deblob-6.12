@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#    Copyright (C) 2008-2024 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2025 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -2220,7 +2220,7 @@ clean_blob drivers/net/wireless/intel/iwlwifi/cfg/2000.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/5000.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/6000.c
 clean_kconfig drivers/net/wireless/intel/iwlwifi/Kconfig IWLDVM
-clean_mk CONFIG_IWLMVM drivers/net/wireless/intel/iwlwifi/Makefile
+clean_mk CONFIG_IWLDVM drivers/net/wireless/intel/iwlwifi/Makefile
 
 announce IWLMVM - "Intel Wireless WiFi MVM Firmware support"
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/7000.c
@@ -2230,6 +2230,9 @@ clean_blob drivers/net/wireless/intel/iwlwifi/cfg/22000.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/ax210.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/bz.c
 clean_blob drivers/net/wireless/intel/iwlwifi/cfg/sc.c
+if test -f drivers/net/wireless/intel/iwlwifi/cfg/dr.c; then
+  clean_blob drivers/net/wireless/intel/iwlwifi/cfg/dr.c
+fi
 clean_kconfig drivers/net/wireless/intel/iwlwifi/Kconfig IWLMVM
 clean_mk CONFIG_IWLMVM drivers/net/wireless/intel/iwlwifi/Makefile
 
@@ -2717,17 +2720,17 @@ clean_blob drivers/net/wireless/realtek/rtw88/rtw8822b.c
 clean_kconfig drivers/net/wireless/realtek/rtw88/Kconfig RTW88_8822BE
 clean_mk CONFIG_RTW88_8822CE drivers/net/wireless/realtek/rtw88/Makefile
 
-announce RTW88_8822CE - "Realtek 8822CE PCI wireless network adaptar"
+announce RTW88_8822CE - "Realtek 8822CE PCI wireless network adapter"
 clean_blob drivers/net/wireless/realtek/rtw88/rtw8822c.c
 clean_kconfig drivers/net/wireless/realtek/rtw88/Kconfig RTW88_8822CE
 clean_mk CONFIG_RTW88_8822CE drivers/net/wireless/realtek/rtw88/Makefile
 
-announce RTW88_8703B - "Realtek 8703B PCI wireless network adaptar"
+announce RTW88_8703B - "Realtek 8703B PCI wireless network adapter"
 clean_blob drivers/net/wireless/realtek/rtw88/rtw8703b.c
 clean_kconfig drivers/net/wireless/realtek/rtw88/Kconfig RTW88_8703B
 clean_mk CONFIG_RTW88_8703B drivers/net/wireless/realtek/rtw88/Makefile
 
-announce RTW88_8723DE - "Realtek 8723DE PCI wireless network adaptar"
+announce RTW88_8723DE - "Realtek 8723DE PCI wireless network adapter"
 clean_blob drivers/net/wireless/realtek/rtw88/rtw8723d.c
 clean_kconfig drivers/net/wireless/realtek/rtw88/Kconfig RTW88_8723DE
 clean_mk CONFIG_RTW88_8723DE drivers/net/wireless/realtek/rtw88/Makefile
