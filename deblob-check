@@ -3,6 +3,8 @@
 # deblob-check version 2025-01-19 r19703
 #        modified with 2025-02-08 r19708
 #        modified with 2025-02-19 r19717
+#        modified with 2025-02-23 r19722
+#        modified with 2025-02-28 r19723
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -26,9 +28,7 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
-# USA
+# along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 
 # usage: deblob-check [-S] [-v] [-v] [-s S] [--reverse-patch] \
@@ -7357,7 +7357,8 @@ set_except () {
     defsnc 'static[ ]const[ ]u8[ ]certs_selftest_\(ecdsa\|rsa\)_\(keys\|data\|sig\)\[\][ ]__initconst[ ]=' crypto/asymmetric_keys/selftest_ecdsa.c
     blobname 'qcom[/]aic100[/]fw[0-9]*\.bin' drivers/accel/qaic/sahara.c
     blobname 'qca[/]%snv%02x\.\(bin\|b%\(02\)\?x\)' drivers/bluetooth/btqca.c
-    blobname 'qca[/]%s' drivers/bluetooth/btqca.c
+    # Moved down.
+    # blobname 'qca[/]%s' drivers/bluetooth/btqca.c
     defsnc 'static[ ]const[ ]u32[ ]gen7_9_0_\(gpu\|gmu\(\|gx\)\|dbgc\|non_context_pipe_b[rv]\|rb_pipe_br_cluster_ps_\(rac\|rbp\)\|sp_pipe_b[rv]_cluster_sp_[vp]s_\(hlsq_state\|sp_top\|usptp\)\|cpr\|gpucc\|isense\|rscc\)_registers\[\][ ]=' drivers/gpu/drm/msm/adreno/adreno_gen7_9_0_snapshot.h
     defsc 'static[ ]const[ ]struct[ ]khadas_ts050_panel_cmd[ ]ts050\(v2\)\?_init_code\[\][ ]=' drivers/gpu/drm/panel/panel-khadas-ts050.c
     accept '[\t]mipi_dsi_dcs_write_seq[(]ctx->link[,][ ]0xb5[,][\n][ \t]*0x75[,][ ]0x60[,][ ]0x2d[,][ ]0x5d[,][ ]0x80[,][ ]0x00[,][ ]0x0a[,][ ]0x0b[,]\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-lg-sw43408.c
@@ -7911,7 +7912,7 @@ set_except () {
     defsnc 'struct[ ]testcase[ ]pull_tests\[NUM_PULL_TESTS\][ ]=' tools/testing/selftests/bpf/prog_tests/test_csum_diff.c
     # A pattern for acenic.c's ace_clear matches this; preempty it.
     accept '[\t]board->interface->interface_clear[(]board[,][ ]0[)][;]' drivers/staging/gpib/common/iblib.c
-    # Presuming pure data, while checking with the driver author.
+    # Author confirmed it's pure data.
     accept 'static[ ]const[ ]char[ ][*]setting_file[ ]=[ ]["]sma1307_setting\.bin["][;]' sound/soc/codecs/sma1307.c
     accept '[\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]file[,][ ]sma1307->dev[)][;]' sound/soc/codecs/sma1307.c
     blobname 'qcom[/]qcm6490[/]a660_zap\.mbn' arm64/boot/dts/qcom/qcm6490-idp.dts
@@ -7930,6 +7931,11 @@ set_except () {
     # New in 6.13.3, 6.12.14.
     blobname 'iwlwifi-[db]r-a0-pe\(tc\)\?-a0' drivers/net/wireless/intel/iwlwifi/cfg/dr.c
     blobname 'iwlwifi-[^ ]*-[ab]0-' 'drivers/net/wireless/intel/iwlwifi/cfg/[^/]*\.c'
+
+    # New in 6.13.5, 6.12.17, 6.6.80.
+    accept '[\t]*snprintf[(]fwname[ ][+][ ][(]suffix[ ]-[ ]filename[)][,][\n\t ]*sizeof[(]fwname[)][ ]-[ ][(]suffix[ ]-[ ]filename[)][,][ ]["]\.bin["]' drivers/bluetooth/btqca.c
+    blobname 'qca[/]%s\(%02x\)\?%s\.\(bin\|%s%02x\)' drivers/bluetooth/btqca.c
+    blobname 'qca[/]%s' drivers/bluetooth/btqca.c
 
     ;;
 
