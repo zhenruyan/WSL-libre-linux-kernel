@@ -16,6 +16,8 @@
 #        modified with 2024-10-10 r19644
 #        modified with 2024-10-18 r19651
 #        modified with 2024-11-11 r19671 (partial)
+#        modified with 2025-02-23 r19722
+#        modified with 2025-02-28 r19723
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -39,9 +41,7 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
-# USA
+# along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 
 # usage: deblob-check [-S] [-v] [-v] [-s S] [--reverse-patch] \
@@ -5981,7 +5981,8 @@ set_except () {
     accept '\(extern[ ]\)\?int[ ]load_msr_list[(][^)]*[)][;]' drivers/staging/media/atomisp/include/linux/libmsrlisthelper.h
     blobname 'qca[/]crbtfw%02x\.tlv' drivers/bluetooth/btqca.c
     blobname 'qca[/]htbtfw%02x\.tlv' drivers/bluetooth/btqca.c
-    blobname 'qca[/]%s' drivers/bluetooth/btqca.c
+    # Moved down.
+    # blobname 'qca[/]%s' drivers/bluetooth/btqca.c
     accept '[\t]quirks[ \t]*=[ ]XHCI_RENESAS_FW_QUIRK[,][\n][\t]\.firmware[ ]=' drivers/usb/host/xhci-pci.c
     accept '[\t]*dev_err[(][&]pdev->dev[,][ ]["]request_firmware[ ]failed' drivers/usb/host/xhci-pci-renesas.c
     accept 'EXPORT_SYMBOL_GPL[(]load_msr_list[)]' drivers/staging/media/atomisp/i2c/atomisp-libmsrlisthelper.c
@@ -7172,6 +7173,11 @@ set_except () {
 
     # New in 6.6.70.
     blobname '\(adsp\|\(c\|gp\)dsp[01]\)\.mbn' drivers/remoteproc/qcom_q6v5_pas.c
+
+    # New in 6.13.5, 6.12.17, 6.6.80.
+    accept '[\t]*snprintf[(]fwname[ ][+][ ][(]suffix[ ]-[ ]filename[)][,][\n\t ]*sizeof[(]fwname[)][ ]-[ ][(]suffix[ ]-[ ]filename[)][,][ ]["]\.bin["]' drivers/bluetooth/btqca.c
+    blobname 'qca[/]%s\(%02x\)\?%s\.\(bin\|%s%02x\)' drivers/bluetooth/btqca.c
+    blobname 'qca[/]%s' drivers/bluetooth/btqca.c
 
     ;;
 
