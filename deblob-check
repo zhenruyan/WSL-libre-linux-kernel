@@ -8,6 +8,7 @@
 #        modified with 2025-02-23 r19722
 #        modified with 2025-02-28 r19723
 #        modified with 2025-01-13 r19700
+#        modified with 2025-03-08 r19732
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7860,6 +7861,13 @@ set_except () {
     accept '[\t]*snprintf[(]fwname[ ][+][ ][(]suffix[ ]-[ ]filename[)][,][\n\t ]*sizeof[(]fwname[)][ ]-[ ][(]suffix[ ]-[ ]filename[)][,][ ]["]\.bin["]' drivers/bluetooth/btqca.c
     blobname 'qca[/]%s\(%02x\)\?%s\.\(bin\|%s%02x\)' drivers/bluetooth/btqca.c
     blobname 'qca[/]%s' drivers/bluetooth/btqca.c
+
+    # New in 6.13.6, 6.12.18, 6.6.81.  These are hashes of known
+    # microcode releases, for accident-avoidance purposes.
+    # Non-matching microcode versions could be loaded with a kernel
+    # option, if we allowed them to be loaded at all.  Since we don't,
+    # these are not useful for us, but there's no need to remove them.
+    defsnc 'static[ ]const[ ]struct[ ]patch_digest[ ]phashes\[\][ ]=' arch/x86/kernel/cpu/microcode/amd_shas.c
 
     ;;
 
