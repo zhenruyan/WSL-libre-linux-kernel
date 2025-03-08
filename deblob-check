@@ -26,13 +26,15 @@
 #        modified with 2024-10-06 r19637
 #        modified with 2024-10-10 r19644
 #        modified with 2024-10-18 r19651
+#        modified with 2025-02-23 r19722
+#        modified with 2025-02-28 r19723
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2024 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2025 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -49,9 +51,7 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
-# USA
+# along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 
 # usage: deblob-check [-S] [-v] [-v] [-s S] [--reverse-patch] \
@@ -5982,7 +5982,8 @@ set_except () {
     accept '\(extern[ ]\)\?int[ ]load_msr_list[(][^)]*[)][;]' drivers/staging/media/atomisp/include/linux/libmsrlisthelper.h
     blobname 'qca[/]crbtfw%02x\.tlv' drivers/bluetooth/btqca.c
     blobname 'qca[/]htbtfw%02x\.tlv' drivers/bluetooth/btqca.c
-    blobname 'qca[/]%s' drivers/bluetooth/btqca.c
+    # Moved down.
+    # blobname 'qca[/]%s' drivers/bluetooth/btqca.c
     accept '[\t]quirks[ \t]*=[ ]XHCI_RENESAS_FW_QUIRK[,][\n][\t]\.firmware[ ]=' drivers/usb/host/xhci-pci.c
     accept '[\t]*dev_err[(][&]pdev->dev[,][ ]["]request_firmware[ ]failed' drivers/usb/host/xhci-pci-renesas.c
     accept 'EXPORT_SYMBOL_GPL[(]load_msr_list[)]' drivers/staging/media/atomisp/i2c/atomisp-libmsrlisthelper.c
@@ -6795,6 +6796,11 @@ set_except () {
 
     # New in 6.11.4, 6.6.57, 6.1.113, 5.15.168, 5.10.227.
     defsc 'static[ ]const[ ]unsigned[ ]char[ ]utf8data\[64080\][ ]=' fs/unicode/utf8data.c_shipped
+
+    # New in 6.13.5, 6.12.17, 6.6.80, 6.1.130.
+    accept '[\t]*snprintf[(]fwname[ ][+][ ][(]suffix[ ]-[ ]filename[)][,][\n\t ]*sizeof[(]fwname[)][ ]-[ ][(]suffix[ ]-[ ]filename[)][,][ ]["]\.bin["]' drivers/bluetooth/btqca.c
+    blobname 'qca[/]%s\(%02x\)\?%s\.\(bin\|%s%02x\)' drivers/bluetooth/btqca.c
+    blobname 'qca[/]%s' drivers/bluetooth/btqca.c
 
     ;;
 
