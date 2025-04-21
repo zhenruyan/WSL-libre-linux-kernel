@@ -6,6 +6,7 @@
 #        modified with 2025-02-23 r19722
 #        modified with 2025-02-28 r19723
 #        modified with 2025-03-08 r19732
+#        modified with 2025-04-21 r19754
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7944,6 +7945,10 @@ set_except () {
     # option, if we allowed them to be loaded at all.  Since we don't,
     # these are not useful for us, but there's no need to remove them.
     defsnc 'static[ ]const[ ]struct[ ]patch_digest[ ]phashes\[\][ ]=' arch/x86/kernel/cpu/microcode/amd_shas.c
+
+    # New in 6.14.3, 6.13.12, 6.12.24.
+    blobname 'qca[/]c[rm]nv%02x%s\.bin' drivers/bluetooth/btqca.c
+    blobname 'qca[/]cmbtfw%02x\.tlv' drivers/bluetooth/btqca.c
 
     ;;
 
