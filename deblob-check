@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2025-03-18 r19742
+#        modified with 2025-04-21 r19754
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7985,6 +7986,10 @@ set_except () {
     accept '[\t][\t]*r[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->vcn\.inst\[i\]\.fw[,]' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
     accept '[\t ]*["]logging[ ]buffers[ ]migrated[ ]to[ ][/]sys[/]kernel[/]debug[/]nouveau[/]%s' gpu/drm/nouveau/nvkm/subdev/gsp/r535.c
     blobna '\(MODULE_FIRMWARE[(]pfx[ ]["][-]["][ ]__stringify[(]api[)][ ]["]\.ucode["][)][;][\t][\\][\n][\t]\)\?MODULE_FIRMWARE[(]pfx[ ]["]\.pnvm["][)]' drivers/net/wireless/intel/iwlwifi/iwl-config.h
+
+    # New in 6.14.3, 6.13.12, 6.12.24.
+    blobname 'qca[/]c[rm]nv%02x%s\.bin' drivers/bluetooth/btqca.c
+    blobname 'qca[/]cmbtfw%02x\.tlv' drivers/bluetooth/btqca.c
 
     ;;
 
