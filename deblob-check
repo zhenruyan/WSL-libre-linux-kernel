@@ -28,6 +28,8 @@
 #        modified with 2024-10-18 r19651
 #        modified with 2025-02-23 r19722
 #        modified with 2025-02-28 r19723
+#        modified with 2025-04-21 r19754
+#        modified with 2025-04-25 r19760
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6802,6 +6804,28 @@ set_except () {
     blobname 'qca[/]%s\(%02x\)\?%s\.\(bin\|%s%02x\)' drivers/bluetooth/btqca.c
     blobname 'qca[/]%s' drivers/bluetooth/btqca.c
 
+    # New in 6.14.3, 6.13.12, 6.12.24, 6.6.88, 6.1.135.
+    blobname 'qca[/]c[rm]nv%02x%s\.bin' drivers/bluetooth/btqca.c
+    blobname 'qca[/]cmbtfw%02x\.tlv' drivers/bluetooth/btqca.c
+
+    # These are not new, but we're cleaning them up starting from
+    # 6.14.4, 6.12.25, 6.6.88, 6.1.135.
+    # SOF binary distributions contain some tivoized files, signed
+    # with a secret key that some hardware relies on to reject
+    # modified versions.  That's Tivoization, and it renders the
+    # program nonfree in that context, and that context happens to be
+    # the primary context the program aims for, so we consider it
+    # nonfree.  Other programs in there, and their source code, are
+    # free software, but a single nonfree program in a set is enough
+    # to render the set nonfree, and for GNU FSDG-compliant distros to
+    # avoid linking to the set.
+    blobna 'https\?[:][/][/][^ \t\n]*[/]thesofproject[/]sof-bin[/]releases' Documentation/sound/codecs/cs35l56.rst
+    blobna 'https\?[:][/][/][^ \t\n]*[/]thesofproject[/]sof-bin[/]\?' sound/soc/sof/'\(fw-file-profile\|loader\)\.c'
+    blobna 'Check[ ]if[ ]you[ ]have[ ][\'"'"']sof-firmware[\'"'"'][ ]package[ ]installed' sound/soc/sof/fw-file-profile.c
+    blobna 'thesofproject[/]sof-bin' sound/soc/sof/'\(fw-file-profile\|loader\)\.c'
+    blobna 'sof-firmware' sound/soc/sof/fw-file-profile.c
+
+    # Add new patterns above.
     ;;
 
   */*freedo*.patch | */*logo*.patch)
