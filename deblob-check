@@ -29,7 +29,7 @@
 #        modified with 2025-02-23 r19722
 #        modified with 2025-02-28 r19723
 #        modified with 2025-04-21 r19754
-#        modified with 2025-04-25 r19760
+#        modified with 2025-04-25 r19761
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6824,6 +6824,7 @@ set_except () {
     blobna 'Check[ ]if[ ]you[ ]have[ ][\'"'"']sof-firmware[\'"'"'][ ]package[ ]installed' sound/soc/sof/fw-file-profile.c
     blobna 'thesofproject[/]sof-bin' sound/soc/sof/'\(fw-file-profile\|loader\)\.c'
     blobna 'sof-firmware' sound/soc/sof/fw-file-profile.c
+    accept '[\t]dev_info[(]dev[,][ ]["][/][*][(]DEBLOBBED[)][*][/][.][\\]n["][)][;]' sound/soc/sof/fw-file-profile.c
 
     # Add new patterns above.
     ;;
