@@ -24,13 +24,14 @@
 #        modified with 2024-10-06 r19637
 #        modified with 2024-10-10 r19644
 #        modified with 2024-10-18 r19651
+#        modified with 2025-04-25 r19761
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
 # Check http://www.fsfla.org/svn/fsfla/software/linux-libre for newer
 # versions.
 
-# Copyright 2008-2023 Alexandre Oliva <lxoliva@fsfla.org>
+# Copyright 2008-2025 Alexandre Oliva <lxoliva@fsfla.org>
 #
 # This program is part of GNU Linux-libre, a GNU project that
 # publishes scripts to clean up Linux so as to make it suitable for
@@ -6387,6 +6388,25 @@ set_except () {
     # New in 6.11.4, 6.6.57, 6.1.113, 5.15.168, 5.10.227.
     defsc 'static[ ]const[ ]unsigned[ ]char[ ]utf8data\[64080\][ ]=' fs/unicode/utf8data.c_shipped
 
+    # These are not new, but we're cleaning them up starting from
+    # 6.14.4, 6.12.25, 6.6.88, 6.1.135, 5.15.181, 5.10.237, 5.4.293.
+    # SOF binary distributions contain some tivoized files, signed
+    # with a secret key that some hardware relies on to reject
+    # modified versions.  That's Tivoization, and it renders the
+    # program nonfree in that context, and that context happens to be
+    # the primary context the program aims for, so we consider it
+    # nonfree.  Other programs in there, and their source code, are
+    # free software, but a single nonfree program in a set is enough
+    # to render the set nonfree, and for GNU FSDG-compliant distros to
+    # avoid linking to the set.
+    blobna 'https\?[:][/][/][^ \t\n]*[/]thesofproject[/]sof-bin[/]releases' Documentation/sound/codecs/cs35l56.rst
+    blobna 'https\?[:][/][/][^ \t\n]*[/]thesofproject[/]sof-bin[/]\?' sound/soc/sof/'\(fw-file-profile\|loader\)\.c'
+    blobna 'Check[ ]if[ ]you[ ]have[ ][\'"'"']sof-firmware[\'"'"'][ ]package[ ]installed' sound/soc/sof/fw-file-profile.c
+    blobna 'thesofproject[/]sof-bin' sound/soc/sof/'\(fw-file-profile\|loader\)\.c'
+    blobna 'sof-firmware' sound/soc/sof/fw-file-profile.c
+    accept '[\t]dev_info[(]dev[,][ ]["][/][*][(]DEBLOBBED[)][*][/][.][\\]n["][)][;]' sound/soc/sof/fw-file-profile.c
+
+    # Add new patterns above.
     ;;
 
   */*freedo*.patch | */*logo*.patch)

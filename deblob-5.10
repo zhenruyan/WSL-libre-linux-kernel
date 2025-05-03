@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#    Copyright (C) 2008-2022 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2025 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -3703,28 +3703,25 @@ clean_blob sound/soc/sh/siu_dai.c
 clean_kconfig sound/soc/sh/Kconfig SND_SOC_SH4_SIU
 clean_mk CONFIG_SND_SOC_SH4_SIU sound/soc/sh/Makefile
 
-# These download firmware indeed, but it is Free firmware.
-
-# announce SND_SOC_SOF - "Sound Open Firmware Support"
-# reject_firmware sound/soc/sof/loader.c
-# reject_firmware sound/soc/sof/topology.c
-# clean_kconfig sound/soc/sof/Kconfig SND_SOC_SOF
-# clean_mk CONFIG_SND_SOC_SOF sound/soc/sof/Makefile
-
-# announce SND_SOC_SOF_ACPI - "SOF ACPI enumeration support"
-# clean_blob sound/soc/sof/sof-acpi-dev.c
-# clean_kconfig sound/soc/sof/Kconfig SND_SOC_SOF_ACPI
-# clean_mk CONFIG_SND_SOC_SOF_ACPI sound/soc/sof/Makefile
-
-# announce SND_SOC_SOF_PCI - "SOF PCI enumeration support"
-# clean_blob sound/soc/sof/sof-pci-dev.c
-# clean_kconfig sound/soc/sof/Kconfig SND_SOC_SOF_PCI
-# clean_mk CONFIG_SND_SOC_SOF_PCI sound/soc/sof/Makefile
-
-# announce SND_SOC_SOF_INTEL_COMMON - "SOF support for Intel audio DSPs"
-# clean_blob sound/soc/sof/intel/hda.c
-# clean_kconfig sound/soc/sof/intel/Kconfig SND_SOC_SOF_HDA_COMMON
-# clean_mk CONFIG_SND_SOC_SOF_HDA_COMMON sound/soc/sof/intel/Makefile
+# The firmware files are built from free sources, but the firmware
+# binaries are then signed, some with publicly-available "private"
+# keys, some with secret keys.  The secret keys are used to Tivoize
+# (i.e., prevent modification of) the firmware on most devices; though
+# some devices might conceivably be able to run the firmware signed by
+# the publicly-available keys, it's not clear whether they're
+# available to the general public.  We defensively consider the
+# firmware signed by the secret key as Tivoized and thus nonfree.
+# However, the firmware signed by the publicly-available key is free,
+# it is installed with the same name, and the loader doesn't tell them
+# apart (the hardware may), so we allow requesting and loading, but we
+# silence references to the repositories containing the Tivoized
+# firmware or recommendations thereof (no such thing on this release).
+# Ideally, we'd refer users to freedom-respecting repositories with
+# sources and binaries of SOF, without any Tivoized binaries, instead
+# of cleaning up the references to them, so if you'd like to maintain
+# Sound Free Firmware, please let us know.  announce SND_SOC_SOF -
+# "Sound Open Firmware Support" clean_kconfig sound/soc/sof/Kconfig
+# SND_SOC_SOF clean_mk CONFIG_SND_SOC_SOF sound/soc/sof/Makefile
 
 announce SND_USB_6FIRE - "TerraTec DMX 6Fire USB"
 reject_firmware sound/usb/6fire/firmware.c
