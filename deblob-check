@@ -35,6 +35,7 @@
 #        modified with 2024-10-10 r19644
 #        modified with 2024-10-18 r19651
 #        modified with 2025-04-25 r19761
+#        modified with 2025-05-18 r19784
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6474,6 +6475,10 @@ set_except () {
     blobna 'thesofproject[/]sof-bin' sound/soc/sof/'\(fw-file-profile\|loader\)\.c'
     blobna 'sof-firmware' sound/soc/sof/fw-file-profile.c
     accept '[\t]dev_info[(]dev[,][ ]["][/][*][(]DEBLOBBED[)][*][/][.][\\]n["][)][;]' sound/soc/sof/fw-file-profile.c
+
+    # New in 6.14.7, 6.12.29, 6.6.91, 6.1.139.
+    blobna 'This[ ]is[^\n]*IPU[ ]2025\.1[ ]microcode[,][ ]which[\n][^\n]*Alternatively[ ]microcode[ ]can[ ]be[\n][^\n]*repository[ ]\[[#]f1\]_\.'  Documentation/admin-guide/hw-vuln/indirect-target-selection.rst
+    blobna 'Microcode[ ]repository[ ]-[ ]http[^\n]*[/]Intel-Linux-Processor-Microcode-[^\n/ ]*-Files' Documentation/admin-guide/hw-vuln/indirect-target-selection.rst
 
     # Add new patterns above.
     ;;
