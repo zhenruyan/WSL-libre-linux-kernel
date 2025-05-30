@@ -230,6 +230,8 @@ for f in \
     `: sources for gfx11 are in ..._gfx10.asm` \
   drivers/gpu/drm/amd/amdkfd/cwsr_trap_handler.h \
 \
+    drivers/gpu/drm/amd/amdgpu/gfx_v9_4_2_cleaner_shader.asm \
+  drivers/gpu/drm/amd/amdgpu/gfx_v9_0_cleaner_shader.h \
     drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3_cleaner_shader.asm \
   drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3_cleaner_shader.h \
     drivers/gpu/drm/amd/amdgpu/gfx_v10_3_0_cleaner_shader.asm \
@@ -887,18 +889,16 @@ clean_blob drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v8_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c
-if grep -q gfx_9_4_2_cleaner_shared drivers/gpu/drm/amd/amdgpu/gfx_v9_0_cleaner_shader.h; then
-  # Added in 6.12.5.
+if grep -q gfx_10_1_10_cleaner_shader drivers/gpu/drm/amd/amdgpu/gfx_v10_0_cleaner_shader.h; then
+  # Added in 6.14.9.
   for f in \
-      drivers/gpu/drm/amd/amdgpu/gfx_v9_4_2_cleaner_shader.asm \
-    drivers/gpu/drm/amd/amdgpu/gfx_v9_0_cleaner_shader.h \
+      drivers/gpu/drm/amd/amdgpu/gfx_v10_1_10_cleaner_shader.asm \
+    drivers/gpu/drm/amd/amdgpu/gfx_v10_0_cleaner_shader.h \
   ; do
     filetest $f || :
   done  
 fi
-if grep -q request_firmware drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c; then
-  reject_firmware drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c
-fi
+reject_firmware drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v11_0.c
 clean_blob drivers/gpu/drm/amd/amdgpu/gfx_v12_0.c
@@ -2011,6 +2011,10 @@ clean_mk CONFIG_SPIDER_NET drivers/net/ethernet/toshiba/Makefile
 announce TEHUTI - "Tehuti Networks 10G Ethernet"
 reject_firmware drivers/net/ethernet/tehuti/tehuti.c
 clean_blob drivers/net/ethernet/tehuti/tehuti.c
+if grep -q 'MODULE_FIRMWARE' drivers/net/ethernet/tehuti/tn40_mdio.c; then
+  # New in 6.14.9.
+  clean_blob drivers/net/ethernet/tehuti/tn40_mdio.c
+fi
 clean_kconfig drivers/net/ethernet/tehuti/Kconfig TEHUTI
 clean_mk CONFIG_TEHUTI drivers/net/ethernet/tehuti/Makefile
 
@@ -3963,7 +3967,7 @@ clean_blob sound/soc/codecs/aw87390.h
 clean_kconfig sound/soc/codecs/Kconfig SND_SOC_AW87390
 clean_mk CONFIG_SND_SOC_AW87390 sound/soc/codecs/Makefile
 
-announce SND_SOC_AW88081 - "Soc Audio for awinic aw88399"
+announce SND_SOC_AW88081 - "Soc Audio for awinic aw88081"
 reject_firmware sound/soc/codecs/aw88081.c
 clean_blob sound/soc/codecs/aw88081.h
 clean_kconfig sound/soc/codecs/Kconfig SND_SOC_AW88081
