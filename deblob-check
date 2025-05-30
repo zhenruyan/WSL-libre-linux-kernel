@@ -12,6 +12,7 @@
 #        modified with 2025-04-21 r19754
 #        modified with 2025-04-25 r19761
 #        modified with 2025-05-18 r19784
+#        modified with 2025-05-19 r10793 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7897,6 +7898,13 @@ set_except () {
     # New in 6.14.7, 6.12.29, 6.6.91, 6.1.139.
     blobna 'This[ ]is[^\n]*IPU[ ]2025\.1[ ]microcode[,][ ]which[\n][^\n]*Alternatively[ ]microcode[ ]can[ ]be[\n][^\n]*repository[ ]\[[#]f1\]_\.'  Documentation/admin-guide/hw-vuln/indirect-target-selection.rst
     blobna 'Microcode[ ]repository[ ]-[ ]http[^\n]*[/]Intel-Linux-Processor-Microcode-[^\n/ ]*-Files' Documentation/admin-guide/hw-vuln/indirect-target-selection.rst
+
+    # New in 6.15-rc, 6.14.9, 6.12.31.
+    # The variable name is very suspicious, but the short sequence of
+    # nearly-sorted small numbers doesn't seem to be executable code.
+    defsnc '[\t]unsigned[ ]char[ ]modified_fix_code\[\][ ]=' arch/arm/mach-at91/pm.c
+    blobname 'tehuti[/]aqr105-tn40xx\.cld' drivers/net/ethernet/tehuti/tn40_mdio.c
+    defsnc 'const[ ]struct[ ]rtw89_fw_blacklist[ ]rtw89_fw_blacklist_default[ ]=' drivers/net/wireless/realtek/rtw89/fw.c
 
     # Add new patterns above.
     ;;

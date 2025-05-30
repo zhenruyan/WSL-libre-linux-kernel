@@ -2013,6 +2013,10 @@ clean_mk CONFIG_SPIDER_NET drivers/net/ethernet/toshiba/Makefile
 announce TEHUTI - "Tehuti Networks 10G Ethernet"
 reject_firmware drivers/net/ethernet/tehuti/tehuti.c
 clean_blob drivers/net/ethernet/tehuti/tehuti.c
+if grep -q 'MODULE_FIRMWARE' drivers/net/ethernet/tehuti/tn40_mdio.c; then
+  # New in 6.12.31.
+  clean_blob drivers/net/ethernet/tehuti/tn40_mdio.c
+fi
 clean_kconfig drivers/net/ethernet/tehuti/Kconfig TEHUTI
 clean_mk CONFIG_TEHUTI drivers/net/ethernet/tehuti/Makefile
 
