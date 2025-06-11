@@ -13,6 +13,7 @@
 #        modified with 2025-04-25 r19761
 #        modified with 2025-05-18 r19784
 #        modified with 2025-05-19 r10793 (partial)
+#        modified with 2025-01-19 r19703 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7905,6 +7906,9 @@ set_except () {
     defsnc '[\t]unsigned[ ]char[ ]modified_fix_code\[\][ ]=' arch/arm/mach-at91/pm.c
     blobname 'tehuti[/]aqr105-tn40xx\.cld' drivers/net/ethernet/tehuti/tn40_mdio.c
     defsnc 'const[ ]struct[ ]rtw89_fw_blacklist[ ]rtw89_fw_blacklist_default[ ]=' drivers/net/wireless/realtek/rtw89/fw.c
+
+    # New in 6.13-rc, 6.12.33.
+    blobname '\(intel[/]vpu[/]\)\?vpu_50xx\(_v0\.0\)\?\.bin' drivers/accel/ivpu/ivpu_fw.c
 
     # Add new patterns above.
     ;;
