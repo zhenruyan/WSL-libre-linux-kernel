@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2025-05-19 r19793
+#        modified with 2025-06-30 r19831
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8098,6 +8099,9 @@ set_except () {
     blobna 'You[ ]must[ ]go[ ]to[^;]*#list-of-firmware[^;]*[^";)]' drivers/net/wireless/b43/main.c
     defsnc 'static[ ]const[ ]struct[ ]clk_div_table[ ]dtable_4_32\[\][ ]=' drivers/clk/renesas/r9a07g044-cpg.c
     
+    # New in 6.15.4, 6.12.35.
+    blobname '\(intel[/]vpu[/]\)\?vpu_\(37\|[45]0\)xx_v1\.bin' drivers/accel/ivpu/ivpu_fw.c
+    accept '[ \t]*["]Invalid[ ]record[ ]length[ ]in[ ]firmware:[ ]' drivers/input/misc/ims-pcu.c
 
     # Add new patterns above.
     ;;
