@@ -14,6 +14,7 @@
 #        modified with 2025-05-18 r19784
 #        modified with 2025-05-19 r10793 (partial)
 #        modified with 2025-01-19 r19703 (partial)
+#        modified with 2025-06-30 r19831
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7909,6 +7910,10 @@ set_except () {
 
     # New in 6.13-rc, 6.12.33.
     blobname '\(intel[/]vpu[/]\)\?vpu_50xx\(_v0\.0\)\?\.bin' drivers/accel/ivpu/ivpu_fw.c
+
+    # New in 6.15.4, 6.12.35.
+    blobname '\(intel[/]vpu[/]\)\?vpu_\(37\|[45]0\)xx_v1\.bin' drivers/accel/ivpu/ivpu_fw.c
+    accept '[ \t]*["]Invalid[ ]record[ ]length[ ]in[ ]firmware:[ ]' drivers/input/misc/ims-pcu.c
 
     # Add new patterns above.
     ;;
