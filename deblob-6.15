@@ -4412,6 +4412,9 @@ clean_blob arch/arm64/boot/dts/qcom/sm8650-hdk.dts
 clean_blob arch/arm64/boot/dts/qcom/sm8650-mtp.dts
 clean_blob arch/arm64/boot/dts/qcom/sm8650-qrd.dts
 clean_blob arch/arm64/boot/dts/qcom/x1e001de-devkit.dts
+if test -f arch/arm64/boot/dts/qcom/x1-crd.dtsi; then
+  clean_blob arch/arm64/boot/dts/qcom/x1-crd.dtsi
+fi
 clean_blob arch/arm64/boot/dts/qcom/x1e78100-lenovo-thinkpad-t14s.dts
 clean_blob arch/arm64/boot/dts/qcom/x1e80100-asus-vivobook-s15.dts
 clean_blob arch/arm64/boot/dts/qcom/x1e80100-crd.dts

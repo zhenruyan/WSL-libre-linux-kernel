@@ -2,6 +2,7 @@
 
 # deblob-check version 2025-05-19 r19793
 #        modified with 2025-06-30 r19831
+#        modified with 2025-07-07 r19836
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6818,9 +6819,7 @@ set_except () {
     blobname 'intel[/]vpu[/]mtl_vpu_v0\.0\.bin' drivers/accel/ivpu/ivpu_fw.c
     blobname 'amdgpu[/]%s_mes%s\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_mes.c
     blobname 'amdgpu[/]%s%d.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_sdma.c
-    # The following is not new, it was just moved down to allow for
-    # new patterns to match despite being prefixed by it, when using
-    # non-NDA regexp engines.
+    # Moved down.
     # blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     accept '[ ][*][ ]This[ ]is[ ]a[ ]helper[ ]that[ ]will[ ]use[ ]request_firmware[ ]' drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c
     accept '[\t]mipi_dsi_dcs_write_seq[(]dsi[,][ ]HX8394_CMD_[^ ,\t\n)]*\([, \t\n]*0x[0-9a-f][0-9a-f]\)*[)][;]' drivers/gpu/drm/panel/panel-himax-hx8394.c
@@ -6977,9 +6976,7 @@ set_except () {
     defsnc 'static[ ]char[ ]data_synd\[\][ ]=' drivers/edac/npcm_edac.c
     blobname 'amdgpu[/]vcn_4_0_3\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
     blobname 'amdgpu[/]%s_\(rlc\|mec\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c
-    # The following is not new, it was just moved down to allow for
-    # new patterns to match despite being prefixed by it, when using
-    # non-NDA regexp engines.
+    # Moved down.
     # blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     defsnc 'static[ ]const[ ]struct[ ]dm_bl_data_point[ ]custom_backlight_curve0\[\][ ]=' drivers/gpu/drm/amd/display/modules/power/power_helpers.c
     defsnc 'static[ ]unsigned[ ]short[ ]meson_encl_gamma_table\[256\][ ]=' drivers/gpu/drm/meson/meson_venc.c
@@ -7438,10 +7435,8 @@ set_except () {
     blobname 'amdgpu[/]%s_\(toc\|pfp\|mec\?\|rlc\)\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v12_0.c
     accept '[\t]err[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->gfx\.imu_fw\[i\][,]' drivers/gpu/drm/amd/amdgpu/imu_v12_0.c
     blobname 'amdgpu[/]%s_imu\.bin' drivers/gpu/drm/amd/amdgpu/imu_v12_0.c
-    # The following is not new, it was just moved down to allow for
-    # new patterns to match despite being prefixed by it, when using
-    # non-NDA regexp engines.
-    blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
+    # Moved down.
+    # blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
     accept '[\t]*err[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->sdma\.instance\[\(instance\|i\)\]\.fw[,]' drivers/gpu/drm/amd/amdgpu/'\(\(amdgpu\|cik\)_sdma\|sdma_v[0-9_]*\)\.c'
     blobname '%s_sdma%s\.bin' drivers/gpu/drm/amd/amdgpu/cik_sdma.c
     accept '[\t][\t]r[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->vcn\.fw\[i\][,]' drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c
@@ -7829,6 +7824,7 @@ set_except () {
     defsnc 'static[ ]const[ ]u32[ ]rtw8922a_digital_pwr_comp_val\[\]\[DIGITAL_PWR_COMP_REG_NUM\][ ]=' drivers/net/wireless/realtek/rtw89/rtw8922a.c
     blobname 'vx[/]%s' sound/drivers/vx/vx_hwdep.c
     defsnc 'static[ ]const[ ]struct[ ]reg_sequence[ ]rt1320_vc_blind_write\[\][ ]=' sound/soc/codecs/rt1320-sdw.c
+    # rt1320_vc_patch_code_write[]:
     blobna '[{][ ]0x[0-9a-f]*[,][ ]0x[0-9a-f][0-9a-f][ ][}][,]\(\([\n][\t][{][ ]0x[0-9a-f]*[,][ ]0x[0-9a-f][0-9a-f][ ][}][,]\)*[\n][\t][{][ ]SDW_SDCA_CTL[(]FUNC_NUM_AMP[,][ ]RT1320_SDCA_ENT_PDE23[,][ ]RT1320_SDCA_CTL_REQ_POWER_STATE[,][ ]0[)][,][ ]0x[0-9a-f][0-9a-f][ ][}][,]\)\+' sound/soc/codecs/rt1320-sdw.c
     accept '[\t]r[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->umsch_mm\.fw[,][ ]["]%s["][,][ ]fw_name[)]' drivers/gpu/drm/amd/amdgpu/amdgpu_umsch_mm.c
     accept '[\t]*r[ ]=[ ]amdgpu_ucode_request[(]adev[,][ ][&]adev->uvd\.fw[,][ ]["]%s["][,][ ]fw_name[)]' drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c
@@ -8102,6 +8098,17 @@ set_except () {
     # New in 6.15.4, 6.12.35.
     blobname '\(intel[/]vpu[/]\)\?vpu_\(37\|[45]0\)xx_v1\.bin' drivers/accel/ivpu/ivpu_fw.c
     accept '[ \t]*["]Invalid[ ]record[ ]length[ ]in[ ]firmware:[ ]' drivers/input/misc/ims-pcu.c
+
+    # New in 6.15.5.
+    blobname 'amdgpu[/]%s_sos_kicker\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
+    blobname 'amdgpu[/]%s_ta_kicker\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
+    blobname 'amdgpu[/]%s_rlc_kicker\.bin' drivers/gpu/drm/amd/amdgpu/gfx_v11_0.c
+    blobname 'amdgpu[/]%s_imu_kicker\.bin' drivers/gpu/drm/amd/amdgpu/imu_v11_0.c
+    blobname 'amdgpu[/]%s_kicker\.bin' drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c
+    # The following is not new, it was just moved down to allow for
+    # new patterns to match despite being prefixed by it, when using
+    # non-NDA regexp engines.
+    blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
 
     # Add new patterns above.
     ;;
