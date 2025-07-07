@@ -15,6 +15,7 @@
 #        modified with 2025-05-19 r10793 (partial)
 #        modified with 2025-01-19 r19703 (partial)
 #        modified with 2025-06-30 r19831
+#        modified with 2025-01-19 r19703 (more partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7914,6 +7915,9 @@ set_except () {
     # New in 6.15.4, 6.12.35.
     blobname '\(intel[/]vpu[/]\)\?vpu_\(37\|[45]0\)xx_v1\.bin' drivers/accel/ivpu/ivpu_fw.c
     accept '[ \t]*["]Invalid[ ]record[ ]length[ ]in[ ]firmware:[ ]' drivers/input/misc/ims-pcu.c
+
+    # New in 6.12.36.
+    blobname 'rtl_nic[/]rtl8125d-1\.fw' drivers/net/ethernet/realtek/r8169_main.c
 
     # Add new patterns above.
     ;;
