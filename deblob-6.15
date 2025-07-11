@@ -661,17 +661,18 @@ maybe_reject_partial_firmware_into_buf(const struct firmware **firmware_p, const
 ' include/linux/firmware.h 'added non-Free firmware notification support'
 
 clean_sed '
+/^use crate::{/ s/}/, dev_err, kernel::c_str}/;
 /FwFunc::request_nowarn/,/^$/{
   /^$/i\
 \
     /// Send a request for a nonresolvable name.\
-    pub fn reject_nowarn(name: &CStr, dev: &Device) -> Result<Self> {\
-        Self::request_internal("/*(DEBLOBBED)*/", dev, FwFunc::request_nowarn())\
+    pub fn reject_nowarn(_name: &CStr, dev: &Device) -> Result<Self> {\
+        Self::request_internal(c_str!("/*(DEBLOBBED)*/"), dev, FwFunc::request_nowarn())\
     }\
 \
     /// Send a request for a nonresolvable name.\
     pub fn reject(name: &CStr, dev: &Device) -> Result<Self> {\
-        dev_err!("Missing Free {} (non-Free firmware loading is disabled)\\n", name);\
+        dev_err!(dev, "Missing Free {} (non-Free firmware loading is disabled)\\n", name);\
         Self::reject_nowarn(name, dev)\
     }\
 
