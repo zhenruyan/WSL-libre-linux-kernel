@@ -17,6 +17,8 @@
 #        modified with 2025-06-30 r19831
 #        modified with 2025-01-19 r19703 (more partial)
 #        modified with 2025-07-07 r19836
+#        modified with 2025-07-17 r19847
+#        modified with 2025-05-19 r10793 (more partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7925,6 +7927,14 @@ set_except () {
     # new patterns to match despite being prefixed by it, when using
     # non-NDA regexp engines.
     blobname 'amdgpu[/]%s' drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c
+
+    # New in 6.15.7, 6.12.39.
+    # SOF topology files are not Tivoized.
+    accept '[\t]ret[ ]=[ ]sscanf[(]mach->sof_tplg_filename[,][ ]["]sof-%3s-[*]\.tplg["][,]' sound/soc/intel/common/sof-function-topology-lib.c
+    accept '[ \t]*["]%s[/]sof-%s-\(%s-\)\?id%d\.tplg["][,]' sound/soc/intel/common/sof-function-topology-lib.c
+    accept '[\t][\t]ret[ ]=[ ]firmware_request_nowarn[(][&]fw[,][ ][(][*]tplg_files[)]\[i\][,][ ]card->dev[)]' sound/soc/intel/common/sof-function-topology-lib.c
+    # New in 6.12.39.
+    blobname 'amdgpu[/]\(\(vega\(1[02]\|20\)\|raven2\?\|picasso\|arcturus\|aldebaran\)_\)\?ip_discovery\.bin' drivers/gpu/drm/amd/amdgpu/amdgpu_discovery.c
 
     # Add new patterns above.
     ;;
