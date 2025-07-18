@@ -661,6 +661,9 @@ clean_mk CONFIG_X86_LOCAL_APIC arch/x86/kernel/apic/Makefile
 # Do no recommend non-Free microcode update.
 announce CPU_SUP_INTEL - "Support Intel processors"
 clean_blob arch/x86/events/intel/core.c
+if test -f Documentation/admin-guide/hw-vuln/indirect-target-selection.rst; then
+  clean_blob Documentation/admin-guide/hw-vuln/indirect-target-selection.rst
+fi
 clean_kconfig arch/x86/Kconfig.cpu CPU_SUP_INTEL
 clean_mk CONFIG_CPU_SUP_INTEL arch/x86/events/intel/Makefile
 
