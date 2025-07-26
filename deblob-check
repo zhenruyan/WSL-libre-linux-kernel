@@ -4,6 +4,7 @@
 #        modified with 2025-06-30 r19831
 #        modified with 2025-07-07 r19836
 #        modified with 2025-07-17 r19847
+#        modified with 2025-07-21 r19854 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8116,6 +8117,10 @@ set_except () {
     accept '[\t]ret[ ]=[ ]sscanf[(]mach->sof_tplg_filename[,][ ]["]sof-%3s-[*]\.tplg["][,]' sound/soc/intel/common/sof-function-topology-lib.c
     accept '[ \t]*["]%s[/]sof-%s-\(%s-\)\?id%d\.tplg["][,]' sound/soc/intel/common/sof-function-topology-lib.c
     accept '[\t][\t]ret[ ]=[ ]firmware_request_nowarn[(][&]fw[,][ ][(][*]tplg_files[)]\[i\][,][ ]card->dev[)]' sound/soc/intel/common/sof-function-topology-lib.c
+
+    # New in 6.16-rc, 6.1.147.
+    blobname 'qca[/]nvm_usb_%08x' drivers/bluetooth/btusb.c
+    blobna 'if[ ][(]variant[)][ \n\t]*len[ ][+]=[ ]snprintf[(][^;]*[)][;][ \n\t]*if[ ][(]board_id[)]\([ \t\n]*len[ ][+]=[ ]snprintf[(][^);]*[)][;]\)*' drivers/bluetooth/btusb.c
 
     # Add new patterns above.
     ;;
