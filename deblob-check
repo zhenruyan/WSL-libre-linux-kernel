@@ -32,6 +32,7 @@
 #        modified with 2025-04-25 r19761
 #        modified with 2025-05-18 r19784
 #        modified with 2025-05-19 r10793 (partial)
+#        modified with 2025-07-21 r19854 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6836,6 +6837,10 @@ set_except () {
     # The variable name is very suspicious, but the short sequence of
     # nearly-sorted small numbers doesn't seem to be executable code.
     defsnc '[\t]unsigned[ ]char[ ]modified_fix_code\[\][ ]=' arch/arm/mach-at91/pm.c
+
+    # New in 6.16-rc, 6.1.147.
+    blobname 'qca[/]nvm_usb_%08x' drivers/bluetooth/btusb.c
+    blobna 'if[ ][(]variant[)][ \n\t]*len[ ][+]=[ ]snprintf[(][^;]*[)][;][ \n\t]*if[ ][(]board_id[)]\([ \t\n]*len[ ][+]=[ ]snprintf[(][^);]*[)][;]\)*' drivers/bluetooth/btusb.c
 
     # Add new patterns above.
     ;;
