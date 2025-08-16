@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2025-07-21 r19854
+#        modified with 2025-08-15 r19868
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8211,6 +8212,11 @@ set_except () {
     accept '[	]snprintf[(]bind_attr_path[,][ ]sizeof[(]bind_attr_path[)][,][ ]["]%s[/]%s[/]%s[/]%s[/]%s[/]%s["][,]' tools/usb/usbip/src/usbip_bind.c
     accept '[	]snprintf[(]\(un\|re\)bind_attr_path[,][ ]sizeof[(]\(un\|re\)bind_attr_path[)][,][ ]["]%s[/]%s[/]%s[/]%s[/]%s[/]%s["][,]' tools/usb/usbip/src/usbip_'\(un\|\)bind\.c'
     accept '[	][	][ ]["]%s[/]%s[/]%s[/]%s[/]%s[/]%s["][,][ ]SYSFS_MNT_PATH[,]' tools/usb/usbip/src/utils.c
+
+    # New in 6.16.1 and 6.15.10.
+    accept '[\t]pas->firmware[ ]=' drivers/remoteproc/qcom_q6v5_pas.c
+    accept '[\t ]*dev_err[(]pas->dev[,][ ]["]request_firmware[ ]failed' drivers/remoteproc/qcom_q6v5_pas.c
+    blobname 'imx[/]xcvr[/]xcvr-imx95\.bin' sound/soc/fsl/fsl_scvr.c
 
     # Add new patterns above.
     ;;
