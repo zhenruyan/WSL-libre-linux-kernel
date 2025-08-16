@@ -5,6 +5,7 @@
 #        modified with 2025-07-07 r19836
 #        modified with 2025-07-17 r19847
 #        modified with 2025-07-21 r19854 (partial)
+#        modified with 2025-08-15 r19868
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8121,6 +8122,11 @@ set_except () {
     # New in 6.16-rc, 6.1.147.
     blobname 'qca[/]nvm_usb_%08x' drivers/bluetooth/btusb.c
     blobna 'if[ ][(]variant[)][ \n\t]*len[ ][+]=[ ]snprintf[(][^;]*[)][;][ \n\t]*if[ ][(]board_id[)]\([ \t\n]*len[ ][+]=[ ]snprintf[(][^);]*[)][;]\)*' drivers/bluetooth/btusb.c
+
+    # New in 6.16.1 and 6.15.10.
+    accept '[\t]pas->firmware[ ]=' drivers/remoteproc/qcom_q6v5_pas.c
+    accept '[\t ]*dev_err[(]pas->dev[,][ ]["]request_firmware[ ]failed' drivers/remoteproc/qcom_q6v5_pas.c
+    blobname 'imx[/]xcvr[/]xcvr-imx95\.bin' sound/soc/fsl/fsl_scvr.c
 
     # Add new patterns above.
     ;;
