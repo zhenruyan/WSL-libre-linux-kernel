@@ -973,6 +973,10 @@ clean_mk CONFIG_DRM_AMDGPU_CIK drivers/gpu/drm/amd/amdgpu/Makefile
 
 announce DRM_AMD_ISP - "Enable AMD Image Signal Processor IP support"
 clean_blob drivers/gpu/drm/amd/amdgpu/amdgpu_isp.c
+if test -f drivers/gpu/drm/amd/amdgpu/isp_v4_1_1.c &&
+   grep -q MODULE_FIRMWARE drivers/gpu/drm/amd/amdgpu/isp_v4_1_1.c; then
+  clean_blob drivers/gpu/drm/amd/amdgpu/isp_v4_1_1.c
+fi
 clean_kconfig drivers/gpu/drm/amd/amdgpu/Kconfig DRM_AMD_ISP
 clean_mk CONFIG_DRM_AMD_ISP drivers/gpu/drm/amd/amdgpu/Makefile
 
