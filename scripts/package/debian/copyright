@@ -1,0 +1,16 @@
+This is a packaged version of GNU Linux-libre.
+
+The sources may be found at most GNU Linux-libre archive sites, including:
+https://linux-libre.fsfla.org/
+
+Copyright: 1991 - 2023 Linus Torvalds and others.
+
+The git repository for mainline kernel development is at:
+/*(DEBLOBBED)*/
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; version 2 dated June, 1991.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License version 2 can be found in `/usr/share/common-licenses/GPL-2'.
