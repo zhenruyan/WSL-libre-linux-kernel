@@ -1,0 +1,2498 @@
+Makefile: added -gnu to EXTRAVERSION
+README: renamed to GNU Linux-libre
+Documentation/admin-guide/README.rst: renamed to GNU Linux-libre
+Documentation/admin-guide/README.rst: dropped partial Linux version
+Documentation/admin-guide/README.rst: Linux is a kernel
+Documentation/admin-guide/README.rst: added blurb about GNU Linux-libre
+scripts/package/builddeb: kernel name
+scripts/package/mkdebian: kernel name
+scripts/package/mkdebian: home page
+scripts/package/debian/copyright: nothing is upstream of itself
+scripts/package/debian/copyright: kernel name
+scripts/package/debian/copyright: archive
+scripts/package/debian/copyright: sources
+scripts/package/debian/copyright: upstream development repo
+scripts/package/kernel.spec: package summary
+scripts/package/kernel.spec: kernel name
+scripts/package/kernel.spec: home page
+scripts/package/snapcraft.template: description
+scripts/package/snapcraft.template: summary
+scripts/Makefile.warn: avoid compile failures at /*(DEBLOBBED)*/ warnings
+include/linux/firmware.h: added non-Free firmware notification support
+rust/kernel/firmware.rs: added non-Free firmware notification support
+include/linux/ihex.h: added non-Free ihex firmware notification support
+drivers/base/firmware_loader/fallback.c: shorten non-Free firmware fail-to-load timeout
+
+MICROCODE - CPU microcode loading support
+arch/x86/kernel/cpu/microcode/intel.c: disabled non-Free firmware-loading machinery
+arch/x86/kernel/cpu/microcode/amd.c: disabled non-Free firmware-loading machinery
+arch/x86/kernel/cpu/microcode/intel.c: removed blobs or mentions thereof
+arch/x86/kernel/cpu/microcode/amd.c: removed blobs or mentions thereof
+arch/x86/kernel/cpu/amd.c: removed blobs or mentions thereof
+Documentation/arch/x86/microcode.rst: removed blobs or mentions thereof
+
+X86_LOCAL_APIC - Undocumented
+arch/x86/kernel/apic/apic.c: removed blobs or mentions thereof
+
+CPU_SUP_INTEL - Support Intel processors
+arch/x86/events/intel/core.c: removed blobs or mentions thereof
+Documentation/admin-guide/hw-vuln/indirect-target-selection.rst: removed blobs or mentions thereof
+Documentation/admin-guide/hw-vuln/old_microcode.rst: removed blobs or mentions thereof
+
+SENSORS_CORETEMP - Intel Core/Core2/Atom temperature sensor
+drivers/hwmon/coretemp.c: removed blobs or mentions thereof
+
+IXP4XX_NPE - IXP4xx Network Processor Engine support
+drivers/soc/ixp4xx/ixp4xx-npe.c: disabled non-Free firmware-loading machinery
+drivers/soc/ixp4xx/ixp4xx-npe.c: removed blobs or mentions thereof
+Documentation/arch/arm/ixp4xx.rst: removed blobs or mentions thereof
+
+MACH_SUN8I - Allwinner sun8i Family SoCs support
+arch/arm/boot/dts/allwinner/sun8i-a23-gt90h-v4.dts: removed blobs or mentions thereof
+arch/arm/boot/dts/allwinner/sun8i-a23-inet86dz.dts: removed blobs or mentions thereof
+arch/arm/boot/dts/allwinner/sun8i-a23-polaroid-mid2407pxe03.dts: removed blobs or mentions thereof
+arch/arm/boot/dts/allwinner/sun8i-a23-polaroid-mid2809pxe04.dts: removed blobs or mentions thereof
+arch/arm/boot/dts/allwinner/sun8i-a33-ga10h-v1.1.dts: removed blobs or mentions thereof
+
+UCODE_PATCH - ppc microcode
+arch/powerpc/platforms/8xx/micropatch.c: removed blobs or mentions thereof
+
+USB_SOF_UCODE_PATCH - USB SOF patch
+
+I2C_SPI_UCODE_PATCH - I2C/SPI relocation patch
+
+I2C_SPI_SMC1_UCODE_PATCH - I2C/SPI/SMC1 relocation patch
+
+SMC_UCODE_PATCH - SMC relocation patch
+
+CPM_QMC - CPM/QE QMC support
+drivers/soc/fsl/qe/qmc.c: disabled non-Free firmware-loading machinery
+Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,qe-ucc-qmc.yaml: removed blobs or mentions thereof
+
+ATM_FORE200E - FORE Systems 200E-series
+drivers/atm/fore200e.c: disabled non-Free firmware-loading machinery
+drivers/atm/fore200e.c: removed blobs or mentions thereof
+Documentation/networking/device_drivers/atm/fore200e.rst: removed blobs or mentions thereof
+drivers/atm/.gitignore: removed blobs or mentions thereof
+
+ATM_SOLOS - Solos ADSL2+ PCI Multiport card driver
+drivers/atm/solos-pci.c: disabled non-Free firmware-loading machinery
+drivers/atm/solos-pci.c: removed blobs or mentions thereof
+
+CAVIUM_CPT - Cavium Cryptographic Accelerator driver
+drivers/crypto/cavium/cpt/cptpf_main.c: disabled non-Free firmware-loading machinery
+drivers/crypto/cavium/cpt/cptpf_main.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_NITROX_CNN55XX - Support for Cavium CNN55XX driver
+drivers/crypto/cavium/nitrox/nitrox_main.c: disabled non-Free firmware-loading machinery
+drivers/crypto/cavium/nitrox/nitrox_main.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_SP_PSP - Platform Security Processor (PSP) device
+drivers/crypto/ccp/sev-dev.c: disabled non-Free firmware-loading machinery
+drivers/crypto/ccp/sev-dev.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_SAFEXCEL - Inside Secure's SafeXcel cryptographic engine driver
+drivers/crypto/inside-secure/safexcel.c: disabled non-Free firmware-loading machinery
+drivers/crypto/inside-secure/safexcel.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_OCTEONTX_CPT - Support for Marvell OcteonTX CPT driver
+drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c: disabled non-Free firmware-loading machinery
+drivers/crypto/marvell/octeontx/otx_cptpf_ucode.h: removed blobs or mentions thereof
+
+CRYPTO_DEV_OCTEONTX2_CPT - Marvell OcteonTX2 CPT driver
+drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c: disabled non-Free firmware-loading machinery
+drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_QAT_DH895xCC - Support for Intel(R) DH895xCC
+drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h: removed blobs or mentions thereof
+drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_QAT - Common bits for Intel(R) QuickAssist Technology
+drivers/crypto/intel/qat/qat_common/adf_accel_engine.c: disabled non-Free firmware-loading machinery
+
+CRYPTO_DEV_QAT_C3XXX - Support for Intel(R) C3XXX
+drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.h: removed blobs or mentions thereof
+drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_QAT_C62X - Support for Intel(R) C62X
+drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.h: removed blobs or mentions thereof
+drivers/crypto/intel/qat/qat_c62x/adf_drv.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_QAT_4XXX - Support for Intel(R) QAT_4XXX
+drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.h: removed blobs or mentions thereof
+drivers/crypto/intel/qat/qat_4xxx/adf_drv.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_QAT_420XX - Support for Intel(R) QAT_420XX
+drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.h: removed blobs or mentions thereof
+drivers/crypto/intel/qat/qat_420xx/adf_drv.c: removed blobs or mentions thereof
+
+CRYPTO_DEV_QAT_6XXX - Support for Intel(R) QAT_6XXX
+drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h: removed blobs or mentions thereof
+drivers/crypto/intel/qat/qat_6xxx/adf_drv.c: removed blobs or mentions thereof
+
+AMDTEE - AMD's Trusted Execution Environment (TEE)
+drivers/tee/amdtee/core.c: disabled non-Free firmware-loading machinery
+drivers/tee/amdtee/core.c: removed blobs or mentions thereof
+
+OPTEE_INSECURE_LOAD_IMAGE - Load OP-TEE image as firmware
+drivers/tee/optee/smc_abi.c: disabled non-Free firmware-loading machinery
+drivers/tee/optee/smc_abi.c: removed blobs or mentions thereof
+drivers/tee/optee/optee_smc.h: removed blobs or mentions thereof
+
+MOXA_INTELLIO - Moxa Intellio support
+drivers/tty/moxa.c: disabled non-Free firmware-loading machinery
+drivers/tty/moxa.c: removed blobs or mentions thereof
+
+DRM_DISPLAY_HDCP_HELPER
+drivers/gpu/drm/display/drm_hdcp_helper.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/display/drm_hdcp_helper.c: removed blobs or mentions thereof
+
+DRM_AMDGPU - AMD GPU
+drivers/gpu/drm/amd/amdgpu/amdgpu_uvd.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_vce.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_vcn.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gfx_v8_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/amd/amdgpu/gfx_v10_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gfx_v11_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gfx_v12_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/imu_v11_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/imu_v12_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/mes_v11_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/mes_v12_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/psp_v3_1.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/psp_v10_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/psp_v11_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/psp_v12_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/psp_v13_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/psp_v13_0_4.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/psp_v14_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/sdma_v2_4.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/sdma_v3_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/sdma_v4_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/sdma_v5_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/sdma_v5_2.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/sdma_v6_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/sdma_v7_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_cgs.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_device.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/amd/amdgpu/amdgpu_device.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_psp.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/pm/powerplay/smumgr/smumgr.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/pm/swsmu/smu11/smu_v11_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_6_ppt.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/pm/swsmu/smu14/smu_v14_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_discovery.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/amd/amdgpu/amdgpu_discovery.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_mes.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_sdma.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/amd/amdgpu/amdgpu_umsch_mm.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/amdgpu_vpe.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/vpe_v6_1.c: removed blobs or mentions thereof
+
+DRM_AMDGPU_CIK - Enable amdgpu support for CIK parts
+drivers/gpu/drm/amd/amdgpu/cik_sdma.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gmc_v7_0.c: removed blobs or mentions thereof
+
+DRM_AMD_ISP - Enable AMD Image Signal Processor IP support
+drivers/gpu/drm/amd/amdgpu/amdgpu_isp.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/isp_v4_1_1.c: removed blobs or mentions thereof
+
+DRM_AMDGPU_SI - Enable amdgpu support for SI parts
+drivers/gpu/drm/amd/pm/legacy-dpm/si_dpm.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gfx_v6_0.c: removed blobs or mentions thereof
+drivers/gpu/drm/amd/amdgpu/gmc_v6_0.c: removed blobs or mentions thereof
+
+DRM_AST - AST server chips
+drivers/gpu/drm/ast/ast_dp501.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/ast/ast_dp501.c: removed blobs or mentions thereof
+
+DRM_CDNS_MHDP8546 - Cadence DPI/DP bridge
+drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.c: removed blobs or mentions thereof
+drivers/gpu/drm/bridge/cadence/cdns-mhdp8546-core.h: removed blobs or mentions thereof
+
+DRM_I915 - Intel 8xx/9xx/G3x/G4x/HD Graphics
+drivers/gpu/drm/i915/display/intel_bios.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/i915/display/intel_dmc.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/i915/display/intel_dmc.c: removed blobs or mentions thereof
+drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c: disable non-Free firmware
+drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c: avoid validation fails
+drivers/gpu/drm/i915/gt/uc/intel_uc_fw.c: removed blobs or mentions thereof
+drivers/gpu/drm/i915/gt/uc/intel_uc_fw.h: removed blobs or mentions thereof
+
+DRM_I915_GVT - Enable Intel GVT-g graphics virtualization host support
+drivers/gpu/drm/i915/gvt/firmware.c: disabled non-Free firmware-loading machinery
+
+DRM_LONTIUM_LT9611UXC - Lontium LT9611UXC DSI/HDMI bridge
+drivers/gpu/drm/bridge/lontium-lt9611uxc.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/bridge/lontium-lt9611uxc.c: removed blobs or mentions thereof
+
+NOVA_CORE - Nova Core GPU driver
+drivers/gpu/nova-core/firmware.rs: disabled non-Free firmware-loading machinery
+drivers/gpu/nova-core/firmware/booter.rs: disabled non-Free firmware-loading machinery
+drivers/gpu/nova-core/firmware/gsp.rs: disabled non-Free firmware-loading machinery
+drivers/gpu/nova-core/firmware.rs: removed blobs or mentions thereof
+drivers/gpu/nova-core/nova_core.rs: removed blobs or mentions thereof
+
+DRM_NOUVEAU - Nouveau (nVidia) cards
+drivers/gpu/drm/nouveau/nvkm/core/firmware.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/nouveau/nvkm/core/firmware.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/falcon.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/nouveau/nvkm/engine/falcon.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/xtensa.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/nouveau/nvkm/engine/xtensa.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/ga102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gk20a.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gm200.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gm20b.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gp100.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gp102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gp104.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gp107.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gp108.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gp10b.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/gv100.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/gr/tu102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/sec2/ga102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/sec2/gp102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/sec2/gp108.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/engine/sec2/tu102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/acr/ga102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/acr/gm200.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/acr/gm20b.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/acr/gp102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/acr/gp108.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/acr/gp10b.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/acr/gv100.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/acr/tu102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/fb/ga102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/fb/gp102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/fb/gv100.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/fb/tu102.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/gsp/priv.h: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/gsp/base.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/pmu/gm20b.c: removed blobs or mentions thereof
+drivers/gpu/drm/nouveau/nvkm/subdev/pmu/gp10b.c: removed blobs or mentions thereof
+
+DRM_MSM - MSM DRM
+drivers/gpu/drm/msm/adreno/adreno_gpu.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/msm/adreno/a2xx_catalog.c: removed blobs or mentions thereof
+drivers/gpu/drm/msm/adreno/a3xx_catalog.c: removed blobs or mentions thereof
+drivers/gpu/drm/msm/adreno/a4xx_catalog.c: removed blobs or mentions thereof
+drivers/gpu/drm/msm/adreno/a5xx_catalog.c: removed blobs or mentions thereof
+drivers/gpu/drm/msm/adreno/a6xx_catalog.c: removed blobs or mentions thereof
+drivers/gpu/drm/msm/adreno/a6xx_gpu.c: removed blobs or mentions thereof
+drivers/gpu/drm/msm/registers/adreno/adreno_pm4.xml: removed blobs or mentions thereof
+
+DRM_PANEL_MIPI_DBI - DRM support for MIPI DBI compatible panels
+drivers/gpu/drm/tiny/panel-mipi-dbi.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/tiny/panel-mipi-dbi.c: removed blobs or mentions thereof
+
+DRM_PANTHOR - Panthor (DRM support for ARM Mali CSF-based GPUs)
+drivers/gpu/drm/panthor/panthor_fw.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/panthor/panthor_fw.c: removed blobs or mentions thereof
+
+DRM_POWERVR - Imagination Technologies PowerVR (Series 6 and later) & IMG Graphics
+drivers/gpu/drm/imagination/pvr_device.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/imagination/pvr_device.c: removed blobs or mentions thereof
+drivers/gpu/drm/imagination/pvr_drv.c: removed blobs or mentions thereof
+
+DRM_RADEON - ATI Radeon
+drivers/gpu/drm/radeon/r100.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/radeon/r100.c: removed blobs or mentions thereof
+drivers/gpu/drm/radeon/r600.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/radeon/r600.c: removed blobs or mentions thereof
+drivers/gpu/drm/radeon/ni.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/radeon/ni.c: removed blobs or mentions thereof
+drivers/gpu/drm/radeon/si.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/radeon/si.c: removed blobs or mentions thereof
+drivers/gpu/drm/radeon/r600.c: enable blobless activation
+drivers/gpu/drm/radeon/evergreen.c: enable blobless activation
+drivers/gpu/drm/radeon/rv770.c: enable blobless activation
+drivers/gpu/drm/radeon/ni.c: enable blobless activation
+drivers/gpu/drm/radeon/si.c: enable blobless activation
+drivers/gpu/drm/radeon/si.c: enable blobless activation
+drivers/gpu/drm/radeon/cik.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/radeon/cik.c: removed blobs or mentions thereof
+drivers/gpu/drm/radeon/radeon_uvd.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/radeon/radeon_uvd.c: removed blobs or mentions thereof
+drivers/gpu/drm/radeon/radeon_vce.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/radeon/radeon_vce.c: removed blobs or mentions thereof
+
+ROCKCHIP_CDN_DP - Rockchip cdn DP
+drivers/gpu/drm/rockchip/cdn-dp-core.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/rockchip/cdn-dp-core.c: removed blobs or mentions thereof
+
+DRM_STI - DRM Support for STMicroelectronics SoC stiH41x Series
+drivers/gpu/drm/sti/sti_hqvdp.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/sti/sti_hqvdp.c: removed blobs or mentions thereof
+
+DRM_TEGRA - NVIDIA Tegra DRM
+drivers/gpu/drm/tegra/falcon.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/tegra/nvdec.c: removed blobs or mentions thereof
+drivers/gpu/drm/tegra/vic.c: removed blobs or mentions thereof
+drivers/gpu/drm/tegra/nvjpg.c: removed blobs or mentions thereof
+
+DRM_XE - Intel Xe Graphics
+drivers/gpu/drm/xe/xe_uc_fw.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/xe/xe_late_bind_fw.c: disabled non-Free firmware-loading machinery
+drivers/gpu/drm/xe/xe_uc_fw.c: removed blobs or mentions thereof
+drivers/gpu/drm/xe/xe_uc_fw.h: removed blobs or mentions thereof
+drivers/gpu/drm/xe/xe_late_bind_fw.c: removed blobs or mentions thereof
+
+IMX_SDMA - i.MX SDMA support
+drivers/dma/imx-sdma.c: disabled non-Free firmware-loading machinery
+drivers/dma/imx-sdma.c: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx25.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx31.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx35.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx50.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx51.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx53.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx53-tx53.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx6qdl.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx6sl.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx6sll.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx6sx.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx6ul.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/nxp/imx/imx7s.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/freescale/imx8mm.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/freescale/imx8mn.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/freescale/imx8mp.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/freescale/imx8mq.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/freescale/imx8qm.dtsi: removed blobs or mentions thereof
+Documentation/devicetree/bindings/bus/fsl,imx8mp-aipstz.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/dma/fsl,imx-sdma.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/dsp/fsl,dsp.yaml: removed blobs or mentions thereof
+arch/arm64/boot/dts/freescale/imx8-ss-audio.dtsi: removed blobs or mentions thereof
+
+ST_FDMA - ST FDMA dmaengine support
+drivers/dma/st_fdma.c: removed blobs or mentions thereof
+
+MEDIA_TUNER_SI2157 - Silicon Labs Si2157 silicon tuner
+drivers/media/tuners/si2157.c: disabled non-Free firmware-loading machinery
+drivers/media/tuners/si2157.c: removed blobs or mentions thereof
+drivers/media/tuners/si2157_priv.h: removed blobs or mentions thereof
+
+MEDIA_TUNER_XC2028 - XCeive xc2028/xc3028 tuners
+drivers/media/tuners/xc2028.h: disabled non-Free firmware
+drivers/media/pci/saa7134/saa7134-cards.c: disabled non-Free firmware
+drivers/media/pci/ivtv/ivtv-driver.c: disabled non-Free firmware
+drivers/media/pci/cx18/cx18-driver.c: disabled non-Free firmware
+drivers/media/pci/cx18/cx18-dvb.c: disabled non-Free firmware
+drivers/media/pci/cx23885/cx23885-dvb.c: disabled non-Free firmware
+drivers/media/pci/cx23885/cx23885-video.c: disabled non-Free firmware
+drivers/media/pci/cx88/cx88-dvb.c: disabled non-Free firmware
+drivers/media/pci/cx88/cx88-cards.c: disabled non-Free firmware
+drivers/media/usb/em28xx/em28xx-cards.c: disabled non-Free firmware
+drivers/media/usb/dvb-usb/dib0700_devices.c: disabled non-Free firmware
+drivers/media/usb/dvb-usb/cxusb.c: disabled non-Free firmware
+drivers/media/tuners/xc2028.c: disabled non-Free firmware-loading machinery
+drivers/media/tuners/xc2028.c: removed blobs or mentions thereof
+
+MEDIA_TUNER_XC4000 - Xceive XC4000 silicon tuner
+drivers/media/tuners/xc4000.c: disabled non-Free firmware
+drivers/media/tuners/xc4000.c: retain Free firmware-loading machinery, disabling non-Free one
+drivers/media/tuners/xc4000.c: removed blobs or mentions thereof
+
+MEDIA_TUNER_XC5000 - Xceive XC5000 silicon tuner
+drivers/media/usb/cx231xx/cx231xx-cards.c: disabled non-Free firmware
+drivers/media/tuners/xc5000.c: disabled non-Free firmware-loading machinery
+drivers/media/tuners/xc5000.c: removed blobs or mentions thereof
+
+DVB_USB - Support for various USB DVB devices
+drivers/media/usb/dvb-usb/dvb-usb-firmware.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/dvb-usb/dvb-usb-firmware.c: removed blobs or mentions thereof
+
+DVB_USB_V2 - Support for various USB DVB devices v2
+drivers/media/usb/dvb-usb-v2/dvb_usb_core.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/dvb-usb-v2/dvb_usb_core.c: removed blobs or mentions thereof
+
+DVB_B2C2_FLEXCOP - Technisat/B2C2 FlexCopII(b) and FlexCopIII adapters
+drivers/media/common/b2c2/flexcop-fe-tuner.c: disabled non-Free firmware-loading machinery
+
+DVB_BT8XX - BT8xx based PCI cards
+drivers/media/pci/bt8xx/dvb-bt8xx.c: disabled non-Free firmware-loading machinery
+
+DVB_USB_A800 - AVerMedia AverTV DVB-T USB 2.0 (A800)
+drivers/media/usb/dvb-usb/a800.c: removed blobs or mentions thereof
+Documentation/admin-guide/media/avermedia.rst: removed blobs or mentions thereof
+
+DVB_USB_AF9005 - Afatech AF9005 DVB-T USB1.1 support
+drivers/media/usb/dvb-usb/af9005-script.h: removed
+drivers/media/usb/dvb-usb/af9005-fe.c: report missing Free init script
+drivers/media/usb/dvb-usb/af9005-fe.c: removed blobs or mentions thereof
+drivers/media/usb/dvb-usb/af9005.c: removed blobs or mentions thereof
+
+DVB_USB_AF9015 - Afatech AF9015 DVB-T USB2.0 support
+drivers/media/usb/dvb-usb-v2/af9015.h: removed blobs or mentions thereof
+drivers/media/usb/dvb-usb-v2/af9015.c: removed blobs or mentions thereof
+
+DVB_USB_AF9035 - Afatech AF9035 DVB-T USB2.0 support
+drivers/media/usb/dvb-usb-v2/af9035.h: removed blobs or mentions thereof
+drivers/media/usb/dvb-usb-v2/af9035.c: removed blobs or mentions thereof
+
+DVB_USB_AZ6007 - Azurewave 6007 and clones DVB-T/C USB2.0 support
+drivers/media/usb/dvb-usb-v2/az6007.c: removed blobs or mentions thereof
+
+DVB_USB_AZ6027 - Azurewave DVB-S/S2 USB2.0 AZ6027 support
+drivers/media/usb/dvb-usb/az6027.c: removed blobs or mentions thereof
+
+DVB_USB_CXUSB - Conexant USB2.0 hybrid reference design support
+drivers/media/usb/dvb-usb/cxusb.c: removed blobs or mentions thereof
+
+DVB_USB_DIB0700 - DiBcom DiB0700 USB DVB devices
+drivers/media/usb/dvb-usb/dib0700_devices.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/dvb-usb/dib0700_devices.c: removed blobs or mentions thereof
+drivers/media/usb/dvb-usb/dib0700_core.c: removed blobs or mentions thereof
+
+DVB_USB_DIBUSB_MB - DiBcom USB DVB-T devices (based on the DiB3000M-B)
+drivers/media/usb/dvb-usb/dibusb-mb.c: removed blobs or mentions thereof
+
+DVB_USB_DIBUSB_MC - DiBcom USB DVB-T devices (based on the DiB3000M-C/P)
+drivers/media/usb/dvb-usb/dibusb-mc.c: removed blobs or mentions thereof
+
+DVB_USB_DIGITV - Nebula Electronics uDigiTV DVB-T USB2.0 support
+drivers/media/usb/dvb-usb/digitv.c: removed blobs or mentions thereof
+
+DVB_USB_DTT200U - WideView WT-200U and WT-220U (pen) DVB-T USB2.0 support (Yakumo/Hama/Typhoon/Yuan)
+drivers/media/usb/dvb-usb/dtt200u.c: removed blobs or mentions thereof
+
+DVB_USB_DW2102 - DvbWorld DVB-S/S2 USB2.0 support
+drivers/media/usb/dvb-usb/dw2102.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/dvb-usb/dw2102.c: removed blobs or mentions thereof
+
+DVB_USB_EC168 - E3C EC168 DVB-T USB2.0 support
+drivers/media/usb/dvb-usb-v2/ec168.h: removed blobs or mentions thereof
+drivers/media/usb/dvb-usb-v2/ec168.c: removed blobs or mentions thereof
+
+DVB_USB_GP8PSK - GENPIX 8PSK->USB module support
+drivers/media/usb/dvb-usb/gp8psk.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/dvb-usb/gp8psk.c: removed blobs or mentions thereof
+
+DVB_USB_LME2510 - LME DM04/QQBOX DVB-S USB2.0 support
+drivers/media/usb/dvb-usb-v2/lmedm04.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/dvb-usb-v2/lmedm04.c: removed blobs or mentions thereof
+Documentation/admin-guide/media/lmedm04.rst: removed
+
+DVB_USB_M920X - Uli m920x DVB-T USB2.0 support
+drivers/media/usb/dvb-usb/m920x.c: removed blobs or mentions thereof
+
+DVB_USB_NOVA_T_USB2 - Hauppauge WinTV-NOVA-T usb2 DVB-T USB2.0 support
+drivers/media/usb/dvb-usb/nova-t-usb2.c: removed blobs or mentions thereof
+
+DVB_USB_OPERA1 - Opera1 DVB-S USB2.0 receiver
+drivers/media/usb/dvb-usb/opera1.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/dvb-usb/opera1.c: removed blobs or mentions thereof
+Documentation/admin-guide/media/opera-firmware.rst: removed blobs or mentions thereof
+
+DVB_USB_TECHNISAT_USB2 - Technisat DVB-S/S2 USB2.0 support
+drivers/media/usb/dvb-usb/technisat-usb2.c: removed blobs or mentions thereof
+
+DVB_USB_TTUSB2 - Pinnacle 400e DVB-S USB2.0 support
+drivers/media/usb/dvb-usb/ttusb2.c: removed blobs or mentions thereof
+
+DVB_USB_UMT_010 - HanfTek UMT-010 DVB-T USB2.0 support
+drivers/media/usb/dvb-usb/umt-010.c: removed blobs or mentions thereof
+
+DVB_USB_VP702X - TwinhanDTV StarBox and clones DVB-S USB2.0 support
+drivers/media/usb/dvb-usb/vp702x.c: removed blobs or mentions thereof
+
+DVB_USB_VP7045 - TwinhanDTV Alpha/MagicBoxII, DNTV tinyUSB2, Beetle USB2.0 support
+drivers/media/usb/dvb-usb/vp7045.c: removed blobs or mentions thereof
+
+DVB_AF9013 - Afatech AF9013 demodulator
+drivers/media/dvb-frontends/af9013.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/af9013.c: removed blobs or mentions thereof
+drivers/media/dvb-frontends/af9013_priv.h: removed blobs or mentions thereof
+
+DVB_BCM3510 - Broadcom BCM3510
+drivers/media/dvb-frontends/bcm3510.c: disabled non-Free firmware
+drivers/media/dvb-frontends/bcm3510.c: removed non-Free firmware notes
+
+DVB_CX24116 - Conexant CX24116 based
+drivers/media/dvb-frontends/cx24116.c: disabled non-Free firmware
+drivers/media/dvb-frontends/cx24116.c: disabled non-Free firmware-loading machinery
+
+DVB_CX24117 - Conexant CX24117 based
+drivers/media/dvb-frontends/cx24117.c: disabled non-Free firmware
+drivers/media/dvb-frontends/cx24117.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/cx24117.c: removed blobs or mentions thereof
+
+DVB_CX24120 - Conexant CX24120 based
+drivers/media/dvb-frontends/cx24120.c: removed blobs or mentions thereof
+
+DVB_DS3000 - Montage Tehnology DS3000 based
+drivers/media/dvb-frontends/ds3000.c: disabled non-Free firmware
+drivers/media/dvb-frontends/ds3000.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/ds3000.c: removed blobs or mentions thereof
+
+DVB_DRX39XYJ - Micronas DRX-J demodulator
+drivers/media/dvb-frontends/drx39xyj/drxj.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/drx39xyj/drxj.c: removed blobs or mentions thereof
+
+DVB_LGS8GXX - Legend Silicon LGS8913/LGS8GL5/LGS8GXX DMB-TH demodulator
+drivers/media/dvb-frontends/lgs8gxx.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/lgs8gxx.c: removed blobs or mentions thereof
+
+DVB_M88DS3103 - Montage M88DS3103
+drivers/media/dvb-frontends/m88ds3103.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/m88ds3103.c: removed blobs or mentions thereof
+drivers/media/dvb-frontends/m88ds3103_priv.h: removed blobs or mentions thereof
+
+DVB_MXL692 - MaxLinear MXL692 based
+drivers/media/dvb-frontends/mxl692.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/mxl692.c: removed blobs or mentions thereof
+drivers/media/dvb-frontends/mxl692.h: removed blobs or mentions thereof
+
+DVB_NXT200X - NxtWave Communications NXT2002/NXT2004 based
+drivers/media/dvb-frontends/nxt200x.c: disabled non-Free firmware
+drivers/media/dvb-frontends/nxt200x.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/nxt200x.c: removed blobs or mentions thereof
+
+DVB_OR51132 - Oren OR51132 based
+drivers/media/dvb-frontends/or51132.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/or51132.c: removed blobs or mentions thereof
+
+DVB_OR51211 - Oren OR51211 based
+drivers/media/dvb-frontends/or51211.c: disabled non-Free firmware
+drivers/media/dvb-frontends/or51211.c: removed blobs or mentions thereof
+
+DVB_SI2165 - Silicon Labs si2165 based
+drivers/media/dvb-frontends/si2165.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/si2165.c: removed blobs or mentions thereof
+drivers/media/dvb-frontends/si2165_priv.h: removed blobs or mentions thereof
+
+DVB_SI2168 - Silicon Labs Si2168
+drivers/media/dvb-frontends/si2168.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/si2168.c: removed blobs or mentions thereof
+drivers/media/dvb-frontends/si2168_priv.h: removed blobs or mentions thereof
+
+DVB_SP8870 - Spase sp8870
+drivers/staging/media/av7110/sp8870.c: disabled non-Free firmware
+drivers/staging/media/av7110/sp8870.c: removed blobs or mentions thereof
+
+DVB_SP887X - Spase sp887x based
+drivers/media/dvb-frontends/sp887x.c: disabled non-Free firmware
+drivers/media/dvb-frontends/sp887x.c: removed blobs or mentions thereof
+
+DVB_TDA10048 - Philips TDA10048HN based
+drivers/media/dvb-frontends/tda10048.c: removed non-Free firmware size
+drivers/media/dvb-frontends/tda10048.c: disabled non-Free firmware
+drivers/media/dvb-frontends/tda10048.c: disabled non-Free firmware-loading machinery
+
+DVB_TDA1004X - Philips TDA10045H/TDA10046H
+drivers/media/dvb-frontends/tda1004x.c: disabled non-Free firmware
+drivers/media/dvb-frontends/tda1004x.c: removed blobs or mentions thereof
+
+DVB_TDA10071 - NXP TDA10071
+drivers/media/dvb-frontends/tda10071.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/tda10071.c: removed blobs or mentions thereof
+drivers/media/dvb-frontends/tda10071_priv.h: removed blobs or mentions thereof
+
+DVB_AS102 - Abilis AS102 DVB receiver
+drivers/media/usb/as102/as102_fw.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/as102/as102_fw.c: removed blobs or mentions thereof
+
+DVB_AV7110 - AV7110 cards
+drivers/staging/media/av7110/av7110.c: disabled non-Free firmware-loading machinery
+drivers/staging/media/av7110/av7110.c: removed blobs or mentions thereof
+
+DVB_BUDGET - Budget cards
+drivers/media/pci/ttpci/budget.c: disabled non-Free firmware-loading machinery
+
+DVB_BUDGET_AV - Budget cards with analog video inputs
+drivers/media/pci/ttpci/budget-av.c: disabled non-Free firmware-loading machinery
+
+DVB_BUDGET_CI - Budget cards with onboard CI connector
+drivers/media/pci/ttpci/budget-ci.c: disabled non-Free firmware-loading machinery
+
+DVB_DRXD - Micronas DRXD driver
+drivers/media/dvb-frontends/drxd_hard.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/drxd_hard.c: removed blobs or mentions thereof
+
+DVB_DRXK - Micronas DRXK based
+drivers/media/dvb-frontends/drxk_hard.c: disabled non-Free firmware-loading machinery
+
+DVB_MN88472 - Panasonic MN88472
+drivers/media/dvb-frontends/mn88472.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/mn88472.c: removed blobs or mentions thereof
+drivers/media/dvb-frontends/mn88472_priv.h: removed blobs or mentions thereof
+
+DVB_MN88473 - Panasonic MN88473
+drivers/media/dvb-frontends/mn88473.c: disabled non-Free firmware-loading machinery
+drivers/media/dvb-frontends/mn88473.c: removed blobs or mentions thereof
+drivers/media/dvb-frontends/mn88473_priv.h: removed blobs or mentions thereof
+
+DVB_NGENE - Micronas nGene support
+drivers/media/pci/ngene/ngene-core.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/ngene/ngene-core.c: removed blobs or mentions thereof
+
+DVB_PLUTO2 - Pluto2 cards
+drivers/media/pci/pluto2/pluto2.c: disabled non-Free firmware-loading machinery
+
+SMS_SIANO_MDTV - Siano SMS1xxx based MDTV receiver
+drivers/media/common/siano/smscoreapi.c: disabled non-Free firmware-loading machinery
+drivers/media/common/siano/smscoreapi.c: removed blobs or mentions thereof
+drivers/media/common/siano/smscoreapi.h: removed blobs or mentions thereof
+
+SMS_USB_DRV - Siano's USB interface support
+drivers/media/usb/siano/smsusb.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/siano/smsusb.c: removed blobs or mentions thereof
+
+DVB_TTUSB_BUDGET - Technotrend/Hauppauge Nova-USB devices
+drivers/media/usb/ttusb-budget/dvb-ttusb-budget.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/ttusb-budget/dvb-ttusb-budget.c: removed blobs or mentions thereof
+
+DVB_TTUSB_DEC - Technotrend/Hauppauge USB DEC devices
+drivers/media/usb/ttusb-dec/ttusb_dec.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/ttusb-dec/ttusb_dec.c: removed blobs or mentions thereof
+Documentation/admin-guide/media/ttusb-dec.rst: removed blobs or mentions thereof
+
+VIDEO_ALLEGRO_DVT - Allegro DVT Video IP Core
+drivers/media/platform/allegro-dvt/allegro-core.c: disabled non-Free firmware-loading machinery
+drivers/media/platform/allegro-dvt/allegro-core.c: removed blobs or mentions thereof
+
+VIDEO_AMPHION_VPU - Amphion VPU (Video Processing Unit) Codec IP
+drivers/media/platform/amphion/vpu_core.c: disabled non-Free firmware-loading machinery
+drivers/media/platform/amphion/vpu_core.c: removed blobs or mentions thereof
+
+VIDEO_ATOMISP - Intel Atom Image Signal Processor Driver
+drivers/staging/media/atomisp/pci/atomisp_v4l2.c: disabled non-Free firmware-loading machinery
+drivers/staging/media/atomisp/pci/atomisp_v4l2.c: removed blobs or mentions thereof
+
+VIDEO_BT848 - BT848 Video For Linux
+drivers/media/pci/bt8xx/bttv-cards.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/bt8xx/bttv-cards.c: removed blobs or mentions thereof
+Documentation/admin-guide/media/bttv.rst: removed blobs or mentions thereof
+
+VIDEO_CCS - MIPI CCS/SMIA++/SMIA sensor support
+drivers/media/i2c/ccs/ccs-core.c: disabled non-Free firmware-loading machinery
+drivers/media/i2c/ccs/ccs-core.c: removed blobs or mentions thereof
+
+VIDEO_CODA - Chips&Media Coda multi-standard codec IP
+drivers/media/platform/chips-media/coda/coda-common.c: disabled non-Free firmware-loading machinery
+drivers/media/platform/chips-media/coda/coda-common.c: removed blobs or mentions thereof
+
+VIDEO_WAVE_VPU - Chips&Media Wave Codec Driver
+drivers/media/platform/chips-media/wave5/wave5-vpu.c: disabled non-Free firmware-loading machinery
+drivers/media/platform/chips-media/wave5/wave5-vpu.c: removed blobs or mentions thereof
+
+VIDEO_CX18 - Conexant cx23418 MPEG encoder support
+drivers/media/pci/cx18/cx18-av-firmware.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/cx18/cx18-dvb.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/cx18/cx18-firmware.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/cx18/cx18-av-firmware.c: removed blobs or mentions thereof
+drivers/media/pci/cx18/cx18-dvb.c: removed blobs or mentions thereof
+drivers/media/pci/cx18/cx18-firmware.c: removed blobs or mentions thereof
+drivers/media/pci/cx18/cx18-driver.c: removed blobs or mentions thereof
+
+VIDEO_CX231XX - Conexant cx231xx USB video capture support
+drivers/media/usb/cx231xx/cx231xx-417.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/cx231xx/cx231xx-417.c: removed blobs or mentions thereof
+
+VIDEO_CX23885 - Conexant cx23885 (2388x successor) support
+drivers/media/pci/cx23885/cx23885-417.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/cx23885/cx23885-417.c: removed blobs or mentions thereof
+drivers/media/pci/cx23885/cx23885-cards.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/cx23885/cx23885-cards.c: removed blobs or mentions thereof
+drivers/media/pci/cx23885/cx23885-video.c: removed blobs or mentions thereof
+
+VIDEO_CX25840 - Conexant CX2584x audio/video decoders
+drivers/media/i2c/cx25840/cx25840-firmware.c: disabled non-Free firmware-loading machinery
+drivers/media/i2c/cx25840/cx25840-firmware.c: removed blobs or mentions thereof
+
+VIDEO_CX88_BLACKBIRD - Blackbird MPEG encoder support (cx2388x + cx23416)
+drivers/media/pci/cx88/cx88-blackbird.c: disabled non-Free firmware-loading machinery
+
+VIDEO_EM28XX_DVB - DVB/ATSC Support for em28xx based TV cards
+drivers/media/usb/em28xx/em28xx-dvb.c: removed blobs or mentions thereof
+
+VIDEO_EXYNOS4_FIMC_IS - EXYNOS4x12 FIMC-IS (Imaging Subsystem) driver
+drivers/media/platform/samsung/exynos4-is/fimc-is.c: disabled non-Free firmware-loading machinery
+drivers/media/platform/samsung/exynos4-is/fimc-is.h: removed blobs or mentions thereof
+
+VIDEO_IPU3_IMGU - Intel ipu3-imgu driver
+drivers/staging/media/ipu3/ipu3-css-fw.c: disabled non-Free firmware-loading machinery
+drivers/staging/media/ipu3/ipu3-css-fw.h: removed blobs or mentions thereof
+drivers/staging/media/ipu3/ipu3.c: removed blobs or mentions thereof
+
+VIDEO_INTEL_IPU6 - Intel IPU6 driver
+drivers/media/pci/intel/ipu6/ipu6.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/intel/ipu6/ipu6.h: removed blobs or mentions thereof
+
+VIDEO_INTEL_IPU7 - Intel IPU7 driver
+drivers/staging/media/ipu7/ipu7.c: disabled non-Free firmware-loading machinery
+drivers/staging/media/ipu7/ipu7.h: removed blobs or mentions thereof
+
+VIDEO_IVTV - Conexant cx23416/cx23415 MPEG encoder/decoder support
+drivers/media/pci/ivtv/ivtv-firmware.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/ivtv/ivtv-firmware.c: removed blobs or mentions thereof
+Documentation/admin-guide/media/ivtv.rst: removed blobs or mentions thereof
+
+VIDEO_MEDIATEK_VPU - Mediatek Video Processor Unit
+drivers/media/platform/mediatek/vpu/mtk_vpu.c: disabled non-Free firmware-loading machinery
+drivers/media/platform/mediatek/vpu/mtk_vpu.c: removed blobs or mentions thereof
+
+VIDEO_MESON_VDEC - Amlogic video decoder driver
+drivers/staging/media/meson/vdec/vdec_1.c: disabled non-Free firmware-loading machinery
+drivers/staging/media/meson/vdec/vdec_hevc.c: disabled non-Free firmware-loading machinery
+drivers/staging/media/meson/vdec/vdec_platform.c: removed blobs or mentions thereof
+
+VIDEO_PVRUSB2 - Hauppauge WinTV-PVR USB2 support
+drivers/media/usb/pvrusb2/pvrusb2-hdw.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/pvrusb2/pvrusb2-devattr.c: removed blobs or mentions thereof
+
+VIDEO_CX23885, VIDEO_CX88_BLACKBIRD, VIDEO_IVTV, VIDEO_PVRUSB2 - See above
+include/media/drv-intf/cx2341x.h: removed blobs or mentions thereof
+
+VIDEO_GO7007 - Go 7007 support
+drivers/media/usb/go7007/go7007-driver.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/go7007/go7007-driver.c: removed blobs or mentions thereof
+drivers/media/usb/go7007/go7007-fw.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/go7007/go7007-fw.c: removed blobs or mentions thereof
+
+VIDEO_GO7007_USB_S2250_BOARD - Sensoray 2250/2251 support
+drivers/media/usb/go7007/go7007-loader.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/go7007/go7007-loader.c: removed blobs or mentions thereof
+
+VIDEO_SAA7134_DVB - DVB/ATSC Support for saa7134 based TV cards
+drivers/media/pci/saa7134/saa7134-dvb.c: disabled non-Free firmware-loading machinery
+
+VIDEO_SAA7134_GO7007 - go7007 support for saa7134 based TV cards
+drivers/media/pci/saa7134/saa7134-go7007.c: removed blobs or mentions thereof
+
+VIDEO_SAA7164 - NXP SAA7164 support
+drivers/media/pci/saa7164/saa7164-fw.c: disabled non-Free firmware-loading machinery
+drivers/media/pci/saa7164/saa7164-fw.c: removed blobs or mentions thereof
+
+VIDEO_S5C73M3 - Samsung S5C73M3 sensor support
+drivers/media/i2c/s5c73m3/s5c73m3-core.c: disabled non-Free firmware-loading machinery
+drivers/media/i2c/s5c73m3/s5c73m3-core.c: removed blobs or mentions thereof
+
+VIDEO_S5K5BAF - Samsung S5K5BAF sensor support
+drivers/media/i2c/s5k5baf.c: disabled non-Free firmware-loading machinery
+drivers/media/i2c/s5k5baf.c: removed blobs or mentions thereof
+
+VIDEO_SAMSUNG_S5P_MFC - Samsung S5P MFC 5.1 Video Codec
+drivers/media/platform/samsung/s5p-mfc/s5p_mfc_ctrl.c: disabled non-Free firmware-loading machinery
+drivers/media/platform/samsung/s5p-mfc/s5p_mfc.c: removed blobs or mentions thereof
+
+VIDEO_VD55G1 - ST VD55G1 sensor support
+drivers/media/i2c/vd55g1.c: removed blobs or mentions thereof
+
+VIDEO_STXY61 - ST VGX:Y61 sensor support
+drivers/media/i2c/vgxy61.c: removed blobs or mentions thereof
+
+USB_S2255 - USB Sensoray 2255 video capture device
+drivers/media/usb/s2255/s2255drv.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/s2255/s2255drv.c: removed blobs or mentions thereof
+
+USB_GSPCA_VICAM - USB 3com HomeConnect, AKA vicam
+drivers/media/usb/gspca/vicam.c: disabled non-Free firmware-loading machinery
+drivers/media/usb/gspca/vicam.c: removed blobs or mentions thereof
+
+VIDEO_QCOM_IRIS - Qualcomm iris V4L2 decoder driver
+drivers/media/platform/qcom/iris/iris_firmware.c: disabled non-Free firmware-loading machinery
+
+VIDEO_QCOM_VENUS - Qualcomm Venus V4L2 encoder/decoder driver
+drivers/media/platform/qcom/venus/firmware.c: disabled non-Free firmware-loading machinery
+drivers/media/platform/qcom/venus/core.c: removed blobs or mentions thereof
+drivers/media/platform/qcom/iris/iris_platform_gen1.c: removed blobs or mentions thereof
+drivers/media/platform/qcom/iris/iris_platform_gen2.c: removed blobs or mentions thereof
+
+VIDEO_TI_VPE - TI VPE (Video Processing Engine) driver
+drivers/media/platform/ti/vpe/vpdma.c: disabled non-Free firmware-loading machinery
+drivers/media/platform/ti/vpe/vpdma.c: removed blobs or mentions thereof
+
+ACENIC - Alteon AceNIC/3Com 3C985/NetGear GA620 Gigabit
+drivers/net/ethernet/alteon/acenic.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/alteon/acenic.c: removed blobs or mentions thereof
+
+ADAPTEC_STARFIRE - Adaptec Starfire/DuraLAN support
+drivers/net/ethernet/adaptec/starfire.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/adaptec/starfire.c: removed blobs or mentions thereof
+
+NET_AIROHA_NPU - Airoha NPU support
+drivers/net/ethernet/airoha/airoha_npu.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/airoha/airoha_npu.c: removed blobs or mentions thereof
+
+BNA - Brocade 1010/1020 10Gb Ethernet Driver support
+drivers/net/ethernet/brocade/bna/bnad.c: removed blobs or mentions thereof
+drivers/net/ethernet/brocade/bna/cna.h: removed blobs or mentions thereof
+drivers/net/ethernet/brocade/bna/bnad_ethtool.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/brocade/bna/cna_fwimg.c: disabled non-Free firmware-loading machinery
+
+BNX2 - Broadcom NetXtremeII
+drivers/net/ethernet/broadcom/bnx2.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/broadcom/bnx2.c: removed blobs or mentions thereof
+
+BNX2X - Broadcom NetXtremeII 10Gb support
+drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c: report missing Free firmware
+drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c: removed blobs or mentions thereof
+drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c: removed blobs or mentions thereof
+drivers/net/ethernet/broadcom/bnx2x/bnx2x_hsi.h: removed blobs or mentions thereof
+drivers/net/ethernet/broadcom/bnx2x/bnx2x_init_ops.h: declare removed function
+drivers/net/ethernet/broadcom/bnx2x/bnx2x_init_ops.h: removed blobs or mentions thereof
+
+CASSINI - Sun Cassini
+drivers/net/ethernet/sun/cassini.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/sun/cassini.c: removed blobs or mentions thereof
+
+CHELSIO_T3 - Chelsio AEL 2005 support
+drivers/net/ethernet/chelsio/cxgb3/cxgb3_main.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/chelsio/cxgb3/cxgb3_main.c: removed blobs or mentions thereof
+
+CHELSIO_T4 - Chelsio Communications T4 Ethernet support
+drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c: removed blobs or mentions thereof
+
+E100 - Intel PRO/100+
+drivers/net/ethernet/intel/e100.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/intel/e100.c: proceed without firmware
+drivers/net/ethernet/intel/e100.c: removed blobs or mentions thereof
+
+ICE - Intel(R) Ethernet Connection E800 Series Support
+drivers/net/ethernet/intel/ice/ice_main.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/intel/ice/ice_main.c: removed blobs or mentions thereof
+Documentation/networking/device_drivers/ethernet/intel/ice.rst: removed blobs or mentions thereof
+
+LIQUIDIO - Cavium LiquidIO support
+drivers/net/ethernet/cavium/liquidio/lio_main.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/cavium/liquidio/lio_main.c: removed blobs or mentions thereof
+
+NET_MEDIATEK_SOC_WED - MediaTek MT7622 SoC Wireless Ethernet Dispatch
+drivers/net/ethernet/mediatek/mtk_wed_mcu.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/mediatek/mtk_wed_mcu.c: removed blobs or mentions thereof
+drivers/net/ethernet/mediatek/mtk_wed_wo.h: removed blobs or mentions thereof
+
+MLXSW_CORE - Mellanox Technologies Switch ASICs support
+drivers/net/ethernet/mellanox/mlxsw/core.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/mellanox/mlxsw/core_linecards.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/mellanox/mlxsw/core_linecards.c: removed blobs or mentions thereof
+
+MLXSW_SPECTRUM - Mellanox Technologies Spectrum support
+drivers/net/ethernet/mellanox/mlxsw/spectrum.c: removed blobs or mentions thereof
+
+MYRI10GE - Myricom Myri-10G Ethernet support
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c: removed blobs or mentions thereof
+
+NFP - Netronome(R) NFP4000/NFP6000 NIC driver
+drivers/net/ethernet/netronome/nfp/nfp_main.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/netronome/nfp/nfp_main.c: removed blobs or mentions thereof
+Documentation/networking/device_drivers/ethernet/netronome/nfp.rst: removed blobs or mentions thereof
+
+NETXEN_NIC - NetXen Multi port (1/10) Gigabit Ethernet NIC
+drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/qlogic/netxen/netxen_nic.h: removed blobs or mentions thereof
+drivers/net/ethernet/qlogic/netxen/netxen_nic_main.c: removed blobs or mentions thereof
+
+QED - QLogic QED 25/40/100Gb core driver
+drivers/net/ethernet/qlogic/qed/qed_main.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/qlogic/qed/qed_main.c: removed blobs or mentions thereof
+
+QLCNIC - QLOGIC QLCNIC 1/10Gb Converged Ethernet NIC Support
+drivers/net/ethernet/qlogic/qlcnic/qlcnic_init.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/qlogic/qlcnic/qlcnic.h: removed blobs or mentions thereof
+drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.h: removed blobs or mentions thereof
+drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c: removed blobs or mentions thereof
+
+R8169 - Realtek 8169 gigabit ethernet support
+drivers/net/ethernet/realtek/r8169_firmware.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/realtek/r8169_main.c: removed blobs or mentions thereof
+
+SLICOSS - Alacritech Gigabit IS-NIC cards
+drivers/net/ethernet/alacritech/slicoss.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/alacritech/slic.h: removed blobs or mentions thereof
+drivers/net/ethernet/alacritech/slicoss.c: removed blobs or mentions thereof
+
+TEHUTI - Tehuti Networks 10G Ethernet
+drivers/net/ethernet/tehuti/tehuti.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/tehuti/tehuti.c: removed blobs or mentions thereof
+
+TEHUTI_TN40 - Tehuti Networks TN40xx 10G Ethernet adapters
+drivers/net/ethernet/tehuti/tn40.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/tehuti/tn40.c: removed blobs or mentions thereof
+drivers/net/ethernet/tehuti/tn40_mdio.c: removed blobs or mentions thereof
+
+TI_ICSSG_PRUETH - TI Gigabit PRU Ethernet driver
+drivers/net/ethernet/ti/icssm/icssm_prueth.c: removed blobs or mentions thereof
+Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml: removed blobs or mentions thereof
+arch/arm64/boot/dts/ti/k3-am65-iot2050-common.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/ti/k3-am654-icssg2.dtso: removed blobs or mentions thereof
+arch/arm64/boot/dts/ti/k3-am654-idk.dtso: removed blobs or mentions thereof
+arch/arm64/boot/dts/ti/k3-am642-evm.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-rdk.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-peb-c-010.dtso: removed blobs or mentions thereof
+arch/arm64/boot/dts/ti/k3-am642-sr-som.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/ti/k3-am642-tqma64xxl-mbax4xxl.dts: removed blobs or mentions thereof
+
+TI_ICSSG_PRUETH_SR1 - TI Gigabit PRU SR1.0 Ethernet driver
+drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c: removed blobs or mentions thereof
+
+TIGON3 - Broadcom Tigon3
+drivers/net/ethernet/broadcom/tg3.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/broadcom/tg3.c: removed blobs or mentions thereof
+
+TYPHOON - 3cr990 series Typhoon
+drivers/net/ethernet/3com/typhoon.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/3com/typhoon.c: removed blobs or mentions thereof
+
+YAM - YAM driver for AX.25
+drivers/net/hamradio/yam.c: disabled non-Free firmware-loading machinery
+drivers/net/hamradio/yam.c: removed blobs or mentions thereof
+
+PCMCIA_SMC91C92 - SMC 91Cxx PCMCIA
+drivers/net/ethernet/smsc/smc91c92_cs.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/smsc/smc91c92_cs.c: removed blobs or mentions thereof
+
+NFC_FDP - Intel FDP NFC driver
+drivers/nfc/fdp/fdp.c: disabled non-Free firmware-loading machinery
+drivers/nfc/fdp/fdp.c: removed blobs or mentions thereof
+
+NFC_MRVL - Marvell NFC core driver
+drivers/nfc/nfcmrvl/fw_dnld.c: disabled non-Free firmware-loading machinery
+
+NFC_NXP_NCI - NXP-NCI NFC driver
+drivers/nfc/nxp-nci/firmware.c: disabled non-Free firmware-loading machinery
+
+NFC_PN544_I2C - NFC PN544 i2c support
+drivers/nfc/pn544/i2c.c: disabled non-Free firmware-loading machinery
+
+NFC_S3FWRN5 - Core driver for Samsung S3FWRN5 NFC chip
+drivers/nfc/s3fwrn5/core.c: removed blobs or mentions thereof
+drivers/nfc/s3fwrn5/firmware.c: disabled non-Free firmware-loading machinery
+drivers/nfc/s3fwrn5/nci.c: disabled non-Free firmware-loading machinery
+
+USB_KAWETH - USB KLSI KL5USB101-based ethernet device support
+drivers/net/usb/kaweth.c: disabled non-Free firmware-loading machinery
+drivers/net/usb/kaweth.c: removed blobs or mentions thereof
+
+USB_RTL8152 - Realtek RTL8152/RTL8153 Based USB Ethernet Adapters
+drivers/net/usb/r8152.c: disabled non-Free firmware-loading machinery
+drivers/net/usb/r8152.c: removed blobs or mentions thereof
+
+AT76C50X_USB - Atmel at76c503/at76c505/at76c505a USB cards
+drivers/net/wireless/atmel/at76c50x-usb.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/atmel/at76c50x-usb.c: removed blobs or mentions thereof
+
+B43 - Broadcom 43xx wireless support (mac80211 stack)
+drivers/net/wireless/broadcom/b43/main.c: retain Free firmware-loading machinery, disabling non-Free one
+drivers/net/wireless/broadcom/b43/main.c: double-check and reject non-Free firmware
+drivers/net/wireless/broadcom/b43/main.c: cleaned up blob basenames
+drivers/net/wireless/broadcom/b43/main.c: removed blobs or mentions thereof
+
+B43LEGACY - Broadcom 43xx-legacy wireless support (mac80211 stack)
+drivers/net/wireless/broadcom/b43legacy/main.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/broadcom/b43legacy/main.c: cleaned up blob basenames
+drivers/net/wireless/broadcom/b43legacy/main.c: removed blobs or mentions thereof
+
+BRCMSMAC - Broadcom IEEE802.11n PCIe SoftMAC WLAN driver
+drivers/net/wireless/broadcom/brcm80211/brcmsmac/mac80211_if.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/broadcom/brcm80211/brcmsmac/mac80211_if.c: removed blobs or mentions thereof
+
+BRCMFMAC - Broadcom IEEE802.11n embedded FullMAC WLAN driver
+drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c: removed blobs or mentions thereof
+drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h: removed blobs or mentions thereof
+
+BRCMFMAC_SDIO - Broadcom IEEE802.11n SDIO FullMAC WLAN driver
+drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c: removed blobs or mentions thereof
+
+BRCMFMAC_USB - Broadcom IEEE802.11n USB FullMAC WLAN driver
+drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c: removed blobs or mentions thereof
+
+BRCMFMAC_PCIE - Broadcom IEEE802.11n PCIE FullMAC WLAN driver
+drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c: removed blobs or mentions thereof
+
+IPW2100 - Intel PRO/Wireless 2100 Network Connection
+drivers/net/wireless/intel/ipw2x00/ipw2100.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intel/ipw2x00/ipw2100.c: removed blobs or mentions thereof
+
+IPW2200 - Intel PRO/Wireless 2200BG and 2915ABG Network Connection
+drivers/net/wireless/intel/ipw2x00/ipw2200.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intel/ipw2x00/ipw2200.c: removed blobs or mentions thereof
+
+IWL3945 - Intel PRO/Wireless 3945ABG/BG Network Connection
+drivers/net/wireless/intel/iwlegacy/3945-mac.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intel/iwlegacy/3945-mac.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlegacy/3945.h: removed blobs or mentions thereof
+
+IWL4965 - Intel Wireless WiFi 4965AGN
+drivers/net/wireless/intel/iwlegacy/4965-mac.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intel/iwlegacy/4965-mac.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlegacy/4965.c: removed blobs or mentions thereof
+
+IWLWIFI - Intel Wireless WiFi Next Gen AGN
+drivers/net/wireless/intel/iwlwifi/iwl-nvm-parse.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intel/iwlwifi/iwl-drv.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intel/iwlwifi/fw/pnvm.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intel/iwlwifi/iwl-config.h: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/iwl-drv.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c: removed blobs or mentions thereof
+
+IWLDVM - Intel Wireless WiFi DVM Firmware support
+drivers/net/wireless/intel/iwlwifi/cfg/1000.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/2000.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/5000.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/6000.c: removed blobs or mentions thereof
+
+IWLMVM - Intel Wireless WiFi MVM Firmware support
+drivers/net/wireless/intel/iwlwifi/cfg/7000.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/8000.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/9000.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/22000.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/bz.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/sc.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/dr.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/rf-gf.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/rf-hr.c: removed blobs or mentions thereof
+drivers/net/wireless/intel/iwlwifi/cfg/rf-jf.c: removed blobs or mentions thereof
+
+LIBERTAS - Marvell 8xxx Libertas WLAN driver support
+drivers/net/wireless/marvell/libertas/firmware.c: disabled non-Free firmware-loading machinery
+
+LIBERTAS_SDIO - Marvell Libertas 8385 and 8686 SDIO 802.11b/g cards
+drivers/net/wireless/marvell/libertas/if_sdio.c: removed blobs or mentions thereof
+
+LIBERTAS_SPI - Marvell Libertas 8686 SPI 802.11b/g cards
+drivers/net/wireless/marvell/libertas/if_spi.c: removed blobs or mentions thereof
+
+LIBERTAS_USB - Marvell Libertas 8388 USB 802.11b/g cards
+drivers/net/wireless/marvell/libertas/if_usb.c: removed blobs or mentions thereof
+drivers/net/wireless/marvell/libertas/README: removed blobs or mentions thereof
+
+LIBERTAS_THINFIRM_USB - Marvell Libertas 8388 USB 802.11b/g cards with thin firmware
+drivers/net/wireless/marvell/libertas_tf/if_usb.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/marvell/libertas_tf/if_usb.c: removed blobs or mentions thereof
+
+MT7601U - MediaTek MT7601U (USB) support
+drivers/net/wireless/mediatek/mt7601u/mcu.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt7601u/usb.c: removed blobs or mentions thereof
+drivers/net/wireless/mediatek/mt7601u/usb.h: removed blobs or mentions thereof
+
+MT76_CONNAC_LIB - MediaTek MT76 support
+drivers/net/wireless/mediatek/mt76/mt76_connac_mcu.c: disabled non-Free firmware-loading machinery
+
+MT76x0_COMMON - MediaTek MT76x0E/U support
+drivers/net/wireless/mediatek/mt76/mt76x0/mt76x0.h: removed blobs or mentions thereof
+
+MT76x0E - MediaTek MT76x0E (PCIe) support
+drivers/net/wireless/mediatek/mt76/mt76x0/pci_mcu.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt76x0/pci.c: removed blobs or mentions thereof
+
+MT76x0U - MediaTek MT76x0U (USB) support
+drivers/net/wireless/mediatek/mt76/mt76x0/usb_mcu.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt76x0/usb.c: removed blobs or mentions thereof
+
+MT76x2E - MediaTek MT76x2E (PCIe) support
+drivers/net/wireless/mediatek/mt76/mt76x2/pci_mcu.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt76x2/mt76x2.h: removed blobs or mentions thereof
+drivers/net/wireless/mediatek/mt76/mt76x2/pci.c: removed blobs or mentions thereof
+
+MT76x2U - MediaTek MT76x2U (USB) support
+drivers/net/wireless/mediatek/mt76/mt76x2/usb_mcu.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt76x2/usb.c: removed blobs or mentions thereof
+
+MT7603E - MediaTek MT7603E (PCIe) and MT76x8 WLAN support
+drivers/net/wireless/mediatek/mt76/mt7603/mcu.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt7603/mt7603.h: removed blobs or mentions thereof
+drivers/net/wireless/mediatek/mt76/mt7603/pci.c: removed blobs or mentions thereof
+drivers/net/wireless/mediatek/mt76/mt7603/soc.c: removed blobs or mentions thereof
+
+MT7615E - MediaTek MT7615E (PCIe) support
+drivers/net/wireless/mediatek/mt76/mt7615/mcu.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt7615/mt7615.h: removed blobs or mentions thereof
+drivers/net/wireless/mediatek/mt76/mt7615/pci.c: removed blobs or mentions thereof
+drivers/net/wireless/mediatek/mt76/mt7615/sdio.c: removed blobs or mentions thereof
+
+MT7622_WMAC - MT7622 (SoC) WMAC support
+drivers/net/wireless/mediatek/mt76/mt7615/soc.c: removed blobs or mentions thereof
+
+MT7663U - MediaTek MT7663U (USB) support
+drivers/net/wireless/mediatek/mt76/mt7615/usb.c: removed blobs or mentions thereof
+
+MT7915E - MediaTek MT7915E (PCIe) support
+drivers/net/wireless/mediatek/mt76/mt7915/eeprom.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt7915/mt7915.h: removed blobs or mentions thereof
+drivers/net/wireless/mediatek/mt76/mt7915/pci.c: removed blobs or mentions thereof
+
+MT798X_WMAC - MT7986 (SoC) WMAC support
+drivers/net/wireless/mediatek/mt76/mt7915/soc.c: removed blobs or mentions thereof
+
+MT792x_LIB - MediaTek MT792x common support
+drivers/net/wireless/mediatek/mt76/mt792x_core.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt792x.h: removed blobs or mentions thereof
+
+MT7921_COMMON - MediaTek MT7921 support
+drivers/net/wireless/mediatek/mt76/mt7921/mcu.c: disabled non-Free firmware-loading machinery
+
+MT7921E - MediaTek MT7921E (PCIe) support
+drivers/net/wireless/mediatek/mt76/mt7921/pci.c: removed blobs or mentions thereof
+
+MT7921S - MediaTek MT7921S (SDIO) support
+drivers/net/wireless/mediatek/mt76/mt7921/sdio.c: removed blobs or mentions thereof
+
+MT7921U - MediaTek MT7921U (USB) support
+drivers/net/wireless/mediatek/mt76/mt7921/usb.c: removed blobs or mentions thereof
+
+MT7925_COMMON - MediaTek MT7925 support
+drivers/net/wireless/mediatek/mt76/mt7925/mcu.c: disabled non-Free firmware-loading machinery
+
+MT7925E - MediaTek MT7925E (PCIe) support
+drivers/net/wireless/mediatek/mt76/mt7925/pci.c: removed blobs or mentions thereof
+
+MT7925U - MediaTek MT7925U (USB) support
+drivers/net/wireless/mediatek/mt76/mt7925/usb.c: removed blobs or mentions thereof
+
+MT7996E - MediaTek MT7996 (PCIe) support
+drivers/net/wireless/mediatek/mt76/mt7996/eeprom.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt7996/mcu.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/mediatek/mt76/mt7996/mt7996.h: removed blobs or mentions thereof
+drivers/net/wireless/mediatek/mt76/mt7996/pci.c: removed blobs or mentions thereof
+
+MWIFIEX - Marvell WiFi-Ex Driver
+drivers/net/wireless/marvell/mwifiex/README: removed blobs or mentions thereof
+drivers/net/wireless/marvell/mwifiex/main.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/marvell/mwifiex/sta_ioctl.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/marvell/mwifiex/main.c: removed blobs or mentions thereof
+drivers/net/wireless/marvell/mwifiex/sta_ioctl.c: removed blobs or mentions thereof
+
+MWIFIEX_SDIO - Marvell WiFi-Ex Driver for SD8787
+drivers/net/wireless/marvell/mwifiex/sdio.h: removed blobs or mentions thereof
+drivers/net/wireless/marvell/mwifiex/sdio.c: removed blobs or mentions thereof
+
+MWIFIEX_PCIE - Marvell WiFi-Ex Driver for PCI 8766
+drivers/net/wireless/marvell/mwifiex/pcie.h: removed blobs or mentions thereof
+drivers/net/wireless/marvell/mwifiex/pcie.c: removed blobs or mentions thereof
+
+MWIFIEX_USB - Marvell WiFi-Ex Driver for USB8797
+drivers/net/wireless/marvell/mwifiex/usb.h: removed blobs or mentions thereof
+drivers/net/wireless/marvell/mwifiex/usb.c: removed blobs or mentions thereof
+
+MWL8K - Marvell 88W8xxx PCI/PCIe Wireless support
+drivers/net/wireless/marvell/mwl8k.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/marvell/mwl8k.c: removed blobs or mentions thereof
+
+PRESTERA_PCI - PCI interface driver for Marvell Prestera Switch ASICs family
+drivers/net/ethernet/marvell/prestera/prestera_pci.c: disabled non-Free firmware-loading machinery
+drivers/net/ethernet/marvell/prestera/prestera_pci.c: removed blobs or mentions thereof
+
+AR5523 - Atheros AR5523 wireless driver support
+drivers/net/wireless/ath/ar5523/ar5523.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ath/ar5523/ar5523.c: removed blobs or mentions thereof
+drivers/net/wireless/ath/ar5523/ar5523.h: removed blobs or mentions thereof
+
+ATH6KL - Atheros ath6kl support
+drivers/net/wireless/ath/ath6kl/init.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ath/ath6kl/init.c: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath6kl/core.h: removed blobs or mentions thereof
+
+ATH6KL_SDIO - Atheros ath6kl SDIO support
+drivers/net/wireless/ath/ath6kl/sdio.c: removed blobs or mentions thereof
+
+ATH6KL_USB - Atheros ath6kl USB support
+drivers/net/wireless/ath/ath6kl/usb.c: removed blobs or mentions thereof
+
+ATH10K - Atheros 802.11ac wireless cards support
+drivers/net/wireless/ath/ath10k/core.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ath/ath10k/core.c: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath10k/hw.h: removed blobs or mentions thereof
+Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml: removed blobs or mentions thereof
+
+ATH10K NL80211_TESTMODE - nl80211 testmode command
+drivers/net/wireless/ath/ath10k/testmode.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ath/ath10k/testmode.c: removed blob name in comment
+drivers/net/wireless/ath/ath10k/testmode.c: removed blobs or mentions thereof
+
+ATH10K_PCI - Atheros ath10k PCI support
+drivers/net/wireless/ath/ath10k/pci.c: removed blobs or mentions thereof
+
+ATH11K - Qualcomm Technologies 802.11ax chipset support
+drivers/net/wireless/ath/ath11k/core.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ath/ath11k/fw.h: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath11k/hw.h: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath11k/core.h: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath11k/core.c: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath11k/qmi.c: removed blobs or mentions thereof
+Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml: removed blobs or mentions thereof
+
+ATH11K_PCI - Atheros ath11k PCI support
+drivers/net/wireless/ath/ath11k/pci.c: removed blobs or mentions thereof
+
+ATH12K - Qualcomm Technologies Wi-Fi 7 support (ath12k)
+drivers/net/wireless/ath/ath12k/core.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ath/ath12k/fw.h: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath12k/core.h: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath12k/core.c: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath12k/hw.h: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath12k/pci.c: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath12k/qmi.c: removed blobs or mentions thereof
+
+ATH12K_AHB - QTI ath12k AHB support
+drivers/net/wireless/ath/ath12k/ahb.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ath/ath12k/ahb.h: removed blobs or mentions thereof
+drivers/net/wireless/ath/ath12k/ahb.c: removed blobs or mentions thereof
+
+WIL6210 - Wilocity 60g WiFi card wil6210 support
+drivers/net/wireless/ath/wil6210/fw_inc.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ath/wil6210/fw.c: removed blobs or mentions thereof
+drivers/net/wireless/ath/wil6210/wil6210.h: removed blobs or mentions thereof
+
+CW1200 - CW1200 WLAN support
+drivers/net/wireless/st/cw1200/fwio.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/st/cw1200/fwio.h: removed blobs or mentions thereof
+drivers/net/wireless/st/cw1200/sta.c: disabled non-Free firmware-loading machinery
+
+CW1200_WLAN_SDIO - Support SDIO platforms
+drivers/net/wireless/st/cw1200/cw1200_sdio.c: removed blobs or mentions thereof
+
+P54_PCI - Prism54 PCI support
+drivers/net/wireless/intersil/p54/p54pci.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intersil/p54/p54pci.c: removed blobs or mentions thereof
+drivers/net/wireless/intersil/p54/Kconfig: removed blob name
+
+P54_SPI - Prism54 SPI (stlc45xx) support
+drivers/net/wireless/intersil/p54/p54spi.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intersil/p54/p54spi.c: removed blobs or mentions thereof
+
+P54_USB - Prism54 USB support
+drivers/net/wireless/intersil/p54/p54usb.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/intersil/p54/p54usb.c: removed blobs or mentions thereof
+drivers/net/wireless/intersil/p54/p54usb.h: removed blobs or mentions thereof
+
+PLFXLC - pureLiFi X, XL, XC device support
+drivers/net/wireless/purelifi/plfxlc/firmware.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/purelifi/plfxlc/firmware.c: removed blobs or mentions thereof
+drivers/net/wireless/purelifi/plfxlc/usb.c: removed blobs or mentions thereof
+
+QTNFMAC_PCIE - Quantenna QSR1000/QSR2000/QSR10g PCIe support
+drivers/net/wireless/quantenna/qtnfmac/pcie/pearl_pcie.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/quantenna/qtnfmac/pcie/topaz_pcie.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/quantenna/qtnfmac/qtn_hw_ids.h: removed blobs or mentions thereof
+
+RSI_91X - Redpine Signals Inc 91x WLAN driver support
+drivers/net/wireless/rsi/rsi_91x_hal.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/rsi/rsi_common.h: removed blobs or mentions thereof
+drivers/net/wireless/rsi/rsi_91x_hal.c: removed blobs or mentions thereof
+
+RSI_SDIO - Redpine Signals SDIO bus support
+drivers/net/wireless/rsi/rsi_91x_sdio.c: removed blobs or mentions thereof
+
+RSI_USB - Redpine Signals USB bus support
+drivers/net/wireless/rsi/rsi_91x_usb.c: removed blobs or mentions thereof
+
+RT2X00_LIB_FIRMWARE - Ralink driver firmware support
+drivers/net/wireless/ralink/rt2x00/rt2x00firmware.c: disabled non-Free firmware-loading machinery
+
+RT61PCI - Ralink rt2501/rt61 (PCI/PCMCIA) support
+drivers/net/wireless/ralink/rt2x00/rt61pci.h: removed blobs or mentions thereof
+drivers/net/wireless/ralink/rt2x00/rt61pci.c: removed blobs or mentions thereof
+
+RT73USB - Ralink rt2501/rt73 (USB) support
+drivers/net/wireless/ralink/rt2x00/rt73usb.h: removed blobs or mentions thereof
+drivers/net/wireless/ralink/rt2x00/rt73usb.c: removed blobs or mentions thereof
+
+RT2800PCI - Ralink rt2800 (PCI/PCMCIA) support
+drivers/net/wireless/ralink/rt2x00/rt2800pci.h: removed blobs or mentions thereof
+drivers/net/wireless/ralink/rt2x00/rt2800pci.c: removed blobs or mentions thereof
+
+RT2800USB - Ralink rt2800 (USB) support
+drivers/net/wireless/ralink/rt2x00/rt2800usb.h: removed blobs or mentions thereof
+drivers/net/wireless/ralink/rt2x00/rt2800usb.c: removed blobs or mentions thereof
+
+RTL8XXXU - RTL8723AU/RTL8188[CR]U/RTL819[12]CU (mac80211) support
+drivers/net/wireless/realtek/rtl8xxxu/core.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtl8xxxu/core.c: removed blobs or mentions thereof
+drivers/net/wireless/realtek/rtl8xxxu/8188e.c: removed blobs or mentions thereof
+drivers/net/wireless/realtek/rtl8xxxu/8188f.c: removed blobs or mentions thereof
+drivers/net/wireless/realtek/rtl8xxxu/8192c.c: removed blobs or mentions thereof
+drivers/net/wireless/realtek/rtl8xxxu/8192e.c: removed blobs or mentions thereof
+drivers/net/wireless/realtek/rtl8xxxu/8192f.c: removed blobs or mentions thereof
+drivers/net/wireless/realtek/rtl8xxxu/8710b.c: removed blobs or mentions thereof
+drivers/net/wireless/realtek/rtl8xxxu/8723a.c: removed blobs or mentions thereof
+drivers/net/wireless/realtek/rtl8xxxu/8723b.c: removed blobs or mentions thereof
+
+RTLWIFI - Realtek Wireless Network Adapters
+drivers/net/wireless/realtek/rtlwifi/core.c: disabled non-Free firmware-loading machinery
+
+RTL8188EE - Realtek RTL8188EE Wireless Network Adapter
+drivers/net/wireless/realtek/rtlwifi/rtl8188ee/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8188ee/sw.c: removed blobs or mentions thereof
+
+RTL8192CE - Realtek RTL8192CE/RTL8188CE Wireless Network Adapter
+drivers/net/wireless/realtek/rtlwifi/rtl8192ce/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8192ce/sw.c: removed blobs or mentions thereof
+
+RTL8192CU - Realtek RTL8192CU/RTL8188CU USB Wireless Network Adapter
+drivers/net/wireless/realtek/rtlwifi/rtl8192cu/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8192cu/sw.c: removed blobs or mentions thereof
+
+RTL8192DE - Realtek RTL8192DE/RTL8188DE PCIe Wireless Network Adapter
+drivers/net/wireless/realtek/rtlwifi/rtl8192de/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8192de/sw.c: removed blobs or mentions thereof
+
+RTL8192DU - Realtek RTL8192DU USB Wireless Network Adapter
+drivers/net/wireless/realtek/rtlwifi/rtl8192du/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8192du/sw.c: removed blobs or mentions thereof
+
+RTL8192SE - Realtek RTL8192SE/RTL8191SE PCIe Wireless Network Adapter
+drivers/net/wireless/realtek/rtlwifi/rtl8192se/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8192se/sw.c: removed blobs or mentions thereof
+
+RTL8192EE - RealTek RTL8192EE Wireless Network Adapter
+drivers/net/wireless/realtek/rtlwifi/rtl8192ee/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8192ee/sw.c: removed blobs or mentions thereof
+
+RTL8723AE - Realtek RTL8723AE PCIe Wireless Network Adapter
+drivers/net/wireless/realtek/rtlwifi/rtl8723ae/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8723ae/sw.c: removed blobs or mentions thereof
+
+RTL8723BE - Realtek RTL8723BE PCIe Wireless Network Adapter
+drivers/net/wireless/realtek/rtlwifi/rtl8723be/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8723be/sw.c: removed blobs or mentions thereof
+
+RTL8723BS - Realtek RTL8723BS SDIO Wireless LAN NIC driver
+drivers/staging/rtl8723bs/hal/rtl8723b_hal_init.c: disabled non-Free firmware-loading machinery
+drivers/staging/rtl8723bs/hal/rtl8723b_hal_init.c: removed blobs or mentions thereof
+
+RTL8821AE - Realtek RTL8821AE/RTL8812AE Wireless LAN NIC driver
+drivers/net/wireless/realtek/rtlwifi/rtl8821ae/sw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtlwifi/rtl8821ae/sw.c: removed blobs or mentions thereof
+
+RTW88 - Realtek 802.11ac wireless chips support
+drivers/net/wireless/realtek/rtw88/main.c: disabled non-Free firmware-loading machinery
+
+RTW88_8814A - Realtek 8814A wireless network adapter
+drivers/net/wireless/realtek/rtw88/rtw8814a.c: removed blobs or mentions thereof
+
+RTW88_8821C - Realtek 8821CE PCI wireless network adapter
+drivers/net/wireless/realtek/rtw88/rtw8821c.c: removed blobs or mentions thereof
+
+RTW88_8822BE - Realtek 8822BE PCI wireless network adapter
+drivers/net/wireless/realtek/rtw88/rtw8822b.c: removed blobs or mentions thereof
+
+RTW88_8822CE - Realtek 8822CE PCI wireless network adapter
+drivers/net/wireless/realtek/rtw88/rtw8822c.c: removed blobs or mentions thereof
+
+RTW88_8703B - Realtek 8703B PCI wireless network adapter
+drivers/net/wireless/realtek/rtw88/rtw8703b.c: removed blobs or mentions thereof
+
+RTW88_8723DE - Realtek 8723DE PCI wireless network adapter
+drivers/net/wireless/realtek/rtw88/rtw8723d.c: removed blobs or mentions thereof
+
+RTW88_8812A - Realtek 8812A wireless network adapter
+drivers/net/wireless/realtek/rtw88/rtw8812a.c: removed blobs or mentions thereof
+
+RTW88_8821A - Realtek 8812A wireless network adapter
+drivers/net/wireless/realtek/rtw88/rtw8821a.c: removed blobs or mentions thereof
+
+RTW89 - Realtek 802.11ax wireless chips support
+drivers/net/wireless/realtek/rtw89/fw.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/realtek/rtw89/fw.h: removed blobs or mentions thereof
+
+RTW89_8851B - Realtek 802.11ax wireless chips support
+drivers/net/wireless/realtek/rtw89/rtw8851b.c: removed blobs or mentions thereof
+
+RTW89_8852A - Realtek 802.11ax wireless chips support
+drivers/net/wireless/realtek/rtw89/rtw8852a.c: removed blobs or mentions thereof
+
+RTW89_8852B - Realtek 802.11ax wireless chips support
+drivers/net/wireless/realtek/rtw89/rtw8852b.c: removed blobs or mentions thereof
+
+RTW89_8852BTE - Realtek 8852BE-VT PCI wireless network (Wi-Fi 6) adapter
+drivers/net/wireless/realtek/rtw89/rtw8852bt.c: removed blobs or mentions thereof
+
+RTW89_8852C - Realtek 802.11ax wireless chips support
+drivers/net/wireless/realtek/rtw89/rtw8852c.c: removed blobs or mentions thereof
+
+RTW89_8922A - Realtek 802.11be wireless chips support
+drivers/net/wireless/realtek/rtw89/rtw8922a.c: removed blobs or mentions thereof
+
+WL1251 - TI wl1251 support
+drivers/net/wireless/ti/wl1251/main.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ti/wl1251/main.c: removed blobs or mentions thereof
+drivers/net/wireless/ti/wl1251/wl1251.h: removed blobs or mentions thereof
+
+WL12XX - TI wl12xx support
+drivers/net/wireless/ti/wl12xx/main.c: removed blobs or mentions thereof
+
+WL18XX - TI wl18xx support
+drivers/net/wireless/ti/wl18xx/main.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ti/wl18xx/main.c: removed blobs or mentions thereof
+
+WLCORE - TI wlcore support
+drivers/net/wireless/ti/wlcore/main.c: disabled non-Free firmware-loading machinery
+
+WLCORE_SDIO - TI wlcore SDIO support
+drivers/net/wireless/ti/wlcore/sdio.c: removed blobs or mentions thereof
+
+WLCORE_SPI - TI wlcore SPI support
+drivers/net/wireless/ti/wlcore/spi.c: removed blobs or mentions thereof
+
+WCN36XX - Qualcomm Atheros WCN3660/3680 support
+drivers/net/wireless/ath/wcn36xx/smd.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/ath/wcn36xx/wcn36xx.h: removed blobs or mentions thereof
+drivers/net/wireless/ath/wcn36xx/main.c: removed blobs or mentions thereof
+
+WFX - Silicon Labs wireless chips WF200 and further
+drivers/net/wireless/silabs/wfx/fwio.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/silabs/wfx/fwio.c: removed blobs or mentions thereof
+
+WILC1000 - WILC1000 support (WiFi only)
+drivers/net/wireless/microchip/wilc1000/netdev.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/microchip/wilc1000/netdev.c: disabled wilc1000 non-Free firmware
+drivers/net/wireless/microchip/wilc1000/netdev.c: disabled wilc3000 non-Free firmware
+drivers/net/wireless/microchip/wilc1000/netdev.c: removed blobs or mentions thereof
+
+ZD1211RW - ZyDAS ZD1211/ZD1211B USB-wireless support
+drivers/net/wireless/zydas/zd1211rw/zd_usb.c: disabled non-Free firmware-loading machinery
+drivers/net/wireless/zydas/zd1211rw/zd_usb.c: removed blobs or mentions thereof
+
+IEEE802154_ADF7242 - ADF7242 transceiver driver
+drivers/net/ieee802154/adf7242.c: disabled non-Free firmware-loading machinery
+drivers/net/ieee802154/adf7242.c: removed blobs or mentions thereof
+
+PSE_TPS23881 - TPS23881 PSE controller
+drivers/net/pse-pd/tps23881.c: disabled non-Free firmware-loading machinery
+drivers/net/pse-pd/tps23881.c: removed blobs or mentions thereof
+
+BT_ATH3K - Atheros firmware download driver
+drivers/bluetooth/ath3k.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/ath3k.c: removed blobs or mentions thereof
+
+BT_BCM - Broadcom protocol support
+drivers/bluetooth/btbcm.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/btbcm.c: removed blobs or mentions thereof
+
+BT_HCIBCM203X - HCI BCM203x USB driver
+drivers/bluetooth/bcm203x.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/bcm203x.c: removed blobs or mentions thereof
+
+BT_HCIBCM4377 - HCI BCM4377/4378/4387 PCIe driver
+drivers/bluetooth/hci_bcm4377.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/hci_bcm4377.c: removed blobs or mentions thereof
+
+BT_HCIUART_AG6XX - Intel AG6XX protocol support
+drivers/bluetooth/hci_ag6xx.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/hci_ag6xx.c: removed blobs or mentions thereof
+
+BT_HCIUART_AML - Amlogic protocol support
+Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml: removed blobs or mentions thereof
+drivers/bluetooth/hci_aml.c: disabled non-Free firmware-loading machinery
+
+BT_HCIUART_LL - HCILL protocol support
+drivers/bluetooth/hci_ll.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/hci_ll.c: removed blobs or mentions thereof
+
+BT_HCIUART_MRVL - Marvell protocol support
+drivers/bluetooth/hci_mrvl.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/hci_mrvl.c: removed blobs or mentions thereof
+
+BT_HCIUART_NOKIA - UART Nokia H4+ protocol support
+drivers/bluetooth/hci_nokia.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/hci_nokia.c: removed blobs or mentions thereof
+
+BT_HCIBFUSB - HCI BlueFRITZ! USB driver
+drivers/bluetooth/bfusb.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/bfusb.c: removed blobs or mentions thereof
+
+BT_HCIBT3C - HCI BT3C (PC Card) driver
+drivers/bluetooth/bt3c_cs.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/bt3c_cs.c: removed blobs or mentions thereof
+
+BT_HCIBTUSB - HCI USB driver
+drivers/bluetooth/btusb.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/btusb.c: removed blobs or mentions thereof
+
+BT_INTEL - Bluetooth support for Intel devices
+drivers/bluetooth/btintel.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/btintel.c: removed blobs or mentions thereof
+
+BT_HCIUART_INTEL - Intel protocol support
+drivers/bluetooth/hci_intel.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/hci_intel.c: removed blobs or mentions thereof
+
+BT_MRVL_SDIO - Marvell BT-over-SDIO driver
+drivers/bluetooth/btmrvl_sdio.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/btmrvl_sdio.c: removed blobs or mentions thereof
+Documentation/admin-guide/btmrvl.rst: removed blobs or mentions thereof
+
+BT_MTK - MediaTek Bluetooth
+drivers/bluetooth/btmtk.h: removed blobs or mentions thereof
+drivers/bluetooth/btmtk.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/btmtk.c: removed blobs or mentions thereof
+
+BT_MTKSDIO - MediaTek HCI SDIO driver
+drivers/bluetooth/btmtksdio.c: removed blobs or mentions thereof
+
+BT_MTKUART - MediaTek HCI UART driver
+
+BT_NXPUART - NXP protocol support
+drivers/bluetooth/btnxpuart.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/btnxpuart.c: removed blobs or mentions thereof
+Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml: removed blobs or mentions thereof
+
+BT_QCA - Bluetooh support for Qualcomm/Atheros devices
+drivers/bluetooth/btqca.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/btqca.c: removed blobs or mentions thereof
+Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml: removed blobs or mentions thereof
+
+BT_RTL - Bluetooth support for Realtek devices
+drivers/bluetooth/btrtl.c: disabled non-Free firmware-loading machinery
+drivers/bluetooth/btrtl.c: removed blobs or mentions thereof
+
+INTEL_MEI_VSC_HW - Intel visual sensing controller device transport driver
+drivers/misc/mei/vsc-fw-loader.c: disabled non-Free firmware-loading machinery
+drivers/misc/mei/vsc-fw-loader.c: removed blobs or mentions thereof
+
+INFINIBAND_HFI1 - Intel OPA Gen1 support
+drivers/infiniband/hw/hfi1/firmware.c: disabled non-Free firmware-loading machinery
+drivers/infiniband/hw/hfi1/firmware.c: removed blobs or mentions thereof
+drivers/infiniband/hw/hfi1/platform.c: disabled non-Free firmware-loading machinery
+drivers/infiniband/hw/hfi1/platform.c: removed blobs or mentions thereof
+
+CAN_SOFTING - Softing Gmbh CAN generic support
+drivers/net/can/softing/softing_fw.c: disabled non-Free firmware-loading machinery
+
+CAN_SOFTING_CS - Softing Gmbh CAN pcmcia cards
+drivers/net/can/softing/softing_cs.c: removed blobs or mentions thereof
+drivers/net/can/softing/softing_platform.h: removed blobs or mentions thereof
+drivers/net/can/softing/Kconfig: removed firmware notes
+
+NET_DSA_LANTIQ_GSWIP - Lantiq / Intel GSWIP
+drivers/net/dsa/lantiq/lantiq_gswip.c: disabled non-Free firmware-loading machinery
+drivers/net/dsa/lantiq/lantiq_gswip.c: removed blobs or mentions thereof
+
+AS21XXX_PHY - Aeonsemi AS21xxx PHYs
+drivers/net/phy/as21xxx.c: disabled non-Free firmware-loading machinery
+Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml: removed blobs or mentions thereof
+
+MEDIATEK_2P5GE_PHY - MediaTek 2.5Gb Ethernet PHYs
+drivers/net/phy/mediatek/mtk-2p5ge.c: disabled non-Free firmware-loading machinery
+drivers/net/phy/mediatek/mtk-2p5ge.c: removed blobs or mentions thereof
+
+MICROSEMI_PHY - Microsemi PHYs
+drivers/net/phy/mscc/mscc_main.c: disabled non-Free firmware-loading machinery
+drivers/net/phy/mscc/mscc_main.c: removed blobs or mentions thereof
+drivers/net/phy/mscc/mscc.h: removed blobs or mentions thereof
+
+AQUANTIA_PHY - Aquantia PHYs
+drivers/net/phy/aquantia/aquantia_firmware.c: disabled non-Free firmware-loading machinery
+Documentation/devicetree/bindings/net/marvell,aquantia.yaml: removed blobs or mentions thereof
+
+AIR_EN8811H_PHY - Airoha EN8811H 2.5 Gigabit PHY
+drivers/net/phy/air_en8811h.c: disabled non-Free firmware-loading machinery
+drivers/net/phy/air_en8811h.c: removed blobs or mentions thereof
+
+AMCC_QT2025_PHY - AMCC QT2025 PHY
+drivers/net/phy/qt2025.rs: removed blobs or mentions thereof
+
+MISDN_SPEEDFAX - Support for Sedlbauer Speedfax+
+drivers/isdn/hardware/mISDN/speedfax.c: disabled non-Free firmware-loading machinery
+drivers/isdn/hardware/mISDN/speedfax.c: removed blobs or mentions thereof
+
+SERIAL_ICOM - IBM Multiport Serial Adapter
+drivers/tty/serial/icom.c: disabled non-Free firmware-loading machinery
+drivers/tty/serial/icom.c: removed blobs or mentions thereof
+
+SERIAL_QE - Freescale QUICC Engine serial port support
+drivers/tty/serial/ucc_uart.c: disabled non-Free firmware-loading machinery
+drivers/tty/serial/ucc_uart.c: removed blobs or mentions thereof
+
+SERIAL_RP2 - Comtrol RocketPort EXPRESS/INFINITY support
+drivers/tty/serial/rp2.c: disabled non-Free firmware-loading machinery
+drivers/tty/serial/rp2.c: removed blobs or mentions thereof
+
+LEDS_LP55XX_COMMON - Common Driver for TI/National LP5521 and LP5523/55231
+drivers/leds/leds-lp55xx-common.c: disabled non-Free firmware-loading machinery
+
+LEDS_LP5521 - LED Support for N.S. LP5521 LED driver chip
+
+LEDS_LP5523 - LED Support for TI/National LP5523/55231 LED driver chip
+
+MOUSE_CYAPA - Cypress APA I2C Trackpad support
+drivers/input/mouse/cyapa.c: removed blobs or mentions thereof
+
+MOUSE_ELAN_I2C - ELAN I2C Touchpad support
+drivers/input/mouse/elan_i2c_core.c: disabled non-Free firmware-loading machinery
+drivers/input/mouse/elan_i2c.h: removed blobs or mentions thereof
+
+ARCH_APPLE - Apple Silicon SoC family
+drivers/input/touchscreen/apple_z2.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/apple_z2.c: removed blobs or mentions thereof
+Documentation/devicetree/bindings/input/touchscreen/apple,z2-multitouch.yaml: removed blobs or mentions thereof
+arch/arm64/boot/dts/apple/t8103-j293.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/apple/t8112-j493.dts: removed blobs or mentions thereof
+
+TOUCHSCREEN_ATMEL_MXT - Atmel mXT I2C Touchscreen
+drivers/input/touchscreen/atmel_mxt_ts.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/atmel_mxt_ts.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_CHIPONE_ICN8505 - chipone icn8505 touchscreen controller
+drivers/input/touchscreen/chipone_icn8505.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/chipone_icn8505.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_ELAN - Elan eKTH I2C touchscreen
+drivers/input/touchscreen/elants_i2c.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/elants_i2c.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_GOODIX - Goodix I2C touchscreen
+drivers/input/touchscreen/goodix.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/goodix.c: removed blobs or mentions thereof
+drivers/input/touchscreen/goodix_fwupload.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/goodix_fwupload.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_HIDEEP - HiDeep Touch IC
+drivers/input/touchscreen/hideep.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/hideep.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_ILI210X - Ilitek ILI210X based touchscreen
+drivers/input/touchscreen/ili210x.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/ili210x.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_IQS5XX - Azoteq IQS550/572/525 trackpad/touchscreen controller
+drivers/input/touchscreen/iqs5xx.c: disabled non-Free firmware-loading machinery
+
+TOUCHSCREEN_MELFAS_MIP4 - MELFAS MIP4 Touchscreen
+drivers/input/touchscreen/melfas_mip4.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/melfas_mip4.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_RM_TS - Raydium I2C Touchscreen
+drivers/input/touchscreen/raydium_i2c_ts.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/raydium_i2c_ts.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_ROHM_BU21023 - ROHM BU21023/24 Dual touch support resistive touchscreens
+drivers/input/touchscreen/rohm_bu21023.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/rohm_bu21023.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_SILEAD - Silead I2C touchscreen
+drivers/input/touchscreen/silead.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/silead.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_DMI - DMI based touchscreen configuration info
+drivers/platform/x86/touchscreen_dmi.c: removed blobs or mentions thereof
+
+X86_ANDROID_TABLETS - X86 Android tablet support
+drivers/platform/x86/x86-android-tablets/other.c: removed blobs or mentions thereof
+
+TOUCHSCREEN_WDT87XX_I2C - Weida HiTech I2C touchscreen
+drivers/input/touchscreen/wdt87xx_i2c.c: disabled non-Free firmware-loading machinery
+drivers/input/touchscreen/wdt87xx_i2c.c: removed blobs or mentions thereof
+
+INPUT_IMS_PCU - IMS Passenger Control Unit driver
+drivers/input/misc/ims-pcu.c: disabled non-Free firmware-loading machinery
+drivers/input/misc/ims-pcu.c: removed blobs or mentions thereof
+
+INTEL_ISH_HID - Intel Integrated Sensor Hub
+Documentation/hid/intel-ish-hid.rst: disabled non-Free firmware-loading machinery
+drivers/hid/intel-ish-hid/ishtp/loader.c: disabled non-Free firmware-loading machinery
+drivers/hid/intel-ish-hid/ipc/pci-ish.c: removed blobs or mentions thereof
+drivers/hid/intel-ish-hid/ishtp/loader.c: removed blobs or mentions thereof
+
+INTEL_ISH_FIRMWARE_DOWNLOADER - Host Firmware Load feature for Intel ISH
+drivers/hid/intel-ish-hid/ishtp-fw-loader.c: disabled non-Free firmware-loading machinery
+drivers/hid/intel-ish-hid/ishtp-fw-loader.c: removed blobs or mentions thereof
+Documentation/hid/intel-ish-hid.rst: removed blobs or mentions thereof
+
+COMEDI - Data acquisition support (comedi)
+drivers/comedi/drivers.c: retain Free firmware-loading machinery, disabling non-Free one
+
+COMEDI_DAQBOARD2000 - IOtech DAQboard/2000 support
+drivers/comedi/drivers/daqboard2000.c: removed blobs or mentions thereof
+
+COMEDI_JR3_PCI - JR3/PCI force sensor board support
+drivers/comedi/drivers/jr3_pci.c: removed blobs or mentions thereof
+
+COMEDI_ME_DAQ - Meilhaus ME-2000i, ME-2600i, ME-3000vm1 support
+drivers/comedi/drivers/me_daq.c: removed blobs or mentions thereof
+
+COMEDI_ME4000 - Meilhaus ME-4000 support
+drivers/comedi/drivers/me4000.c: removed blobs or mentions thereof
+
+COMEDI_NI_PCIDIO - NI PCI-DIO32HS, PCI-6533, PCI-6534 support
+drivers/comedi/drivers/ni_pcidio.c: removed blobs or mentions thereof
+
+IIO_SSP_SENSORHUB - Samsung Sensorhub driver
+drivers/iio/common/ssp_sensors/ssp_dev.c: removed blobs or mentions thereof
+
+BMI270 - Bosch BMI270
+drivers/iio/imu/bmi270/bmi270_core.c: disabled non-Free firmware-loading machinery
+drivers/iio/imu/bmi270/bmi270_core.c: removed blobs or mentions thereof
+
+AW96103 - AW96103/AW96105 Awinic proximity sensor
+drivers/iio/proximity/aw96103.c: disabled non-Free firmware-loading machinery
+drivers/iio/proximity/aw96103.c: removed blobs or mentions thereof
+
+HX9023S - TYHX HX9023S SAR sensor
+drivers/iio/proximity/hx9023s.c: disabled non-Free firmware-loading machinery
+drivers/iio/proximity/hx9023s.c: removed blobs or mentions thereof
+
+MMC_VUB300 - VUB300 USB to SDIO/SD/MMC Host Controller support
+drivers/mmc/host/Kconfig: removed firmware notes
+drivers/mmc/host/vub300.c: disabled non-Free firmware-loading machinery
+drivers/mmc/host/vub300.c: removed blobs or mentions thereof
+
+SCSI_QLOGICPTI - PTI Qlogic, ISP Driver
+drivers/scsi/qlogicpti.c: disabled non-Free firmware-loading machinery
+drivers/scsi/qlogicpti.c: removed blobs or mentions thereof
+
+SCSI_ADVANSYS - AdvanSys SCSI
+drivers/scsi/advansys.c: disabled non-Free firmware-loading machinery
+drivers/scsi/advansys.c: removed blobs or mentions thereof
+
+SCSI_QLOGIC_1280 - Qlogic QLA 1240/1x80/1x160 SCSI
+drivers/scsi/qla1280.c: disabled non-Free firmware-loading machinery
+drivers/scsi/qla1280.c: removed blobs or mentions thereof
+
+SCSI_AIC94XX - Adaptec AIC94xx SAS/SATA support
+drivers/scsi/aic94xx/aic94xx_seq.c: disabled non-Free firmware-loading machinery
+drivers/scsi/aic94xx/aic94xx_seq.c: removed blobs or mentions thereof
+drivers/scsi/aic94xx/aic94xx_seq.h: removed blobs or mentions thereof
+
+SCSI_BFA_FC - Brocade BFA Fibre Channel Support
+drivers/scsi/bfa/bfad.c: disabled non-Free firmware-loading machinery
+drivers/scsi/bfa/bfad.c: removed blobs or mentions thereof
+
+SCSI_CHELSIO_FCOE - Chelsio Communications FCoE support
+drivers/scsi/csiostor/csio_hw.c: disabled non-Free firmware-loading machinery
+drivers/scsi/csiostor/csio_hw_chip.h: removed blobs or mentions thereof
+drivers/scsi/csiostor/csio_init.c: removed blobs or mentions thereof
+
+SCSI_EFCT - Emulex Fibre Channel Target
+drivers/scsi/elx/efct/efct_driver.c: disabled non-Free firmware-loading machinery
+drivers/scsi/elx/efct/efct_driver.c: removed blobs or mentions thereof
+
+SCSI_LPFC - Emulex LightPulse Fibre Channel Support
+drivers/scsi/lpfc/lpfc_init.c: disabled non-Free firmware-loading machinery
+drivers/scsi/lpfc/lpfc_init.c: removed blobs or mentions thereof
+
+SCSI_QLA_FC - QLogic QLA2XXX Fibre Channel Support
+drivers/scsi/qla2xxx/qla_os.c: disabled non-Free firmware-loading machinery
+drivers/scsi/qla2xxx/Kconfig: removed firmware notes
+drivers/scsi/qla2xxx/qla_os.c: removed blobs or mentions thereof
+
+SCSI_WD719x - Western Digital WD7193/7197/7296 support
+drivers/scsi/wd719x.c: disabled non-Free firmware-loading machinery
+drivers/scsi/wd719x.c: removed blobs or mentions thereof
+Documentation/scsi/wd719x.rst: removed blobs or mentions thereof
+Documentation/translations/zh_CN/scsi/wd719x.rst: removed blobs or mentions thereof
+
+SCSI_UFS_RENESAS - Renesas specific hooks to UFS controller platform driver
+drivers/ufs/host/ufs-renesas.c: disabled non-Free firmware-loading machinery
+drivers/ufs/host/ufs-renesas.c: removed blobs or mentions thereof
+
+USB_CXACRU - Conexant AccessRunner USB support
+drivers/usb/atm/cxacru.c: disabled non-Free firmware-loading machinery
+drivers/usb/atm/cxacru.c: removed blobs or mentions thereof
+
+USB_SPEEDTOUCH - Speedtouch USB support
+drivers/usb/atm/speedtch.c: disabled non-Free firmware-loading machinery
+drivers/usb/atm/speedtch.c: removed blobs or mentions thereof
+
+USB_UEAGLEATM - ADI 930 and eagle USB DSL modem
+drivers/usb/atm/ueagle-atm.c: disabled non-Free firmware-loading machinery
+drivers/usb/atm/ueagle-atm.c: removed blobs or mentions thereof
+
+USB_XHCI_RCAR - xHCI support for Renesas R-Car SoCs
+drivers/usb/host/xhci-rcar.c: disabled non-Free firmware-loading machinery
+drivers/usb/host/xhci-rcar.c: removed blobs or mentions thereof
+
+USB_XHCI_PCI_RENESAS - Support for additional Renesas xHCI controller with firmware
+drivers/usb/host/xhci-pci-renesas.c: disabled non-Free firmware-loading machinery
+drivers/usb/host/xhci-pci-renesas.c: removed blobs or mentions thereof
+
+USB_XHCI_TEGRA - xHCI support for NVIDIA Tegra SoCs
+drivers/usb/host/xhci-tegra.c: disabled non-Free firmware-loading machinery
+drivers/usb/host/xhci-tegra.c: removed blobs or mentions thereof
+
+USB_EMI26 - EMI 2|6 USB Audio interface
+drivers/usb/misc/emi26.c: disabled non-Free firmware-loading machinery
+drivers/usb/misc/emi26.c: removed blobs or mentions thereof
+
+USB_EMI62 - EMI 6|2m USB Audio interface
+drivers/usb/misc/emi62.c: disabled non-Free firmware-loading machinery
+drivers/usb/misc/emi62.c: removed blobs or mentions thereof
+
+USB_EZUSB_FX2 - Functions for loading firmware on EZUSB chips
+drivers/usb/misc/ezusb.c: retain Free firmware-loading machinery, disabling non-Free one
+
+USB_ISIGHTFW - iSight firmware loading support
+drivers/usb/misc/isight_firmware.c: disabled non-Free firmware-loading machinery
+drivers/usb/misc/isight_firmware.c: removed blobs or mentions thereof
+
+USB_STORAGE_ENE_UB6250 - USB ENE card reader support
+drivers/usb/storage/ene_ub6250.c: disabled non-Free firmware-loading machinery
+drivers/usb/storage/ene_ub6250.c: removed blobs or mentions thereof
+
+USB_SERIAL_KEYSPAN - USB Keyspan USA-xxx Serial Driver
+drivers/usb/serial/keyspan.c: removed blobs or mentions thereof
+
+USB_SERIAL_EDGEPORT - USB Inside Out Edgeport Serial Driver
+drivers/usb/serial/io_edgeport.c: disabled non-Free firmware-loading machinery
+drivers/usb/serial/io_edgeport.c: removed blobs or mentions thereof
+
+USB_SERIAL_EDGEPORT_TI - USB Inside Out Edgeport Serial Driver (TI devices)
+drivers/usb/serial/io_ti.c: disabled non-Free firmware-loading machinery
+drivers/usb/serial/io_ti.c: deblobbed comment
+drivers/usb/serial/io_ti.c: removed blobs or mentions thereof
+
+USB_SERIAL_MXUPORT - USB Moxa UPORT Serial Driver
+drivers/usb/serial/mxuport.c: disabled non-Free firmware-loading machinery
+drivers/usb/serial/mxuport.c: removed blobs or mentions thereof
+
+USB_SERIAL_TI - USB TI 3410/5052 Serial Driver
+drivers/usb/serial/ti_usb_3410_5052.c: disabled non-Free firmware-loading machinery
+drivers/usb/serial/ti_usb_3410_5052.c: removed blobs or mentions thereof
+
+USB_SERIAL_WHITEHEAT - USB ConnectTech WhiteHEAT Serial Driver
+drivers/usb/serial/whiteheat.c: removed blobs or mentions thereof
+
+UCSI_CCG - UCSI Interface Driver for Cypress CCGx
+drivers/usb/typec/ucsi/ucsi_ccg.c: disabled non-Free firmware-loading machinery
+drivers/usb/typec/ucsi/ucsi_ccg.c: removed blobs or mentions thereof
+
+UCSI_STM32G0 - UCSI Interface Driver for STM32G0
+drivers/usb/typec/ucsi/ucsi_stm32g0.c: disabled non-Free firmware-loading machinery
+arch/arm/boot/dts/st/stm32mp135f-dk.dts: removed blobs or mentions thereof
+
+TYPEC_TPS6598X - TI TPS6598x USB Power Delivery controller driver
+drivers/usb/typec/tipd/core.c: disabled non-Free firmware-loading machinery
+Documentation/devicetree/bindings/usb/ti,tps6598x.yaml: removed blobs or mentions thereof
+
+BCM_VK - Support for Broadcom VK Accelerators
+drivers/misc/bcm-vk/bcm_vk_dev.c: disabled non-Free firmware-loading machinery
+drivers/misc/bcm-vk/bcm_vk_dev.c: removed blobs or mentions thereof
+
+GEHC_ACHC - GEHC ACHC support
+drivers/misc/gehc-achc.c: disabled non-Free firmware-loading machinery
+drivers/misc/gehc-achc.c: removed blobs or mentions thereof
+Documentation/ABI/testing/sysfs-driver-ge-achc: removed blobs or mentions thereof
+
+DRM_ACCEL_AMDXDNA - AMD AI Engine
+drivers/accel/amdxdna/aie2_pci.c: disabled non-Free firmware-loading machinery
+drivers/accel/amdxdna/amdxdna_pci_drv.c: removed blobs or mentions thereof
+
+DRM_ACCEL_HABANALABS - HabanaLabs AI accelerators (habanalabs)
+drivers/accel/habanalabs/common/firmware_if.c: disabled non-Free firmware-loading machinery
+drivers/accel/habanalabs/gaudi/gaudi.c: disabled non-Free firmware-loading machinery
+drivers/accel/habanalabs/gaudi/gaudi.c: removed blobs or mentions thereof
+drivers/accel/habanalabs/gaudi2/gaudi2P.h: removed blobs or mentions thereof
+drivers/accel/habanalabs/goya/goya.c: removed blobs or mentions thereof
+
+DRM_ACCEL_IVPU - Intel VPU for Meteor Lake and newer
+drivers/accel/ivpu/ivpu_fw.c: disabled non-Free firmware-loading machinery
+drivers/accel/ivpu/ivpu_fw.c: removed blobs or mentions thereof
+
+DRM_ACCEL_QAIC - Qualcomm Cloud AI accelerators
+drivers/accel/qaic/sahara.c: disabled non-Free firmware-loading machinery
+drivers/accel/qaic/sahara.c: removed blobs or mentions thereof
+drivers/accel/qaic/mhi_controller.c: removed blobs or mentions thereof
+
+LATTICE_ECP3_CONFIG - Lattice ECP3 FPGA bitstrap configuration via SPI
+drivers/misc/lattice-ecp3-config.c: disabled non-Free firmware-loading machinery
+drivers/misc/lattice-ecp3-config.c: removed blobs or mentions thereof
+
+REMOTEPROC - Support for Remote Processor subsystem
+drivers/remoteproc/remoteproc_core.c: retain Free firmware-loading machinery, disabling non-Free one
+
+IMX_DSP_REMOTEPROC - i.MX DSP remoteproc support
+drivers/remoteproc/imx_dsp_rproc.c: disabled non-Free firmware-loading machinery
+
+KEYSTONE_REMOTEPROC - Keystone Remoteproc support
+drivers/remoteproc/keystone_remoteproc.c: removed blobs or mentions thereof
+
+MTK_SCP - Mediatek SCP support
+drivers/remoteproc/mtk_scp.c: removed blobs or mentions thereof
+
+WKUP_M3_RPROC - AMx3xx Wakeup M3 remoteproc support
+Documentation/devicetree/bindings/remoteproc/wkup_m3_rproc.txt: removed blobs or mentions thereof
+arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/ti/omap/am437x-l4.dtsi: removed blobs or mentions thereof
+arch/arm/mach-omap2/pm33xx-core.c: removed blobs or mentions thereof
+
+WKUP_M3_IPC - TI AMx3 Wkup-M3 IPC Driver
+drivers/soc/ti/wkup_m3_ipc.c: disabled non-Free firmware-loading machinery
+Documentation/devicetree/bindings/soc/ti/wkup-m3-ipc.yaml: removed blobs or mentions thereof
+
+QCOM_Q6V5_ADSP - Qualcomm Technology Inc ADSP Peripheral Image Loader
+drivers/remoteproc/qcom_q6v5_adsp.c: removed blobs or mentions thereof
+
+QCOM_Q6V5_MSS - Qualcomm Hexagon V5 self-authenticating modem subsystem support
+drivers/remoteproc/qcom_q6v5_mss.c: disabled non-Free firmware-loading machinery
+drivers/remoteproc/qcom_q6v5_mss.c: removed blobs or mentions thereof
+
+QCOM_Q6V5_PAS - Qualcomm Hexagon V5 Peripheral Authentication Service support
+drivers/remoteproc/qcom_q6v5_pas.c: disabled non-Free firmware-loading machinery
+drivers/remoteproc/qcom_q6v5_pas.c: removed blobs or mentions thereof
+
+QCOM_Q6V5_WCSS - Qualcomm Hexagon based WCSS Peripheral Image Loader
+drivers/remoteproc/qcom_q6v5_wcss.c: removed blobs or mentions thereof
+
+QCOM_WCNSS_PIL - Qualcomm WCNSS Peripheral Image Loader
+drivers/remoteproc/qcom_wcnss.c: removed blobs or mentions thereof
+Documentation/devicetree/bindings/remoteproc/qcom,wcnss-pil.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/remoteproc/qcom,sc8280xp-pas.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/remoteproc/qcom,sm8150-pas.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/remoteproc/qcom,sm8350-pas.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/remoteproc/qcom,sm8550-pas.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.yaml: removed blobs or mentions thereof
+
+QCOM_IPA - Qualcomm IPA support
+drivers/net/ipa/ipa_main.c: disabled non-Free firmware-loading machinery
+drivers/net/ipa/ipa_main.c: removed blobs or mentions thereof
+
+MFD_IQS62X - Azoteq IQS620A/621/622/624/625 core support
+drivers/mfd/iqs62x.c: disabled non-Free firmware-loading machinery
+drivers/mfd/iqs62x.c: removed blobs or mentions thereof
+Documentation/devicetree/bindings/mfd/iqs62x.yaml: removed blobs or mentions thereof
+
+MFD_CS42L43 - Cirrus Logic CS42L43
+drivers/mfd/cs42l43.c: disabled non-Free firmware-loading machinery
+drivers/mfd/cs42l43.c: removed blobs or mentions thereof
+
+MFD_CS40L50_CORE - Cirrus Logic CS40L50 core
+drivers/mfd/cs40l50-core.c: disabled non-Free firmware-loading machinery
+drivers/mfd/cs40l50-core.c: removed blobs or mentions thereof
+include/linux/mfd/cs40l50.h: removed blobs or mentions thereof
+
+PTP_1588_CLOCK_IDTCM - IDT CLOCKMATRIX as PTP clock
+drivers/ptp/ptp_clockmatrix.c: disabled non-Free firmware-loading machinery
+drivers/ptp/ptp_clockmatrix.h: removed blobs or mentions thereof
+Documentation/driver-api/ptp.rst: removed blobs or mentions thereof
+
+PTP_1588_CLOCK_IDT82P33 - IDT 82P33xxx PTP clock
+drivers/ptp/ptp_idt82p33.c: disabled non-Free firmware-loading machinery
+drivers/ptp/ptp_idt82p33.c: removed blobs or mentions thereof
+drivers/ptp/ptp_idt82p33.h: removed blobs or mentions thereof
+
+PTP_1588_CLOCK_FC3W - RENESAS FemtoClock3 Wireless as PTP clock
+drivers/ptp/ptp_fc3.c: disabled non-Free firmware-loading machinery
+drivers/ptp/ptp_fc3.h: removed blobs or mentions thereof
+
+SND_ASIHPI - AudioScience ASIxxxx
+sound/pci/asihpi/hpidspcd.c: disabled non-Free firmware-loading machinery
+sound/pci/asihpi/hpidspcd.c: removed blobs or mentions thereof
+sound/pci/asihpi/hpioctl.c: removed blobs or mentions thereof
+
+SND_CS46XX - Cirrus Logic (Sound Fusion) CS4280/CS461x/CS462x/CS463x
+sound/pci/cs46xx/cs46xx_lib.c: disabled non-Free firmware-loading machinery
+sound/pci/cs46xx/cs46xx_lib.c: removed blobs or mentions thereof
+
+SND_KORG1212 - Korg 1212 IO
+sound/pci/korg1212/korg1212.c: disabled non-Free firmware-loading machinery
+sound/pci/korg1212/korg1212.c: removed blobs or mentions thereof
+
+SND_MAESTRO3 - ESS Allegro/Maestro3
+sound/pci/maestro3.c: disabled non-Free firmware-loading machinery
+sound/pci/maestro3.c: removed blobs or mentions thereof
+
+SND_YMFPCI - Yamaha YMF724/740/744/754
+sound/pci/ymfpci/ymfpci_main.c: disabled non-Free firmware-loading machinery
+sound/pci/ymfpci/ymfpci_main.c: removed blobs or mentions thereof
+
+SND_SB16_CSP - SB16 Advanced Signal Processor
+sound/isa/sb/sb16_csp.c: disabled non-Free firmware-loading machinery
+sound/isa/sb/sb16_csp.c: removed blobs or mentions thereof
+
+SND_WAVEFRONT - Turtle Beach Maui,Tropez,Tropez+ (Wavefront)
+sound/isa/wavefront/wavefront_fx.c: disabled non-Free firmware-loading machinery
+sound/isa/wavefront/wavefront_fx.c: removed blobs or mentions thereof
+sound/isa/wavefront/wavefront_synth.c: disabled non-Free firmware-loading machinery
+sound/isa/wavefront/wavefront_synth.c: removed blobs or mentions thereof
+
+SND_VX_LIB - Digigram VX soundcards
+sound/drivers/vx/vx_hwdep.c: disabled non-Free firmware-loading machinery
+sound/drivers/vx/vx_hwdep.c: removed blobs or mentions thereof
+
+SND_DARLA20 - (Echoaudio) Darla20
+sound/pci/echoaudio/darla20.c: removed blobs or mentions thereof
+
+SND_DARLA24 - (Echoaudio) Darla24
+sound/pci/echoaudio/darla24.c: removed blobs or mentions thereof
+
+SND_ECHO3G - (Echoaudio) 3G cards
+sound/pci/echoaudio/echo3g.c: removed blobs or mentions thereof
+
+SND_GINA20 - (Echoaudio) Gina20
+sound/pci/echoaudio/gina20.c: removed blobs or mentions thereof
+
+SND_GINA24 - (Echoaudio) Gina24
+sound/pci/echoaudio/gina24.c: removed blobs or mentions thereof
+
+SND_INDIGO - (Echoaudio) Indigo
+sound/pci/echoaudio/indigo.c: removed blobs or mentions thereof
+
+SND_INDIGODJ - (Echoaudio) Indigo DJ
+sound/pci/echoaudio/indigodj.c: removed blobs or mentions thereof
+
+SND_INDIGODJX - (Echoaudio) Indigo DJx
+sound/pci/echoaudio/indigodjx.c: removed blobs or mentions thereof
+
+SND_INDIGOIO - (Echoaudio) Indigo IO
+sound/pci/echoaudio/indigoio.c: removed blobs or mentions thereof
+
+SND_INDIGOIOX - (Echoaudio) Indigo IOx
+sound/pci/echoaudio/indigoiox.c: removed blobs or mentions thereof
+
+SND_LAYLA20 - (Echoaudio) Layla20
+sound/pci/echoaudio/layla20.c: removed blobs or mentions thereof
+
+SND_LAYLA24 - (Echoaudio) Layla24
+sound/pci/echoaudio/layla24.c: removed blobs or mentions thereof
+
+SND_MIA - (Echoaudio) Mia
+sound/pci/echoaudio/mia.c: removed blobs or mentions thereof
+
+SND_MONA - (Echoaudio) Mona
+sound/pci/echoaudio/mona.c: removed blobs or mentions thereof
+
+SND_<(Echoaudio)> - (Echoaudio) all of the above
+sound/pci/echoaudio/echoaudio.c: disabled non-Free firmware-loading machinery
+sound/pci/echoaudio/echoaudio.c: removed blobs or mentions thereof
+
+SND_EMU10K1 - Emu10k1 (SB Live!, Audigy, E-mu APS)
+sound/pci/emu10k1/emu10k1_main.c: disabled non-Free firmware-loading machinery
+sound/pci/emu10k1/emu10k1_main.c: removed blobs or mentions thereof
+
+SND_MIXART - Digigram miXart
+sound/pci/mixart/mixart_hwdep.c: disabled non-Free firmware-loading machinery
+sound/pci/mixart/mixart_hwdep.c: removed blobs or mentions thereof
+
+SND_PCXHR - Digigram PCXHR
+sound/pci/pcxhr/pcxhr_hwdep.c: disabled non-Free firmware-loading machinery
+sound/pci/pcxhr/pcxhr_hwdep.c: removed blobs or mentions thereof
+
+SND_RIPTIDE - Conexant Riptide
+sound/pci/riptide/riptide.c: disabled non-Free firmware-loading machinery
+sound/pci/riptide/riptide.c: removed blobs or mentions thereof
+
+SND_HDA_CODEC_CA0132_DSP - Support new DSP code for CA0132 codec
+sound/hda/codecs/ca0132.c: disabled non-Free firmware-loading machinery
+sound/hda/codecs/ca0132.c: removed blobs or mentions thereof
+sound/hda/codecs/Kconfig: removed blob name
+
+SND_HDA_SCODEC_CS35L41 - CS35L41 HD-audio side codec support
+sound/hda/codecs/side-codecs/cs35l41_hda.c: disabled non-Free firmware-loading machinery
+sound/hda/codecs/side-codecs/cs35l41_hda.c: removed blobs or mentions thereof
+
+SND_HDA_SCODEC_CS35L56 - CS35L56 HD-audio side codec support
+sound/hda/codecs/side-codecs/cs35l56_hda.c: disabled non-Free firmware-loading machinery
+sound/hda/codecs/side-codecs/cs35l56_hda.c: removed blobs or mentions thereof
+Documentation/sound/codecs/cs35l56.rst: removed blobs or mentions thereof
+
+SND_HDA_SCODEC_TAS2781_SPI - TAS2781 HD-audio side codec support for SPI Bus
+sound/hda/codecs/side-codecs/tas2781_hda_spi.c: disabled non-Free firmware-loading machinery
+sound/hda/codecs/side-codecs/tas2781_hda_spi.c: removed blobs or mentions thereof
+
+SND_HDSP - RME Hammerfall DSP Audio
+sound/pci/rme9652/hdsp.c: disabled non-Free firmware-loading machinery
+sound/pci/rme9652/hdsp.c: removed blobs or mentions thereof
+
+SND_MSND_PINNACLE - Support for Turtle Beach MultiSound Pinnacle
+sound/isa/msnd/msnd_pinnacle.h: removed blobs or mentions thereof
+sound/isa/msnd/msnd_pinnacle.c: disabled non-Free firmware-loading machinery
+sound/isa/msnd/msnd_pinnacle.c: removed blobs or mentions thereof
+Documentation/sound/cards/multisound.sh: removed blobs or mentions thereof
+
+SND_MSND_CLASSIC - Support for Turtle Beach MultiSound Classic, Tahiti, Monterey
+sound/isa/msnd/msnd_classic.h: removed blobs or mentions thereof
+
+SND_SSCAPE - Ensoniq SoundScape driver
+sound/isa/sscape.c: disabled non-Free firmware-loading machinery
+sound/isa/sscape.c: removed blobs or mentions thereof
+sound/isa/Kconfig: removed firmware names
+
+SND_SOC_ADAU1701 - ADAU1701 SigmaDSP processor
+sound/soc/codecs/adau1701.c: removed blobs or mentions thereof
+
+SND_SOC_ADAU1761 - ADAU1761 SigmaDSP processor
+sound/soc/codecs/adau1761.c: removed blobs or mentions thereof
+
+SND_SOC_ADAU1781 - ADAU1781 SigmaDSP processor
+sound/soc/codecs/adau1781.c: removed blobs or mentions thereof
+
+SND_SOC_AW87390 - Soc Audio for awinic aw87390
+sound/soc/codecs/aw87390.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/aw87390.h: removed blobs or mentions thereof
+
+SND_SOC_AW88081 - Soc Audio for awinic aw88081
+sound/soc/codecs/aw88081.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/aw88081.h: removed blobs or mentions thereof
+
+SND_SOC_AW88166 - Soc Audio for awinic aw88166
+sound/soc/codecs/aw88166.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/aw88166.h: removed blobs or mentions thereof
+
+SND_SOC_AW88261 - Soc Audio for awinic aw88261
+sound/soc/codecs/aw88261.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/aw88261.h: removed blobs or mentions thereof
+
+SND_SOC_AW88395 - Soc Audio for awinic aw88395
+sound/soc/codecs/aw88395/aw88395.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/aw88395/aw88395_device.h: removed blobs or mentions thereof
+
+SND_SOC_AW88399 - Soc Audio for awinic aw88399
+sound/soc/codecs/aw88399.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/aw88399.h: removed blobs or mentions thereof
+
+SND_SOC_PCM6240 - Texas Instruments PCM6240 Family Audio chips based on I2C
+sound/soc/codecs/pcm6240.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/pcm6240.c: removed blobs or mentions thereof
+
+SND_SOC_PEB2466 - Infineon PEB2466 quad PCM codec
+sound/soc/codecs/peb2466.c: disabled non-Free firmware-loading machinery
+
+SND_SOC_FS_AMP_LIB - FourSemi audio amplifiers
+sound/soc/codecs/fs-amp-lib.c: disabled non-Free firmware-loading machinery
+
+SND_SOC_FS210X - FourSemi FS2104/5S digital audio amplifier
+sound/soc/codecs/fs210x.c: removed blobs or mentions thereof
+Documentation/devicetree/bindings/sound/foursemi,fs2105s.yaml: removed blobs or mentions thereof
+
+SND_SOC_FSL_EASRC - Enhanced Asynchronous Sample Rate Converter (EASRC) module support
+sound/soc/fsl/fsl_easrc.c: disabled non-Free firmware-loading machinery
+Documentation/devicetree/bindings/sound/fsl,easrc.yaml: removed blobs or mentions thereof
+
+SND_SOC_FSL_XCVR - NXP Audio Transceiver (XCVR) module support
+sound/soc/fsl/fsl_xcvr.c: disabled non-Free firmware-loading machinery
+sound/soc/fsl/fsl_xcvr.c: removed blobs or mentions thereof
+
+SND_SOC_MAX98390 - Maxim Integrated MAX98390 Speaker Amplifier
+sound/soc/codecs/max98390.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/max98390.c: removed blobs or mentions thereof
+
+SND_SOC_NTP8835 - NeoFidelity NTP8835 and NTP8835C amplifiers
+sound/soc/codecs/ntp8835.c: removed blobs or mentions thereof
+
+SND_SOC_NTP8918 - NeoFidelity NTP8918 amplifier
+sound/soc/codecs/ntp8918.c: removed blobs or mentions thereof
+
+SND_SOC_NTPFW - NeoFidelity NTP firmware
+sound/soc/codecs/ntpfw.c: disabled non-Free firmware-loading machinery
+
+SND_SOC_RT1320_SDW - Realtek RT1320 Codec - SDW
+sound/soc/codecs/rt1320-sdw.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/rt1320-sdw.h: removed blobs or mentions thereof
+
+SND_SOC_RT5677 - RT5677 SoC
+sound/soc/codecs/rt5677.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/rt5677.h: removed blobs or mentions thereof
+sound/soc/codecs/rt5677.c: removed blobs or mentions thereof
+
+SND_SOC_SIGMADSP - SigmaStudio firmware loader
+sound/soc/codecs/sigmadsp.c: retain Free firmware-loading machinery, disabling non-Free one
+
+SND_SOC_ACPI_INTEL_MATCH - undocumented
+sound/soc/intel/common/soc-acpi-intel-bxt-match.c: removed blobs or mentions thereof
+sound/soc/intel/common/soc-acpi-intel-byt-match.c: removed blobs or mentions thereof
+sound/soc/intel/common/soc-acpi-intel-cht-match.c: removed blobs or mentions thereof
+sound/soc/intel/common/soc-acpi-intel-cnl-match.c: removed blobs or mentions thereof
+sound/soc/intel/common/soc-acpi-intel-icl-match.c: removed blobs or mentions thereof
+sound/soc/intel/common/soc-acpi-intel-glk-match.c: removed blobs or mentions thereof
+sound/soc/intel/common/soc-acpi-intel-kbl-match.c: removed blobs or mentions thereof
+sound/soc/intel/common/soc-acpi-intel-skl-match.c: removed blobs or mentions thereof
+sound/soc/intel/common/sof-function-topology-lib.c: removed blobs or mentions thereof
+
+SND_SOC_INTEL_AVS - Intel AVS driver
+sound/soc/intel/avs/topology.c: disabled non-Free firmware-loading machinery
+sound/soc/intel/avs/utils.c: disabled non-Free firmware-loading machinery
+sound/soc/intel/avs/board_selection.c: removed blobs or mentions thereof
+sound/soc/intel/avs/core.c: removed blobs or mentions thereof
+sound/soc/intel/avs/loader.c: removed blobs or mentions thereof
+sound/soc/intel/avs/pcm.c: removed blobs or mentions thereof
+
+SND_SOC_INTEL_CATPT - undocumented
+sound/soc/intel/catpt/loader.c: disabled non-Free firmware-loading machinery
+sound/soc/intel/catpt/loader.c: removed blobs or mentions thereof
+
+SND_SST_ATOM_HIFI2_PLATFORM - HiFi2 Platforms
+sound/soc/intel/atom/sst/sst.c: disabled non-Free firmware-loading machinery
+sound/soc/intel/atom/sst/sst_loader.c: disabled non-Free firmware-loading machinery
+
+SND_SST_ATOM_HIFI2_PLATFORM_PCI - PCI HiFi2 (Merrifield) Platforms
+sound/soc/intel/atom/sst/sst_pci.c: removed blobs or mentions thereof
+
+SND_SOC_RT5514 - undocumented
+sound/soc/codecs/rt5514.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/rt5514.h: removed blobs or mentions thereof
+
+SND_SOC_SDCA_FDL - SDCA FDL (File DownLoad) support
+sound/soc/sdca/sdca_fdl.c: disabled non-Free firmware-loading machinery
+sound/soc/sdca/sdca_fdl.c: removed blobs or mentions thereof
+
+SND_SOC_TAS2781_COMLIB_I2C - Texas Instruments TAS2781 speaker amplifier (comlib-i2c)
+sound/soc/codecs/tas2781-comlib-i2c.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/tas2781-comlib-i2c.c: removed blobs or mentions thereof
+
+SND_SOC_TAS2781_FMWLIB - Texas Instruments TAS2781 speaker amplifier (fmwlib)
+sound/soc/codecs/tas2781-fmwlib.c: disabled non-Free firmware-loading machinery
+
+SND_SOC_TAS2781_I2C - Texas Instruments TAS2781 speaker amplifier based on I2C
+sound/soc/codecs/tas2781-i2c.c: removed blobs or mentions thereof
+
+SND_SOC_TAS2783_I2C - Texas Instruments TAS2783 speaker amplifier (sdw)
+sound/soc/codecs/tas2783-sdw.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/tas2783-sdw.c: removed blobs or mentions thereof
+
+SND_SOC_TAS5805M - Texas Instruments TAS5805M speaker amplifier
+sound/soc/codecs/tas5805m.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/tas5805m.c: removed blobs or mentions thereof
+
+SND_SOC_TLV320AIC31XX - Texas Instruments TLV320AIC31xx CODECs
+sound/soc/codecs/tlv320aic31xx.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/tlv320aic31xx.c: removed blobs or mentions thereof
+
+SND_SOC_WM0010 - WM0010 DSP driver
+sound/soc/codecs/wm0010.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/wm0010.c: removed blobs or mentions thereof
+
+SND_SOC_WM2000 - WM2000 ALSA Soc Audio codecs
+sound/soc/codecs/wm2000.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/wm2000.c: removed blobs or mentions thereof
+
+SND_SOC_WM8994 - WM8994 ALSA Soc Audio codecs
+sound/soc/codecs/wm8958-dsp2.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/wm8958-dsp2.c: removed blobs or mentions thereof
+
+SND_SOC_WM_ADSP - Wolfson ADSP support
+sound/soc/codecs/wm_adsp.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/wm_adsp.c: removed blobs or mentions thereof
+
+SND_SOC_ZL38060 - Microsemi ZL38060 Connected Home Audio Processor
+sound/soc/codecs/zl38060.c: disabled non-Free firmware-loading machinery
+sound/soc/codecs/zl38060.c: removed blobs or mentions thereof
+
+SND_SOC_SH4_SIU - ALSA SoC driver for Renesas SH7343, SH7722 SIU peripheral
+sound/soc/renesas/siu_dai.c: disabled non-Free firmware-loading machinery
+sound/soc/renesas/siu_dai.c: removed blobs or mentions thereof
+
+SND_SOC_SOF - Sound Open Firmware Support
+sound/soc/sof/loader.c: removed blobs or mentions thereof
+sound/soc/sof/fw-file-profile.c: removed blobs or mentions thereof
+sound/soc/sof/topology.c: removed blobs or mentions thereof
+
+SND_SOC_QDSP6_APM - SoC ALSA audio driver for QDSP6 (APM)
+sound/soc/qcom/qdsp6/topology.c: disabled non-Free firmware-loading machinery
+sound/soc/qcom/qdsp6/topology.c: removed blobs or mentions thereof
+
+SND_USB_6FIRE - TerraTec DMX 6Fire USB
+sound/usb/6fire/firmware.c: disabled non-Free firmware-loading machinery
+sound/usb/6fire/firmware.c: removed blobs or mentions thereof
+
+ZIIRAVE_WATCHDOG - Zodiac RAVE Watchdog Timer
+drivers/watchdog/ziirave_wdt.c: disabled non-Free firmware-loading machinery
+drivers/watchdog/ziirave_wdt.c: removed blobs or mentions thereof
+
+FSI_MASTER_AST_CF - FSI master based on Aspeed ColdFire coprocessor
+drivers/fsi/fsi-master-ast-cf.c: disabled non-Free firmware-loading machinery
+drivers/fsi/fsi-master-ast-cf.c: removed blobs or mentions thereof
+
+PCIE_RCAR_GEN4 - Renesas R-Car Gen4 PCIe controller (r8a779g0 V4H)
+Documentation/PCI/controller/rcar-pcie-firmware.rst: removed
+drivers/pci/controller/dwc/pcie-rcar-gen4.c: disabled non-Free firmware-loading machinery
+drivers/pci/controller/dwc/pcie-rcar-gen4.c: removed blobs or mentions thereof
+
+I2C_SLAVE_EEPROM - I2C eeprom slave driver
+drivers/i2c/i2c-slave-eeprom.c: disabled non-Free firmware-loading machinery
+
+MHI_BUS - Modem Host Interface (MHI) bus
+drivers/bus/mhi/host/boot.c: disabled non-Free firmware-loading machinery
+
+MHI_BUS_PCI_GENERIC - MHI PCI controller driver
+drivers/bus/mhi/host/pci_generic.c: removed blobs or mentions thereof
+
+GREYBUS_FIRMWARE - Greybus Firmware Download Class driver
+drivers/staging/greybus/firmware.h: removed blobs or mentions thereof
+drivers/staging/greybus/fw-download.c: disabled non-Free firmware-loading machinery
+drivers/staging/greybus/fw-download.c: removed blobs or mentions thereof
+
+GREYBUS_BOOTROM - Greybus Bootrom Class driver
+drivers/staging/greybus/bootrom.c: disabled non-Free firmware-loading machinery
+drivers/staging/greybus/bootrom.c: removed blobs or mentions thereof
+
+SOC_AM33XX - TI AM33XX
+arch/arm/boot/dts/ti/omap/am335x-bone-common.dtsi: removed blobs or mentions thereof
+arch/arm/boot/dts/ti/omap/am335x-evm.dts: removed blobs or mentions thereof
+arch/arm/boot/dts/ti/omap/am335x-evmsk.dts: removed blobs or mentions thereof
+arch/arm/boot/dts/ti/omap/am335x-tqma335x.dtsi: removed blobs or mentions thereof
+
+SOC_AM43XX - TI AM43XX
+arch/arm/boot/dts/ti/omap/am43x-epos-evm.dts: removed blobs or mentions thereof
+arch/arm/boot/dts/ti/omap/am437x-gp-evm.dts: removed blobs or mentions thereof
+arch/arm/boot/dts/ti/omap/am437x-sk-evm.dts: removed blobs or mentions thereof
+
+ARCH_QCOM - Qualcomm Support
+arch/arm/boot/dts/qcom/qcom-apq8074-dragonboard.dts: removed blobs or mentions thereof
+arch/arm/boot/dts/qcom/qcom-msm8926-htc-memul.dts: removed blobs or mentions thereof
+
+ARCH_QCOM - Qualcomm Platforms
+Documentation/devicetree/bindings/display/msm/gpu.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/net/qcom,ipa.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/remoteproc/qcom,milos-pas.yaml: removed blobs or mentions thereof
+Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.yaml: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/apq8016-sbc.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/apq8016-schneider-hmibsc.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/apq8096-db820c.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/hamoa-iot-som.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/lemans-evk.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/lemans-ride-common.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/monaco-evk.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/msm8996-oneplus3.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/msm8996-oneplus3t.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/msm8996-xiaomi-gemini.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/msm8996pro-xiaomi-natrium.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/msm8996pro-xiaomi-scorpio.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/msm8998-lenovo-miix-630.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qcm6490-fairphone-fp5.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qcm6490-idp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qcm6490-particle-tachyon.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qcm6490-shift-otter.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qcs615-ride.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qcs6490-radxa-dragon-q6a.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qcs8300-ride.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qcs8550-aim300-aiot.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qrb2210-rb1.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qrb4210-rb2.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/qrb5165-rb5.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sa8155p-adp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sa8295p-adp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sa8540p-ride.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sar2130p-qar2130p.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc7180-acer-aspire1.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc7180-trogdor-lte-sku.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc7180-trogdor.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc7280-chrome-common.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc7280-herobrine-lte-sku.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc8180x-lenovo-flex-5g.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc8180x-primus.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc8280xp-crd.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc8280xp-microsoft-arcata.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sc8280xp-microsoft-blackrock.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sda660-inforce-ifc6560.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm630-sony-xperia-nile.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm632-fairphone-fp3.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm670-google-sargo.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-db845c.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-lg-judyln.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-lg-judyp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-mtp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-oneplus-common.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-samsung-starqltechn.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-shift-axolotl.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-sony-xperia-tama.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-xiaomi-beryllium-common.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm845-xiaomi-polaris.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm850-huawei-matebook-e-2019.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdm850-samsung-w737.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sdx75-idp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm6115-fxtec-pro1x.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm6115p-lenovo-j606f.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm6375-sony-xperia-murray-pdx225.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm7325-nothing-spacewar.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8150-hdk.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8150-microsoft-surface-duo.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8150-mtp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8250-mtp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8250-samsung-r8q.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8250-samsung-x1q.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8250-sony-xperia-edo.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8250-xiaomi-elish-common.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8250-xiaomi-pipa.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8350-hdk.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8350-microsoft-surface-duo2.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8350-mtp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8350-sony-xperia-sagami.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8450-hdk.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8450-qrd.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8450-sony-xperia-nagara.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8550-hdk.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8550-mtp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8550-qrd.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8550-samsung-q5q.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8550-sony-xperia-yodo-pdx234.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8650-hdk.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8650-mtp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8650-qrd.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8750-mtp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/sm8750-qrd.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1-crd.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e001de-devkit.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e78100-lenovo-thinkpad-t14s.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-asus-vivobook-s15.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-asus-zenbook-a14.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-crd.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-dell-inspiron-14-plus-7441.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-dell-latitude-7455.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-dell-xps13-9345.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-hp-elitebook-ultra-g1q.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-hp-omnibook-x14.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-microsoft-romulus.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1e80100-qcp.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1p42100-asus-zenbook-a14.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1p42100-crd.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1p42100-hp-omnibook-x14.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/qcom/x1p42100-lenovo-thinkbook-16.dts: removed blobs or mentions thereof
+
+QCOM_GENI_SE - QCOM GENI Serial Engine Driver
+drivers/soc/qcom/qcom-geni-se.c: disabled non-Free firmware-loading machinery
+
+QCOM_MDT_LOADER - Qualcomm Peripheral Image Loader
+drivers/soc/qcom/mdt_loader.c: disabled non-Free firmware-loading machinery
+
+QCOM_WCNSS_CTRL - Qualcomm WCNSS control driver
+drivers/soc/qcom/wcnss_ctrl.c: disabled non-Free firmware-loading machinery
+drivers/soc/qcom/wcnss_ctrl.c: removed blobs or mentions thereof
+
+KEYSTONE_NAVIGATOR_QMSS - Keystone Queue Manager Sub System
+drivers/soc/ti/knav_qmss_queue.c: disabled non-Free firmware-loading machinery
+drivers/soc/ti/knav_qmss_queue.c: removed blobs or mentions thereof
+Documentation/arch/arm/keystone/knav-qmss.rst: removed blobs or mentions thereof
+
+BRCMSTB_DPFE - Broadcom STM DPFE driver
+drivers/memory/brcmstb_dpfe.c: disabled non-Free firmware-loading machinery
+drivers/memory/brcmstb_dpfe.c: removed blobs or mentions thereof
+
+ARCH_MEDIATEK - MediaTek SoC Support
+arch/arm64/boot/dts/mediatek/mt8192-asurada.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/mediatek/mt8183-kukui-krane.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/mediatek/mt8183-kukui-kakadu.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/mediatek/mt8186-corsola.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/mediatek/mt8188-geralt.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/mediatek/mt8195-cherry.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/mediatek/mt8395-genio-common.dtsi: removed blobs or mentions thereof
+arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts: removed blobs or mentions thereof
+arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts: removed blobs or mentions thereof
+
+INTEL_IFS - Intel In Field Scan
+drivers/platform/x86/intel/ifs/load.c: disabled non-Free firmware-loading machinery
+
+Documentation - non-Free firmware scripts and documentation
+Documentation/sound/alsa-configuration.rst: removed blobs or mentions thereof
+scripts/get_dvb_firmware: removed
+scripts/extract_xc3028.pl: removed
+drivers/base/firmware_loader/Kconfig: removed blob name
+cleaning up has completed successfully, without verification
