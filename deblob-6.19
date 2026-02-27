@@ -4468,6 +4468,9 @@ clean_blob arch/arm64/boot/dts/qcom/sm7325-nothing-spacewar.dts
 clean_blob arch/arm64/boot/dts/qcom/sm8150-hdk.dts
 clean_blob arch/arm64/boot/dts/qcom/sm8150-microsoft-surface-duo.dts
 clean_blob arch/arm64/boot/dts/qcom/sm8150-mtp.dts
+if fgrep -q a650_zap.mbn arch/arm64/boot/dts/qcom/sm8250-hdk.dts; then
+  clean_blob arch/arm64/boot/dts/qcom/sm8250-hdk.dts
+fi
 clean_blob arch/arm64/boot/dts/qcom/sm8250-mtp.dts
 clean_blob arch/arm64/boot/dts/qcom/sm8250-samsung-r8q.dts
 clean_blob arch/arm64/boot/dts/qcom/sm8250-samsung-x1q.dts

@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2026-01-24 r19915
+#        modified with 2026-02-27 r19926
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8405,6 +8406,10 @@ set_except () {
     blob 'static[ ]const[ ]u8[ ]vd55g1_patch_array\[\][ ]=[ ][{]'"$sepx$blobpat*$sepx"'[}][;]' drivers/media/i2c/vd55g1.c
     blobna 'vd55g1_write_array[(]sensor[,][ ]VD55G1_REG_FWPATCH_START_ADDR[,][\n\t ]*sizeof[(]vd55g1_patch_array[)][,][\n\t ]*vd55g1_patch_array[,][ ][&]ret[)][;]' drivers/media/i2c/vd55g1.c
     accept '[ ][*][ \t]*mediatek[/][(]soc_model[)][/]scp\([(]_cX[)]\)\?\.img' drivers/remoteproc/mtk_scp.c
+
+    # New in 6.19.4.
+    blobname 'qcom[/]sm8150[/]a640_zap\.mbn' 'arch/arm64/boot/dts/qcom/sm8150-\(hdk\|mtp\)\.dts'
+    blobname 'qcom[/]sm8150[/]a650_zap\.mbn' arch/arm64/boot/dts/qcom/sm8250-hdk.dts
 
     # Add new patterns above.
     ;;
