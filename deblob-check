@@ -2,6 +2,7 @@
 
 # deblob-check version 2026-01-24 r19915
 #        modified with 2026-02-27 r19926
+#        modified with 2026-03-04 r19929
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8410,6 +8411,10 @@ set_except () {
     # New in 6.19.4.
     blobname 'qcom[/]sm8150[/]a640_zap\.mbn' 'arch/arm64/boot/dts/qcom/sm8150-\(hdk\|mtp\)\.dts'
     blobname 'qcom[/]sm8150[/]a650_zap\.mbn' arch/arm64/boot/dts/qcom/sm8250-hdk.dts
+
+    # New in 6.19.6, 6.18.16, 6.12.75.
+    defsnc 'static[ ]const[ ]u32[ ]rtw8922a_digital_pwr_comp_2g_s[01]_val\[\]\[DIGITAL_PWR_COMP_REG_NUM\][ ]=' drivers/net/wireless/realtek/rtw89/rtw8922a.c
+    defsnc 'static[ ]const[ ]struct[ ]alc298_lg_gram_style_seq[ ]alc298_lg_gram_style_init_seq_3[89cd]\[\][ ]=' 'sound/\(pci/hda/patch_realtek\|hda/codecs/realtek/alc269\)\.c'
 
     # Add new patterns above.
     ;;
