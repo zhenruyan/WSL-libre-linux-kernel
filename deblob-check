@@ -12,15 +12,17 @@
 #        modified with 2025-04-21 r19754
 #        modified with 2025-04-25 r19761
 #        modified with 2025-05-18 r19784
-#        modified with 2025-05-19 r10793 (partial)
+#        modified with 2025-05-19 r19793 (partial)
 #        modified with 2025-01-19 r19703 (partial)
 #        modified with 2025-06-30 r19831
 #        modified with 2025-01-19 r19703 (more partial)
 #        modified with 2025-07-07 r19836
 #        modified with 2025-07-17 r19847
-#        modified with 2025-05-19 r10793 (more partial)
+#        modified with 2025-05-19 r19793 (more partial)
 #        modified with 2025-07-21 r19854 (partial)
 #        modified with 2026-01-19 r19902
+#        modified with 2025-09-14 r19873 (partial)
+#        modified with 2026-03-04 r19929
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7944,6 +7946,12 @@ set_except () {
 
     # New in 6.18.6, 6.12.66, 6.6.121, 6.1.161, 5.15.198, 5.10.248.
     defsnc 'static[ ]volatile[ ]const[ ]u8[ ]____cacheline_aligned[ ]aes_\(inv_\)\?sbox\[\][ ]=' lib/crypto/aes.c
+
+    # New in 6.17-rc, 6.12.75.
+    defsnc 'static[ ]struct[ ]wake_capable_part[ ]wake_capable_list\[\][ ]=' drivers/soundwire/intel_auxdevice.c
+    # New in 6.19.6, 6.18.16, 6.12.75.
+    defsnc 'static[ ]const[ ]u32[ ]rtw8922a_digital_pwr_comp_2g_s[01]_val\[\]\[DIGITAL_PWR_COMP_REG_NUM\][ ]=' drivers/net/wireless/realtek/rtw89/rtw8922a.c
+    defsnc 'static[ ]const[ ]struct[ ]alc298_lg_gram_style_seq[ ]alc298_lg_gram_style_init_seq_3[89cd]\[\][ ]=' 'sound/\(pci/hda/patch_realtek\|hda/codecs/realtek/alc269\)\.c'
 
     # Add new patterns above.
     ;;
