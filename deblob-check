@@ -23,6 +23,7 @@
 #        modified with 2026-01-19 r19902
 #        modified with 2025-09-14 r19873 (partial)
 #        modified with 2026-03-04 r19929
+#        modified with 2026-03-12 r19936
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7952,6 +7953,9 @@ set_except () {
     # New in 6.19.6, 6.18.16, 6.12.75.
     defsnc 'static[ ]const[ ]u32[ ]rtw8922a_digital_pwr_comp_2g_s[01]_val\[\]\[DIGITAL_PWR_COMP_REG_NUM\][ ]=' drivers/net/wireless/realtek/rtw89/rtw8922a.c
     defsnc 'static[ ]const[ ]struct[ ]alc298_lg_gram_style_seq[ ]alc298_lg_gram_style_init_seq_3[89cd]\[\][ ]=' 'sound/\(pci/hda/patch_realtek\|hda/codecs/realtek/alc269\)\.c'
+
+    # New in 6.19.7, 6.18.17, 6.12.78, 6.6.130, 6.1.167.
+    initnc 'CBPF_MPTCP_SUBOPTION_RM_ADDR=["]' tools/testing/sefltests/net/mptcp/mptcp_join.sh
 
     # Add new patterns above.
     ;;
