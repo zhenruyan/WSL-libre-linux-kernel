@@ -1,0 +1,4 @@
+perf-util-y += header.o
+
+perf-util-$(CONFIG_LOCAL_LIBUNWIND) += unwind-libunwind.o
+perf-util-$(CONFIG_LIBDW_DWARF_UNWIND) += unwind-libdw.o
