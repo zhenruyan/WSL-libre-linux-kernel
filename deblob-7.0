@@ -665,7 +665,7 @@ maybe_reject_partial_firmware_into_buf(const struct firmware **firmware_p, const
 ' include/linux/firmware.h 'added non-Free firmware notification support'
 
 clean_sed '
-/^use crate::{/ s/}/, dev_err, kernel::c_str}/;
+/^use crate::{/ , /};/ s/^};/    dev_err,\n    kernel::c_str,\n&/;
 /FwFunc::request_nowarn/,/^$/{
   /^$/i\
 \
