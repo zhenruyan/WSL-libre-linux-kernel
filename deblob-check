@@ -26,6 +26,7 @@
 #        modified with 2025-07-21 r19854 (partial)
 #        modified with 2026-01-19 r19902
 #        modified with 2026-03-12 r19936
+#        modified with 2024-04-28 r19540 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7240,6 +7241,9 @@ set_except () {
 
     # New in 6.19.7, 6.18.17, 6.12.78, 6.6.130, 6.1.167.
     initnc 'CBPF_MPTCP_SUBOPTION_RM_ADDR=["]' tools/testing/sefltests/net/mptcp/mptcp_join.sh
+
+    # New in 6.9-rc, 6.6.142.
+    blobname 'mediatek[/]BT_RAM_CODE_MT%04x_1a_%x_hdr\.bin' drivers/bluetooth/btusb.c
 
     # Add new patterns above.
     ;;
