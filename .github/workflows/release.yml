@@ -1,0 +1,64 @@
+name: Kernel Release
+
+on:
+  push:
+    tags:
+      - "sources/v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          path: source
+          fetch-depth: 0
+
+      - name: Check out config branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          path: config
+          fetch-depth: 1
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bc bison flex libelf-dev libssl-dev dwarves rsync xz-utils
+
+      - name: Build kernel image
+        working-directory: source
+        run: |
+          tag="${GITHUB_REF_NAME#sources/}"
+          mkdir -p build release/linux-libre-"$tag"
+          cp ../config/config-wsl build/.config
+          make O=build ARCH=x86 olddefconfig
+          make O=build ARCH=x86 -j"$(nproc)" bzImage
+          cp build/arch/x86/boot/bzImage release/linux-libre-"$tag"/bzImage
+          cp build/System.map release/linux-libre-"$tag"/System.map
+          cp build/.config release/linux-libre-"$tag"/config
+          sha256sum release/linux-libre-"$tag"/bzImage release/linux-libre-"$tag"/System.map release/linux-libre-"$tag"/config > release/linux-libre-"$tag"/SHA256SUMS
+          tar -C release -czf "linux-libre-${tag}.tar.gz" "linux-libre-${tag}"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: source
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#sources/}"
+          asset="release/linux-libre-${tag#sources/}.tar.gz"
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$asset" --clobber
+          else
+            gh release create "$tag" "$asset" \
+              --title "Linux-libre $version" \
+              --notes "Automated build from $tag."
+          fi

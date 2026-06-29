@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "master" ]
   schedule:
-      - cron: "0 0 1 * *"
+    - cron: "0 0 */3 * *"
 
 jobs:
   build:
@@ -33,4 +33,3 @@ jobs:
           git commit --allow-empty -m "sync libre kernel ${mdy}"
           git push origin --all 
           git push origin --tags 
-
