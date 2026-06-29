@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v3
         
       - name: sync  libre fsf la
+        id: sync
         run: |
           echo Add other actions to build,
           export mdy=`date`
@@ -29,7 +30,30 @@ jobs:
           git remote add libre git://linux-libre.fsfla.org/releases.git
           git fetch libre
           git fetch libre --prune --tags
-          
+
+          # 记录推送前的 sources/v* 标签
+          old_tags=$(git tag -l 'sources/v*' | sort)
+
           git commit --allow-empty -m "sync libre kernel ${mdy}"
-          git push origin --all 
-          git push origin --tags 
+          git push origin --all
+          git push origin --tags
+
+          # 找出新推送的 sources/v* 标签
+          new_tags=$(git tag -l 'sources/v*' | sort)
+          added_tags=$(comm -13 <(echo "$old_tags") <(echo "$new_tags"))
+          echo "new_sources_tags<<EOF" >> $GITHUB_OUTPUT
+          echo "$added_tags" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Trigger release builds for new tags
+        if: steps.sync.outputs.new_sources_tags != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "New sources tags to build:"
+          echo "${{ steps.sync.outputs.new_sources_tags }}"
+          while IFS= read -r tag; do
+            [ -z "$tag" ] && continue
+            echo "Triggering release build for: $tag"
+            gh workflow run release.yml -f tag="$tag" || true
+          done <<< "${{ steps.sync.outputs.new_sources_tags }}"
