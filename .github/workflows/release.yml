@@ -4,12 +4,6 @@ on:
   push:
     tags:
       - "sources/v*"
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag to build (e.g. sources/v6.15-gnu)'
-        required: true
-        type: string
 
 permissions:
   contents: write
@@ -17,14 +11,12 @@ permissions:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-    env:
-      TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
       - name: Check out source tag
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.TAG }}
+          ref: ${{ github.ref_name }}
           path: source
           fetch-depth: 0
 
@@ -43,7 +35,7 @@ jobs:
       - name: Build kernel image
         working-directory: source
         run: |
-          tag="${TAG#sources/}"
+          tag="${GITHUB_REF_NAME#sources/}"
           mkdir -p build release/linux-libre-"$tag"
           cp ../config/config-wsl build/.config
           make O=build ARCH=x86 olddefconfig
@@ -59,7 +51,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         working-directory: source
         run: |
-          tag="$TAG"
+          tag="${GITHUB_REF_NAME}"
           version="${tag#sources/}"
           asset="release/linux-libre-${tag#sources/}.tar.gz"
 

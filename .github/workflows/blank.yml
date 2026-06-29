@@ -16,8 +16,10 @@ jobs:
     steps:
     
       - name: Clone repository
-        uses: actions/checkout@v3
-        
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: sync  libre fsf la
         id: sync
         run: |
@@ -45,15 +47,50 @@ jobs:
           echo "$added_tags" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Trigger release builds for new tags
+      - name: Install build tools
+        if: steps.sync.outputs.new_sources_tags != ''
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bc bison flex libelf-dev libssl-dev dwarves rsync xz-utils
+
+      - name: Build and release kernel for new tags
         if: steps.sync.outputs.new_sources_tags != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "New sources tags to build:"
-          echo "${{ steps.sync.outputs.new_sources_tags }}"
           while IFS= read -r tag; do
             [ -z "$tag" ] && continue
-            echo "Triggering release build for: $tag"
-            gh workflow run release.yml -f tag="$tag" || true
+            echo "=== Building kernel for: $tag ==="
+            version="${tag#sources/}"
+
+            # Checkout the tag
+            git checkout "$tag"
+
+            # Build
+            mkdir -p build release/linux-libre-"$version"
+            cp config-wsl build/.config
+            make O=build ARCH=x86 olddefconfig
+            make O=build ARCH=x86 -j"$(nproc)" bzImage
+            cp build/arch/x86/boot/bzImage release/linux-libre-"$version"/bzImage
+            cp build/System.map release/linux-libre-"$version"/System.map
+            cp build/.config release/linux-libre-"$version"/config
+            sha256sum release/linux-libre-"$version"/bzImage release/linux-libre-"$version"/System.map release/linux-libre-"$version"/config > release/linux-libre-"$version"/SHA256SUMS
+            tar -C release -czf "linux-libre-${version}.tar.gz" "linux-libre-${version}"
+
+            # Create release
+            asset="release/linux-libre-${version}.tar.gz"
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "Release $tag already exists, uploading asset..."
+              gh release upload "$tag" "$asset" --clobber
+            else
+              echo "Creating release $tag..."
+              gh release create "$tag" "$asset" \
+                --title "Linux-libre $version" \
+                --notes "Automated build from $tag."
+            fi
+
+            # Cleanup for next iteration
+            rm -rf build release
+            git checkout master
+            echo "=== Done: $tag ==="
           done <<< "${{ steps.sync.outputs.new_sources_tags }}"
