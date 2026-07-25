@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2026-06-01 r19981
+#        modified with 2026-07-24 r19990
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8590,6 +8591,14 @@ set_except () {
     defsnc '[\t]const[ ]int[ ]lookup_table\[64\][ ]=' tools/sched_ext/include/scx/common.bpf.h
     accept '[\t]*tools[/]testing[/]selftests[/]rcutorture[/]bin[/]kvm\.sh[ ][^\n]*[ ][>][ ]["][$]T[/]kvm\.sh\.out["]' tools/testing/selftests/rcutorture/bin/srcu_lockdep.sh
     accept '[ ][*][ ]@found[:][ ]Set[ ]by[ ]firmware[:]' drivers/net/dsa/mxl862xx/mxl862xx-api.h
+
+    # New in 7.1.5, 6.18.40.
+    accept '[ ][*][ ]request_firmware_nowait_cancel[(][)][ ]-[ ]cancel[ ]an[ ]async[ ]firmware[ ]request' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]@\(context\|cont\):[ ]\(context\|callback\)[ ]passed[ ]to[ ]request_firmware_nowait[(][)]' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]Cancel[ ]a[ ]pending[ ]request_firmware_nowait[(][)][ ]request' drivers/base/firmware_loader/main.c
+    accept '\(static[ ]inline[ ]\)\?void[ ]request_firmware_nowait_cancel[(]' 'drivers/base/firmware_loader/main.c\|include/linux/firmware.h'
+    accept 'EXPORT_SYMBOL_GPL[(]request_firmware_nowait_cancel[)]' drivers/base/firmware_loader/main.c
+    accept '[\t]request_firmware_nowait_cancel[(]tas_' sound/hda/codecs/side-codecs/tas2781_hda_'\(i2c\|spi\)\.c'
 
     # Add new patterns above.
     ;;
