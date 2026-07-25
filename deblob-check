@@ -4,6 +4,7 @@
 #        modified with 2026-01-19 r19902
 #        modified with 2026-03-04 r19929
 #        modified with 2026-03-12 r19936
+#        modified with 2026-07-24 r19990
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8345,6 +8346,14 @@ set_except () {
 
     # New in 6.19.7, 6.18.17.
     initnc 'CBPF_MPTCP_SUBOPTION_RM_ADDR=["]' tools/testing/sefltests/net/mptcp/mptcp_join.sh
+
+    # New in 7.1.5, 6.18.40.
+    accept '[ ][*][ ]request_firmware_nowait_cancel[(][)][ ]-[ ]cancel[ ]an[ ]async[ ]firmware[ ]request' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]@\(context\|cont\):[ ]\(context\|callback\)[ ]passed[ ]to[ ]request_firmware_nowait[(][)]' drivers/base/firmware_loader/main.c
+    accept '[ ][*][ ]Cancel[ ]a[ ]pending[ ]request_firmware_nowait[(][)][ ]request' drivers/base/firmware_loader/main.c
+    accept '\(static[ ]inline[ ]\)\?void[ ]request_firmware_nowait_cancel[(]' 'drivers/base/firmware_loader/main.c\|include/linux/firmware.h'
+    accept 'EXPORT_SYMBOL_GPL[(]request_firmware_nowait_cancel[)]' drivers/base/firmware_loader/main.c
+    accept '[\t]request_firmware_nowait_cancel[(]tas_' sound/hda/codecs/side-codecs/tas2781_hda_'\(i2c\|spi\)\.c'
 
     # Add new patterns above.
     ;;
