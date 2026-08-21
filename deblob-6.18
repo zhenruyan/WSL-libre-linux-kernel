@@ -4486,7 +4486,11 @@ clean_blob arch/arm64/boot/dts/qcom/x1e80100-microsoft-romulus.dtsi
 clean_blob arch/arm64/boot/dts/qcom/x1e80100-qcp.dts
 clean_blob arch/arm64/boot/dts/qcom/x1e80100-asus-zenbook-a14.dts
 clean_blob arch/arm64/boot/dts/qcom/hamoa-iot-som.dtsi
-clean_blob arch/arm64/boot/dts/qcom/x1p42100-asus-zenbook-a14.dts
+if test -f arch/arm64/boot/dts/qcom/x1p42100-asus-zenbook-a14.dtsi; then
+  clean_blob arch/arm64/boot/dts/qcom/x1p42100-asus-zenbook-a14.dtsi
+else
+  clean_blob arch/arm64/boot/dts/qcom/x1p42100-asus-zenbook-a14.dts
+fi
 clean_blob arch/arm64/boot/dts/qcom/x1p42100-crd.dts
 clean_blob arch/arm64/boot/dts/qcom/x1p42100-hp-omnibook-x14.dts
 clean_blob arch/arm64/boot/dts/qcom/x1p42100-lenovo-thinkbook-16.dts
