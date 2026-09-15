@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2026-08-10 r19995
+#        modified with 2026-09-14 r20004
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8663,6 +8664,9 @@ set_except () {
     defsnc 'static[ ]const[ ]u64[ ]morekeys\[\][ ]=' tools/testing/selftests/bpf/libarena/selftests/test_rbtree.bpf.c
     accept '[ ]*DMESG_FILE[=]["][$][{]LOG_DIR[}][/]rds-dmesg\.out["]' tools/testing/selftests/net/rds/rds_run.sh
     accept '[\t]snprintf_assert[(]path[,][ ]PATH_MAX[,][ ]["][/]sys[/]bus[/]pci[/]%s[/]%s[/]%s["]' tools/testing/selftests/vfio/lib/sysfs.c
+
+    # New in 7.2.6, 6.18.52.
+    defsnc 'static[ ]const[ ]u32[ ]a623_gmu_gpucc_registers\[\][ ]=' drivers/gpu/drm/msm/adreno/a6xx_gpu_state.h
 
     # Add new patterns above.
     ;;
