@@ -27,6 +27,7 @@
 #        modified with 2026-01-19 r19902
 #        modified with 2026-03-12 r19936
 #        modified with 2024-04-28 r19540 (partial)
+#        modified with 2023-12-26 r19450 (more partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7244,6 +7245,13 @@ set_except () {
 
     # New in 6.9-rc, 6.6.142.
     blobname 'mediatek[/]BT_RAM_CODE_MT%04x_1a_%x_hdr\.bin' drivers/bluetooth/btusb.c
+
+    # New in 6.7-rc, 6.6.157.
+    accept 'static[ ]int[ ]ath11k_fw_request_firmware_api_n[(]' drivers/net/wireless/ath/ath11k/fw.c
+    accept '[\t]ab->fw\.fw[ ]=[ ]ath11k_core_firmware_request[(]ab[,][ ]name[)]' drivers/net/wireless/ath/ath11k/fw.c
+    accept '[\t]ret[ ]=[ ]ath11k_fw_request_firmware_api_n[(]ab[,][ ]ATH11K_FW_API2_FILE[)]' drivers/net/wireless/ath/ath11k/fw.c
+    blobname 'firmware-2\.bin' drivers/net/wireless/ath/ath11k/fw.h
+    blobna '[/][*][ ]No[ ]m3[ ]file[ ]in[ ]firmware-N\.bin[ ]so[ ]try[ ]to[ ]request[ ]old[\n\t *]*separate[ ]m3\.bin\.[\n\t *]*[*][/]' drivers/net/wireless/ath/ath11k/qmi.c
 
     # Add new patterns above.
     ;;

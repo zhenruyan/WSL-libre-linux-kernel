@@ -2365,6 +2365,9 @@ clean_mk CONFIG_ATH10K_PCI drivers/net/wireless/ath/ath10k/Makefile
 
 announce ATH11K - "Qualcomm Technologies 802.11ax chipset support"
 reject_firmware drivers/net/wireless/ath/ath11k/core.c
+if fgrep -q firmware-2 drivers/net/wireless/ath/ath11k/fw.h; then
+  clean_blob drivers/net/wireless/ath/ath11k/fw.h
+fi
 clean_blob drivers/net/wireless/ath/ath11k/hw.h
 clean_blob drivers/net/wireless/ath/ath11k/core.c
 clean_blob drivers/net/wireless/ath/ath11k/qmi.c
