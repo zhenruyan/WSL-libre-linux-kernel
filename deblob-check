@@ -7,6 +7,7 @@
 #        modified with 2026-07-24 r19990
 #        modified with 2026-06-01 r19981 (partial)
 #        modified with 2026-09-14 r20004
+#        modified with 2026-09-22 r20014 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8363,6 +8364,11 @@ set_except () {
 
     # New in 7.2.6, 6.18.52.
     defsnc 'static[ ]const[ ]u32[ ]a623_gmu_gpucc_registers\[\][ ]=' drivers/gpu/drm/msm/adreno/a6xx_gpu_state.h
+
+    # New in 7.2.7, 6.18.53, 6.12.111.
+    blobname 'mediatek[/]BT_RAM_CODE_MT7961_1a_2_hdr\.bin' drivers/bluetooth/btmtk.h
+    # This was refactoring of the topology loader.
+    accept '[\t]fullname[ ]=[ ]kasprintf[^\n]*component->driver->topology_name_prefix[^;]*[;][\n][\t]if[ ][(][!]fullname[)][\n][\t][\t]return[^;]*[;][\n]*[\t]return[ ]request_firmware[(]fw[,][ ]fullname[,][ ]component->dev[)]' sound/soc/intel/avs/pcm.c
 
     # Add new patterns above.
     ;;
