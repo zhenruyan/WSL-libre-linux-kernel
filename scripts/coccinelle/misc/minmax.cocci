@@ -1,0 +1,260 @@
+// SPDX-License-Identifier: GPL-2.0-only
+///
+/// Check for opencoded min(), max() implementations.
+/// Generated patches sometimes require adding a cast to fix compile warning.
+/// Warnings/patches scope intentionally limited to a function body.
+///
+// Confidence: Medium
+// Copyright: (C) 2021 Denis Efremov ISPRAS
+// Options: --no-includes --include-headers
+//
+// Keywords: min, max
+//
+
+
+virtual report
+virtual org
+virtual context
+virtual patch
+
+@max_candidate disable not_int1, not_int2, neg_if_exp@
+expression E1, E2, E3, E4;
+binary operator cmp = {>, >=};
+@@
+
+	E1 cmp E2 ? E3 : E4
+
+@min_candidate disable not_int1, not_int2, neg_if_exp@
+expression E1, E2, E3, E4;
+binary operator cmp = {<, <=};
+@@
+
+	E1 cmp E2 ? E3 : E4
+
+@rmax depends on !patch && max_candidate disable not_int1, not_int2, neg_if_exp@
+identifier func;
+expression x, y;
+binary operator cmp = {>, >=};
+position p;
+@@
+
+func(...)
+{
+	<...
+*	(x) cmp@p (y) ? (x) : (y)
+	...>
+}
+
+@maxif_candidate disable not_int1, not_int2, neg_if@
+expression x, y;
+expression max_val;
+binary operator cmp = {>, >=};
+@@
+
+if ((x) cmp (y)) {
+        max_val = (x);
+} else {
+        max_val = (y);
+}
+
+@rmaxif depends on !patch && maxif_candidate disable not_int1, not_int2, neg_if@
+identifier func;
+expression x, y;
+expression max_val;
+binary operator cmp = {>, >=};
+position p;
+@@
+
+func(...)
+{
+	<...
+*	if ((x) cmp@p (y)) {
+*		max_val = (x);
+*	} else {
+*		max_val = (y);
+*	}
+	...>
+}
+
+// Ignore errcode returns.
+@errcode depends on min_candidate disable not_int1, not_int2, neg_if_exp@
+position p;
+identifier func;
+expression x;
+binary operator cmp = {<, <=};
+@@
+
+func(...)
+{
+	<...
+	return ((x) cmp@p 0 ? (x) : 0);
+	...>
+}
+
+@rmin depends on !patch && min_candidate disable not_int1, not_int2, neg_if_exp@
+identifier func;
+expression x, y;
+binary operator cmp = {<, <=};
+position p != errcode.p;
+@@
+
+func(...)
+{
+	<...
+*	(x) cmp@p (y) ? (x) : (y)
+	...>
+}
+
+@minif_candidate disable not_int1, not_int2, neg_if@
+expression x, y;
+expression min_val;
+binary operator cmp = {<, <=};
+@@
+
+if ((x) cmp (y)) {
+        min_val = (x);
+} else {
+        min_val = (y);
+}
+
+@rminif depends on !patch && minif_candidate disable not_int1, not_int2, neg_if@
+identifier func;
+expression x, y;
+expression min_val;
+binary operator cmp = {<, <=};
+position p;
+@@
+
+func(...)
+{
+	<...
+*	if ((x) cmp@p (y)) {
+*		min_val = (x);
+*	} else {
+*		min_val = (y);
+*	}
+	...>
+}
+
+@pmax depends on patch && max_candidate disable not_int1, not_int2, neg_if_exp@
+identifier func;
+expression x, y;
+binary operator cmp = {>=, >};
+@@
+
+func(...)
+{
+	<...
+-	((x) cmp (y) ? (x) : (y))
++	max(x, y)
+	...>
+}
+
+@pmaxif depends on patch && maxif_candidate disable not_int1, not_int2, neg_if@
+identifier func;
+expression x, y;
+expression max_val;
+binary operator cmp = {>=, >};
+@@
+
+func(...)
+{
+	<...
+-	if ((x) cmp (y)) {
+-		max_val = x;
+-	} else {
+-		max_val = y;
+-	}
++	max_val = max(x, y);
+	...>
+}
+
+@pmin depends on patch && min_candidate disable not_int1, not_int2, neg_if_exp@
+identifier func;
+expression x, y;
+binary operator cmp = {<=, <};
+position p != errcode.p;
+@@
+
+func(...)
+{
+	<...
+-	((x) cmp@p (y) ? (x) : (y))
++	min(x, y)
+	...>
+}
+
+@pminif depends on patch && minif_candidate disable not_int1, not_int2, neg_if@
+identifier func;
+expression x, y;
+expression min_val;
+binary operator cmp = {<=, <};
+@@
+
+func(...)
+{
+	<...
+-	if ((x) cmp (y)) {
+-		min_val = x;
+-	} else {
+-		min_val = y;
+-	}
++	min_val = min(x, y);
+	...>
+}
+
+@script:python depends on report@
+p << rmax.p;
+@@
+
+for p0 in p:
+	coccilib.report.print_report(p0, "WARNING opportunity for max()")
+
+@script:python depends on org@
+p << rmax.p;
+@@
+
+for p0 in p:
+	coccilib.org.print_todo(p0, "WARNING opportunity for max()")
+
+@script:python depends on report@
+p << rmaxif.p;
+@@
+
+for p0 in p:
+	coccilib.report.print_report(p0, "WARNING opportunity for max()")
+
+@script:python depends on org@
+p << rmaxif.p;
+@@
+
+for p0 in p:
+	coccilib.org.print_todo(p0, "WARNING opportunity for max()")
+
+@script:python depends on report@
+p << rmin.p;
+@@
+
+for p0 in p:
+	coccilib.report.print_report(p0, "WARNING opportunity for min()")
+
+@script:python depends on org@
+p << rmin.p;
+@@
+
+for p0 in p:
+	coccilib.org.print_todo(p0, "WARNING opportunity for min()")
+
+@script:python depends on report@
+p << rminif.p;
+@@
+
+for p0 in p:
+	coccilib.report.print_report(p0, "WARNING opportunity for min()")
+
+@script:python depends on org@
+p << rminif.p;
+@@
+
+for p0 in p:
+	coccilib.org.print_todo(p0, "WARNING opportunity for min()")
