@@ -8,6 +8,7 @@
 #        modified with 2026-06-01 r19981 (partial)
 #        modified with 2026-09-14 r20004
 #        modified with 2026-09-22 r20014 (partial)
+#        modified with 2026-11-07 r20028
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8369,6 +8370,9 @@ set_except () {
     blobname 'mediatek[/]BT_RAM_CODE_MT7961_1a_2_hdr\.bin' drivers/bluetooth/btmtk.h
     # This was refactoring of the topology loader.
     accept '[\t]fullname[ ]=[ ]kasprintf[^\n]*component->driver->topology_name_prefix[^;]*[;][\n][\t]if[ ][(][!]fullname[)][\n][\t][\t]return[^;]*[;][\n]*[\t]return[ ]request_firmware[(]fw[,][ ]fullname[,][ ]component->dev[)]' sound/soc/intel/avs/pcm.c
+
+    # New in 7.3.3, 6.18.62.
+    accept '[ \t]*[*][ ]There[ ]are[ ]two[ ]ways[ ]of[ ]reporting[ ]inputs[ ]from[ ]firmware:' drivers/hid/wacom_wac.c
 
     # Add new patterns above.
     ;;
