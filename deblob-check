@@ -1,6 +1,7 @@
 #! /bin/sh
 
 # deblob-check version 2026-10-15 r20023
+#        modified with 2026-11-07 r20028
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8788,6 +8789,9 @@ set_except () {
     accept '[	]fd[ ]=[ ]open[(]at[(]["]img[/]md\.img["][)]' tools/testing/selftests/filesystems/mount_cycle/loop_cycle_test.c
     accept '[	]n[ ]=[ ]loop_attach[(]at[(]["]img[/]md\.img["][)][)][;]' tools/testing/selftests/filesystems/mount_cycle/loop_cycle_test.c
     accept '#define[ ]INITRD_IMAGE[ ]["][/]initrd\.img["]' tools/testing/selftests/liveupdate/init.c
+
+    # New in 7.3.3, 6.18.62.
+    accept '[ \t]*[*][ ]There[ ]are[ ]two[ ]ways[ ]of[ ]reporting[ ]inputs[ ]from[ ]firmware:' drivers/hid/wacom_wac.c
 
     # Add new patterns above.
     ;;
