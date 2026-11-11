@@ -1,0 +1,162 @@
+.. SPDX-License-Identifier: GPL-2.0
+.. include:: ../disclaimer-zh_CN.rst
+
+:Original: Documentation/usb/CREDITS
+
+:翻译:
+
+ 白钶凡 Kefan Bai <baikefan@leap-io-kernel.com>
+
+:校译:
+
+
+Simple Linux USB 驱动项目致谢名单：
+
+以下人员都为 Linux USB 驱动代码作出过贡献（按姓氏字母顺序排列）。这份名
+单本该更长，只是确实不易维护；如果你也应列名其中，欢迎提交补丁把自己加上。
+
+  Georg Acher <acher@informatik.tu-muenchen.de>
+  David Brownell <dbrownell@users.sourceforge.net>
+  Alan Cox <alan@lxorguk.ukuu.org.uk>
+  Randy Dunlap <randy.dunlap@intel.com>
+  Johannes Erdfelt <johannes@erdfelt.com>
+  Deti Fliegl <deti@fliegl.de>
+  ham <ham@unsuave.com>
+  Bradley M Keryan <keryan@andrew.cmu.edu>
+  Greg Kroah-Hartman <greg@kroah.com>
+  Pavel Machek <pavel@suse.cz>
+  Paul Mackerras <paulus@cs.anu.edu.au>
+  Petko Manlolov <petkan@dce.bg>
+  David E. Nelson <dnelson@jump.net>
+  Vojtech Pavlik <vojtech@suse.cz>
+  Bill Ryder <bryder@sgi.com>
+  Thomas Sailer <sailer@ife.ee.ethz.ch>
+  Gregory P. Smith <greg@electricrain.com>
+  Linus Torvalds <torvalds@linux-foundation.org>
+  Roman Weissgaerber <weissg@vienna.at>
+  <Kazuki.Yasumatsu@fujixerox.co.jp>
+
+特别感谢：
+
+  Inaky Perez Gonzalez <inaky@peloncho.fis.ucm.es>
+  感谢他牵头开发 Linux USB 驱动，并编写了 uusbd 驱动的大部分代码，我们
+  从中学到了很多。
+
+  NetBSD 和 FreeBSD 的 USB 开发者们
+  感谢他们加入 Linux USB 邮件列表，提供建议并分享实现经验。
+
+另外还要感谢：
+
+  以下公司和个人在硬件、支持、时间和开发工作上给予了帮助（摘自 Inaky
+  驱动原始的 THANKS 文件）：
+
+    以下公司曾为 Linux USB / UUSBD 的开发提供帮助：
+
+        - 3Com GmbH 捐赠了一台 ISDN Pro TA，并在技术问题和测试设备方面提供
+          了大力支持。
+
+        - USAR Systems 向我们提供了出色的 USB 评估套件，使我们得以测试
+          Linux USB 驱动对最新 USB 规范的符合性。USAR Systems 也认识到，
+          让开放操作系统跟上时代很重要，因此以硬件支持了这个项目，在此
+          致谢。
+
+        - 感谢英特尔提供的宝贵帮助。
+
+        - 我们与 Cherry 合作，使 Linux 成为首个内置 USB 支持的操作系统。
+          Cherry 是全球最大的键盘制造商之一。
+
+        - CMD Technology, Inc. 慷慨捐赠了一块 CSA-6700 PCI 转 USB 控制卡，
+          用于测试 OHCI 实现。
+
+        - 有了他们的支持，Keytronic 可以确信，其键盘能够销售给至少 300 万
+          Linux 用户中的一部分。
+
+        - 特别感谢 ing büro h doran [http://www.ibhdoran.com]。
+          在欧洲，想给主板配一个 PC 背板 USB 连接器几乎是不可能的（我自己
+          做的那个效果并不好）。现在我知道该去哪里购买合适的 USB 配件了。
+
+        - Genius Germany 捐赠了一只 USB 鼠标，用于测试鼠标启动协议；
+          他们还捐赠了 F-23 数字摇杆和 NetMouse Pro，在此致谢。
+
+        - AVM GmbH Berlin 支持我们开发 Linux 下的 AVM ISDN Controller B1 USB
+          驱动。AVM 是主动式和被动式 ISDN 控制器及基于 CAPI 2.0 软件的领先
+          制造商。AVM B1 的主动式设计对包括 Linux 在内的所有操作系统平台
+          开放。
+
+        - 非常感谢 Y-E Data, Inc 捐赠的 FlashBuster-U USB 软驱，使我们能够测试
+          批量传输代码。
+
+        - 感谢 Logitech 捐赠了一只三轴 USB 鼠标。
+
+          Logitech 负责设计、制造并销售各种人机接口设备，在键盘、鼠标、轨迹球、
+          摄像头、扬声器，以及面向游戏和专业用途的控制设备方面拥有悠久历史和
+          丰富经验。
+
+          作为这些设备广为人知的供应商和销售商，他们捐赠了 USB 鼠标、摇杆和
+          扫描仪，以表明 Linux 的重要性，也让 Logitech 的客户能在自己偏爱的
+          操作系统上获得支持，并让所有 Linux 用户都能使用 Logitech 及其他
+          USB 硬件。
+
+          Logitech 也是 1999 年 2 月 11 日维也纳 Linux 大会的官方赞助商，
+          我们将在会上展示 Linux USB 工作的最新进展。
+
+        - 感谢 CATC 提供 USB Inspector，帮助我们看到 UHCI 内部实现中的那些
+          隐秘角落。
+
+        - 感谢 Entrega 为开发工作提供 PCI 转 USB 卡、集线器和转换器产品。
+
+        - 感谢 ConnectTech 提供 WhiteHEAT USB 转串口转换器以及相关文档，让
+          这个驱动得以写成。
+
+        - 感谢 ADMtek 提供 Pegasus 和 Pegasus II 评估板、规格说明，以及驱动
+          开发过程中的宝贵建议。
+
+    另外还要感谢以下个人（排名不分先后）：
+
+        - Oren Tirosh <orenti@hishome.net>
+          他非常耐心地解答我反复提出的各种 USB 问题，并提供了许多有价值的
+          想法。
+
+        - Jochen Karrer <karrer@wpfd25.physik.uni-wuerzburg.de>
+          指出了严重问题，并给出了宝贵建议。
+
+        - Edmund Humemberger <ed@atnet.at>，他在公共关系与项目管理方面为
+          Linux-USB 项目付出了巨大的努力。
+
+        - Alberto Menegazzi <flash@flash.iol.it> 正在着手编写 UUSBD 文档。
+
+        - Ric Klaren <ia_ric@cs.utwente.nl> 编写了很好的入门文档，与
+          Alberto 的作品形成了良性互补。
+
+        - Christian Groessler <cpg@aladdin.de>，感谢他在诸多复杂细节上的帮助。
+
+        - Paul MacKerras 改进了 OHCI 实现，推动了对 iMac 的支持，并提供了
+          大量的改进意见。
+
+        - Fernando Herrera <fherrera@eurielec.etsit.upm.es> 负责撰写、维护并
+          持续补充那份期待已久、内容翔实的 UUSBD FAQ。
+
+        - Rasca Gmelch <thron@gmx.de> 重新启用了 raw 驱动，指出了一些错误，并
+          启动了 uusbd-utils 软件包。
+
+        - Peter Dettori <dettori@ozy.dec.com>，持续发现问题，并提出了许多
+          有价值的建议。
+
+        - 自由软件与 Linux 社区的所有成员，包括 FSF、GNU 项目、MIT X 联盟、
+          TeX 社区等，在此一并致谢。
+
+        - 特别感谢 Richard Stallman 创造了 Emacs。
+
+        - 感谢 linux-usb 邮件列表的所有成员阅读了大量邮件，并提出了诸多
+          建议。
+
+        - 感谢 USB Implementers Forum 成员们的帮助与支持。
+
+        - Nathan Myers <ncm@cantrip.org>，感谢他的建议。（也希望你喜欢
+          Cibeles 的派对。）
+
+        - 感谢 Linus Torvalds 创立、开发并维护 Linux。
+
+        - Mike Smith、Craig Keithley、Thierry Giron 和 Janet Schank
+          感谢他们让我认识到，标准 USB 集线器其实一点也不“标准”；也正因
+          如此，我们才能在标准集线器驱动中加入厂商特定的处理。
