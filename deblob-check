@@ -9,6 +9,7 @@
 #        modified with 2026-09-14 r20004
 #        modified with 2026-09-22 r20014 (partial)
 #        modified with 2026-11-07 r20028
+#        modified with 2026-11-10 r20033
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8371,8 +8372,11 @@ set_except () {
     # This was refactoring of the topology loader.
     accept '[\t]fullname[ ]=[ ]kasprintf[^\n]*component->driver->topology_name_prefix[^;]*[;][\n][\t]if[ ][(][!]fullname[)][\n][\t][\t]return[^;]*[;][\n]*[\t]return[ ]request_firmware[(]fw[,][ ]fullname[,][ ]component->dev[)]' sound/soc/intel/avs/pcm.c
 
-    # New in 7.3.3, 6.18.62.
+    # New in 7.3.3, 6.18.62, 6.12.117.
     accept '[ \t]*[*][ ]There[ ]are[ ]two[ ]ways[ ]of[ ]reporting[ ]inputs[ ]from[ ]firmware:' drivers/hid/wacom_wac.c
+
+    # New in 7.3.3, 6.18.62.
+    defsc 'static[ ]const[ ]struct[ ]sig_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
 
     # Add new patterns above.
     ;;
