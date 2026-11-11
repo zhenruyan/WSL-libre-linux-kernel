@@ -27,6 +27,7 @@
 #        modified with 2026-06-01 r19981 (partial)
 #        modified with 2026-09-22 r20014 (partial)
 #        modified with 2025-08-15 r19868 (partial)
+#        modified with 2026-11-07 r20028
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7972,6 +7973,9 @@ set_except () {
     # New in 6.16.1, 6.15.10, and 6.12.112.
     accept '[\t]pas->firmware[ ]=' drivers/remoteproc/qcom_q6v5_pas.c
     accept '[\t ]*dev_err[(]pas->dev[,][ ]["]request_firmware[ ]failed' drivers/remoteproc/qcom_q6v5_pas.c
+
+    # New in 7.3.3, 6.18.62, 6.12.117.
+    accept '[ \t]*[*][ ]There[ ]are[ ]two[ ]ways[ ]of[ ]reporting[ ]inputs[ ]from[ ]firmware:' drivers/hid/wacom_wac.c
 
     # Add new patterns above.
     ;;
