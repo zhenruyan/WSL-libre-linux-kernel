@@ -3,6 +3,7 @@
 # deblob-check version 2026-10-15 r20023
 #        modified with 2026-11-07 r20028
 #        modified with 2026-11-10 r20033
+#        modified with 2026-11-17 r20040
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8794,8 +8795,11 @@ set_except () {
     # New in 7.3.3, 6.18.62, 6.12.117.
     accept '[ \t]*[*][ ]There[ ]are[ ]two[ ]ways[ ]of[ ]reporting[ ]inputs[ ]from[ ]firmware:' drivers/hid/wacom_wac.c
 
-    # New in 7.3.3, 6.18.62.
+    # New in 7.3.4, 6.18.63.
     defsc 'static[ ]const[ ]struct[ ]sig_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
+
+    # New in 6.12.118.
+    defsc 'static[ ]const[ ]struct[ ]akcipher_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
 
     # Add new patterns above.
     ;;
