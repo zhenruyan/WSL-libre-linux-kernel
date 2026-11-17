@@ -1,0 +1,369 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ *
+ * Copyright (C) Jonathan Naylor G4KLX (g4klx@g4klx.demon.co.uk)
+ */
+#include <linux/errno.h>
+#include <linux/types.h>
+#include <linux/socket.h>
+#include <linux/in.h>
+#include <linux/kernel.h>
+#include <linux/jiffies.h>
+#include <linux/timer.h>
+#include <linux/string.h>
+#include <linux/sockios.h>
+#include <linux/net.h>
+#include <linux/slab.h>
+#include <net/ax25.h>
+#include <linux/inet.h>
+#include <linux/netdevice.h>
+#include <linux/skbuff.h>
+#include <net/sock.h>
+#include <linux/fcntl.h>
+#include <linux/mm.h>
+#include <linux/interrupt.h>
+#include <net/rose.h>
+
+static void rose_ftimer_expiry(struct timer_list *);
+static void rose_t0timer_expiry(struct timer_list *);
+
+/*
+ * neigh->ax25 is replaced when a frame is sent or the link is looked up,
+ * from process context, softirq and the neighbour timers, and cleared by
+ * rose_link_failed(). Each holder of the pointer owns a reference on the
+ * ax25_cb: swap the pointer under this lock, then drop the reference that
+ * was taken off, so that it is dropped once and none is lost.
+ */
+static DEFINE_SPINLOCK(rose_neigh_ax25_lock);
+
+static void rose_neigh_set_ax25(struct rose_neigh *neigh, ax25_cb *ax25)
+{
+	ax25_cb *old;
+
+	spin_lock_bh(&rose_neigh_ax25_lock);
+	old = neigh->ax25;
+	neigh->ax25 = ax25;
+	spin_unlock_bh(&rose_neigh_ax25_lock);
+
+	if (old)
+		ax25_cb_put(old);
+}
+
+/*
+ * Clear neigh->ax25 if it still is @ax25, and drop its reference.
+ */
+bool rose_neigh_clear_ax25(struct rose_neigh *neigh, ax25_cb *ax25)
+{
+	bool found;
+
+	spin_lock_bh(&rose_neigh_ax25_lock);
+	found = neigh->ax25 == ax25;
+	if (found)
+		neigh->ax25 = NULL;
+	spin_unlock_bh(&rose_neigh_ax25_lock);
+
+	if (found)
+		ax25_cb_put(ax25);
+
+	return found;
+}
+
+static void rose_transmit_restart_confirmation(struct rose_neigh *neigh);
+static void rose_transmit_restart_request(struct rose_neigh *neigh);
+
+void rose_neigh_init_timers(struct rose_neigh *neigh)
+{
+	timer_setup(&neigh->ftimer, rose_ftimer_expiry, 0);
+	timer_setup(&neigh->t0timer, rose_t0timer_expiry, 0);
+}
+
+void rose_start_ftimer(struct rose_neigh *neigh)
+{
+	mod_timer(&neigh->ftimer,
+		  jiffies + msecs_to_jiffies(sysctl_rose_link_fail_timeout));
+}
+
+static void rose_start_t0timer(struct rose_neigh *neigh)
+{
+	mod_timer(&neigh->t0timer,
+		  jiffies + msecs_to_jiffies(sysctl_rose_restart_request_timeout));
+}
+
+void rose_stop_ftimer(struct rose_neigh *neigh)
+{
+	timer_delete(&neigh->ftimer);
+}
+
+void rose_stop_t0timer(struct rose_neigh *neigh)
+{
+	timer_delete(&neigh->t0timer);
+}
+
+int rose_ftimer_running(struct rose_neigh *neigh)
+{
+	return timer_pending(&neigh->ftimer);
+}
+
+static int rose_t0timer_running(struct rose_neigh *neigh)
+{
+	return timer_pending(&neigh->t0timer);
+}
+
+static void rose_ftimer_expiry(struct timer_list *t)
+{
+}
+
+static void rose_t0timer_expiry(struct timer_list *t)
+{
+	struct rose_neigh *neigh = timer_container_of(neigh, t, t0timer);
+
+	rose_transmit_restart_request(neigh);
+
+	neigh->dce_mode = 0;
+
+	rose_start_t0timer(neigh);
+}
+
+/*
+ *	Interface to ax25_send_frame. Changes my level 2 callsign depending
+ *	on whether we have a global ROSE callsign or use the default port
+ *	callsign.
+ */
+static int rose_send_frame(struct sk_buff *skb, struct rose_neigh *neigh)
+{
+	const ax25_address *rose_call;
+	ax25_cb *ax25;
+
+	if (ax25cmp(&rose_callsign, &null_ax25_address) == 0)
+		rose_call = (const ax25_address *)neigh->dev->dev_addr;
+	else
+		rose_call = &rose_callsign;
+
+	ax25 = ax25_send_frame(skb, 260, rose_call, &neigh->callsign, neigh->digipeat, neigh->dev);
+	rose_neigh_set_ax25(neigh, ax25);
+
+	return !!ax25;
+}
+
+/*
+ *	Interface to ax25_link_up. Changes my level 2 callsign depending
+ *	on whether we have a global ROSE callsign or use the default port
+ *	callsign.
+ */
+static int rose_link_up(struct rose_neigh *neigh)
+{
+	const ax25_address *rose_call;
+	ax25_cb *ax25;
+
+	if (ax25cmp(&rose_callsign, &null_ax25_address) == 0)
+		rose_call = (const ax25_address *)neigh->dev->dev_addr;
+	else
+		rose_call = &rose_callsign;
+
+	ax25 = ax25_find_cb(rose_call, &neigh->callsign, neigh->digipeat, neigh->dev);
+	rose_neigh_set_ax25(neigh, ax25);
+
+	return !!ax25;
+}
+
+/*
+ *	This handles all restart and diagnostic frames.
+ */
+void rose_link_rx_restart(struct sk_buff *skb, struct rose_neigh *neigh, unsigned short frametype)
+{
+	struct sk_buff *skbn;
+
+	switch (frametype) {
+	case ROSE_RESTART_REQUEST:
+		/*
+		 * A Restart Request on a link that is already up means that
+		 * the other end has lost its virtual circuits, clear ours.
+		 * Nothing is established over a link that is not up yet, and
+		 * the calls waiting in neigh->queue must be left alone.
+		 */
+		if (neigh->restarted)
+			rose_link_restarted(neigh);
+		rose_stop_t0timer(neigh);
+		neigh->restarted = 1;
+		neigh->dce_mode  = (skb->data[3] == ROSE_DTE_ORIGINATED);
+		rose_transmit_restart_confirmation(neigh);
+		break;
+
+	case ROSE_RESTART_CONFIRMATION:
+		rose_stop_t0timer(neigh);
+		neigh->restarted = 1;
+		break;
+
+	case ROSE_DIAGNOSTIC:
+		pr_warn("ROSE: received diagnostic #%d - %3ph\n", skb->data[3],
+			skb->data + 4);
+		break;
+
+	default:
+		printk(KERN_WARNING "ROSE: received unknown %02X with LCI 000\n", frametype);
+		break;
+	}
+
+	if (neigh->restarted) {
+		while ((skbn = skb_dequeue(&neigh->queue)) != NULL)
+			if (!rose_send_frame(skbn, neigh))
+				kfree_skb(skbn);
+	}
+}
+
+/*
+ *	This routine is called when a Restart Request is needed
+ */
+static void rose_transmit_restart_request(struct rose_neigh *neigh)
+{
+	struct sk_buff *skb;
+	unsigned char *dptr;
+	int len;
+
+	len = AX25_BPQ_HEADER_LEN + AX25_MAX_HEADER_LEN + ROSE_MIN_LEN + 3;
+
+	if ((skb = alloc_skb(len, GFP_ATOMIC)) == NULL)
+		return;
+
+	skb_reserve(skb, AX25_BPQ_HEADER_LEN + AX25_MAX_HEADER_LEN);
+
+	dptr = skb_put(skb, ROSE_MIN_LEN + 3);
+
+	*dptr++ = AX25_P_ROSE;
+	*dptr++ = ROSE_GFI;
+	*dptr++ = 0x00;
+	*dptr++ = ROSE_RESTART_REQUEST;
+	*dptr++ = ROSE_DTE_ORIGINATED;
+	*dptr++ = 0;
+
+	if (!rose_send_frame(skb, neigh))
+		kfree_skb(skb);
+}
+
+/*
+ * This routine is called when a Restart Confirmation is needed
+ */
+static void rose_transmit_restart_confirmation(struct rose_neigh *neigh)
+{
+	struct sk_buff *skb;
+	unsigned char *dptr;
+	int len;
+
+	len = AX25_BPQ_HEADER_LEN + AX25_MAX_HEADER_LEN + ROSE_MIN_LEN + 1;
+
+	if ((skb = alloc_skb(len, GFP_ATOMIC)) == NULL)
+		return;
+
+	skb_reserve(skb, AX25_BPQ_HEADER_LEN + AX25_MAX_HEADER_LEN);
+
+	dptr = skb_put(skb, ROSE_MIN_LEN + 1);
+
+	*dptr++ = AX25_P_ROSE;
+	*dptr++ = ROSE_GFI;
+	*dptr++ = 0x00;
+	*dptr++ = ROSE_RESTART_CONFIRMATION;
+
+	if (!rose_send_frame(skb, neigh))
+		kfree_skb(skb);
+}
+
+/*
+ * This routine is called when a Clear Request is needed outside of the context
+ * of a connected socket.
+ */
+void rose_transmit_clear_request(struct rose_neigh *neigh, unsigned int lci, unsigned char cause, unsigned char diagnostic)
+{
+	struct sk_buff *skb;
+	unsigned char *dptr;
+	int len;
+
+	if (!neigh->dev)
+		return;
+
+	len = AX25_BPQ_HEADER_LEN + AX25_MAX_HEADER_LEN + ROSE_MIN_LEN + 3;
+
+	if ((skb = alloc_skb(len, GFP_ATOMIC)) == NULL)
+		return;
+
+	skb_reserve(skb, AX25_BPQ_HEADER_LEN + AX25_MAX_HEADER_LEN);
+
+	dptr = skb_put(skb, ROSE_MIN_LEN + 3);
+
+	*dptr++ = AX25_P_ROSE;
+	*dptr++ = ((lci >> 8) & 0x0F) | ROSE_GFI;
+	*dptr++ = ((lci >> 0) & 0xFF);
+	*dptr++ = ROSE_CLEAR_REQUEST;
+	*dptr++ = cause;
+	*dptr++ = diagnostic;
+
+	if (!rose_send_frame(skb, neigh))
+		kfree_skb(skb);
+}
+
+/*
+ * A neighbour has just been created while an AX.25 connection to it is
+ * already up, e.g. it was removed from the routing tables and added back.
+ * The other end still regards the link as restarted and will not restart it,
+ * and through calls only use restarted neighbours, so nothing would ever
+ * restart it from this end either: do it now.
+ */
+void rose_link_restart(struct rose_neigh *neigh)
+{
+	if (neigh->loopback || neigh->restarted || rose_t0timer_running(neigh))
+		return;
+
+	if (!rose_link_up(neigh))
+		return;
+
+	rose_transmit_restart_request(neigh);
+	neigh->dce_mode = 0;
+	rose_start_t0timer(neigh);
+}
+
+/*
+ * Start the restart procedure on a link that is down without waiting for
+ * a frame to send over it. Nothing is done while a restart is under way.
+ */
+void rose_link_bring_up(struct rose_neigh *neigh)
+{
+	if (neigh->loopback || neigh->restarted || rose_t0timer_running(neigh))
+		return;
+
+	rose_transmit_restart_request(neigh);
+	neigh->dce_mode = 0;
+	rose_start_t0timer(neigh);
+}
+
+void rose_transmit_link(struct sk_buff *skb, struct rose_neigh *neigh)
+{
+	unsigned char *dptr;
+
+	if (!neigh) {
+		kfree_skb(skb);
+		return;
+	}
+
+	if (neigh->loopback) {
+		rose_loopback_queue(skb, neigh);
+		return;
+	}
+
+	if (!rose_link_up(neigh))
+		neigh->restarted = 0;
+
+	dptr = skb_push(skb, 1);
+	*dptr++ = AX25_P_ROSE;
+
+	if (neigh->restarted) {
+		if (!rose_send_frame(skb, neigh))
+			kfree_skb(skb);
+	} else {
+		skb_queue_tail(&neigh->queue, skb);
+
+		if (!rose_t0timer_running(neigh)) {
+			rose_transmit_restart_request(neigh);
+			neigh->dce_mode = 0;
+			rose_start_t0timer(neigh);
+		}
+	}
+}
