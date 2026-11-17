@@ -1,0 +1,99 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/* Kernel module to match AH parameters. */
+
+/* (C) 2001-2002 Andras Kis-Szabo <kisza@sch.bme.hu>
+ */
+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+#include <linux/module.h>
+#include <linux/skbuff.h>
+#include <linux/ip.h>
+#include <linux/ipv6.h>
+#include <linux/types.h>
+#include <net/checksum.h>
+#include <net/ipv6.h>
+
+#include <linux/netfilter/x_tables.h>
+#include <linux/netfilter_ipv6/ip6_tables.h>
+#include <linux/netfilter_ipv6/ip6t_ah.h>
+
+MODULE_LICENSE("GPL");
+MODULE_DESCRIPTION("Xtables: IPv6 IPsec-AH match");
+MODULE_AUTHOR("Andras Kis-Szabo <kisza@sch.bme.hu>");
+
+/* Returns 1 if the spi is matched by the range, 0 otherwise */
+static inline bool
+spi_match(u_int32_t min, u_int32_t max, u_int32_t spi, bool invert)
+{
+	return (spi >= min && spi <= max) ^ invert;
+}
+
+static bool ah_mt6(const struct sk_buff *skb, struct xt_action_param *par)
+{
+	struct ip_auth_hdr _ah;
+	const struct ip_auth_hdr *ah;
+	const struct ip6t_ah *ahinfo = par->matchinfo;
+	unsigned int ptr = 0;
+	unsigned int hdrlen = 0;
+	int err;
+
+	err = ipv6_find_hdr(skb, &ptr, NEXTHDR_AUTH, NULL, NULL);
+	if (err < 0) {
+		if (err != -ENOENT)
+			par->hotdrop = true;
+		return false;
+	}
+
+	ah = skb_header_pointer(skb, ptr, sizeof(_ah), &_ah);
+	if (ah == NULL) {
+		par->hotdrop = true;
+		return false;
+	}
+
+	hdrlen = ipv6_authlen(ah);
+	if (skb->len - ptr < hdrlen) {
+		/* Packet smaller than its length field */
+		par->hotdrop = true;
+		return false;
+	}
+
+	return spi_match(ahinfo->spis[0], ahinfo->spis[1],
+			  ntohl(ah->spi),
+			  !!(ahinfo->invflags & IP6T_AH_INV_SPI)) &&
+		(!ahinfo->hdrlen ||
+		 (ahinfo->hdrlen == hdrlen) ^
+		 !!(ahinfo->invflags & IP6T_AH_INV_LEN)) &&
+		!(ahinfo->hdrres && ah->reserved);
+}
+
+static int ah_mt6_check(const struct xt_mtchk_param *par)
+{
+	const struct ip6t_ah *ahinfo = par->matchinfo;
+
+	if (ahinfo->invflags & ~IP6T_AH_INV_MASK) {
+		pr_info_ratelimited("unknown flags %X\n", ahinfo->invflags);
+		return -EINVAL;
+	}
+	return 0;
+}
+
+static struct xt_match ah_mt6_reg __read_mostly = {
+	.name		= "ah",
+	.family		= NFPROTO_IPV6,
+	.match		= ah_mt6,
+	.matchsize	= sizeof(struct ip6t_ah),
+	.checkentry	= ah_mt6_check,
+	.me		= THIS_MODULE,
+};
+
+static int __init ah_mt6_init(void)
+{
+	return xt_register_match(&ah_mt6_reg);
+}
+
+static void __exit ah_mt6_exit(void)
+{
+	xt_unregister_match(&ah_mt6_reg);
+}
+
+module_init(ah_mt6_init);
+module_exit(ah_mt6_exit);

@@ -1,0 +1,78 @@
+/* SPDX-License-Identifier: MIT */
+/*
+ * Copyright 2026 Advanced Micro Devices, Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE COPYRIGHT HOLDER(S) OR AUTHOR(S) BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Authors: AMD
+ *
+ */
+
+#ifndef AMDGPU_DM_AMDGPU_DM_DMUB_H_
+#define AMDGPU_DM_AMDGPU_DM_DMUB_H_
+
+#include "amdgpu.h"
+
+void dm_dmub_aux_setconfig_callback(struct amdgpu_device *adev,
+				    struct dmub_notification *notify);
+void dm_dmub_aux_fused_io_callback(struct amdgpu_device *adev,
+				   struct dmub_notification *notify);
+bool dm_register_dmub_notify_callback(struct amdgpu_device *adev,
+				      enum dmub_notification_type type,
+				      dmub_notify_interrupt_callback_t callback,
+				      bool dmub_int_thread_offload);
+int dm_dmub_hw_init(struct amdgpu_device *adev);
+void dm_dmub_hw_resume(struct amdgpu_device *adev);
+enum dmub_ips_disable_type dm_get_default_ips_mode(struct amdgpu_device *adev);
+int dm_dmub_sw_init(struct amdgpu_device *adev);
+int dm_init_microcode(struct amdgpu_device *adev);
+
+#define FIRMWARE_RENOIR_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_SIENNA_CICHLID_DMUB	"/*(DEBLOBBED)*/"
+#define FIRMWARE_NAVY_FLOUNDER_DMUB	"/*(DEBLOBBED)*/"
+#define FIRMWARE_GREEN_SARDINE_DMUB	"/*(DEBLOBBED)*/"
+#define FIRMWARE_VANGOGH_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DIMGREY_CAVEFISH_DMUB	"/*(DEBLOBBED)*/"
+#define FIRMWARE_BEIGE_GOBY_DMUB	"/*(DEBLOBBED)*/"
+#define FIRMWARE_YELLOW_CARP_DMUB	"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_314_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_315_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN316_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_V3_2_0_DMCUB	"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_V3_2_1_DMCUB	"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_35_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_351_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_36_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_401_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_42_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_42B_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_DCN_60_DMUB		"/*(DEBLOBBED)*/"
+#define FIRMWARE_RAVEN_DMCU		"/*(DEBLOBBED)*/"
+#define FIRMWARE_NAVI12_DMCU		"/*(DEBLOBBED)*/"
+
+#if IS_ENABLED(CONFIG_DRM_AMD_DC_KUNIT_TEST)
+struct dc_context;
+struct dmub_cmd_fused_request;
+
+void *dm_dmub_get_vbios_bounding_box(struct amdgpu_device *adev);
+void abort_fused_io(struct dc_context *ctx,
+		    const struct dmub_cmd_fused_request *request);
+#endif
+
+#endif /* AMDGPU_DM_AMDGPU_DM_DMUB_H_ */
