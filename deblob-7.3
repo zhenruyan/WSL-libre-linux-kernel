@@ -3034,8 +3034,13 @@ clean_kconfig drivers/bluetooth/Kconfig BT_HCIBFUSB
 clean_mk CONFIG_BT_HCIBFUSB drivers/bluetooth/Makefile
 
 announce BT_HCIBTUSB - "HCI USB driver"
-reject_firmware drivers/bluetooth/btusb.c
-clean_blob drivers/bluetooth/btusb.c
+if test -f drivers/bluetooth/btusb_main.c; then
+  reject_firmware drivers/bluetooth/btusb_main.c
+  clean_blob drivers/bluetooth/btusb_main.c
+else
+  reject_firmware drivers/bluetooth/btusb.c
+  clean_blob drivers/bluetooth/btusb.c
+fi
 clean_kconfig drivers/bluetooth/Kconfig BT_HCIBTUSB
 clean_mk CONFIG_BT_HCIBTUSB drivers/bluetooth/Makefile
 
@@ -3066,7 +3071,9 @@ clean_kconfig drivers/bluetooth/Kconfig BT_MTK
 clean_mk CONFIG_BT_MTK drivers/bluetooth/Makefile
 
 announce BT_MTKSDIO - "MediaTek HCI SDIO driver"
-clean_blob drivers/bluetooth/btmtksdio.c
+if grep -q BT_RAM_CODE drivers/bluetooth/btmtksdio.c; then
+  clean_blob drivers/bluetooth/btmtksdio.c
+fi
 clean_kconfig drivers/bluetooth/Kconfig BT_MTKSDIO
 clean_mk CONFIG_BT_MTKSDIO drivers/bluetooth/Makefile
 

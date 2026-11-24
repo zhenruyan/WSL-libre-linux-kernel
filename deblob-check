@@ -4,6 +4,8 @@
 #        modified with 2026-11-07 r20028
 #        modified with 2026-11-10 r20033
 #        modified with 2026-11-17 r20040
+#        modified with 2026-11-24 r20048
+#        modified with 2026-11-24 r20058
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8800,6 +8802,12 @@ set_except () {
 
     # New in 6.12.118.
     defsc 'static[ ]const[ ]struct[ ]akcipher_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
+
+    # New in 7.3.6, 6.18.65, 6.12.119.
+    accept '[\t]bt_dev_info[(]hdev[,][ ]["]Loading[ ]BT[ ]firmware:' drivers/bluetooth/btmtk.c
+
+    # New in 7.3.6.
+    accept '[\t][\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]fw_name[,][ ][&]slave->dev[)]' drivers/soundwire/debugfs.c
 
     # Add new patterns above.
     ;;
