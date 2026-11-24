@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#    Copyright (C) 2008-2025 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2026 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -2784,13 +2784,6 @@ if grep -q 8922A drivers/net/wireless/realtek/rtw89/Kconfig; then
   clean_mk CONFIG_RTW89_8922A drivers/net/wireless/realtek/rtw89/Makefile
 fi
 
-announce VT6656 - "VIA Technologies VT6656 support"
-reject_firmware drivers/staging/vt6656/main_usb.c
-clean_blob drivers/staging/vt6656/device.h
-clean_blob drivers/staging/vt6656/main_usb.c
-clean_kconfig drivers/staging/vt6656/Kconfig VT6656
-clean_mk CONFIG_VT6656 drivers/staging/vt6656/Makefile
-
 announce WL1251 - "TI wl1251 support"
 reject_firmware drivers/net/wireless/ti/wl1251/main.c
 clean_blob drivers/net/wireless/ti/wl1251/main.c
@@ -2975,7 +2968,9 @@ clean_kconfig drivers/bluetooth/Kconfig BT_MTK
 clean_mk CONFIG_BT_MTK drivers/bluetooth/Makefile
 
 announce BT_MTKSDIO - "MediaTek HCI SDIO driver"
-clean_blob drivers/bluetooth/btmtksdio.c
+if grep -q BT_RAM_CODE drivers/bluetooth/btmtksdio.c; then
+  clean_blob drivers/bluetooth/btmtksdio.c
+fi
 clean_kconfig drivers/bluetooth/Kconfig BT_MTKSDIO
 clean_mk CONFIG_BT_MTKSDIO drivers/bluetooth/Makefile
 

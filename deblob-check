@@ -30,6 +30,9 @@
 #        modified with 2026-11-07 r20028
 #        modified with 2026-11-10 r20033
 #        modified with 2026-11-17 r20040
+#        modified with 2026-11-24 r20048
+#        modified with 2026-11-24 r20057
+#        modified with 2026-06-01 r19981 (more partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -2826,7 +2829,8 @@ set_except () {
     blobname 'maxtouch\.fw' drivers/input/touchscreen/atmel_mxt_ts.c
     blobname 'fm\(c\|_[rt]x\)_ch8\(_[0-9a-f]*\.[0-9]*\.bts\)\?' drivers/media/radio/wl128x/fmdrv_common.h
     blobname '%s_%x\.%d\.bts' drivers/media/radio/wl128x/fmdrv_common.c
-    blobname 'vntwusb\.fw' drivers/staging/vt6656/firmware.c
+    # vt6656 firmware is free software as of November, 2026.
+    # blobname 'vntwusb\.fw' drivers/staging/vt6656/firmware.c
     # New in 3.0.
     accept 'resume[/]restore[,][ ]but[ ]they[ ]cannot[ ]do[ ]it[ ]by[ ]calling[ ]request_firmware[(][)]' Documentation/power/notifiers.txt
     accept '[	][	][	]interrupts[ ]=[ ]<\([\n][	][	][	][	]0xe[0-7][ ]0[ ]0[ ]0\)*>[;]' arch/powerpc/boot/dts/p1022ds.dts
@@ -7984,6 +7988,21 @@ set_except () {
 
     # New in 6.12.118.
     defsc 'static[ ]const[ ]struct[ ]akcipher_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
+
+    # New in 7.3.6, 6.18.65, 6.12.119.
+    accept '[\t]bt_dev_info[(]hdev[,][ ]["]Loading[ ]BT[ ]firmware:' drivers/bluetooth/btmtk.c
+
+    # New for 6.12.119; planned for 6.6.164, 6.1.194, 5.15.227, 5.10.276.
+    # vt6656 firmware is free software as of November, 2026.
+    accept '[#]define[ ]FIRMWARE_NAME[ \t]*["]vntwusb\.fw["]' drivers/staging/vt6656/device.h
+    accept '[\t]dev_dbg[(]dev[,][ ]["]----[>]Download[ ]firmware[\\]n["][)][;][\n \t]*ret[ ]=[ ]request_firmware[(][&]fw[,][ ]FIRMWARE_NAME[,][ ]dev[)][;]' drivers/staging/vt6656/main_usb.c
+    accept 'module_usb_driver[(]vt6656_driver[)][;][\n]*MODULE_FIRMWARE[(]FIRMWARE_NAME[)][;]' drivers/staging/vt6656/main_usb.c
+
+    # New in 7.1-rc, 6.18.65, 6.12.119.
+    # Same as in sound/pci/hda/hda_intel.c since v3.7, previously in
+    # hda_hwdep.c only.  The patch is a text file supplied by users
+    # through a kernel parameter.
+    accept '#ifdef[ ]CONFIG_SND_HDA_PATCH_LOADER[\n][\t]if[ ][(]patch\[dev\][^\n{]*[{]\([\n]\([\t][^}][^\n]*\)\?\)*[\n][\t]*if[ ][(]request_firmware[(][&]fw[,][ ]patch\[dev\][,]' sound/hda/controllers/intel.c
 
     # Add new patterns above.
     ;;
