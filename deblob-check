@@ -28,6 +28,9 @@
 #        modified with 2026-03-12 r19936
 #        modified with 2024-04-28 r19540 (partial)
 #        modified with 2023-12-26 r19450 (more partial)
+#        modified with 2026-11-10 r20033
+#        modified with 2026-11-17 r20040
+#        modified with 2026-11-23 r20047
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -7252,6 +7255,12 @@ set_except () {
     accept '[\t]ret[ ]=[ ]ath11k_fw_request_firmware_api_n[(]ab[,][ ]ATH11K_FW_API2_FILE[)]' drivers/net/wireless/ath/ath11k/fw.c
     blobname 'firmware-2\.bin' drivers/net/wireless/ath/ath11k/fw.h
     blobna '[/][*][ ]No[ ]m3[ ]file[ ]in[ ]firmware-N\.bin[ ]so[ ]try[ ]to[ ]request[ ]old[\n\t *]*separate[ ]m3\.bin\.[\n\t *]*[*][/]' drivers/net/wireless/ath/ath11k/qmi.c
+
+    # New in 7.3.4, 6.18.63.
+    defsc 'static[ ]const[ ]struct[ ]sig_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
+
+    # New in 6.12.118, 6.6.163, 6.1.193, 5.15.226, 5.10.275.
+    defsc 'static[ ]const[ ]struct[ ]akcipher_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
 
     # Add new patterns above.
     ;;
