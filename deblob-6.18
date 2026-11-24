@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#    Copyright (C) 2008-2025 Alexandre Oliva <lxoliva@fsfla.org>
+#    Copyright (C) 2008-2026 Alexandre Oliva <lxoliva@fsfla.org>
 #    Copyright (C) 2008 Jeff Moe
 #    Copyright (C) 2009 Rubén Rodríguez <ruben@gnu.org>
 #
@@ -3020,7 +3020,9 @@ clean_kconfig drivers/bluetooth/Kconfig BT_MTK
 clean_mk CONFIG_BT_MTK drivers/bluetooth/Makefile
 
 announce BT_MTKSDIO - "MediaTek HCI SDIO driver"
-clean_blob drivers/bluetooth/btmtksdio.c
+if grep -q BT_RAM_CODE drivers/bluetooth/btmtksdio.c; then
+  clean_blob drivers/bluetooth/btmtksdio.c
+fi
 clean_kconfig drivers/bluetooth/Kconfig BT_MTKSDIO
 clean_mk CONFIG_BT_MTKSDIO drivers/bluetooth/Makefile
 
@@ -4065,8 +4067,16 @@ clean_kconfig sound/soc/codecs/Kconfig SND_SOC_AW88395
 clean_mk CONFIG_SND_SOC_AW88395 sound/soc/codecs/Makefile
 
 announce SND_SOC_AW88399 - "Soc Audio for awinic aw88399"
-reject_firmware sound/soc/codecs/aw88399.c
-clean_blob sound/soc/codecs/aw88399.h
+if test -f sound/soc/codecs/aw88399-lib.c; then
+  reject_firmware sound/soc/codecs/aw88399-lib.c
+else
+  reject_firmware sound/soc/codecs/aw88399.c
+fi
+if test -f include/sound/aw88399.h; then
+  clean_blob include/sound/aw88399.h
+else
+  clean_blob sound/soc/codecs/aw88399.h
+fi
 clean_kconfig sound/soc/codecs/Kconfig SND_SOC_AW88399
 clean_mk CONFIG_SND_SOC_AW88399 sound/soc/codecs/Makefile
 

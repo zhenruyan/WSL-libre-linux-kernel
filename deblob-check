@@ -11,6 +11,12 @@
 #        modified with 2026-11-07 r20028
 #        modified with 2026-11-10 r20033
 #        modified with 2026-11-17 r20040
+#        modified with 2026-11-24 r20048
+#        modified with 2026-11-24 r20058
+#        modified with 2026-11-24 r20059
+#        modified with 2026-06-01 r19981 (more partial)
+#        modified with 2026-01-24 r19915 (partial)
+#        modified with 2026-10-15 r20023 (partial)
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -8381,6 +8387,27 @@ set_except () {
 
     # New in 6.12.118.
     defsc 'static[ ]const[ ]struct[ ]akcipher_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
+
+    # New in 7.3.6, 6.18.65, 6.12.119.
+    accept '[\t]bt_dev_info[(]hdev[,][ ]["]Loading[ ]BT[ ]firmware:' drivers/bluetooth/btmtk.c
+
+    # New in 7.3.6, 6.18.55.
+    accept '[\t][\t]ret[ ]=[ ]request_firmware[(][&]fw[,][ ]fw_name[,][ ][&]slave->dev[)]' drivers/soundwire/debugfs.c
+
+    # New in 7.1-rc, 6.18.65, 6.12.119.
+    # Same as in sound/pci/hda/hda_intel.c since v3.7, previously in
+    # hda_hwdep.c only.  The patch is a text file supplied by users
+    # through a kernel parameter.
+    accept '#ifdef[ ]CONFIG_SND_HDA_PATCH_LOADER[\n][\t]if[ ][(]patch\[dev\][^\n{]*[{]\([\n]\([\t][^}][^\n]*\)\?\)*[\n][\t]*if[ ][(]request_firmware[(][&]fw[,][ ]patch\[dev\][,]' sound/hda/controllers/intel.c
+    # New in 7.1-rc, 6.18.65.
+    accept '[\t][\t]firmware[:][ ]rpi-firmware[ ][{]' arch/arm64/boot/dts/broadcom/'\(bcm2835-pri\.dts\|bcm2712-rpi-5-b-base\)\.dtsi'
+
+    # New in 6.19-rc, 6.18.65.
+    blobname '\(a612_r\|gen80[12]00_\)gmu\.bin' drivers/gpu/drm/msm/adreno/a6xx_catalog.c
+
+    # New in 7.3-rc, 6.18.65.
+    accept 'int[ ]aw88399_request_firmware_file[(]struct' 'include/sound/aw88399\.h\|sound/soc/codecs/aw88399-lib\.c'
+    accept 'EXPORT_SYMBOL_GPL[(]aw88399_request_firmware_file[)]' sound/soc/codecs/aw88399-lib.c
 
     # Add new patterns above.
     ;;
