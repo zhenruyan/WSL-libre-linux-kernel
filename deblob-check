@@ -35,6 +35,9 @@
 #        modified with 2025-07-21 r19854 (partial)
 #        modified with 2026-01-19 r19902
 #        modified with 2026-03-12 r19936
+#        modified with 2026-11-10 r20033
+#        modified with 2026-11-17 r20040
+#        modified with 2026-11-23 r20047
 # Inspired in gNewSense's find-firmware script.
 # Written by Alexandre Oliva <lxoliva@fsfla.org>
 
@@ -6849,6 +6852,12 @@ set_except () {
 
     # New in 6.19.7, 6.18.17, 6.12.78, 6.6.130, 6.1.167.
     initnc 'CBPF_MPTCP_SUBOPTION_RM_ADDR=["]' tools/testing/sefltests/net/mptcp/mptcp_join.sh
+
+    # New in 7.3.4, 6.18.63.
+    defsc 'static[ ]const[ ]struct[ ]sig_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
+
+    # New in 6.12.118, 6.6.163, 6.1.193, 5.15.226, 5.10.275.
+    defsc 'static[ ]const[ ]struct[ ]akcipher_testvec[ ]ecrdsa_tv_template\[\][ ]=' crypto/testmgr.h
 
     # Add new patterns above.
     ;;
